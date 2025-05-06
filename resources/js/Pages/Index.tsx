@@ -21,53 +21,35 @@ export default function Welcome({
             </div>
 
             <section className="bg-firefly-700 py-20 px-4 text-center text-white">
-                <div className="max-w-3xl mx-auto">
+                <div className="max-w-4xl mx-auto">
                     <h2 className="text-5xl font-bold mb-6">Connect for a Sustainable Ocean</h2>
                     <p className="text-xl mb-8">
                         Join researchers, innovators, and stakeholders to accelerate progress through collaboration.
                     </p>
-                    <a
-                        href="#get-started"
-                        className="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition"
-                    >
-                        Get Started
-                    </a>
+                    <div class="aspect-w-16 aspect-h-9">
+                        <iframe src="https://www.youtube.com/embed/nfpELa_Jqb0?si=nrLj0Z1H-cFSHW1C" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
                 </div>
             </section>
 
             <section id="features" className="py-20 px-4">
                 <div className="max-w-6xl mx-auto text-center">
-                    <h3 className="text-3xl font-bold mb-12">What You Can Do</h3>
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-2 gap-8">
                         <div className="p-6 bg-gray-50 rounded-xl shadow">
-                            <h4 className="text-xl font-semibold mb-2">Discover Initiatives</h4>
-                            <p className="text-gray-600">
-                                Explore ongoing ocean science projects and find opportunities to contribute.
-                            </p>
+                            <h4 className="text-xl font-semibold mb-2">
+                                List of service providers partner with CDF
+                            </h4>
                         </div>
                         <div className="p-6 bg-gray-50 rounded-xl shadow">
-                            <h4 className="text-xl font-semibold mb-2">Connect with Experts</h4>
-                            <p className="text-gray-600">
-                                Engage with scientists, institutions, and stakeholders around the globe.
-                            </p>
-                        </div>
-                        <div className="p-6 bg-gray-50 rounded-xl shadow">
-                            <h4 className="text-xl font-semibold mb-2">Collaborate Easily</h4>
-                            <p className="text-gray-600">
-                                Match with relevant contacts and projects aligned with your mission.
-                            </p>
+                            <h4 className="text-xl font-semibold mb-2">
+                                List of Capacity Development Opportunities
+                            </h4>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section id="about" className="bg-gray-100 py-20 px-4 text-center">
-                <div className="max-w-3xl mx-auto">
-                    <h3 className="text-3xl font-bold mb-4">About the Portal</h3>
-                    <p className="text-gray-700">
-                        This portal supports the UN Decade of Ocean Science for Sustainable Development by facilitating collaboration across disciplines, sectors, and borders.
-                    </p>
-                </div>
+            <section id="footer" className="bg-gray-800 py-20 px-4">
             </section>
         </>
     );
