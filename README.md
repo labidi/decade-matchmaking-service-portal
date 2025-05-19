@@ -14,5 +14,100 @@ A modern Web Portal built using **Laravel 12** (PHP), **React.js** (via Vite), a
 - **Package Manager**: NPM
 
 ---
+## ⚙️ Setup Instructions With docker
 
-## ⚙️ Setup Instructions (To be completed)
+### Prerequisites
+
+- Docker Installer
+
+### Installation Steps
+
+1. **Clone the repository**
+git clone https://github.com/labidi/decade-matchmaking-service-portal.git
+cd oceandecade_portal/portal
+
+2. **Run Laravel Sail**
+
+```bash
+php artisan sail:install
+```
+
+```bash
+./vendor/bin/sail up -d
+```
+3. **Run migrations**
+```bash
+./vendor/bin/sail artisan migrate
+```
+
+4. **Install Node.js dependencies**
+```bash
+./vendor/bin/sail npm install
+```
+
+5. **Build assets**
+```bash
+./vendor/bin/sail npm run dev
+```
+
+The application will be available at `http://portal_dev.local`
+## ⚙️ Setup Instructions Without docker
+
+### Prerequisites
+
+- PHP 8.2 or higher
+- Composer
+- Node.js (16+)
+- MySQL/PostgreSQL
+- Git
+
+### Installation Steps
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/labidi/decade-matchmaking-service-portal.git
+cd oceandecade_portal/portal
+```
+
+2. **Install PHP dependencies**
+```bash
+composer install
+```
+
+3. **Install Node.js dependencies**
+```bash
+npm install
+```
+
+4. **Environment Configuration**
+```bash
+php artisan key:generate
+```
+
+5. **Configure your database**
+   - Edit `.env` file and update database credentials:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+6. **Run migrations**
+```bash
+php artisan migrate
+```
+
+7. **Build assets**
+```bash
+npm run dev
+```
+
+8. **Start the development server**
+```bash
+php artisan serve
+```
+
+The application will be available at `http://portal_dev.local`
