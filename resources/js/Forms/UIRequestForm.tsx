@@ -1,5 +1,45 @@
+export interface Request {
+    id: string;
+    is_partner: 'Yes' | 'No';
+    unique_id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    capacity_development_title: string;
+    has_significant_changes: 'Yes' | 'No';
+    changes_description: string;
+    change_effect: string;
+    request_link_type: string;
+    project_stage: string;
+    project_url: string;
+    activity_name: string;
+    related_activity: 'Training' | 'Workshop' | 'Both';
+    subthemes: string[];
+    subthemes_other: string;
+    support_types: string[];
+    support_types_other: string;
+    gap_description: string;
+    has_partner: string;
+    partner_name: string;
+    partner_confirmed: string;
+    needs_financial_support: string;
+    budget_breakdown: string;
+    support_months: string;
+    completion_date: string;
+    risks: string;
+    personnel: string;
+    direct_beneficiaries: string;
+    direct_beneficiaries_number: string;
+    expected_outcomes: string;
+    success_metrics: string;
+    long_term_impact: string;
+}
 
 export const UIRequestForm = {
+    id:{
+        type: 'hidden',
+        id: 'id',
+    },
     is_partner: {
         type: 'radio',
         options: [
