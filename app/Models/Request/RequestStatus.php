@@ -16,4 +16,8 @@ class RequestStatus extends Model
         return static::where('status_code', 'draft')->first();
     }
 
+    public static function getUnderReviewStatus(){
+        return static::where('status_code', 'under_review')->first();
+    }
+
 }

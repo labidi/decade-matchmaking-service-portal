@@ -53,21 +53,27 @@ class RequestController extends Controller
 
     public function submit(Request $httpRequest, $mode = 'submit')
     {
+        $requestId = $httpRequest->input('id') ?? null;
         if ($mode == 'draft') {
-            return $this->saveRequestAsDraft($httpRequest);
+            return $this->saveRequestAsDraft($httpRequest, $requestId);
         }
-        return $this->store($httpRequest);
+        return $this->store($httpRequest, $requestId);
     }
 
-    public function saveRequestAsDraft(Request $httpRequest)
+    public function saveRequestAsDraft(Request $httpRequest, $requestId = null)
     {
         try {
-            $request = $httpRequest->all();
-            $ocdRequest = new OCDRequest([
-                'request_data' => json_encode($httpRequest->all())
-            ]);
-            $ocdRequest->status()->associate(RequestStatus::getDraftStatus());
-            $ocdRequest->user()->associate($httpRequest->user());
+            if ($requestId) {
+                $ocdRequest = OCDRequest::find($requestId);
+                if (!$ocdRequest) {
+                    throw new \Exception('Request not found');
+                }
+            } else {
+                $ocdRequest = new OCDRequest();
+                $ocdRequest->status()->associate(RequestStatus::getDraftStatus());
+                $ocdRequest->user()->associate($httpRequest->user());
+            }
+            $ocdRequest->request_data = json_encode($httpRequest->all());
             $ocdRequest->save();
             return response()->json([
                 'message' => 'Draft saved successfully',
@@ -81,19 +87,28 @@ class RequestController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $httpRequest, $requestId = null)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'message' => 'required|string|max:500',
-        ]);
-
-        $ocdRequest = OCDRequest::create($request->all());
-        return response()->json([
-            'message' => 'Draft saved successfully',
-            'request_data' => $ocdRequest->attributesToArray()
-        ], 201);
+        try {
+            if ($requestId) {
+                $ocdRequest = OCDRequest::find($requestId);
+                if (!$ocdRequest) {
+                    throw new \Exception('Request not found');
+                }
+            } else {
+                $ocdRequest = new OCDRequest();
+                $ocdRequest->user()->associate($httpRequest->user());
+            }
+            $ocdRequest->request_data = json_encode($httpRequest->all());
+            $ocdRequest->status()->associate(RequestStatus::getUnderReviewStatus());
+            $ocdRequest->save();
+            return response()->json([
+                'message' => 'Request submitted successfully',
+                'request_data' => $ocdRequest->attributesToArray()
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
