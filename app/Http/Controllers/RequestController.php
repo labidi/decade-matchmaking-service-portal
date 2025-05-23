@@ -24,15 +24,17 @@ class RequestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function list()
+    public function list(Request $httpRequest)
     {
+        Log::info(OCDRequest::where('user_id', $httpRequest->user())->get());
         return Inertia::render('Request/List', [
             'title' => 'My requests',
             'banner' => [
                 'title' => 'List of my requests',
                 'description' => 'Manager your requests here.',
                 'image' => 'http://portal_dev.local/assets/img/sidebar.png',
-            ]
+            ],
+            'requests' => OCDRequest::where('user_id', $httpRequest->user())->get(),
         ]);
     }
 

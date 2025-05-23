@@ -33,7 +33,7 @@ export default function Banner() {
                         )}
                     </>
                 )}
-
+{metrics && (
                 <div className="py-20 px-4">
                     <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 text-center">
                         <div>
@@ -71,7 +71,7 @@ export default function Banner() {
                             <span className="mt-2 text-2xl">Open Partner Opportunities</span>
                         </div>
                     </div>
-                </div>
+                </div> )}
             </section >
         </>
     );
