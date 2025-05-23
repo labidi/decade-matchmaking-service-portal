@@ -30,7 +30,7 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('request/create',[RequestController::class, 'create'] )->name('request.create');
     Route::get('request/list',[RequestController::class, 'list'])->name('request.list');
-    Route::post('request/save_draft', [RequestController::class, 'saveDraft'])->name('request.save_draft');
+    Route::post('request/submit/{mode?}', [RequestController::class, 'submit'])->name('request.submit');
 });
 
 

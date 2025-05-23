@@ -51,19 +51,15 @@ class RequestController extends Controller
         ]);
     }
 
-    public function submit(Request $request)
+    public function submit(Request $httpRequest, $mode = 'submit')
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'message' => 'required|string|max:500',
-        ]);
-
-        OCDRequest::create($request->all());
-        return response()->json(['message' => 'Request submitted successfully'], 201);
+        if ($mode == 'draft') {
+            return $this->saveRequestAsDraft($httpRequest);
+        }
+        return $this->store($httpRequest);
     }
 
-    public function saveDraft(Request $httpRequest)
+    public function saveRequestAsDraft(Request $httpRequest)
     {
         try {
             $request = $httpRequest->all();
@@ -72,13 +68,10 @@ class RequestController extends Controller
             ]);
             $ocdRequest->status()->associate(RequestStatus::getDraftStatus());
             $ocdRequest->user()->associate($httpRequest->user());
-            
-            Log::info($request);
-            Log::info($ocdRequest->attributesToArray());
             $ocdRequest->save();
             return response()->json([
                 'message' => 'Draft saved successfully',
-                'request_data'=> $ocdRequest->attributesToArray()
+                'request_data' => $ocdRequest->attributesToArray()
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -90,7 +83,17 @@ class RequestController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'message' => 'required|string|max:500',
+        ]);
+
+        $ocdRequest = OCDRequest::create($request->all());
+        return response()->json([
+            'message' => 'Draft saved successfully',
+            'request_data' => $ocdRequest->attributesToArray()
+        ], 201);
     }
 
     /**
