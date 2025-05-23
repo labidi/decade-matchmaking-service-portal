@@ -34,5 +34,8 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'oceanexpert' => [
+        'auth_url' => 'https://oceanexpert.org/api/login_check',
+        'search_url' =>'https://oceanexpert.org/api/v1/advancedSearch/search.json',
+    ],
 ];

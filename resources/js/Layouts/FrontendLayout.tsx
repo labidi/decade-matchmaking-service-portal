@@ -1,23 +1,26 @@
 import React from 'react';
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
-import Breadcrumb from '@/Components/Breadcrumb';
+import Banner from '@/Components/Banner';
+import Userguide from '@/Components/UserGuide';
+import { usePage } from '@inertiajs/react';
 
 interface FrontendLayoutProps {
   children: React.ReactNode;
 }
 
 const FrontendLayout: React.FC<FrontendLayoutProps> = ({ children }) => {
+  const { auth } = usePage().props ;
+  console.log(auth);
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900">
       <Header />
-      <nav className="flex-grow container mx-auto px-4 py-6 bg-gray-100 py-3">
-        <div className="container mx-auto px-4">
-          <Breadcrumb />
+      <Banner />
+      <Userguide />
+      <main className="flex-grow container mx-auto py-8">
+        <div className="container shadow rounded bg-white p-6">
+          {children}
         </div>
-      </nav>
-      <main className="flex-grow container mx-auto px-4 py-6">
-        {children}
       </main>
       <Footer />
     </div>

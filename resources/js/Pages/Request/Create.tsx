@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
 import { UIRequestForm } from '@/Forms/UIRequestForm';
+import XHRMessageDialog from '@/Components/Dialog/XHRMessageDialog';
+import axios from 'axios';
+
 
 const subthemeOptions = [
     'Mapping & modeling ocean-climate interactions',
@@ -35,6 +38,7 @@ const supportOptions = [
 
 export default function RequestForm() {
     const form = useForm({
+        id: '',
         is_partner: '',
         unique_id: '',
         first_name: '',
@@ -70,19 +74,49 @@ export default function RequestForm() {
         long_term_impact: '',
     });
     const [step, setStep] = useState(1);
-    const steps = ['Identification', 'Details', 'Capacity & Partners', 'Service', 'Risks', 'Review'];
+    const steps = ['Identification', 'Details', 'Capacity & Partners', 'Service', 'Risks'];
 
     const isPartner = form.data.is_partner === 'Yes';
     const showChange = isPartner && form.data.has_significant_changes === 'Yes';
 
     const next = () => setStep(prev => Math.min(prev + 1, steps.length));
+    const handleSaveDraft = () => {
+        axios.post(route('request.save_draft'), {
+            ...form.data,
+        }, {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            },
+        })
+            .then(function (responseXhr) {
+                setXhrDialogResponseType('success');
+                form.setData('id', responseXhr.data.id);
+                form.setData('unique_id', responseXhr.data.unique_id);
+                setXhrDialogResponseMessage(responseXhr.data.message);
+            })
+            .catch(function (responseXhr) {
+                setXhrDialogResponseType('error');
+                setXhrDialogResponseMessage(responseXhr.data.error || 'Something went wrong');
+            }).finally(function () {
+                setXhrDialogOpen(true);
+            });
+    };
     const back = () => setStep(prev => Math.max(prev - 1, 1));
-    const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); form.post(route('requests.store')); };
+    const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); form.post(route('requests.submit')); };
+
+    const [xhrdialogOpen, setXhrDialogOpen] = useState(false);
+    const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
+    const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info'>('info');
 
     return (
         <FrontendLayout>
             <Head title="Submit Request" />
-
+            <XHRMessageDialog
+                open={xhrdialogOpen}
+                onOpenChange={setXhrDialogOpen}
+                message={xhrdialogResponseMessage}
+                type={xhrdialogResponseType}
+            />
             <form onSubmit={handleSubmit} className="mx-auto bg-white">
                 {/* Stepper */}
                 <div className="flex mb-6">
@@ -97,12 +131,16 @@ export default function RequestForm() {
                 {/* Step 1: Identification */}
                 {step === 1 && (
                     <>
+                        <input id={UIRequestForm.id.id} type={UIRequestForm.id.type}
+                                    value={form.data.id}
+                                    onChange={e => form.setData('id', e.currentTarget.value)} />
+
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
-                            <label className="block font-medium">{ UIRequestForm.is_partner.label}</label>
+                            <label className="block font-medium">{UIRequestForm.is_partner.label}</label>
                             <div className="mt-2 space-x-6">
                                 {UIRequestForm.is_partner.options.map(opt => (
                                     <label key={opt.value} className="inline-flex items-center">
-                                        <input type="radio" name={ UIRequestForm.is_partner.id} value={opt.value}
+                                        <input type="radio" name={UIRequestForm.is_partner.id} value={opt.value}
                                             checked={form.data.is_partner === opt.value}
                                             onChange={e => form.setData('is_partner', e.currentTarget.value)}
                                             className="form-radio" required />
@@ -114,7 +152,7 @@ export default function RequestForm() {
                         {isPartner && (
                             <div className='mt-8'>
                                 <label htmlFor={UIRequestForm.unique_id.id} className="block font-medium">{UIRequestForm.unique_id.label}</label>
-                                <p className="mt-1 text-sm text-gray-500">{ UIRequestForm.unique_id.description}</p>
+                                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.unique_id.description}</p>
                                 <input id={UIRequestForm.unique_id.id} type="text" required
                                     className="mt-1 block w-full border-gray-300 rounded"
                                     value={form.data.unique_id}
@@ -238,7 +276,7 @@ export default function RequestForm() {
                 {step === 3 && (
                     <>
                         <div className='mt-8'>
-                            <label htmlFor="related_activity" className="block font-medium">{ UIRequestForm.related_activity.label}</label>
+                            <label htmlFor="related_activity" className="block font-medium">{UIRequestForm.related_activity.label}</label>
                             <p className="mt-1 text-sm text-gray-500">Please select the option that best describes your request.</p>
                             <select required className="mt-1 block w-full border-gray-300 rounded"
                                 value={form.data.related_activity}
@@ -509,7 +547,7 @@ support)  &#10;  Other (please specify)  "
                             {form.errors.expected_outcomes && <p className="text-red-600 mt-1">{form.errors.expected_outcomes}</p>}
                         </div>
 
-                       <div className='mt-8'>
+                        <div className='mt-8'>
                             <label htmlFor="success_metrics" className="block font-medium">
                                 How will you measure success or impact ?
                             </label>
@@ -539,21 +577,24 @@ support)  &#10;  Other (please specify)  "
                         </div>
                     </>
                 )}
-                {/* Step 4: Review & Submit */}
-                {step === 6 && (
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Review your entries and submit.</h3>
-                        {/* Optionally render a summary here */}
-                    </div>
-                )}
-
                 {/* Navigation Buttons */}
                 <div className="flex justify-between mt-6">
                     <button type="button" onClick={back} disabled={step === 1}
                         className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" >Back</button>
-                    {step < 6 ? (
-                        <button type="button" onClick={next}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" >Next</button>
+                    <button
+                        type="button"
+                        onClick={handleSaveDraft}
+                        disabled={form.processing}
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+                    >
+                        {form.processing ? 'Saving...' : 'Save Draft'}
+                    </button>
+                    {step < 5 ? (
+                        <>
+                            <button type="button" onClick={next}
+                                className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700" >Next</button>
+                        </>
+
                     ) : (
                         <button type="submit" disabled={form.processing}
                             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
