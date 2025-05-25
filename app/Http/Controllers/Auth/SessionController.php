@@ -63,12 +63,8 @@ class SessionController extends Controller
                 'city' => $oceanExpertProfile['city'],
             ]
         );
-
-        // 5. Log in locally
         Auth::login($user, false);
-        // 6. Store external token in session (or cookie)
         $request->session()->put('external_api_token', $token);
-        // 7. Regenerate session ID
         $request->session()->regenerate();
         return to_route('request.create');
     }
