@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use Illuminate\Support\Facades\DB;
+
 
 
 class RequestController extends Controller
@@ -33,7 +35,7 @@ class RequestController extends Controller
                 'description' => 'Manager your requests here.',
                 'image' => 'http://portal_dev.local/assets/img/sidebar.png',
             ],
-            'requests' => OCDRequest::where('user_id', $httpRequest->user())->get(),
+            'requests' => OCDRequest::with('status')->where('user_id', $httpRequest->user()->id)->get(),
         ]);
     }
 
