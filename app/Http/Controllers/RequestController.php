@@ -26,7 +26,6 @@ class RequestController extends Controller
      */
     public function list(Request $httpRequest)
     {
-        Log::info(OCDRequest::where('user_id', $httpRequest->user())->get());
         return Inertia::render('Request/List', [
             'title' => 'My requests',
             'banner' => [
@@ -124,9 +123,21 @@ class RequestController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request)
+    public function edit(Request $OCDrequestId)
     {
-        //
+        $ocdRequest = OCDRequest::find($OCDrequestId);
+        if (!$ocdRequest) {
+            return response()->json(['error' => 'Request not found'], 404);
+        }
+        return Inertia::render('Request/Edit', [
+            'title' => 'Edit Request',
+            'banner' => [
+                'title' => 'Edit Request',
+                'description' => 'Modify your request details.',
+                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
+            ],
+            'request' => $ocdRequest->attributesToArray(),
+        ]);
     }
 
 
