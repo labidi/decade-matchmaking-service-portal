@@ -131,11 +131,6 @@ class RequestController extends Controller
         }
         return Inertia::render('Request/Edit', [
             'title' => 'Edit Request',
-            'banner' => [
-                'title' => 'Edit Request',
-                'description' => 'Modify your request details.',
-                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
-            ],
             'request' => $ocdRequest->attributesToArray(),
         ]);
     }
