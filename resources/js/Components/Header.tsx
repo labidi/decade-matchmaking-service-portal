@@ -51,10 +51,20 @@ export default function Header() {
                     </span>
                   </DropdownMenu.Label>
                   <DropdownMenu.Item className={itemClassName}>
-                    Manage Request
+                    <Link
+                      href={route('request.list')}
+                      className="hover:underline"
+                    >
+                      Manage Request
+                    </Link>
                   </DropdownMenu.Item>
                   <DropdownMenu.Item className={itemClassName}>
+                    <Link
+                      href={route('logout')}
+                      className="hover:underline"
+                    >
                     Log out
+                    </Link>
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>

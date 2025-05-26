@@ -42,3 +42,35 @@ export interface YoutubeEmbed {
 export interface UserGuideFile {
     url: string;
 }
+
+export interface OCDMetrics {
+    number_successful_matches: number;
+    number_fully_closed_matches: number;
+    number_user_requests_in_implementation: number;
+    committed_funding_amount: number;
+    number_of_open_partner_opertunities: number;
+}
+
+export interface OCDRequest {
+    id: string;
+    type: string;
+    submissionDate: string;
+    status: {
+        id: string;
+        status_label: string;
+        status_code: string;
+        created_at: string;
+        updated_at: string;
+    }
+    created_at: string;
+    matched_partner_id: string | null;
+    status_id: string;
+    user_id: string;
+
+};
+
+export interface OCDRequestList {
+    data : OCDRequest[];
+}
+
+

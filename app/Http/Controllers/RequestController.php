@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use Illuminate\Support\Facades\DB;
+
 
 
 class RequestController extends Controller
@@ -24,7 +26,7 @@ class RequestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function list()
+    public function list(Request $httpRequest)
     {
         return Inertia::render('Request/List', [
             'title' => 'My requests',
@@ -32,7 +34,8 @@ class RequestController extends Controller
                 'title' => 'List of my requests',
                 'description' => 'Manager your requests here.',
                 'image' => 'http://portal_dev.local/assets/img/sidebar.png',
-            ]
+            ],
+            'requests' => OCDRequest::with('status')->where('user_id', $httpRequest->user()->id)->get(),
         ]);
     }
 
@@ -51,34 +54,33 @@ class RequestController extends Controller
         ]);
     }
 
-    public function submit(Request $request)
+    public function submit(Request $httpRequest, $mode = 'submit')
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'message' => 'required|string|max:500',
-        ]);
-
-        OCDRequest::create($request->all());
-        return response()->json(['message' => 'Request submitted successfully'], 201);
+        $requestId = $httpRequest->input('id') ?? null;
+        if ($mode == 'draft') {
+            return $this->saveRequestAsDraft($httpRequest, $requestId);
+        }
+        return $this->store($httpRequest, $requestId);
     }
 
-    public function saveDraft(Request $httpRequest)
+    public function saveRequestAsDraft(Request $httpRequest, $requestId = null)
     {
         try {
-            $request = $httpRequest->all();
-            $ocdRequest = new OCDRequest([
-                'request_data' => json_encode($httpRequest->all())
-            ]);
-            $ocdRequest->status()->associate(RequestStatus::getDraftStatus());
-            $ocdRequest->user()->associate($httpRequest->user());
-            
-            Log::info($request);
-            Log::info($ocdRequest->attributesToArray());
+            if ($requestId) {
+                $ocdRequest = OCDRequest::find($requestId);
+                if (!$ocdRequest) {
+                    throw new \Exception('Request not found');
+                }
+            } else {
+                $ocdRequest = new OCDRequest();
+                $ocdRequest->status()->associate(RequestStatus::getDraftStatus());
+                $ocdRequest->user()->associate($httpRequest->user());
+            }
+            $ocdRequest->request_data = json_encode($httpRequest->all());
             $ocdRequest->save();
             return response()->json([
                 'message' => 'Draft saved successfully',
-                'request_data'=> $ocdRequest->attributesToArray()
+                'request_data' => $ocdRequest->attributesToArray()
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -88,9 +90,28 @@ class RequestController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $httpRequest, $requestId = null)
     {
-        //
+        try {
+            if ($requestId) {
+                $ocdRequest = OCDRequest::find($requestId);
+                if (!$ocdRequest) {
+                    throw new \Exception('Request not found');
+                }
+            } else {
+                $ocdRequest = new OCDRequest();
+                $ocdRequest->user()->associate($httpRequest->user());
+            }
+            $ocdRequest->request_data = json_encode($httpRequest->all());
+            $ocdRequest->status()->associate(RequestStatus::getUnderReviewStatus());
+            $ocdRequest->save();
+            return response()->json([
+                'message' => 'Request submitted successfully',
+                'request_data' => $ocdRequest->attributesToArray()
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -104,9 +125,21 @@ class RequestController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request)
+    public function edit(Request $OCDrequestId)
     {
-        //
+        $ocdRequest = OCDRequest::find($OCDrequestId);
+        if (!$ocdRequest) {
+            return response()->json(['error' => 'Request not found'], 404);
+        }
+        return Inertia::render('Request/Create', [
+            'title' => 'Create a new request',
+            'banner' => [
+                'title' => 'Create a new request',
+                'description' => 'Create a new request to get started.',
+                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
+            ],
+            'request'=> $ocdRequest
+        ]);
     }
 
 

@@ -16,6 +16,9 @@ class Request extends Model
         'user_id',
         'matched_partner_id'
     ];
+    
+    protected $hidden = ['updated_at'];
+
 
     public function user(): BelongsTo
     {

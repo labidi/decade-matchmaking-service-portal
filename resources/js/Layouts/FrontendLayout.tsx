@@ -11,7 +11,6 @@ interface FrontendLayoutProps {
 
 const FrontendLayout: React.FC<FrontendLayoutProps> = ({ children }) => {
   const { auth } = usePage().props ;
-  console.log(auth);
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900">
       <Header />

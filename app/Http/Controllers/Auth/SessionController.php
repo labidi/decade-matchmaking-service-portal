@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class LoginController extends Controller
+class SessionController extends Controller
 {
     public function __construct(
         protected OceanExpertAuthService $oceanExpertAuthService,
@@ -28,7 +28,7 @@ class LoginController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
 
         $credentials = $request->validate([
@@ -45,7 +45,7 @@ class LoginController extends Controller
                 $credentials['email']
             );
 
-            Log::info($oceanExpertProfile) ;
+            Log::info($oceanExpertProfile);
         } catch (\Exception $e) {
             throw ValidationException::withMessages([
                 'email' => $e->getMessage(),
@@ -57,19 +57,29 @@ class LoginController extends Controller
             [
                 'name' => $oceanExpertProfile['name'],
                 'password' => Hash::make($userPayload['password']),
-                'first_name'=> $oceanExpertProfile['first_name'],
-                'last_name'=> $oceanExpertProfile['last_name'],
-                'country'=> $oceanExpertProfile['country'],
-                'city'=> $oceanExpertProfile['city'],
+                'first_name' => $oceanExpertProfile['first_name'],
+                'last_name' => $oceanExpertProfile['last_name'],
+                'country' => $oceanExpertProfile['country'],
+                'city' => $oceanExpertProfile['city'],
             ]
         );
-
-        // 5. Log in locally
         Auth::login($user, false);
-        // 6. Store external token in session (or cookie)
         $request->session()->put('external_api_token', $token);
-        // 7. Regenerate session ID
         $request->session()->regenerate();
-        return redirect()->intended(route('request.create'));
+        return to_route('request.create');
+    }
+
+    /**
+     * Destroy an authenticated session.
+     */
+    public function destroy(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return to_route('index');
     }
 }
