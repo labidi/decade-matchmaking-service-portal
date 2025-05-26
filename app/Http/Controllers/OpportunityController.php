@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Opportunity;
 
 class OpportunityController extends Controller
 {
     
     public function create(){
-        return Inertia::render('Request/Create', [
+        return Inertia::render('Opportunity/Create', [
             'title' => 'Create a new request',
             'banner' => [
                 'title' => 'Create a new Opportunity',
