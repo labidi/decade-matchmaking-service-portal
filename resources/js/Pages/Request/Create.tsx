@@ -4,7 +4,7 @@ import FrontendLayout from '@/Layouts/FrontendLayout';
 import { UIRequestForm } from '@/Forms/UIRequestForm';
 import XHRMessageDialog from '@/Components/Dialog/XHRMessageDialog';
 import axios from 'axios';
-
+import { usePage } from '@inertiajs/react';
 
 const subthemeOptions = [
   'Mapping & modeling ocean-climate interactions',
@@ -243,6 +243,9 @@ const handleSubmitV2 = (mode: 'submit' | 'draft') => {
     });
   }
 };
+
+    const BannerData = usePage().props;
+  console.log(BannerData);
 
 return (
     <FrontendLayout>

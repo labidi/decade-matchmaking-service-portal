@@ -39,13 +39,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('request/create',[RequestController::class, 'create'] )->name('request.create');
     Route::get('request/list',[RequestController::class, 'list'])->name('request.list');
     Route::get('request/edit/{id}',[RequestController::class, 'edit'])->name('request.edit');
+    Route::get('request/show/{id}',[RequestController::class, 'show'])->name('request.show');
     Route::post('request/submit/{mode?}', [RequestController::class, 'submit'])->name('request.submit');
 });
 
-
-
-
-Route::post('login', [LoginController::class, 'login'])->name('login.post');
 
 
 require __DIR__ . '/auth.php';

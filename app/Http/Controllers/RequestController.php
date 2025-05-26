@@ -127,10 +127,13 @@ class RequestController extends Controller
      */
     public function edit(Request $OCDrequestId)
     {
-        $ocdRequest = OCDRequest::find($OCDrequestId);
+        DB::connection()->enableQueryLog();
+        $ocdRequest = OCDRequest::find(strval($OCDrequestId->id));
         if (!$ocdRequest) {
+            dd( DB::getQueryLog());
             return response()->json(['error' => 'Request not found'], 404);
         }
+
         return Inertia::render('Request/Create', [
             'title' => 'Create a new request',
             'banner' => [
@@ -138,7 +141,7 @@ class RequestController extends Controller
                 'description' => 'Create a new request to get started.',
                 'image' => 'http://portal_dev.local/assets/img/sidebar.png',
             ],
-            'request'=> $ocdRequest
+            'request'=> $ocdRequest->toArray()
         ]);
     }
 

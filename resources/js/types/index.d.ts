@@ -54,7 +54,7 @@ export interface OCDMetrics {
 export interface OCDRequest {
     id: string;
     type: string;
-    submissionDate: string;
+    request_data: any;
     status: {
         id: string;
         status_label: string;
@@ -69,8 +69,7 @@ export interface OCDRequest {
 
 };
 
-export interface OCDRequestList {
-    data : OCDRequest[];
-}
+export type OCDRequestList = OCDRequest[];
+
 
 
