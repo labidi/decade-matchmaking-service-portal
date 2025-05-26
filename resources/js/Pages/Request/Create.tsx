@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import React, { useEffect, useState } from 'react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
 import { UIRequestForm } from '@/Forms/UIRequestForm';
 import XHRMessageDialog from '@/Components/Dialog/XHRMessageDialog';
 import axios from 'axios';
-import { usePage } from '@inertiajs/react';
+import { OCDRequest } from '@/types';
+
 
 const subthemeOptions = [
   'Mapping & modeling ocean-climate interactions',
@@ -44,7 +45,14 @@ type ValidationRule = {
   condition?: () => boolean;
 };
 
+type RequestFormData = {
+  request_data: OCDRequest
+}
+
 export default function RequestForm() {
+
+  const ocdRequestFormData = usePage().props.request as OCDRequest;
+
   const form = useForm({
     id: '',
     is_partner: '',
@@ -82,6 +90,7 @@ export default function RequestForm() {
     long_term_impact: '',
   });
 
+  
   type FormDataKeys = keyof typeof form.data;
 
   const [step, setStep] = useState(1);
@@ -214,6 +223,7 @@ const handleBack = () => {
   setStep(prev => Math.max(prev - 1, 1));
 };
 
+
 const handleSubmitV2 = (mode: 'submit' | 'draft') => {
 
   const isValid = validateForm(mode);
@@ -233,19 +243,37 @@ const handleSubmitV2 = (mode: 'submit' | 'draft') => {
       form.setData('id', responseXhr.data.request_data.id);
       form.setData('unique_id', responseXhr.data.request_data.unique_id);
       setXhrDialogResponseMessage(responseXhr.data.request_data.message);
+      router.push({
+            url: route(`request.edit`, { id: responseXhr.data.request_data.id }),
+            clearHistory: false,
+            encryptHistory: false,
+            preserveScroll: true,
+            preserveState: true,
+        })
     })
     .catch(function (responseXhr) {
       setXhrDialogResponseType('error');
       setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
     })
     .finally(() => {
-      setXhrDialogOpen(true);
+        // window.history.replaceState(null, "Submit Request", "/request/create/" + form.data.id);
+        setXhrDialogOpen(true);
     });
   }
 };
 
-    const BannerData = usePage().props;
-  console.log(BannerData);
+
+
+useEffect(() => {
+  if (ocdRequestFormData && ocdRequestFormData.id) {
+    Object.entries(ocdRequestFormData.request_data).forEach(([key, value]) => {
+      if (key in form.data) {
+        form.setData(key as FormDataKeys, value || '');
+      }
+    });
+  }
+
+}, []);
 
 return (
     <FrontendLayout>

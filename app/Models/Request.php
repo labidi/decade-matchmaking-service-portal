@@ -19,13 +19,13 @@ class Request extends Model
         'user_id',
         'matched_partner_id'
     ];
-    
+
     protected $hidden = ['updated_at'];
 
     protected function requestData(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => json_decode($value),
+            get: fn(string $value) => json_decode($value),
         );
     }
     public function user(): BelongsTo

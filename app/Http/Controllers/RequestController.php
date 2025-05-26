@@ -130,8 +130,7 @@ class RequestController extends Controller
         DB::connection()->enableQueryLog();
         $ocdRequest = OCDRequest::find(strval($OCDrequestId->id));
         if (!$ocdRequest) {
-            dd( DB::getQueryLog());
-            return response()->json(['error' => 'Request not found'], 404);
+            return response()->json(['error' => 'Ocd Request not found'], 404);
         }
 
         return Inertia::render('Request/Create', [
