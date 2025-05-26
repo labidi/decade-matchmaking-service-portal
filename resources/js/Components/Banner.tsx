@@ -13,6 +13,7 @@ export default function Banner() {
             autoplay: 0,
         },
     };
+    console.log(BannerData) ;
     return (
         <>
             <section style={{ backgroundImage: `url(${BannerData.image})` }} className="bg-cover bg-center bg-casal-700 py-20 px-4 text-center text-white" >

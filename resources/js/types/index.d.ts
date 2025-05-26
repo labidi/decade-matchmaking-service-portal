@@ -50,3 +50,27 @@ export interface OCDMetrics {
     committed_funding_amount: number;
     number_of_open_partner_opertunities: number;
 }
+
+export interface OCDRequest {
+    id: string;
+    type: string;
+    submissionDate: string;
+    status: {
+        id: string;
+        status_label: string;
+        status_code: string;
+        created_at: string;
+        updated_at: string;
+    }
+    created_at: string;
+    matched_partner_id: string | null;
+    status_id: string;
+    user_id: string;
+
+};
+
+export interface OCDRequestList {
+    data : OCDRequest[];
+}
+
+

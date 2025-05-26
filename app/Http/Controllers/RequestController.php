@@ -131,9 +131,14 @@ class RequestController extends Controller
         if (!$ocdRequest) {
             return response()->json(['error' => 'Request not found'], 404);
         }
-        return Inertia::render('Request/Edit', [
-            'title' => 'Edit Request',
-            'request' => $ocdRequest->attributesToArray(),
+        return Inertia::render('Request/Create', [
+            'title' => 'Create a new request',
+            'banner' => [
+                'title' => 'Create a new request',
+                'description' => 'Create a new request to get started.',
+                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
+            ],
+            'request'=> $ocdRequest
         ]);
     }
 
