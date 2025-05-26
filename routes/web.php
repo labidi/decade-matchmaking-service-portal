@@ -38,7 +38,7 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('request/create',[RequestController::class, 'create'] )->name('request.create');
     Route::get('request/list',[RequestController::class, 'list'])->name('request.list');
-    Route::get('request/edit/{id}',[RequestController::class, 'edit'])->name('request.list');
+    Route::get('request/edit/{id}',[RequestController::class, 'edit'])->name('request.edit');
     Route::post('request/submit/{mode?}', [RequestController::class, 'submit'])->name('request.submit');
 });
 
