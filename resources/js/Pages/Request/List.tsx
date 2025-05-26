@@ -12,6 +12,14 @@ export default function RequestsList() {
         <FrontendLayout>
             <Head title="Welcome" />
             <div className="overflow-x-auto">
+                <div className='flex justify-between items-center mb-6'>
+                    <Link
+                        href={route('request.create')}    
+                        className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
+                        >
+                        Create new request
+                    </Link>
+                </div>
                 <table className="min-w-full table-auto bg-white">
                     <thead className="bg-gray-50">
                         <tr>
