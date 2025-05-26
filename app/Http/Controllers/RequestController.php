@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Request as OCDRequest;
 use Illuminate\Http\Request;
 use App\Models\Request\RequestStatus;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
