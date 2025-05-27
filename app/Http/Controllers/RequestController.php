@@ -139,8 +139,7 @@ class RequestController extends Controller
      */
     public function edit(int $OCDrequestId)
     {
-        DB::connection()->enableQueryLog();
-        $ocdRequest = OCDRequest::find(strval($OCDrequestId->id));
+        $ocdRequest = OCDRequest::find($OCDrequestId);
         if (!$ocdRequest) {
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }
