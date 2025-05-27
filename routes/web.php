@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Dashboard\IndexController;
 use App\Http\Controllers\RequestController;
 use Inertia\Inertia;
 use App\Http\Controllers\OpportunityController;
@@ -47,6 +48,8 @@ Route::middleware(['auth'])->group(function () {
     // Opportunity routes
     Route::get('opportunity/create', [OpportunityController::class, 'create'])->name('opportunity.create');
     Route::post('opportunity/store', [OpportunityController::class, 'store'])->name('opportunity.store');
+
+    Route::get('dashboard',IndexController::class)->name('dashboard');
 });
 
 
