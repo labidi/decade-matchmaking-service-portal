@@ -67,7 +67,6 @@ export default function CreateOpportunity() {
     const validateForm = (): boolean => {
         let hasErrors = false;
         form.clearErrors();
-
         validationSchema.forEach(({ field, message, condition }) => {
             const value = form.data[field as keyof typeof form.data];
 
@@ -99,7 +98,7 @@ export default function CreateOpportunity() {
     return (
         <FrontendLayout>
             <Head title="Create Opportunity" />
-            <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+            <div className="max-w-4xl mx-auto p-6 ">
                 <form method="POST" action={route('opportunity.store')}>
                     <input
                         type="hidden"

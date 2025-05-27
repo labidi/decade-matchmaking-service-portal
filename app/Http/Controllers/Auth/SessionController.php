@@ -23,7 +23,7 @@ class SessionController extends Controller
 
     public function create(Request $request): Response
     {
-        return Inertia::render('Auth/Login', [
+        return Inertia::render('Auth/SignIn', [
             'status' => $request->session()->get('status'),
             'banner' => [
                 'title' => 'Login to Oceean decade portal',
@@ -69,7 +69,7 @@ class SessionController extends Controller
         Auth::login($user, false);
         $request->session()->put('external_api_token', $token);
         $request->session()->regenerate();
-        return to_route('request.create');
+        return to_route('index');
     }
 
     /**
