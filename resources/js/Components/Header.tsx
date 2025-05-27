@@ -20,12 +20,13 @@ export default function Header() {
   const itemClassName =
     "relative flex cursor-default select-none items-center rounded-sm px-4 py-2 text-sm outline-none transition-colors focus:bg-slate-50 data-[disabled]:pointer-events-none data-[disabled]:opacity-50";
 
-  // Close dropdown on outside click []);
 
   return (
     <header className="bg-firefly-900 text-white py-2 px-4 shadow">
       <div className="container mx-auto flex items-center justify-between">
         <ApplicationLogo />
+        <span className="text-4xl font-semibold text-white flex items-center gap-2">Capacity Development Matchmaking Platform</span>
+        
         <nav className="relative">
           {!auth.user ? (
             <LoginDialog />

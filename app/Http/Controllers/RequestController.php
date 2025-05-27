@@ -116,18 +116,30 @@ class RequestController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request)
+    public function show(int $OCDrequestId)
     {
-        //
+        $ocdRequest = OCDRequest::with('status')->find($OCDrequestId);  
+        if (!$ocdRequest) {
+            return response()->json(['error' => 'Ocd Request not found'], 404);
+        }
+
+        return Inertia::render('Request/Show', [
+            'title' => 'Request #'.$OCDrequestId,
+            'banner' => [
+                'title' => 'Request #'.$OCDrequestId,
+                'description' => 'View my request details here.',
+                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
+            ],
+            'request'=> $ocdRequest->toArray()
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $OCDrequestId)
+    public function edit(int $OCDrequestId)
     {
-        DB::connection()->enableQueryLog();
-        $ocdRequest = OCDRequest::find(strval($OCDrequestId->id));
+        $ocdRequest = OCDRequest::find($OCDrequestId);
         if (!$ocdRequest) {
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }

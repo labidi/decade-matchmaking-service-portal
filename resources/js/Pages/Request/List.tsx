@@ -51,7 +51,7 @@ export default function RequestsList() {
                                     {req.status.status_label}
                                 </td>
                                 <td className="px-4 py-2 whitespace-nowrap flex space-x-2">
-                                    {(req.status.status_code === 'draft' || req.status.status_code === 'in_implementation') && (
+                                    {(req.status.status_code === 'draft') && (
                                         <Link
                                             href={route('request.edit', req.id)}
                                             className="px-2 py-1 text-sm font-medium text-blue-600 hover:text-blue-800"

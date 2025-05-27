@@ -25,12 +25,16 @@ class SessionController extends Controller
     {
         return Inertia::render('Auth/Login', [
             'status' => $request->session()->get('status'),
+            'banner' => [
+                'title' => 'Login to Oceean decade portal',
+                'description' => 'Use your OceanExpert credentials to login, Or use your Google account or LinkedIn account.',
+                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
+            ],
         ]);
     }
 
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
-
         $credentials = $request->validate([
             'email'    => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
@@ -45,17 +49,16 @@ class SessionController extends Controller
                 $credentials['email']
             );
 
-            Log::info($oceanExpertProfile);
+            
         } catch (\Exception $e) {
             throw ValidationException::withMessages([
-                'email' => $e->getMessage(),
+                "Login" => $e->getMessage(),
             ]);
         }
-
         $user = User::updateOrCreate(
             ['email' => $credentials['email']],
             [
-                'name' => $oceanExpertProfile['name'],
+                'name' => $oceanExpertProfile['name'] ?? $oceanExpertProfile['first_name'] . ' ' . $oceanExpertProfile['last_name'],
                 'password' => Hash::make($userPayload['password']),
                 'first_name' => $oceanExpertProfile['first_name'],
                 'last_name' => $oceanExpertProfile['last_name'],

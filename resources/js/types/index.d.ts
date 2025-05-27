@@ -108,4 +108,17 @@ export interface OCDRequest {
 export type OCDRequestList = OCDRequest[];
 
 
-
+export interface OCDOpportunity {
+    id: string;
+    title: string;
+    type: string[];
+    closing_date: string;
+    coverage_activity: string[];
+    implementation_location: string[];
+    target_audience: string[];
+    summary: string;
+    url: string;
+    created_at: string;
+    updated_at: string;
+    user_id: string;
+}
