@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Request\RequestStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Models\User;
+
 
 class Request extends Model
 {
+    protected $table = 'requests';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'request_data',
@@ -16,10 +20,15 @@ class Request extends Model
         'user_id',
         'matched_partner_id'
     ];
-    
+
     protected $hidden = ['updated_at'];
 
-
+    protected function requestData(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string $value) => json_decode($value),
+        );
+    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

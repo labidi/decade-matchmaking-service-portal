@@ -21,16 +21,15 @@ class OceanExpertSearchService
             ]);
         $response->throw();
         $profile = [];
-        if(isset($response['results']['data'][0])) {
-           $profile['name'] = $response['results']['data'][0]['name'];
-           $profile['first_name'] = $response['results']['data'][0]['fname'];
-           $profile['last_name'] = $response['results']['data'][0]['sname'];
-           $profile['country'] = $response['results']['data'][0]['country'];
-           $profile['city'] = $response['results']['data'][0]['city'];
-        }else {
+        if (isset($response['results']['data'][0])) {
+            $profile['name'] = $response['results']['data'][0]['name'] ?? null;
+            $profile['first_name'] = $response['results']['data'][0]['fname'] ?? null;
+            $profile['last_name'] = $response['results']['data'][0]['sname'] ?? null;
+            $profile['country'] = $response['results']['data'][0]['country'] ?? null;
+            $profile['city'] = $response['results']['data'][0]['city'] ?? null;
+        } else {
             throw new \RuntimeException('OceanExpert Profile Not found.');
         }
         return $profile;
     }
-    
 }

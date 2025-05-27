@@ -63,6 +63,4 @@ class User extends Authenticatable
     {
         return $this->hasOne(Request::class);
     }
-
-
 }

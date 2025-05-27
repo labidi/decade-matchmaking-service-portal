@@ -5,12 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SessionController;
 
 Route::middleware('guest')->group(function () {
-    Route::get('login', [SessionController::class, 'create'])
-        ->name('login');
-    Route::post('login', [SessionController::class, 'store'])->name('login.post');
+    Route::get('signin', [SessionController::class, 'create'])
+        ->name('sign.in');
+    Route::post('signin', [SessionController::class, 'store'])->name('sign.in.post');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('logout', [SessionController::class, 'destroy'])
-        ->name('logout');
+    Route::post('signout', [SessionController::class, 'destroy'])
+        ->name('sign.out');
 });

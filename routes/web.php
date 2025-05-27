@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RequestController;
 use Inertia\Inertia;
+use App\Http\Controllers\OpportunityController;
 
 
 Route::get('/', function () {
@@ -36,16 +37,18 @@ Route::get('/', function () {
 
 
 Route::middleware(['auth'])->group(function () {
+    // OCD Requests routes
     Route::get('request/create',[RequestController::class, 'create'] )->name('request.create');
     Route::get('request/list',[RequestController::class, 'list'])->name('request.list');
     Route::get('request/edit/{id}',[RequestController::class, 'edit'])->name('request.edit');
+    Route::get('request/show/{id}',[RequestController::class, 'show'])->name('request.show');
     Route::post('request/submit/{mode?}', [RequestController::class, 'submit'])->name('request.submit');
+
+    // Opportunity routes
+    Route::get('opportunity/create', [OpportunityController::class, 'create'])->name('opportunity.create');
+    Route::post('opportunity/store', [OpportunityController::class, 'store'])->name('opportunity.store');
 });
 
-
-
-
-Route::post('login', [LoginController::class, 'login'])->name('login.post');
 
 
 require __DIR__ . '/auth.php';
