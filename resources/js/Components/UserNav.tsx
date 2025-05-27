@@ -64,6 +64,13 @@ export default function UserDropdown() {
                     aria-orientation="vertical"
                 >
                     <Link
+                        href={route('dashboard')}
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
+                    >
+                        My Dashboard
+                    </Link>
+                    <Link
                         href={route('request.list')}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         role="menuitem"

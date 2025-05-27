@@ -69,7 +69,9 @@ class SessionController extends Controller
         Auth::login($user, false);
         $request->session()->put('external_api_token', $token);
         $request->session()->regenerate();
-        return to_route('index');
+        return to_route('dashboard')->with([
+            'status' => 'You are logged in successfully.',
+        ]);
     }
 
     /**
