@@ -5,21 +5,12 @@ import FrontendLayout from '@/Layouts/FrontendLayout';
 import { OCDRequest, OCDRequestList } from '@/types';
 import { usePage } from '@inertiajs/react';
 
-
 export default function RequestsList() {
     const requests = usePage().props.requests as OCDRequestList;
     return (
         <FrontendLayout>
             <Head title="Welcome" />
             <div className="overflow-x-auto">
-                <div className='flex justify-between items-center mb-6'>
-                    <Link
-                        href={route('user.request.create')}    
-                        className="px-4 py-2 text-xl bg-firefly-600 text-white rounded hover:bg-firefly-700"
-                        >
-                        Create new request
-                    </Link>
-                </div>
                 <table className="min-w-full table-auto bg-white">
                     <thead className="bg-gray-50">
                         <tr>
@@ -51,19 +42,18 @@ export default function RequestsList() {
                                     {req.status.status_label}
                                 </td>
                                 <td className="px-4 py-2 whitespace-nowrap flex space-x-2">
-                                    {(req.status.status_code === 'draft') && (
-                                        <Link
-                                            href={route('user.request.edit', req.id)}
-                                            className="px-2 py-1 text-base font-medium text-blue-600 hover:text-blue-800"
-                                        >
-                                            Edit
-                                        </Link>
-                                    )}
+
                                     <Link
                                         href={route('user.request.show', req.id)}
                                         className="px-2 py-1 text-base font-medium text-green-600 hover:text-green-800"
                                     >
                                         View
+                                    </Link>
+                                    <Link
+                                        href={route('user.request.show', req.id)}
+                                        className="px-2 py-1 text-base font-medium text-green-600 hover:text-green-800"
+                                    >
+                                        Express interrest
                                     </Link>
                                 </td>
                             </tr>
