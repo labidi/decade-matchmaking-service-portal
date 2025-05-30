@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { usePage, Link , useForm} from '@inertiajs/react';
+import { usePage, Link, useForm } from '@inertiajs/react';
 import { Auth, User } from '@/types';
 
 export default function UserDropdown() {
-    const auth = usePage().props.auth as Auth;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const user = auth.user;
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -71,20 +71,21 @@ export default function UserDropdown() {
                         My Dashboard
                     </Link>
                     <Link
-                        href={route('request.list')}
+                        href={route('user.request.list')}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         role="menuitem"
                     >
                         My Requests List
                     </Link>
+                    {user.is_partner && (
                     <Link
-                        href="#"
+                        href={route('partner.opportunity.list')}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         role="menuitem"
                     >
-                        View Opportunties
+                        My Opportunties List
                     </Link>
-
+                    )}
                     <form method="POST" onSubmit={handleSignOutFormSubmit}>
                         {/* Include CSRF token if needed */}
                         <button

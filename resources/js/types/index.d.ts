@@ -7,6 +7,8 @@ export interface User {
     city: string;
     email: string;
     email_verified_at?: string;
+    is_partner: boolean;
+    is_admin: boolean;
 }
 
 export interface Auth {
@@ -121,4 +123,9 @@ export interface OCDOpportunity {
     created_at: string;
     updated_at: string;
     user_id: string;
+    status: string;
+    status_label: string;
+    can_edit: boolean;
 }
+
+export type OCDOpportunitiesList = OCDOpportunity[];

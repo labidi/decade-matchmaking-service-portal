@@ -15,8 +15,9 @@ export default function Breadcrumb(){
   const defaultItems = usePage().props.breadcrumbs as BreadcrumbItem[] ||  [];
   if (defaultItems.length === 0) return null;
   return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex items-center space-x-2 text-gray-600 text-sm">
+    <div className='flex-grow container mx-auto py-4'>
+      <nav aria-label="Breadcrumb">
+      <ol className="flex items-center space-x-2 text-gray-600 text-base">
         {defaultItems.map((item, idx) => (
           <li key={idx} className="flex items-center">
             {idx > 0 && (
@@ -40,5 +41,7 @@ export default function Breadcrumb(){
         ))}
       </ol>
     </nav>
+    </div>
+
   );
 };

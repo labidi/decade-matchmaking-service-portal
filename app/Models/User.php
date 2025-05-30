@@ -10,6 +10,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Request;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable
 {
@@ -31,12 +32,26 @@ class User extends Authenticatable
         'city',
     ];
 
+    protected $appends = ['is_partner','is_admin'];
+
+
+    public function getIsAdminAttribute()
+    {
+        return $this->hasRole('administrator');  
+    }
+
+    public function getIsPartnerAttribute()
+    {
+        return $this->hasRole('partner');  
+    }
+    
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
      */
     protected $hidden = [
+        'id',
         'password',
         'remember_token',
     ];
@@ -63,4 +78,5 @@ class User extends Authenticatable
     {
         return $this->hasOne(Request::class);
     }
+
 }

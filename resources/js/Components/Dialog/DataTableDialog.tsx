@@ -1,8 +1,10 @@
 // resources/js/Components/DataTableDialog.tsx
 import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { DataTableRow } from '@/Types'; // define type accordingly or use any
 
+interface DataTableRow {
+  [key: string]: any; // Generic row type, can be replaced with a more specific type
+}
 interface DataTableDialogProps {
   data: DataTableRow[];
   columns: { key: keyof DataTableRow; label: string }[];
@@ -30,7 +32,7 @@ export default function DataTableDialog<TRow extends Record<string, any>>({
         <Dialog.Content className="fixed top-1/2 left-1/2 w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg transform -translate-x-1/2 -translate-y-1/2 overflow-auto">
           <Dialog.Title className="text-xl font-semibold mb-4">Data Overview</Dialog.Title>
           <Dialog.Description className="text-sm text-gray-600 mb-6">
-            Description
+            Source from CDhub
           </Dialog.Description>
 
           <div className="overflow-x-auto">
