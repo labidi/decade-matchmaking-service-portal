@@ -267,7 +267,7 @@ export default function CreateOpportunity() {
                         )}
                     </div>
 
-
+                    <TagsInput />
                     <div className="flex justify-end mt-6">
                         <button
                             type="submit"

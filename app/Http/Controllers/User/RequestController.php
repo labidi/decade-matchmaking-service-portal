@@ -134,7 +134,7 @@ class RequestController extends Controller
             'request'=> $ocdRequest->toArray(),
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
-                ['name' => 'Requests', 'url' => route('partner.opportunity.list')],
+                ['name' => 'Requests', 'url' => route('user.request.list')],
                 ['name' => 'View Request #'.$ocdRequest->id, 'url' => route('partner.opportunity.show', ['id' => $ocdRequest->id])],
             ],
         ]);

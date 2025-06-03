@@ -1,6 +1,33 @@
 // resources/js/Components/DataTableDialog.tsx
 import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
+import DataTable from 'react-data-table-component';
+
+const columns = [
+  {
+    name: 'Title',
+    selector: row => row.title,
+    sortable: true,
+  },
+  {
+    name: 'Year',
+    selector: row => row.year,
+    sortable: true,
+  },
+];
+
+const data = [
+  {
+    id: 1,
+    title: 'Beetlejuice',
+    year: '1988',
+  },
+  {
+    id: 2,
+    title: 'Ghostbusters',
+    year: '1984',
+  },
+]
 
 interface DataTableRow {
   [key: string]: any; // Generic row type, can be replaced with a more specific type
@@ -34,6 +61,11 @@ export default function DataTableDialog<TRow extends Record<string, any>>({
           <Dialog.Description className="text-sm text-gray-600 mb-6">
             Source from CDhub
           </Dialog.Description>
+
+          <DataTable
+            columns={columns}
+            data={data}
+          />
 
           <div className="overflow-x-auto">
             <table className="min-w-full table-auto border-collapse">

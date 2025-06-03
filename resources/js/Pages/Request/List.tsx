@@ -28,6 +28,9 @@ export default function RequestsList() {
                                 ID
                             </th>
                             <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">
+                                Title
+                            </th>
+                            <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">
                                 Submission Date
                             </th>
                             <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">
@@ -43,6 +46,9 @@ export default function RequestsList() {
                             <tr key={req.id} className="hover:bg-gray-100">
                                 <td className="px-4 py-2 whitespace-nowrap text-base text-gray-900">
                                     {req.id}
+                                </td>
+                                <td className="px-4 py-2 whitespace-nowrap text-base text-gray-900">
+                                    {req.request_data.capacity_development_title}
                                 </td>
                                 <td className="px-4 py-2 whitespace-nowrap text-base text-gray-900">
                                     {new Date(req.created_at).toLocaleDateString()}
