@@ -66,8 +66,11 @@ The application will be available at `http://portal_dev.local`
 ### Prerequisites
 
 - PHP 8.2 or higher
+  - php dom extension 
+  - php mysql extension
 - Composer
 - Node.js (16+)
+  - NPM
 - MySQL/PostgreSQL
 - Git
 
@@ -87,7 +90,6 @@ composer install
 3. **Install Node.js dependencies**
 ```bash
 npm install
-```
 ```
 
 4. **Configure your database**
