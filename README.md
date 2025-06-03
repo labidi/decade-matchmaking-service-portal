@@ -88,13 +88,9 @@ composer install
 ```bash
 npm install
 ```
-
-4. **Environment Configuration**
-```bash
-php artisan key:generate
 ```
 
-5. **Configure your database**
+4. **Configure your database**
    - Edit `.env` file and update database credentials:
 ```env
 DB_CONNECTION=mysql
@@ -103,6 +99,11 @@ DB_PORT=3306
 DB_DATABASE=your_database_name
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
+```
+
+5. **Environment Configuration**
+```bash
+php artisan key:generate
 ```
 
 6. **Run migrations**
