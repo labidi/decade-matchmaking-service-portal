@@ -99,6 +99,8 @@ DB_PORT=3306
 DB_DATABASE=your_database_name
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
+
+APP_KEY=
 ```
 
 5. **Environment Configuration**
