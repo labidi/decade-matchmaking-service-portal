@@ -296,8 +296,9 @@ export default function CreateOpportunity() {
 
                     <div className="mt-4">
                         <label htmlFor="tags" className="block font-medium">
-                            Tags (Max 3)
+                            Three key words
                         </label>
+                        <p className="mt-1 text-base text-gray-500">Add comma (,) to seperate key words or press enter</p>
                         <Chips
                             value={tags}
                             onChange={(e) => setTags(e.value ?? [])}

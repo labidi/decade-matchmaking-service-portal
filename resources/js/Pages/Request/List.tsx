@@ -12,34 +12,31 @@ import 'primeicons/primeicons.css';
 
 export default function RequestsList() {
     const requests = usePage().props.requests as OCDRequestList;
-
+    console.log('Requests:', requests);
     const titleBodyTemplate = (rowData: OCDRequest) => rowData.request_data.capacity_development_title;
-
-    const submissionDateTemplate = (rowData: OCDRequest) =>
-        new Date(rowData.created_at).toLocaleDateString();
-
+    const submissionDateTemplate = (rowData: OCDRequest) => new Date(rowData.created_at).toLocaleDateString();
     const statusTemplate = (rowData: OCDRequest) => rowData.status.status_label;
 
     const actionsTemplate = (rowData: OCDRequest) => (
-    <div className="flex space-x-4">
-        {rowData.status.status_code === 'draft' && (
+        <div className="flex space-x-4">
+            {rowData.status.status_code === 'draft' && (
+                <Link
+                    href={route('user.request.edit', rowData.id)}
+                    className="flex items-center text-blue-600 hover:text-blue-800"
+                >
+                    <i className="pi pi-pencil mr-1" aria-hidden="true" />
+                    Edit
+                </Link>
+            )}
             <Link
-                href={route('user.request.edit', rowData.id)}
-                className="flex items-center text-blue-600 hover:text-blue-800"
+                href={route('user.request.show', rowData.id)}
+                className="flex items-center text-green-600 hover:text-green-800"
             >
-                <i className="pi pi-pencil mr-1" aria-hidden="true" />
-                Edit
+                <i className="pi pi-eye mr-1" aria-hidden="true" />
+                View
             </Link>
-        )}
-        <Link
-            href={route('user.request.show', rowData.id)}
-            className="flex items-center text-green-600 hover:text-green-800"
-        >
-            <i className="pi pi-eye mr-1" aria-hidden="true" />
-            View
-        </Link>
-    </div>
-);
+        </div>
+    );
 
     const statusBodyTemplate = (rowData: OCDRequest) => {
         const code = rowData.status.status_code;
@@ -65,9 +62,15 @@ export default function RequestsList() {
                 tagSeverity = 'success';
                 iconColor = 'mr-1';
                 break;
+            case 'rejected':
+                iconClass = 'pi pi-times-circle';
+                tagSeverity = 'danger';
+                iconColor = 'mr-1';
+                break;
             default:
                 iconClass = 'pi pi-info-circle';
                 tagSeverity = undefined;
+                iconColor = 'mr-1';
         }
 
         return (
@@ -87,7 +90,7 @@ export default function RequestsList() {
             <div>
                 <div className='flex justify-between items-center mb-6'>
                     <Link
-                        href={route('user.request.create')}    
+                        href={route('user.request.create')}
                         className="px-4 py-2 text-xl bg-firefly-600 text-white rounded hover:bg-firefly-700"
                     >
                         Create new request
@@ -103,9 +106,9 @@ export default function RequestsList() {
                     className="p-datatable-sm .datatable-rows"
                 >
                     <Column field="id" header="ID" sortable />
-                    <Column body={titleBodyTemplate} header="Title" sortable />
-                    <Column body={submissionDateTemplate} header="Submission Date" sortable />
-                    <Column body={statusBodyTemplate} header="Status" sortable />
+                    <Column body={titleBodyTemplate} header="Title" />
+                    <Column field="created_at" body={submissionDateTemplate} header="Submission Date" sortable />
+                    <Column field="status.status_code" body={statusBodyTemplate} header="Status" sortable />
                     <Column body={actionsTemplate} header="Actions" />
                 </DataTable>
             </div>
