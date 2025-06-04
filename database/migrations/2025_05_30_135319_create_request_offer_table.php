@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('documents');
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -19,17 +20,17 @@ return new class extends Migration
             $table->string('document_type')->nullable();
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('parent_type')->nullable();
-            $table->foreign('uploader_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('uploader_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
 
+        Schema::dropIfExists('request_offers');
         Schema::create('request_offers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('request_id')->constrained('requests')->onDelete('cascade');
-            $table->foreignId('offer_id')->constrained('offers')->onDelete('cascade');
             $table->text('description')->nullable();
             $table->foreignId('matched_partner_id')->constrained('users')->onDelete('cascade');
-            $table->unsignedTinyInteger('status')->default(1); 
+            $table->unsignedTinyInteger('status')->default(1);
             $table->timestamps();
         });
     }
@@ -39,6 +40,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('documents');
         Schema::dropIfExists('request_offer');
     }
 };

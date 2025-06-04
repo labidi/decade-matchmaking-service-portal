@@ -1,5 +1,5 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
 import { OCDOpportunity } from '@/types';
 import TagsInput from '@/Components/TagsInput';
@@ -8,6 +8,12 @@ import { Tag } from 'react-tag-input';
 import axios from 'axios';
 import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
 import { FormEventHandler } from 'react';
+
+import { Chips } from 'primereact/chips';
+
+import 'primereact/resources/themes/saga-blue/theme.css'; // ou un autre thème
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 
 export default function CreateOpportunity() {
     const opportunity = usePage().props.request as OCDOpportunity;
@@ -26,7 +32,7 @@ export default function CreateOpportunity() {
         created_at: '',
         updated_at: '',
         user_id: '',
-        key_words: [],
+        key_words: '',
     });
 
     const getInputClass = () => {
@@ -51,6 +57,11 @@ export default function CreateOpportunity() {
     const [xhrdialogOpen, setXhrDialogOpen] = useState(false);
     const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
     const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect'>('info');
+    const [tags, setTags] = useState<string[]>([]);
+    
+    useEffect(() => {
+        setData('key_words', tags.join(','));
+    }, [tags]);
 
     return (
 
@@ -267,7 +278,37 @@ export default function CreateOpportunity() {
                         )}
                     </div>
 
-                    <TagsInput />
+                    <div className="mt-4">
+                        <label htmlFor="url" className="block font-medium">
+                            Url
+                        </label>
+                        <input
+                            id="url"
+                            type="text"
+                            className={getInputClass()}
+                            value={data.url}
+                            onChange={(e) => setData('url' as keyof typeof data, e.currentTarget.value)}
+                        />
+                        {errors.url && (
+                            <p className="text-red-600 text-base mt-1">{errors.url}</p>
+                        )}
+                    </div>
+
+                    <div className="mt-4">
+                        <label htmlFor="tags" className="block font-medium">
+                            Tags (Max 3)
+                        </label>
+                        <Chips
+                            value={tags}
+                            onChange={(e) => setTags(e.value ?? [])}
+                            separator=","
+                            max={3}
+                            allowDuplicate={false}
+                            className="w-full"
+                            />
+                            <input type="hidden" name="key_words" value={data.key_words} />
+                    </div>
+
                     <div className="flex justify-end mt-6">
                         <button
                             type="submit"

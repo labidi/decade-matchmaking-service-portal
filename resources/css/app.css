@@ -162,3 +162,75 @@
     @apply bg-background text-foreground;
     }
 }
+
+.p-paginator .p-paginator-page.p-highlight {
+  @apply bg-firefly-600 text-white font-bold rounded;
+}
+
+
+.p-paginator-rpp-options {
+   @apply px-2 py-1 border border-gray-300 rounded bg-white text-sm;
+}
+
+
+.p-datatable .p-datatable-tbody > tr{
+    border-bottom: 1px solid #f1f1f1 !important;
+}
+
+/* Style du sélecteur de lignes par page */
+.p-paginator .p-dropdown {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #f1f1f1;
+  border-radius: 4px;
+  font-size: 1rem;
+  height: 2.5rem;
+  padding: 0;
+}
+
+
+/* Cible l'input interne de <Chips /> */
+.p-chips input {
+  margin-top: 0.25rem; /* mt-1 */
+  display: block;      /* block */
+  width: 100%;         /* w-full */
+  border: 1px solid #D1D5DB; /* border-gray-300 */
+  border-radius: 0.375rem;   /* rounded-md */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+
+  padding: 0.5rem; /* optionnel pour + d’espace */
+}
+
+.p-chips input:focus {
+  outline: none;
+  border-color: #3B82F6;      /* border-blue-500 */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* focus:ring-blue-500 */
+}
+
+
+.p-chips-multiple-container {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.p-chips input {
+  order: 1;
+  text-align: left;
+}
+
+.p-chips ul {
+    width: 100%;
+}
+
+.p-chips-token {
+  order: 2;
+}
+
+.p-chips.p-input-wrapper-focus ul, .p-chips.p-focus ul {
+  box-shadow: none !important;
+  border-color: inherit !important;
+}
+
+.p-chips input:focus {
+  box-shadow: none !important;
+}
