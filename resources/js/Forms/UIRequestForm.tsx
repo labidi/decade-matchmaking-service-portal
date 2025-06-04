@@ -47,8 +47,9 @@ export const UIRequestForm = {
             { value: 'No', label: 'No' },
         ],
         required: true,
-        label: 'Are you an endorsed partner?',
+        label: 'Is this request related an Ocean Decade Action ?',
         id: 'is_partner',
+        description: 'Only Ocean Decade Programmes, Projects, and Contributions are considered official Decade Actions. Activities are not considered Decade Actions.'
     },
     unique_id: {
         id: 'unique_id',

@@ -26,10 +26,11 @@ class SessionController extends Controller
         return Inertia::render('Auth/SignIn', [
             'status' => $request->session()->get('status'),
             'banner' => [
-                'title' => 'Login to Oceean decade portal',
-                'description' => 'Use your OceanExpert credentials to login, Or use your Google account or LinkedIn account.',
-                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
+                'title' => 'Sign in to Oceean decade portal',
+                'description' => 'Use your OceanExpert credentials to sign in, Or use your Google account or LinkedIn account.',
+                'image' => '/assets/img/sidebar.png',
             ],
+            'status'=>$request->session()->get('status')
         ]);
     }
 
@@ -52,7 +53,7 @@ class SessionController extends Controller
             
         } catch (\Exception $e) {
             throw ValidationException::withMessages([
-                "Login" => $e->getMessage(),
+                "password" => $e->getMessage(),
             ]);
         }
         $user = User::updateOrCreate(
@@ -69,7 +70,9 @@ class SessionController extends Controller
         Auth::login($user, false);
         $request->session()->put('external_api_token', $token);
         $request->session()->regenerate();
-        return to_route('index');
+        return to_route('dashboard')->with([
+            'status' => 'You are logged in successfully.',
+        ]);
     }
 
     /**

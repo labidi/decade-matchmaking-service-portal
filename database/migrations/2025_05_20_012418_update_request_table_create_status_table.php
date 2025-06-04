@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('request_statuses');
         Schema::create('request_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('status_label')->nullable();

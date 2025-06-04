@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
 import { UIRequestForm } from '@/Forms/UIRequestForm';
-import XHRMessageDialog from '@/Components/Dialog/XHRMessageDialog';
+import XHRMessageDialog from '@/Components/Dialog/XHRAlertDialog';
 import axios from 'axios';
 import { OCDRequest } from '@/types';
 
@@ -90,15 +90,16 @@ export default function RequestForm() {
     long_term_impact: '',
   });
 
-
+  
   type FormDataKeys = keyof typeof form.data;
 
   const [step, setStep] = useState(1);
   const steps = ['Identification', 'Details', 'Capacity & Partners', 'Service', 'Risks'];
+  const [errorSteps, setErrorSteps] = useState<number[]>([]);
 
   const [xhrdialogOpen, setXhrDialogOpen] = useState(false);
   const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
-  const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info'>('info');
+  const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect'>('info');
 
   const isPartner = form.data.is_partner === 'Yes';
 
@@ -107,43 +108,53 @@ export default function RequestForm() {
       { field: 'is_partner', message: 'This field is required.' },
       { field: 'first_name', message: 'This field is required.' },
       { field: 'last_name', message: 'This field is required.' },
-      { field: 'email', message: 'This field is required.' },
+      {
+        field: 'email',
+        message: 'This field is required.',
+      },
+      {
+        field: 'email',
+        message: 'Email format is invalid.',
+        condition: () =>
+          !!form.data.email &&
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.data.email),
+      },
       ...(form.data.is_partner === 'Yes'
         ? [
-          { field: 'unique_id', message: 'This field is required.' },
-        ]
+            { field: 'unique_id', message: 'This field is required.' },
+          ]
         : []),
     ],
     2: [
       ...(!isPartner
         ? [
-          { field: 'request_link_type', message: 'This field is required.' },
-          { field: 'project_stage', message: 'This field is required.' },
-          { field: 'project_url', message: 'This field is required.' },
-          { field: 'activity_name', message: 'This field is required.' },
-        ]
+            { field: 'request_link_type', message: 'This field is required.' },
+            { field: 'project_stage', message: 'This field is required.' },
+            { field: 'project_url', message: 'This field is required.' },
+            { field: 'activity_name', message: 'This field is required.' },
+          ]
         : []),
       ...(isPartner
         ? [
-          { field: 'capacity_development_title', message: 'This field is required.' },
-          { field: 'has_significant_changes', message: 'This field is required.' },
-          { field: 'changes_description', message: 'This field is required.', condition: () => form.data.has_significant_changes === 'Yes' },
-        ]
+            { field: 'capacity_development_title', message: 'This field is required.' },
+            { field: 'has_significant_changes', message: 'This field is required.' },
+            { field: 'changes_description', message: 'This field is required.', condition: () => form.data.has_significant_changes === 'Yes' },
+          ]
         : []),
     ],
     3: [
       { field: 'related_activity', message: 'This field is required.' },
-      { field: 'subthemes', message: 'This field is required.', condition: () => form.data.subthemes.length > 0 },
-      { field: 'support_types', message: 'This field is required.', condition: () => form.data.support_types.length > 0 },
+      { field: 'subthemes', message: 'This field is required.', condition: () => form.data.subthemes.length === 0 },
+      { field: 'support_types', message: 'This field is required.', condition: () => form.data.support_types.length === 0 },
       { field: 'gap_description', message: 'This field is required.' },
       ...(form.data.subthemes.includes('Other')
         ? [
-          { field: 'subthemes_other', message: 'This field is required.' },
+            { field: 'subthemes_other', message: 'This field is required.' },
         ]
         : []),
       ...(form.data.support_types.includes('Other')
         ? [
-          { field: 'support_types_other', message: 'This field is required.' },
+            { field: 'support_types_other', message: 'This field is required.' },
         ]
         : []),
     ],
@@ -151,17 +162,17 @@ export default function RequestForm() {
       { field: 'has_partner', message: 'This field is required.' },
       ...(form.data.has_partner === 'Yes'
         ? [
-          { field: 'partner_name', message: 'This field is required.' },
-          { field: 'partner_confirmed', message: 'This field is required.' },
-        ]
+            { field: 'partner_name', message: 'This field is required.' },
+            { field: 'partner_confirmed', message: 'This field is required.' },
+          ]
         : []),
       { field: 'needs_financial_support', message: 'This field is required.' },
       ...(form.data.needs_financial_support === 'Yes'
         ? [
-          { field: 'budget_breakdown', message: 'This field is required.' },
-          { field: 'support_months', message: 'This field is required.' },
-          { field: 'completion_date', message: 'This field is required.' },
-        ]
+            { field: 'budget_breakdown', message: 'This field is required.' },
+            { field: 'support_months', message: 'This field is required.' },
+            { field: 'completion_date', message: 'This field is required.' },
+          ]
         : []),
     ],
     5: [
@@ -175,105 +186,178 @@ export default function RequestForm() {
     ],
   };
 
-  const validateForm = (currentMode: 'submit' | 'draft' = 'submit'): boolean => {
-    form.clearErrors();
+const isEmptyValue = (value: any): boolean => {
+  return (
+    value === undefined ||
+    value === null ||
+    (typeof value === 'string' && value.trim() === '') ||
+    (Array.isArray(value) && value.length === 0) ||
+    (typeof value === 'boolean' && value === false)
+  );
+};
 
-    const errors: Record<string, string> = {};
+const validateAllSteps = (currentStep: unknown = null) => {
+  const arrayErrorSteps: number[] = [];
+  const stepsToValidate = currentStep ? [currentStep] : steps.map((_, idx) => idx + 1);
+  let hasError = false;
 
-    if (currentMode === 'draft') return true;
+  stepsToValidate.forEach((_, idx) => {
+    const currentStep = idx + 1;
+    const schema = validationSchema[currentStep];
+    if (!schema) return;
 
-    const schema = validationSchema;
-    if (!schema) return true;
+    const fieldsWithError = new Set<string>();
 
     schema.forEach(({ field, message, condition }) => {
-      // if (condition && !condition()) return;
       const value = (form.data as Record<string, any>)[field];
-      console.log(field, ': ', value);
-      if (
-        value === undefined ||
-        value === null ||
-        (typeof value === 'string' && value.trim() === '') ||
-        (Array.isArray(value) && value.length === 0)
-      ) {
-        errors[field] = message;
+
+      const shouldTrigger = condition
+        ? condition() // ex: subthemes.length === 0
+        : isEmptyValue(value); // required classique
+
+      if (shouldTrigger) {
+        form.setError(field as keyof typeof form.data, message);
+        hasError = true;
+        fieldsWithError.add(field);
+
+        const errorStep = getErrorStepByField(field as keyof typeof form.data);
+        if (!arrayErrorSteps.includes(errorStep)) {
+          arrayErrorSteps.push(errorStep);
+        }
       }
     });
 
-    Object.entries(errors).forEach(([key, message]) => {
-      form.setError(key as keyof typeof form.data, message);
+    // Clear les erreurs pour les champs sans problème
+    schema.forEach(({ field }) => {
+      if (!fieldsWithError.has(field)) {
+        form.clearErrors(field as keyof typeof form.data);
+      }
     });
+  });
 
-    return Object.keys(errors).length === 0;
-  };
+  setErrorSteps(arrayErrorSteps);
+  return !hasError;
+};
 
-  const getInputClass = (fieldName: keyof typeof form.errors) => {
-    return `mt-2 block w-full border rounded ${form.errors[fieldName] ? 'border-red-600' : 'border-gray-300'}`;
-  };
 
-  const handleNext = () => {
-    const isValid = validateForm();
-    // if (isValid) {
+const getErrorStepByField = (field: keyof typeof form.data): number => {
+  for (const step in validationSchema) {
+    const rules = validationSchema[step as unknown as number];
+    if (rules.some(rule => rule.field === field)) {
+      return parseInt(step, 10);
+    }
+  }
+  return -1;
+};
+
+
+const validateForm = (currentMode: 'submit' | 'draft' = 'submit'): boolean => {
+  form.clearErrors();
+
+  const errors: Record<string, string> = {};
+
+  if (currentMode === 'draft') return true;
+
+  const schema = validationSchema[step as keyof typeof validationSchema];
+  const allSchema = validationSchema as Record<number, ValidationRule[]>;
+  console.log(allSchema)
+  if (!schema) return true;
+
+  schema.forEach(({ field, message, condition }) => {
+    // if (condition && !condition()) return;
+    const value = (form.data as Record<string, any>)[field];
+    console.log(field,': ',  value);
+    if (
+      value === undefined ||
+      value === null ||
+      (typeof value === 'string' && value.trim() === '') ||
+      (Array.isArray(value) && value.length === 0)
+    ) {
+      errors[field] = message;
+    }
+  });
+
+  Object.entries(errors).forEach(([key, message]) => {
+    form.setError(key as keyof typeof form.data, message);
+  });
+
+  return Object.keys(errors).length === 0;
+};
+
+const getInputClass = (fieldName: keyof typeof form.errors) => {
+  return `mt-2 block w-full border rounded ${form.errors[fieldName] ? 'border-red-600' : 'border-gray-300'}`;
+};
+
+const handleNext = () => {
     setXhrDialogResponseMessage('');
     setXhrDialogResponseType('info');
     setStep(prev => Math.min(prev + 1, steps.length));
-    // }
-  };
+    const isValid = Object.keys(form.errors).length && validateAllSteps(step);
+};
 
-  const handleBack = () => {
-    setStep(prev => Math.max(prev - 1, 1));
-  };
+const handleBack = () => {
+  setStep(prev => Math.max(prev - 1, 1));
+  const isValid = Object.keys(form.errors).length && validateAllSteps(step);
+};
 
 
-  const handleSubmitV2 = (mode: 'submit' | 'draft') => {
+const handleSubmitV2 = (mode: 'submit' | 'draft') => {
+  const isValid = mode === 'submit'? validateAllSteps(): true;
+  // const isValid = validateForm(mode);
+  if (isValid) {
+    axios
+    .post(
+      route(`user.request.submit`, { mode }),
+      { ...form.data },
+      {
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+      }
+    )
+    .then(function (responseXhr) {
+      form.setData('id', responseXhr.data.request_data.id);
+      form.setData('unique_id', responseXhr.data.request_data.unique_id);
+      setXhrDialogResponseMessage(responseXhr.data.request_data.message);
 
-    const isValid = validateForm(mode);
-    if (isValid) {
-      axios
-        .post(
-          route(`request.submit`, { mode }),
-          { ...form.data },
-          {
-            headers: {
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            },
-          }
-        )
-        .then(function (responseXhr) {
-          setXhrDialogResponseType('success');
-          form.setData('id', responseXhr.data.request_data.id);
-          form.setData('unique_id', responseXhr.data.request_data.unique_id);
-          setXhrDialogResponseMessage(responseXhr.data.request_data.message);
-          router.push({
-            url: route(`request.edit`, { id: responseXhr.data.request_data.id }),
+      if (mode === 'draft') {
+        setXhrDialogResponseType('success');
+        router.push({
+            url: route(`user.request.edit`, { id: responseXhr.data.request_data.id }),
             clearHistory: false,
             encryptHistory: false,
             preserveScroll: true,
             preserveState: true,
-          })
         })
-        .catch(function (responseXhr) {
-          setXhrDialogResponseType('error');
-          setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
-        })
-        .finally(() => {
-          // window.history.replaceState(null, "Submit Request", "/request/create/" + form.data.id);
-          setXhrDialogOpen(true);
-        });
-    }
-  };
+      } else {
+        setXhrDialogResponseType('redirect');
+      }
+    })
+    .catch(function (responseXhr) {
+      setXhrDialogResponseType('error');
+      setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
+    })
+    .finally(() => {
+        // window.history.replaceState(null, "Submit Request", "/request/create/" + form.data.id);
+        setXhrDialogOpen(true);
+    });
+  }
+};
 
-  useEffect(() => {
-    if (ocdRequestFormData && ocdRequestFormData.id) {
-      Object.entries(ocdRequestFormData.request_data).forEach(([key, value]) => {
-        if (key in form.data) {
-          form.setData(key as FormDataKeys, value || '');
-        }
-      });
-    }
 
-  }, []);
 
-  return (
+useEffect(() => {
+  if (ocdRequestFormData && ocdRequestFormData.id) {
+    Object.entries(ocdRequestFormData.request_data).forEach(([key, value]) => {
+      if (key in form.data) {
+        form.setData(key as FormDataKeys, value || '');
+      }
+    });
+  }
+}, []);
+
+console.log(errorSteps)
+return (
     <FrontendLayout>
       <Head title="Submit Request" />
       <XHRMessageDialog
@@ -281,19 +365,26 @@ export default function RequestForm() {
         onOpenChange={setXhrDialogOpen}
         message={xhrdialogResponseMessage}
         type={xhrdialogResponseType}
+        onConfirm={() => {
+          setXhrDialogOpen(false);
+          if (xhrdialogResponseType === 'redirect') {
+            router.visit(route(`user.request.list`), { method: 'get' });
+          }
+        }}
       />
       <form className="mx-auto bg-white">
         {/* Stepper */}
         <div className="flex mb-6">
           {steps.map((label, idx) => (
-            <div key={label} className="flex-1">
+            <div key={label} className="flex-1" onClick={() => {setStep(idx + 1)}}>
               <div
-                className={`w-8 h-8 mx-auto rounded-full text-center leading-8 ${step === idx + 1 ? 'bg-firefly-600 text-white' : 'bg-firefly-200 text-gray-600'
-                  }`}
+                className={`w-8 h-8 mx-auto rounded-full text-center leading-8 ${
+                  step === idx + 1 ? 'bg-firefly-600 text-white' : 'bg-firefly-200 text-gray-600'
+                } ${errorSteps.includes(idx + 1) && step !== idx + 1 ? 'bg-red-600 text-white' : ''}`}
               >
                 {idx + 1}
               </div>
-              <div className="text-xl text-center mt-2">{label}</div>
+              <div className={`text-xl text-center mt-2 ${errorSteps.includes(idx + 1) && step !== idx + 1 ? 'text-red-600' : ''}`}>{label}</div>
             </div>
           ))}
         </div>
@@ -312,7 +403,11 @@ export default function RequestForm() {
 
             {/* is_partner */}
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
-              <label className="block font-medium">{UIRequestForm.is_partner.label}</label>
+              <label className="block font-medium">{UIRequestForm.is_partner.label}
+                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.is_partner.description}</p>
+              </label>
+                              
+
               <div className="mt-2 space-x-6">
                 {UIRequestForm.is_partner.options.map((opt) => (
                   <label key={opt.value} className="inline-flex items-center">
@@ -428,7 +523,7 @@ export default function RequestForm() {
                   </select>
                   {form.errors.request_link_type && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.request_link_type}</p>
-                  )}
+                )}
                 </div>
                 {/* Current stage */}
                 <div className="mt-4">
@@ -450,7 +545,7 @@ export default function RequestForm() {
                   </select>
                   {form.errors.project_stage && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.project_stage}</p>
-                  )}
+                )}
                 </div>
                 {/* Project URL */}
                 <div className="mt-4">
@@ -466,7 +561,7 @@ export default function RequestForm() {
                   />
                   {form.errors.project_url && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.project_url}</p>
-                  )}
+                )}
                 </div>
                 {/* Activity Name */}
                 <div className="mt-4">
@@ -483,7 +578,7 @@ export default function RequestForm() {
                   />
                   {form.errors.activity_name && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.activity_name}</p>
-                  )}
+                )}
                 </div>
               </>
             ) : (
@@ -501,7 +596,7 @@ export default function RequestForm() {
                   />
                   {form.errors.capacity_development_title && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.capacity_development_title}</p>
-                  )}
+                )}
                 </div>
                 {/* Significative changes */}
                 <div className="mt-4">
@@ -518,7 +613,7 @@ export default function RequestForm() {
                   </select>
                   {form.errors.has_significant_changes && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.has_significant_changes}</p>
-                  )}
+                )}
                 </div>
                 {/* Changes description if Yes */}
                 {form.data.has_significant_changes === 'Yes' && (
@@ -533,8 +628,8 @@ export default function RequestForm() {
                       onChange={(e) => form.setData('changes_description' as keyof typeof form.data, e.currentTarget.value)}
                     />
                     {form.errors.changes_description && (
-                      <p className="text-red-600 text-sm mt-1">{form.errors.changes_description}</p>
-                    )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.changes_description}</p>
+                )}
                   </div>
                 )}
               </>
@@ -561,8 +656,8 @@ export default function RequestForm() {
                 <option value="Both">Both</option>
               </select>
               {form.errors.related_activity && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.related_activity}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.related_activity}</p>
+                )}
             </div>
             {/* Sub-themes */}
             <fieldset className="mt-8">
@@ -601,7 +696,7 @@ export default function RequestForm() {
                   />
                   {form.errors.subthemes_other && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.subthemes_other}</p>
-                  )}
+                )}
                 </div>
               )}
             </fieldset>
@@ -642,7 +737,7 @@ export default function RequestForm() {
                   />
                   {form.errors.support_types_other && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.support_types_other}</p>
-                  )}
+                )}
                 </div>
               )}
             </fieldset>
@@ -660,8 +755,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('gap_description' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.gap_description && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.gap_description}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.gap_description}</p>
+                )}
             </div>
           </>
         )}
@@ -688,8 +783,8 @@ export default function RequestForm() {
                 <option value="No">No</option>
               </select>
               {form.errors.has_partner && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.has_partner}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.has_partner}</p>
+                )}
             </div>
             {/* Partner details if Yes */}
             {form.data.has_partner === 'Yes' && (
@@ -711,7 +806,7 @@ export default function RequestForm() {
                   />
                   {form.errors.partner_name && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.partner_name}</p>
-                  )}
+                )}
                 </div>
                 <div className="mt-8">
                   <label className="block font-medium">Has this partner already been contacted and confirmed?</label>
@@ -727,7 +822,7 @@ export default function RequestForm() {
                   </select>
                   {form.errors.partner_confirmed && (
                     <p className="text-red-600 text-sm mt-1">{form.errors.partner_confirmed}</p>
-                  )}
+                )}
                 </div>
               </>
             )}
@@ -747,8 +842,8 @@ export default function RequestForm() {
                 <option value="No">No</option>
               </select>
               {form.errors.needs_financial_support && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.needs_financial_support}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.needs_financial_support}</p>
+                )}
             </div>
             {/* Budget breakdown if Yes */}
             {form.data.needs_financial_support === 'Yes' && (
@@ -768,7 +863,7 @@ export default function RequestForm() {
                   placeholder="- Personnel & Staffing (e.g., salaries, stipends, consultant fees) ... "
                 />
                 {form.errors.budget_breakdown && (
-                  <p className="text-red-600 text-sm mt-1">{form.errors.budget_breakdown}</p>
+                    <p className="text-red-600 text-sm mt-1">{form.errors.budget_breakdown}</p>
                 )}
               </div>
             )}
@@ -789,8 +884,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('support_months' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.support_months && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.support_months}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.support_months}</p>
+                )}
             </div>
 
             <div className="mt-8">
@@ -808,8 +903,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('completion_date' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.completion_date && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.completion_date}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.completion_date}</p>
+                )}
             </div>
           </>
         )}
@@ -832,8 +927,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('risks' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.risks && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.risks}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.risks}</p>
+                )}
             </div>
             {/* Personnel expertise */}
             <div className="mt-8">
@@ -847,8 +942,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('personnel_expertise' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.personnel_expertise && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.personnel_expertise}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.personnel_expertise}</p>
+                )}
             </div>
             {/* Direct Beneficiaries */}
             <div className="mt-8">
@@ -863,8 +958,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('direct_beneficiaries' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.direct_beneficiaries && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.direct_beneficiaries}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.direct_beneficiaries}</p>
+                )}
             </div>
             {/* Beneficiaries Number */}
             <div className="mt-8">
@@ -883,8 +978,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('direct_beneficiaries_number' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.direct_beneficiaries_number && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.direct_beneficiaries_number}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.direct_beneficiaries_number}</p>
+                )}
             </div>
             {/* Expected Outcomes */}
             <div className="mt-8">
@@ -901,8 +996,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('expected_outcomes' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.expected_outcomes && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.expected_outcomes}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.expected_outcomes}</p>
+                )}
             </div>
             {/* Success Metrics */}
             <div className="mt-8">
@@ -919,8 +1014,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('success_metrics' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.success_metrics && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.success_metrics}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.success_metrics}</p>
+                )}
             </div>
             {/* Long term impact */}
             <div className="mt-8">
@@ -934,8 +1029,8 @@ export default function RequestForm() {
                 onChange={(e) => form.setData('long_term_impact' as keyof typeof form.data, e.currentTarget.value)}
               />
               {form.errors.long_term_impact && (
-                <p className="text-red-600 text-sm mt-1">{form.errors.long_term_impact}</p>
-              )}
+                    <p className="text-red-600 text-sm mt-1">{form.errors.long_term_impact}</p>
+                )}
             </div>
           </>
         )}
@@ -953,8 +1048,8 @@ export default function RequestForm() {
           <button
             type="button"
             onClick={() => {
-              handleSubmitV2('draft');
-            }}
+                handleSubmitV2('draft');
+              }}
             disabled={form.processing}
             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
           >

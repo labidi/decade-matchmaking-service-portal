@@ -7,7 +7,7 @@ type XHRAlertDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   message: string;
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'redirect';
   onConfirm?: () => void;
 };
 
@@ -20,6 +20,7 @@ export default function XHRAlertDialog({
 }: XHRAlertDialogProps) {
   const icon = {
     success: <CheckIcon className="w-6 h-6 text-green-600" />,
+    redirect: <CheckIcon className="w-6 h-6 text-green-600" />,
     error:   <Cross2Icon className="w-6 h-6 text-red-600" />,
     info:    <InfoCircledIcon className="w-6 h-6 text-blue-600" />,
   }[type];
@@ -33,7 +34,7 @@ export default function XHRAlertDialog({
             {icon}
             <div className="flex-1">
               <AlertDialog.Title className="text-lg font-semibold text-gray-900">
-                {type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Information'}
+                {type === 'success' || 'redirect' ? 'Success' : type === 'error' ? 'Error' : 'Information'}
               </AlertDialog.Title>
               <AlertDialog.Description className="mt-2 text-sm text-gray-700">
                 {message}

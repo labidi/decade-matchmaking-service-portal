@@ -1,26 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
 use App\Models\Request as OCDRequest;
 use Illuminate\Http\Request;
 use App\Models\Request\RequestStatus;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use Illuminate\Support\Facades\DB;
-
+use App\Http\Controllers\Controller;
 
 
 class RequestController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+
 
     /**
      * Display a listing of the resource.
@@ -32,9 +24,13 @@ class RequestController extends Controller
             'banner' => [
                 'title' => 'List of my requests',
                 'description' => 'Manager your requests here.',
-                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
+                'image' => '/assets/img/sidebar.png',
             ],
             'requests' => OCDRequest::with('status')->where('user_id', $httpRequest->user()->id)->get(),
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Requests', 'url' => route('user.request.list')],
+            ],
         ]);
     }
 
@@ -48,8 +44,13 @@ class RequestController extends Controller
             'banner' => [
                 'title' => 'Create a new request',
                 'description' => 'Create a new request to get started.',
-                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
-            ]
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Requests', 'url' => route('user.request.list')],
+                ['name' => 'Create Request', 'url' => route('user.request.create')],
+            ],
         ]);
     }
 
@@ -128,9 +129,14 @@ class RequestController extends Controller
             'banner' => [
                 'title' => 'Request #'.$OCDrequestId,
                 'description' => 'View my request details here.',
-                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
+                'image' => '/assets/img/sidebar.png',
             ],
-            'request'=> $ocdRequest->toArray()
+            'request'=> $ocdRequest->toArray(),
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Requests', 'url' => route('user.request.list')],
+                ['name' => 'View Request #'.$ocdRequest->id, 'url' => route('partner.opportunity.show', ['id' => $ocdRequest->id])],
+            ],
         ]);
     }
 
@@ -149,9 +155,14 @@ class RequestController extends Controller
             'banner' => [
                 'title' => 'Create a new request',
                 'description' => 'Create a new request to get started.',
-                'image' => 'http://portal_dev.local/assets/img/sidebar.png',
+                'image' => '/assets/img/sidebar.png',
             ],
-            'request'=> $ocdRequest->toArray()
+            'request'=> $ocdRequest->toArray(),
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Requests', 'url' => route('user.request.list')],
+                ['name' => 'Edit Request #'.$ocdRequest->id, 'url' => route('user.request.edit', ['id' => $ocdRequest->id])],
+            ],
         ]);
     }
 
