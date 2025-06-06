@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        schema::table('opportunities', function (Blueprint $table) {	
+        Schema::table('opportunities', function (Blueprint $table) {
             $table->unsignedTinyInteger('status')->nullable(false)->default(1)->after('id');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        schema::table('opportunities', function (Blueprint $table) {	
+        Schema::table('opportunities', function (Blueprint $table) {
             $table->dropColumn('status');
         });
     }

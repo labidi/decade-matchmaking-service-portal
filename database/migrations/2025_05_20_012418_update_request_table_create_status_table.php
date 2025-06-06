@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        schema::table('requests', function (Blueprint $table) {
+        Schema::table('requests', function (Blueprint $table) {
             $table->text('request_data')->nullable();
             $table->unsignedBigInteger('user_id')->nullable(false);
             $table->unsignedBigInteger('matched_partner_id')->nullable();
