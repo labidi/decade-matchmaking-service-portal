@@ -48,6 +48,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
     Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('user.request.show');
     Route::post('user/request/submit/{mode?}', [OcdRequestController::class, 'submit'])->name('user.request.submit');
+    Route::post('user/request/{request}/document', [\App\Http\Controllers\DocumentController::class, 'store'])->name('user.request.document.store');
     Route::get('user/opportunity/list', [UserOpportunityController::class, 'list'])->name('user.opportunity.list');
     Route::get('user/opportunity/show/{id}', [UserOpportunityController::class, 'show'])->name('user.opportunity.show');
 });
