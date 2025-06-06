@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Document;
 
 class OcdRequestController extends Controller
 {
@@ -167,6 +169,10 @@ class OcdRequestController extends Controller
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }
 
+        $documents = \App\Models\Document::where('parent_type', OCDRequest::class)
+            ->where('parent_id', $OCDrequestId)
+            ->get();
+
         return Inertia::render('Request/Show', [
             'title' => 'Request #' . $OCDrequestId,
             'banner' => [
@@ -175,6 +181,7 @@ class OcdRequestController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'request' => $ocdRequest->toArray(),
+            'documents' => $documents,
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
@@ -214,6 +221,28 @@ class OcdRequestController extends Controller
                 ['name' => 'Edit Request #' . $ocdRequest->id, 'url' => route('user.request.edit', ['id' => $ocdRequest->id])],
             ],
         ]);
+    }
+
+    public function storeDocument(Request $httpRequest, OCDRequest $request)
+    {
+        $validated = $httpRequest->validate([
+            'document_type' => 'required|in:financial_breakdown_report,lesson_learned_report,offer_document',
+            'file' => 'required|file',
+        ]);
+
+        $path = $httpRequest->file('file')->store('documents', 'public');
+
+        Document::create([
+            'name' => $httpRequest->file('file')->getClientOriginalName(),
+            'path' => $path,
+            'file_type' => $httpRequest->file('file')->getClientMimeType(),
+            'document_type' => $validated['document_type'],
+            'parent_id' => $request->id,
+            'parent_type' => OCDRequest::class,
+            'uploader_id' => $httpRequest->user()->id,
+        ]);
+
+        return back();
     }
 
 

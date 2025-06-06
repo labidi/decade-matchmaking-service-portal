@@ -43,17 +43,22 @@ Route::get('user-guide', [UserGuideController::class, 'download'])->name('user.g
 Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::get('dashboard', IndexController::class)->name('dashboard');
+
+
     Route::get('user/request/create', [OcdRequestController::class, 'create'])->name('user.request.create');
     Route::get('user/request/myrequests', [OcdRequestController::class, 'myRequestsList'])->name('user.request.myrequests');
     Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
     Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('user.request.show');
     Route::post('user/request/submit/{mode?}', [OcdRequestController::class, 'submit'])->name('user.request.submit');
+    Route::post('user/request/{request}/document', [OcdRequestController::class, 'storeDocument'])->name('user.request.document.store');
+
+
     Route::get('user/opportunity/list', [UserOpportunityController::class, 'list'])->name('user.opportunity.list');
     Route::get('user/opportunity/show/{id}', [UserOpportunityController::class, 'show'])->name('user.opportunity.show');
 });
 
 Route::middleware(['auth', 'role:partner'])->group(function () {
-    
+
     // Opportunity routes
     Route::get('partner/opportunity/create', [PartnerOpportunityController::class, 'create'])->name('partner.opportunity.create');
     Route::post('partner/opportunity/store', [PartnerOpportunityController::class, 'store'])->name('partner.opportunity.store');
