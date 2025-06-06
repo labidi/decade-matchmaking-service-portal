@@ -135,7 +135,8 @@ export type OCDRequestGrid = {
         canEdit: boolean;
         canDelete: boolean;
         canView: boolean;
-        canCreate: boolean;
-        canExpressInterrest: boolean;
+        canCreate?: boolean;
+        canExpressInterrest?: boolean;
+        canExportPdf?:boolean;
     }
 }
