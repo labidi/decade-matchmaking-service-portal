@@ -29,4 +29,26 @@ class OpportunityController extends Controller
             ],
         ]);
     }
+
+
+    public function show(Request $httpRequest)
+    {
+        // Fetch all opportunities
+        $opportunities = Opportunity::where('status',Opportunity::STATUS['ACTIVE'])->get();
+
+        // Return the opportunities to the view
+        return Inertia::render('Opportunity/List', [
+            'opportunities' => $opportunities,
+            'title' => 'Opportunities',
+            'banner' => [
+                'title' => 'List of Opportunities',
+                'description' => 'Manage your opportunities here.',
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Opportunities', 'url' => route('user.opportunity.list')],
+            ],
+        ]);
+    }
 }

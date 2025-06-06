@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
-use Illuminate\Http\Request;
 use App\Models\Request\RequestStatus;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Http\Controllers\Controller;
-
 
 class RequestController extends Controller
 {
@@ -17,7 +17,7 @@ class RequestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function list(Request $httpRequest)
+    public function myRequestsList(Request $httpRequest)
     {
         return Inertia::render('Request/List', [
             'title' => 'My requests',
@@ -29,7 +29,50 @@ class RequestController extends Controller
             'requests' => OCDRequest::with('status')->where('user_id', $httpRequest->user()->id)->get(),
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
-                ['name' => 'Requests', 'url' => route('user.request.list')],
+                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
+            ],
+            'grid.actions' => [
+                'canEdit' => true,
+                'canDelete' => false,
+                'canView' => true,
+                'canCreate' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function list(Request $httpRequest)
+    {
+        $request = OCDRequest::with('status')->whereHas(
+            'status',
+            function (Builder $query) {
+                $query->where('status_code', 'validated');
+                $query->orWhere('status_code', 'offer_made');
+                $query->orWhere('status_code', 'match_made');
+                $query->orWhere('status_code', 'closed');
+            }
+        )->get();
+
+        return Inertia::render('Request/List', [
+            'title' => 'View Request for Training workshops',
+            'banner' => [
+                'title' => 'View Request for Training workshops',
+                'description' => 'View requests for training and workshops.',
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'requests' => $request,
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Requests', 'url' => route('partner.request.list')],
+            ],
+            'grid.actions' => [
+                'canEdit' => false,
+                'canDelete' => false,
+                'canView' => true,
+                'canCreate' => false,
+                'canExpressInterrest' => true
             ],
         ]);
     }
@@ -48,7 +91,7 @@ class RequestController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
-                ['name' => 'Requests', 'url' => route('user.request.list')],
+                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
                 ['name' => 'Create Request', 'url' => route('user.request.create')],
             ],
         ]);
@@ -119,23 +162,23 @@ class RequestController extends Controller
      */
     public function show(int $OCDrequestId)
     {
-        $ocdRequest = OCDRequest::with('status')->find($OCDrequestId);  
+        $ocdRequest = OCDRequest::with('status')->find($OCDrequestId);
         if (!$ocdRequest) {
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }
 
         return Inertia::render('Request/Show', [
-            'title' => 'Request #'.$OCDrequestId,
+            'title' => 'Request #' . $OCDrequestId,
             'banner' => [
-                'title' => 'Request #'.$OCDrequestId,
+                'title' => 'Request #' . $OCDrequestId,
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'request'=> $ocdRequest->toArray(),
+            'request' => $ocdRequest->toArray(),
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
-                ['name' => 'Requests', 'url' => route('user.request.list')],
-                ['name' => 'View Request #'.$ocdRequest->id, 'url' => route('partner.opportunity.show', ['id' => $ocdRequest->id])],
+                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
+                ['name' => 'View Request #' . $ocdRequest->id, 'url' => route('partner.opportunity.show', ['id' => $ocdRequest->id])],
             ],
         ]);
     }
@@ -157,11 +200,11 @@ class RequestController extends Controller
                 'description' => 'Create a new request to get started.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'request'=> $ocdRequest->toArray(),
+            'request' => $ocdRequest->toArray(),
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
-                ['name' => 'Requests', 'url' => route('user.request.list')],
-                ['name' => 'Edit Request #'.$ocdRequest->id, 'url' => route('user.request.edit', ['id' => $ocdRequest->id])],
+                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
+                ['name' => 'Edit Request #' . $ocdRequest->id, 'url' => route('user.request.edit', ['id' => $ocdRequest->id])],
             ],
         ]);
     }

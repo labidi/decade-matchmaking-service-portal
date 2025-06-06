@@ -32,7 +32,7 @@ export default function Dashboard({
                                         </div>
                                     </div>
                                 </Link>
-                                <Link href={route('user.request.list')} className={LinkCardClassName}>
+                                <Link href={route('user.request.myrequests')} className={LinkCardClassName}>
                                     <div>
                                         <div className="px-6 py-4">
                                             <div className="font-bold text-xl mb-2">List of My Requests</div>

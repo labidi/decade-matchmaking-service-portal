@@ -356,7 +356,6 @@ useEffect(() => {
   }
 }, []);
 
-console.log(errorSteps)
 return (
     <FrontendLayout>
       <Head title="Submit Request" />
@@ -368,7 +367,7 @@ return (
         onConfirm={() => {
           setXhrDialogOpen(false);
           if (xhrdialogResponseType === 'redirect') {
-            router.visit(route(`user.request.list`), { method: 'get' });
+            router.visit(route(`user.request.myrequests`), { method: 'get' });
           }
         }}
       />
@@ -403,17 +402,17 @@ return (
 
             {/* is_partner */}
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
-              <label className="block font-medium">{UIRequestForm.is_partner.label}
-                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.is_partner.description}</p>
+              <label className="block font-medium">{UIRequestForm.details.is_partner.label}
+                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.details.is_partner.description}</p>
               </label>
                               
 
               <div className="mt-2 space-x-6">
-                {UIRequestForm.is_partner.options.map((opt) => (
+                {UIRequestForm.details.is_partner.options.map((opt) => (
                   <label key={opt.value} className="inline-flex items-center">
                     <input
                       type="radio"
-                      name={UIRequestForm.is_partner.id}
+                      name={UIRequestForm.details.is_partner.id}
                       value={opt.value}
                       checked={form.data.is_partner === opt.value}
                       onChange={(e) => form.setData('is_partner', e.currentTarget.value)}
@@ -428,12 +427,12 @@ return (
             {/* Si partenaire */}
             {isPartner && (
               <div className="mt-8">
-                <label htmlFor={UIRequestForm.unique_id.id} className="block font-medium">
-                  {UIRequestForm.unique_id.label}
+                <label htmlFor={UIRequestForm.details.unique_id.id} className="block font-medium">
+                  {UIRequestForm.details.unique_id.label}
                 </label>
-                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.unique_id.description}</p>
+                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.details.unique_id.description}</p>
                 <input
-                  id={UIRequestForm.unique_id.id}
+                  id={UIRequestForm.details.unique_id.id}
                   type="text"
                   required
                   className={getInputClass('unique_id')}
@@ -447,12 +446,12 @@ return (
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
               {/* First Name */}
               <div>
-                <label htmlFor={UIRequestForm.first_name.id} className="block font-medium">
-                  {UIRequestForm.first_name.label}
+                <label htmlFor={UIRequestForm.details.first_name.id} className="block font-medium">
+                  {UIRequestForm.details.first_name.label}
                 </label>
-                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.first_name.description}</p>
+                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.details.first_name.description}</p>
                 <input
-                  id={UIRequestForm.first_name.id}
+                  id={UIRequestForm.details.first_name.id}
                   type="text"
                   className={getInputClass('first_name')}
                   value={form.data.first_name}
@@ -464,12 +463,12 @@ return (
               </div>
               {/* Last Name */}
               <div>
-                <label htmlFor={UIRequestForm.last_name.id} className="block font-medium">
-                  {UIRequestForm.last_name.label}
+                <label htmlFor={UIRequestForm.details.last_name.id} className="block font-medium">
+                  {UIRequestForm.details.last_name.label}
                 </label>
-                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.last_name.description}</p>
+                <p className="mt-1 text-sm text-gray-500">{UIRequestForm.details.last_name.description}</p>
                 <input
-                  id={UIRequestForm.last_name.id}
+                  id={UIRequestForm.details.last_name.id}
                   type="text"
                   className={getInputClass('last_name')}
                   value={form.data.last_name}
@@ -483,9 +482,9 @@ return (
             {/* Email */}
             <div className="mt-8">
               <label htmlFor="email" className="block font-medium">
-                {UIRequestForm.email.label}
+                {UIRequestForm.details.email.label}
               </label>
-              <p className="mt-1 text-sm text-gray-500">{UIRequestForm.email.description}</p>
+              <p className="mt-1 text-sm text-gray-500">{UIRequestForm.details.email.description}</p>
               <input
                 id="email"
                 type="email"

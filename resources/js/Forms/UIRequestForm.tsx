@@ -36,50 +36,54 @@ export interface Request {
 }
 
 export const UIRequestForm = {
-    id:{
+    details: {
+        is_partner: {
+            type: 'radio',
+            options: [
+                { value: 'Yes', label: 'Yes' },
+                { value: 'No', label: 'No' },
+            ],
+            required: true,
+            label: 'Is this request related an Ocean Decade Action ?',
+            id: 'is_partner',
+            description: 'Only Ocean Decade Programmes, Projects, and Contributions are considered official Decade Actions. Activities are not considered Decade Actions.'
+        },
+        unique_id: {
+            id: 'unique_id',
+            type: 'text',
+            required: true,
+            label: 'Unique Partner ID',
+            description: 'This is the unique ID assigned to you as a partner. If you are not a partner, please leave this field blank.',
+        },
+        first_name: {
+            id: 'first_name',
+            type: 'text',
+            required: true,
+            label: 'First Name',
+            description: 'Your given name as on official records.',
+        },
+        last_name: {
+            id: 'last_name',
+            type: 'text',
+            required: true,
+            label: 'Last Name',
+            description: 'Your family name or surname.',
+        },
+        email: {
+            id: 'email',
+            type: 'email',
+            required: true,
+            label: 'Email',
+            description: 'Please provide your contact information',
+        },
+    },
+    capacity_and_partners : {
+    },
+    id: {
         type: 'hidden',
         id: 'id',
     },
-    is_partner: {
-        type: 'radio',
-        options: [
-            { value: 'Yes', label: 'Yes' },
-            { value: 'No', label: 'No' },
-        ],
-        required: true,
-        label: 'Is this request related an Ocean Decade Action ?',
-        id: 'is_partner',
-        description: 'Only Ocean Decade Programmes, Projects, and Contributions are considered official Decade Actions. Activities are not considered Decade Actions.'
-    },
-    unique_id: {
-        id: 'unique_id',
-        type: 'text',
-        required: true,
-        label: 'Unique Partner ID',
-        description: 'This is the unique ID assigned to you as a partner. If you are not a partner, please leave this field blank.',
-    },
-    first_name: {
-        id: 'first_name',
-        type: 'text',
-        required: true,
-        label: 'First Name',
-        description: 'Your given name as on official records.',
-    },
-    last_name: {
-        id: 'last_name',
-        type: 'text',
-        required: true,
-        label: 'Last Name',
-        description: 'Your family name or surname.',
-    },
-    email: {
-        id: 'email',
-        type: 'email',
-        required: true,
-        label: 'Email',
-        description: 'Please provide your contact information',
-    },
-    capacity_development_title:{
+    capacity_development_title: {
         id: 'capacity_development_title',
         type: 'text',
         required: true,

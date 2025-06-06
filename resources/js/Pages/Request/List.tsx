@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDRequest, OCDRequestList } from '@/types';
+import { OCDRequest, OCDRequestList, OCDRequestGrid } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -12,14 +12,13 @@ import 'primeicons/primeicons.css';
 
 export default function RequestsList() {
     const requests = usePage().props.requests as OCDRequestList;
-    console.log('Requests:', requests);
-    const titleBodyTemplate = (rowData: OCDRequest) => rowData.request_data.capacity_development_title;
+    const grid = usePage().props.grid as OCDRequestGrid;
+    const titleBodyTemplate = (rowData: OCDRequest) => rowData.request_data.capacity_development_title ?? 'N/A';
     const submissionDateTemplate = (rowData: OCDRequest) => new Date(rowData.created_at).toLocaleDateString();
-    const statusTemplate = (rowData: OCDRequest) => rowData.status.status_label;
 
     const actionsTemplate = (rowData: OCDRequest) => (
         <div className="flex space-x-4">
-            {rowData.status.status_code === 'draft' && (
+            {grid.actions.canEdit && rowData.status.status_code === 'draft' && (
                 <Link
                     href={route('user.request.edit', rowData.id)}
                     className="flex items-center text-blue-600 hover:text-blue-800"
@@ -28,13 +27,24 @@ export default function RequestsList() {
                     Edit
                 </Link>
             )}
-            <Link
-                href={route('user.request.show', rowData.id)}
-                className="flex items-center text-green-600 hover:text-green-800"
-            >
-                <i className="pi pi-eye mr-1" aria-hidden="true" />
-                View
-            </Link>
+            {grid.actions.canView && (
+                <Link
+                    href={route('user.request.show', rowData.id)}
+                    className="flex items-center text-green-600 hover:text-green-800"
+                >
+                    <i className="pi pi-eye mr-1" aria-hidden="true" />
+                    View
+                </Link>
+            )}
+            {grid.actions.canExpressInterrest && (
+                <Link
+                    href={route('user.request.show', rowData.id)}
+                    className="flex items-center text-green-700 hover:text-green-800"
+                >
+                    <i className="pi pi-star-fill mr-1" aria-hidden="true" />
+                    Express interrest
+                </Link>
+            )}
         </div>
     );
 
@@ -88,14 +98,17 @@ export default function RequestsList() {
         <FrontendLayout>
             <Head title="Welcome" />
             <div>
-                <div className='flex justify-between items-center mb-6'>
-                    <Link
-                        href={route('user.request.create')}
-                        className="px-4 py-2 text-xl bg-firefly-600 text-white rounded hover:bg-firefly-700"
-                    >
-                        Create new request
-                    </Link>
-                </div>
+                {grid.actions.canCreate && (
+                    <div className='flex justify-between items-center mb-6'>
+                        <Link
+                            href={route('user.request.create')}
+                            className="px-4 py-2 text-xl bg-firefly-600 text-white rounded hover:bg-firefly-700"
+                        >
+                            Create new request
+                        </Link>
+                    </div>
+                )}
+
                 <DataTable
                     value={requests}
                     paginator
