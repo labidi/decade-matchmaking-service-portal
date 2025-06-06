@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class RequestController extends Controller
+class OcdRequestController extends Controller
 {
 
 
@@ -160,9 +160,9 @@ class RequestController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $OCDrequestId)
+    public function show(Request $httpRequest, int $OCDrequestId)
     {
-        $ocdRequest = OCDRequest::with('status')->find($OCDrequestId);
+        $ocdRequest = OCDRequest::with(['status', 'user'])->find($OCDrequestId);
         if (!$ocdRequest) {
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }
@@ -179,6 +179,13 @@ class RequestController extends Controller
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
                 ['name' => 'View Request #' . $ocdRequest->id, 'url' => route('partner.opportunity.show', ['id' => $ocdRequest->id])],
+            ],
+            'requestDetail.actions' => [
+                'canEdit' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
+                'canDelete' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
+                'canCreate' => false,
+                'canExpressInterrest' => $ocdRequest->user->id !== $httpRequest->user()->id,
+                'canExportPdf' => true
             ],
         ]);
     }

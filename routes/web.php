@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\IndexController;
-use App\Http\Controllers\RequestController;
+use App\Http\Controllers\OcdRequestController;
 use Inertia\Inertia;
 use App\Http\Controllers\Partner\OpportunityController as PartnerOpportunityController;
 use App\Http\Controllers\User\OpportunityController as UserOpportunityController;
@@ -43,11 +43,11 @@ Route::get('user-guide', [UserGuideController::class, 'download'])->name('user.g
 Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::get('dashboard', IndexController::class)->name('dashboard');
-    Route::get('user/request/create', [RequestController::class, 'create'])->name('user.request.create');
-    Route::get('user/request/myrequests', [RequestController::class, 'myRequestsList'])->name('user.request.myrequests');
-    Route::get('user/request/edit/{id}', [RequestController::class, 'edit'])->name('user.request.edit');
-    Route::get('user/request/show/{id}', [RequestController::class, 'show'])->name('user.request.show');
-    Route::post('user/request/submit/{mode?}', [RequestController::class, 'submit'])->name('user.request.submit');
+    Route::get('user/request/create', [OcdRequestController::class, 'create'])->name('user.request.create');
+    Route::get('user/request/myrequests', [OcdRequestController::class, 'myRequestsList'])->name('user.request.myrequests');
+    Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
+    Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('user.request.show');
+    Route::post('user/request/submit/{mode?}', [OcdRequestController::class, 'submit'])->name('user.request.submit');
     Route::get('user/opportunity/list', [UserOpportunityController::class, 'list'])->name('user.opportunity.list');
     Route::get('user/opportunity/show/{id}', [UserOpportunityController::class, 'show'])->name('user.opportunity.show');
 });
@@ -59,8 +59,8 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::post('partner/opportunity/store', [PartnerOpportunityController::class, 'store'])->name('partner.opportunity.store');
     Route::get('partner/opportunity/list', [PartnerOpportunityController::class, 'list'])->name('partner.opportunity.list');
     Route::get('partner/opportunity/show/{id}', [PartnerOpportunityController::class, 'show'])->name('partner.opportunity.show');
-    Route::get('partner/request/list', [RequestController::class, 'list'])->name('partner.request.list');
-    Route::get('partner/request/matchedrequests', [RequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
+    Route::get('partner/request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
+    Route::get('partner/request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
 });
 
 
