@@ -131,6 +131,12 @@ export const UIRequestForm: UIStep[] = [
     {
         label: 'Details',
         fields: {
+            capacity_development_title: {
+                id: 'capacity_development_title',
+                type: 'text',
+                required: true,
+                label: 'What is the name or title of the capacity development activity you are submitting ?',
+            },
             request_link_type: {
                 id: 'request_link_type',
                 type: 'select',
@@ -169,13 +175,6 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Could you please provide the name of the proposal, programme, or initiative—or, if this is a standalone request, the name of the capacity development activity?',
                 show: data => data.is_partner !== 'Yes',
-            },
-            capacity_development_title: {
-                id: 'capacity_development_title',
-                type: 'text',
-                required: true,
-                label: 'What is the name or title of the capacity development activity you are submitting ?',
-                show: data => data.is_partner === 'Yes',
             },
             has_significant_changes: {
                 id: 'has_significant_changes',
