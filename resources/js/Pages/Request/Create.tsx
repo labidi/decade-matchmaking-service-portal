@@ -320,9 +320,9 @@ export default function RequestForm() {
   };
 
   const renderField = (name: FormDataKeys, field: UIField) => {
-    if (field.show && !field.show(form.data as unknown as Request)) {
-      return null;
-    }
+   // if (field.show && !field.show(form.data as unknown as Request)) {
+     // return null;
+    //}
     const error = form.errors[name];
     const common = {
       id: field.id,
