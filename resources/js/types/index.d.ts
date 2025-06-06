@@ -93,7 +93,7 @@ export interface OCDRequest {
         support_months: string;
         completion_date: string;
         risks: string;
-        personnel: string;
+        personnel_expertise: string;
         direct_beneficiaries: string;
         direct_beneficiaries_number: string;
         expected_outcomes: string;
