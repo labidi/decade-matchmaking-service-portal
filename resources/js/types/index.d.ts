@@ -129,3 +129,13 @@ export interface OCDOpportunity {
 }
 
 export type OCDOpportunitiesList = OCDOpportunity[];
+
+export type OCDRequestGrid = {
+    actions: {
+        canEdit: boolean;
+        canDelete: boolean;
+        canView: boolean;
+        canCreate: boolean;
+        canExpressInterrest: boolean;
+    }
+}

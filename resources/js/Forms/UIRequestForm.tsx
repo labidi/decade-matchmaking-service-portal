@@ -34,7 +34,6 @@ export interface Request {
     success_metrics: string;
     long_term_impact: string;
 }
-
 export interface UIField {
     id: string;
     type: string;
