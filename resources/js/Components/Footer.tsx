@@ -1,15 +1,18 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import ApplicationLogo from './ApplicationLogo';
+import FlanderLogo from './FlanderLogo';
 import { Instagram, Facebook, Linkedin } from 'lucide-react';
 
 const Header: React.FC = () => {
     return (
         <section id="footer" className="bg-gray-700 py-8 px-4">
-            <div className='container grid md:grid-cols-4 gap-4 mx-auto'>
+            <div className='container grid md:grid-cols-5 gap-3 mx-auto'>
                 <div>
                     <ApplicationLogo />
+                   
                 </div>
+                <div> <FlanderLogo />u</div>
                 <div>
                     <span className='text font-bold text-white'>Contact</span>
                     <p className='text-white'>Capacity Development Facility</p>
