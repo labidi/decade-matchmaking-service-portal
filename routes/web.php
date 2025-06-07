@@ -8,6 +8,7 @@ use App\Http\Controllers\Partner\OpportunityController as PartnerOpportunityCont
 use App\Http\Controllers\User\OpportunityController as UserOpportunityController;
 use App\Http\Controllers\Partner\OpportunityController;
 use App\Http\Controllers\UserGuideController;
+use App\Http\Controllers\Admin\UserRoleController;
 
 Route::get('/', function () {
     return Inertia::render('Index', [
@@ -63,6 +64,11 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::get('partner/request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
     Route::get('partner/request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
 });
+
+// Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
+    Route::get('users', [UserRoleController::class, 'index'])->name('admin.users.index');
+    Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
+// });
 
 
 
