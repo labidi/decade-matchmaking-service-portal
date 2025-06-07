@@ -53,6 +53,21 @@ export interface OCDMetrics {
     number_of_open_partner_opertunities: number;
 }
 
+export interface Document {
+    id: number;
+    name: string;
+    path: string;
+    file_type?: string;
+    document_type?: string;
+    parent_id?: number;
+    parent_type?: string;
+    uploader_id: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export type DocumentList = Document[];
+
 export interface OCDRequest {
     id: string;
     type: string;

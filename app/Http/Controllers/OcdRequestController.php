@@ -167,6 +167,10 @@ class OcdRequestController extends Controller
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }
 
+        $documents = \App\Models\Document::where('parent_type', OCDRequest::class)
+            ->where('parent_id', $OCDrequestId)
+            ->get();
+
         return Inertia::render('Request/Show', [
             'title' => 'Request #' . $OCDrequestId,
             'banner' => [
@@ -175,6 +179,7 @@ class OcdRequestController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'request' => $ocdRequest->toArray(),
+            'documents' => $documents,
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
