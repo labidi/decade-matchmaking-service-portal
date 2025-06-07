@@ -86,6 +86,15 @@ export default function UserDropdown() {
                         My Opportunties List
                     </Link>
                     )}
+                    {user.is_admin && (
+                    <Link
+                        href={route('admin.users.index')}
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
+                    >
+                        Manage User Roles
+                    </Link>
+                    )}
                     <form method="POST" onSubmit={handleSignOutFormSubmit}>
                         {/* Include CSRF token if needed */}
                         <button

@@ -11,6 +11,17 @@ export interface User {
     is_admin: boolean;
 }
 
+export interface Role {
+    id: number;
+    name: string;
+}
+
+export interface UserWithRoles extends User {
+    roles: Role[];
+}
+
+export type UserWithRolesList = UserWithRoles[];
+
 export interface Auth {
     user: User;
 }
