@@ -65,10 +65,10 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::get('partner/request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
 });
 
-Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
+// Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('users', [UserRoleController::class, 'index'])->name('admin.users.index');
     Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
-});
+// });
 
 
 

@@ -4,13 +4,12 @@ import FrontendLayout from '@/Layouts/FrontendLayout';
 import axios from 'axios';
 import { Role, UserWithRoles } from '@/types';
 
-interface PageProps {
-    users: UserWithRoles[];
-    roles: Role[];
-}
-
 export default function UserRolesList() {
-    const { users, roles } = usePage<PageProps>().props;
+    const users = usePage().props.users as UserWithRoles[];
+    const roles = usePage().props.roles as Role[];
+
+    console.log(users);
+    console.log(roles);
 
     const [userRoles, setUserRoles] = useState<Record<number, string[]>>(() => {
         const map: Record<number, string[]> = {};

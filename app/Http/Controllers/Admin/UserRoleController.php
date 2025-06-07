@@ -14,7 +14,17 @@ class UserRoleController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/User/List', [
-            'users' => User::with('roles')->get(),
+            'title' => 'Manage users roles',
+            'banner' => [
+                'title' => 'List of my requests',
+                'description' => 'Manager your requests here.',
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
+            ],
+            'users' => User::with('roles')->get()->makeVisible('id'),
             'roles' => Role::all(),
         ]);
     }
