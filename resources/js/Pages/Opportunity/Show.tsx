@@ -6,7 +6,6 @@ import { OCDOpportunity } from '@/types';
 
 export default function Show() {
     const opportunity = usePage().props.opportunity as OCDOpportunity;
-    console.log(opportunity);
     return (
         <FrontendLayout>
             <Head title={`Opportunity: ${opportunity.title}`} />
@@ -25,10 +24,10 @@ export default function Show() {
                         <h2 className="text-sm font-semibold text-gray-500">Status</h2>
                         <span
                             className={`inline-block px-2 py-1 text-sm font-medium rounded-full ${opportunity.status === 'Open'
-                                    ? 'bg-green-100 text-green-800'
-                                    : opportunity.status === 'Closed'
-                                        ? 'bg-red-100 text-red-800'
-                                        : 'bg-gray-100 text-gray-800'
+                                ? 'bg-green-100 text-green-800'
+                                : opportunity.status === 'Closed'
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-gray-100 text-gray-800'
                                 }`}
                         >
                             {opportunity.status}
@@ -74,21 +73,21 @@ export default function Show() {
                 </div>
 
                 {/* Tags */}
-                {/* {opportunity.tags && opportunity.tags.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-sm font-semibold text-gray-500">Tags</h2>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {opportunity.tags.map(tag => (
-                <span
-                  key={tag}
-                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        )} */}
+                {opportunity.tags && opportunity.tags.length > 0 && (
+                    <div className="mb-6">
+                        <h2 className="text-sm font-semibold text-gray-500">Tags</h2>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                            {opportunity.tags.map(tag => (
+                                <span
+                                    key={tag}
+                                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Actions */}
                 <div className="mt-8 flex space-x-4">

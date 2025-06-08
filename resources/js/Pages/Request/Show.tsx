@@ -2,25 +2,19 @@
 import React, { useState } from 'react';
 import { Head, usePage, Link, useForm } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDRequest, OCDRequestGrid , DocumentList } from '@/types';
+import { OCDRequest, OCDRequestGrid } from '@/types';
 import { UIRequestForm } from '@/Forms/UIRequestForm';
+import Attachements from '@/Pages/Request/Components/Attachements';
 
 
 export default function ShowRequest() {
   const OcdRequest = usePage().props.request as OCDRequest;
-  const documents = usePage().props.documents as DocumentList;
-  const form = useForm<{ file: File | null; document_type: string }>({
-    file: null,
-    document_type: 'financial_breakdown_report',
-  });
   const RequestDetails = usePage().props.requestDetail as OCDRequestGrid;
-
+  
 
   return (
     <FrontendLayout>
       <Head title={`Request: ${OcdRequest.id}`} />
-
-
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
           <div className="max-w-screen-xl mx-auto px-5 bg-white min-h-sceen">
@@ -66,66 +60,8 @@ export default function ShowRequest() {
               ))}
             </div>
           </div>
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold text-gray-500 mb-2">Attachments</h2>
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                form.post(route('user.request.document.store', { request: OcdRequest.id }), {
-                  forceFormData: true,
-                  onSuccess: () => form.reset(),
-                });
-              }}
-            >
-              <div className="flex space-x-4 items-end">
-                <select
-                  className="border rounded px-2 py-1"
-                  value={form.data.document_type}
-                  onChange={e => form.setData('document_type', e.currentTarget.value)}
-                >
-                  <option value="financial_breakdown_report">Financial Breakdown Report</option>
-                  <option value="lesson_learned_report">Lesson Learned Report</option>
-                  <option value="offer_document">Offer Document</option>
-                </select>
-                <input
-                  type="file"
-                  className="border rounded px-2 py-1"
-                  onChange={e => form.setData('file', e.currentTarget.files ? e.currentTarget.files[0] : null)}
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-1 bg-firefly-600 text-white rounded disabled:opacity-50"
-                  disabled={form.processing || !form.data.file}
-                >
-                  Upload
-                </button>
-              </div>
-            </form>
-            {documents.length > 0 && (
-              <table className="mt-4 w-full text-left border">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="p-2">Name</th>
-                    <th className="p-2">Type</th>
-                    <th className="p-2">Uploaded At</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {documents.map(doc => (
-                    <tr key={doc.id} className="border-t">
-                      <td className="p-2">
-                        <a href={`/storage/${doc.path}`} className="text-blue-600 underline">
-                          {doc.name}
-                        </a>
-                      </td>
-                      <td className="p-2">{doc.document_type}</td>
-                      <td className="p-2">{new Date(doc.created_at).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+
+          <Attachements />
         </div>
         <div>
           <div className='py-2'>
@@ -145,8 +81,7 @@ export default function ShowRequest() {
       </div>
 
       <section id="offer_container" className='container'>
-        <div className='row-span-full
-'>
+        <div className='row-span-full'>
           <table className="table-auto w-full">
             <thead>
               <tr>
@@ -157,9 +92,8 @@ export default function ShowRequest() {
             </thead>
             <tbody>
             </tbody>
-          </table>u
+          </table>
         </div>
-
       </section>
 
 

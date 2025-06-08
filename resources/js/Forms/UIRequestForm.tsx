@@ -1,7 +1,7 @@
 export interface Request {
     id: string;
-    is_partner: 'Yes' | 'No';
-    unique_id: string;
+    is_related_decade_action: 'Yes' | 'No';
+    unique_related_decade_action_id: string;
     first_name: string;
     last_name: string;
     email: string;
@@ -85,8 +85,8 @@ export const UIRequestForm: UIStep[] = [
         label: 'Identification',
         fields: {
             id: { id: 'id', type: 'hidden' },
-            is_partner: {
-                id: 'is_partner',
+            is_related_decade_action: {
+                id: 'is_related_decade_action',
                 type: 'radio',
                 required: true,
                 label: 'Is this request related an Ocean Decade Action ?',
@@ -96,13 +96,13 @@ export const UIRequestForm: UIStep[] = [
                     { value: 'No', label: 'No' },
                 ],
             },
-            unique_id: {
-                id: 'unique_id',
+            unique_related_decade_action_id: {
+                id: 'unique_action_id',
                 type: 'text',
                 required: true,
-                label: 'Unique Partner ID',
-                description: 'This is the unique ID assigned to you as a partner. If you are not a partner, please leave this field blank.',
-                show: data => data.is_partner === 'Yes',
+                label: 'Unique Action ID',
+                description: 'Uniqe Action ID.  If you do not know your unique ID, please provide the title of your Action as submitted for the Call for Decade Action.',
+                show: data => data.is_related_decade_action === 'Yes',
             },
             first_name: {
                 id: 'first_name',
@@ -146,7 +146,7 @@ export const UIRequestForm: UIStep[] = [
                     { value: 'Standalone', label: 'Standalone Capacity Development Request' },
                     { value: 'Other', label: 'Other' },
                 ],
-                show: data => data.is_partner !== 'Yes',
+                show: data => data.is_related_decade_action !== 'Yes',
             },
             project_stage: {
                 id: 'project_stage',
@@ -160,20 +160,20 @@ export const UIRequestForm: UIStep[] = [
                     { value: 'Closed', label: 'Closed' },
                     { value: 'Other', label: 'Other' },
                 ],
-                show: data => data.is_partner !== 'Yes',
+                show: data => data.is_related_decade_action !== 'Yes',
             },
             project_url: {
                 id: 'project_url',
                 type: 'url',
                 label: 'Please share any URLs related to the project document or information to help us better understand how this request fits within the broader framework.',
-                show: data => data.is_partner !== 'Yes',
+                show: data => data.is_related_decade_action !== 'Yes',
             },
             activity_name: {
                 id: 'activity_name',
                 type: 'text',
                 required: true,
                 label: 'Could you please provide the name of the proposal, programme, or initiative—or, if this is a standalone request, the name of the capacity development activity?',
-                show: data => data.is_partner !== 'Yes',
+                show: data => data.is_related_decade_action !== 'Yes',
             },
             has_significant_changes: {
                 id: 'has_significant_changes',
@@ -184,7 +184,7 @@ export const UIRequestForm: UIStep[] = [
                     { value: 'Yes', label: 'Yes' },
                     { value: 'No', label: 'No' },
                 ],
-                show: data => data.is_partner === 'Yes',
+                show: data => data.is_related_decade_action === 'Yes',
             },
             changes_description: {
                 id: 'changes_description',
@@ -192,7 +192,7 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Please explain how this is affecting your Action.',
                 description: "If the capacity development gap/challenge is not affecting the overall implementation of your Action, please enter 'NA'.",
-                show: data => data.is_partner === 'Yes' && data.has_significant_changes === 'Yes',
+                show: data => data.is_related_decade_action === 'Yes' && data.has_significant_changes === 'Yes',
             },
         },
     },

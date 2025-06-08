@@ -92,8 +92,8 @@ export interface OCDRequest {
     }
     request_data: {
         id: string;
-        is_partner: 'Yes' | 'No';
-        unique_id: string;
+        is_related_decade_action: 'Yes' | 'No';
+        unique_related_decade_action_id: string;
         first_name: string;
         last_name: string;
         email: string;
@@ -152,6 +152,7 @@ export interface OCDOpportunity {
     status: string;
     status_label: string;
     can_edit: boolean;
+    tags: string[]
 }
 
 export type OCDOpportunitiesList = OCDOpportunity[];
