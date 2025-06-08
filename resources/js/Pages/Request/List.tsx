@@ -9,15 +9,38 @@ import { Tag } from 'primereact/tag';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+import axios from 'axios';
 
 export default function RequestsList() {
     const requests = usePage().props.requests as OCDRequestList;
     const grid = usePage().props.grid as OCDRequestGrid;
+    const [requestList, setRequestList] = React.useState<OCDRequestList>(requests);
+    const statuses = [
+        'draft',
+        'under_review',
+        'validated',
+        'offer_made',
+        'in_implementation',
+        'rejected',
+        'unmatched',
+        'closed',
+    ];
+
+    const handleStatusChange = (id: string, status: string) => {
+        axios.patch(route('user.request.status', id), { status })
+            .then(res => {
+                setRequestList(prev => prev.map(req =>
+                    req.id === id
+                        ? { ...req, status: { ...req.status, ...res.data.status } }
+                        : req
+                ));
+            });
+    };
     const titleBodyTemplate = (rowData: OCDRequest) => rowData.request_data.capacity_development_title ?? 'N/A';
     const submissionDateTemplate = (rowData: OCDRequest) => new Date(rowData.created_at).toLocaleDateString();
 
     const actionsTemplate = (rowData: OCDRequest) => (
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
             {grid.actions.canEdit && rowData.status.status_code === 'draft' && (
                 <Link
                     href={route('user.request.edit', rowData.id)}
@@ -45,6 +68,15 @@ export default function RequestsList() {
                     Express interrest
                 </Link>
             )}
+            <select
+                className="border rounded px-2 py-1"
+                value={rowData.status.status_code}
+                onChange={e => handleStatusChange(rowData.id, e.currentTarget.value)}
+            >
+                {statuses.map(s => (
+                    <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
+                ))}
+            </select>
         </div>
     );
 
@@ -110,7 +142,7 @@ export default function RequestsList() {
                 )}
 
                 <DataTable
-                    value={requests}
+                    value={requestList}
                     paginator
                     rows={10}
                     rowsPerPageOptions={[10, 25, 50, 100]}

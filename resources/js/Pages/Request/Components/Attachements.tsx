@@ -6,7 +6,6 @@ export default function Attachements() {
     const { auth } = usePage<{ auth: Auth }>().props;
     const documents = usePage().props.documents as DocumentList;
     const OcdRequest = usePage().props.request as OCDRequest;
-
     const form = useForm<{ file: File | null; document_type: string }>({
         file: null,
         document_type: 'financial_breakdown_report',
