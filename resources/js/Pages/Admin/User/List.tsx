@@ -8,9 +8,6 @@ export default function UserRolesList() {
     const users = usePage().props.users as UserWithRoles[];
     const roles = usePage().props.roles as Role[];
 
-    console.log(users);
-    console.log(roles);
-
     const [userRoles, setUserRoles] = useState<Record<number, string[]>>(() => {
         const map: Record<number, string[]> = {};
         users.forEach((u) => {

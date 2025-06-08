@@ -50,7 +50,6 @@ export default function SignInForm({ status }: LoginProps) {
         e.preventDefault();
         post(route('sign.in.post'), {
             onFinish: () => {
-                console.log();
                 reset('password');
             }
         });

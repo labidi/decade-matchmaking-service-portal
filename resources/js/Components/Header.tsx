@@ -6,7 +6,6 @@ import UserNav from '@/Components/UserNav';
 
 export default function Header() {
   const { auth } = usePage<{ auth: Auth }>().props;
-  console.log(auth);
   return (
     <header className="bg-firefly-900 text-white py-2 px-4 shadow">
       <div className="container mx-auto flex items-center justify-between">
