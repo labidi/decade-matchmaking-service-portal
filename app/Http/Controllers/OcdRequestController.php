@@ -157,6 +157,26 @@ class OcdRequestController extends Controller
         }
     }
 
+    public function updateStatus(Request $httpRequest, int $requestId)
+    {
+        $statusCode = $httpRequest->input('status');
+        $ocdRequest = OCDRequest::find($requestId);
+        if (!$ocdRequest) {
+            return response()->json(['error' => 'Request not found'], 404);
+        }
+        $status = RequestStatus::where('status_code', $statusCode)->first();
+        if (!$status) {
+            return response()->json(['error' => 'Status not found'], 422);
+        }
+        $ocdRequest->status()->associate($status);
+        $ocdRequest->save();
+
+        return response()->json([
+            'message' => 'Status updated successfully',
+            'status' => $status->only(['status_code', 'status_label'])
+        ]);
+    }
+
     /**
      * Display the specified resource.
      */
