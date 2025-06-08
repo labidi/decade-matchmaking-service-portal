@@ -15,91 +15,99 @@ export default function Dashboard({
             <Head title="Welcome" />
             <section id="features" className="px-4">
                 <div className="mx-auto text-center">
-                    {auth.user && (
-                        <>
-                            <div className="my-6 lg:my-12 container px-6 mx-auto flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-300">
+
+                    <div className="my-6 lg:my-12 container px-6 mx-auto flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-300">
+                        <div>
+                            <h4 className="text-2xl font-bold leading-tight text-gray-800 dark:text-gray-100">Request section</h4>
+                        </div>
+
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {auth.user && (
+                            <Link href={route('user.request.create')} className={LinkCardUserClassName}>
                                 <div>
-                                    <h4 className="text-2xl font-bold leading-tight text-gray-800 dark:text-gray-100">Request section</h4>
+                                    <div className="px-6 py-4">
+                                        <div className="font-bold text-xl mb-2">Submit new Request</div>
+                                        <p className="text-base">
+                                            Use this feature to submit a new capacity development request for training and workshops                                            </p>
+                                    </div>
                                 </div>
-
-                            </div>
-                            <div className="grid md:grid-cols-3 gap-8">
-                                <Link href={route('user.request.create')} className={LinkCardUserClassName}>
-                                    <div>
-                                        <div className="px-6 py-4">
-                                            <div className="font-bold text-xl mb-2">Submit new Request</div>
-                                            <p className="text-base">
-                                                Use this feature to submit a new capacity development request for training and workshops                                            </p>
-                                        </div>
-                                    </div>
-                                </Link>
-                                <Link href={route('user.request.myrequests')} className={LinkCardUserClassName}>
-                                    <div>
-                                        <div className="px-6 py-4">
-                                            <div className="font-bold text-xl mb-2">List of My Requests</div>
-                                            <p className="text-base">
-                                                Use this feature to track the progress and current status of your submitted request.                                            </p>
-                                        </div>
-                                    </div>
-                                </Link>
-                                <Link href={route('user.opportunity.list')} className={LinkCardUserClassName}>
-                                    <div>
-                                        <div className="px-6 py-4">
-                                            <div className="font-bold text-xl mb-2">View and Apply for Partner Opportunities</div>
-                                            <p className="text-base">
-                                                Use this feature to track the progress and current status of your submitted request.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </Link>
-
-                            </div>
-                        </>
-                    )}
-                    {auth.user.is_partner && (
-                        <>
-                            <div className="my-6 lg:my-12 container px-6 mx-auto flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-300">
+                            </Link>
+                        )}
+                        {auth.user && (
+                            <Link href={route('user.request.myrequests')} className={LinkCardUserClassName}>
                                 <div>
-                                    <h4 className="text-2xl font-bold leading-tight text-gray-800 dark:text-gray-100">Opportunity section</h4>
+                                    <div className="px-6 py-4">
+                                        <div className="font-bold text-xl mb-2">List of My Requests</div>
+                                        <p className="text-base">
+                                            Use this feature to track the progress and current status of your submitted request.                                            </p>
+                                    </div>
                                 </div>
+                            </Link>
+                        )}
+                        {auth.user && auth.user.is_partner && (
+                            <Link href={route("partner.request.list")} className={LinkCardClassName}>
+                                <div className="px-6 py-4">
+                                    <div className="font-bold text-xl mb-2">View Request for Training & Workshops</div>
+                                    <p className="text-base">
+                                        Browse and explore training and workshop requests that align with your interests and expertise as a Partner
+                                    </p>
+                                </div>
+                            </Link>
+                        )}
+                        {auth.user && auth.user.is_partner && (
+                            <div className={LinkCardClassName}>
+                                <div className="px-6 py-4">
+                                    <div className="font-bold text-xl mb-2">My matched requests</div>
+                                    <p className="text-base">
+                                        Manage training and workshop requests that you matched with as a Partner                                        </p>
+                                </div>
+                            </div>
+                        )}
 
-                            </div>
-                            <div className="grid md:grid-cols-3 gap-8">
-                                <Link href={route("partner.opportunity.create")} className={LinkCardClassName}>
+
+                    </div>
+                    <div className="my-6 lg:my-12 container px-6 mx-auto flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-300">
+                        <div>
+                            <h4 className="text-2xl font-bold leading-tight text-gray-800 dark:text-gray-100">Opportunity section</h4>
+                        </div>
+
+                    </div>
+
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {auth.user && (
+                            <Link href={route('user.opportunity.list')} className={LinkCardUserClassName}>
+                                <div>
                                     <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">Submit Opportunity</div>
+                                        <div className="font-bold text-xl mb-2">View and Apply for Partner Opportunities</div>
                                         <p className="text-base">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
-                                        </p>
-                                    </div>
-                                </Link>
-                                <Link href={route("partner.request.list")} className={LinkCardClassName}>
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">View Request for Training workshops</div>
-                                        <p className="text-base">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
-                                        </p>
-                                    </div>
-                                </Link>
-                                <div className={LinkCardClassName}>
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">My matched requests</div>
-                                        <p className="text-base">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
-                                        </p>
+                                            Browse and apply for available capacity development opportunities offered by partners of CDF                                            </p>
                                     </div>
                                 </div>
-                                <Link href={route("partner.opportunity.list")} className={LinkCardClassName}>
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">View My submited Opportunities</div>
-                                        <p className="text-base">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
-                                        </p>
-                                    </div>
-                                </Link>
-                            </div>
-                        </>
-                    )}
+                            </Link>
+                        )}
+                        {auth.user && auth.user.is_partner && (
+                            <Link href={route("partner.opportunity.create")} className={LinkCardClassName}>
+                                <div className="px-6 py-4">
+                                    <div className="font-bold text-xl mb-2">Submit Opportunity</div>
+                                    <p className="text-base">
+                                        Submit a new capacity development opportunity as an User.
+                                    </p>
+                                </div>
+                            </Link>
+
+                        )}
+                        {auth.user && auth.user.is_partner && (
+                            <Link href={route("partner.opportunity.list")} className={LinkCardClassName}>
+                                <div className="px-6 py-4">
+                                    <div className="font-bold text-xl mb-2">View My submited Opportunities</div>
+                                    <p className="text-base">
+                                        View the capacity development opportunity you have submitted as a Partner                                        </p>
+                                </div>
+                            </Link>
+                        )}
+                    </div>
                 </div>
             </section>
         </FrontendLayout>
