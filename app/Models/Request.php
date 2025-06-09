@@ -27,8 +27,9 @@ class Request extends Model
 
     protected function requestData(): Attribute
     {
+        
         return Attribute::make(
-            get: fn(string $value) => json_decode($value),
+            get: fn(?string $value) => json_decode($value),
         );
     }
     public function user(): BelongsTo
