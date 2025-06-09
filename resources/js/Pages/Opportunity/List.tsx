@@ -11,11 +11,30 @@ import { Tag } from 'primereact/tag';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+import axios from 'axios';
 
 
 export default function OpportunitiesList() {
     const opportunitiesList = usePage().props.opportunities as OCDOpportunitiesList;
     const { auth } = usePage<{ auth: Auth }>().props;
+    const [opportunityList, setOpportunityList] = React.useState<OCDOpportunitiesList>(opportunitiesList);
+    const statuses = [
+        { value: '1', label: 'ACTIVE' },
+        { value: '2', label: 'Closed' },
+        { value: '3', label: 'Rejected' },
+        { value: '4', label: 'Pending review' },
+    ];
+
+    const handleStatusChange = (id: string, status: string) => {
+        axios.patch(route('partner.opportunity.status', id), { status })
+            .then(res => {
+                setOpportunityList(prev => prev.map(op =>
+                    op.id === id
+                        ? { ...op, status: res.data.status.status_code, status_label: res.data.status.status_label }
+                        : op
+                ));
+            });
+    };
     const titleBodyTemplate = (rowData: OCDOpportunity) => rowData.title ?? 'N/A';
     const ApplicationClosingDate = (rowData: OCDOpportunity) => new Date(rowData.closing_date).toLocaleDateString();
     const statusBodyTemplate = (rowData: OCDOpportunity) => {
@@ -39,7 +58,7 @@ export default function OpportunitiesList() {
                 break;
             case '3':
                 iconClass = 'pi pi-check-circle';
-                tagSeverity = 'success';
+                tagSeverity = 'danger';
                 iconColor = 'mr-1';
                 break;
             case '4':
@@ -66,7 +85,7 @@ export default function OpportunitiesList() {
 
     const actionsTemplate = (rowData: OCDOpportunity) => (
         <div className="flex space-x-4 items-center">
-            {(rowData.can_edit) && (
+            {rowData.can_edit && (
                 <Link
                     href="#"
                     className="px-2 py-1 text-base font-medium text-blue-600 hover:text-blue-800"
@@ -76,12 +95,22 @@ export default function OpportunitiesList() {
             )}
 
             <Link
-                href={route('user.request.show', rowData.id)}
+                href={route('opportunity.show', rowData.id)}
                 className="flex items-center text-green-600 hover:text-green-800"
             >
                 <i className="pi pi-eye mr-1" aria-hidden="true" />
                 View
             </Link>
+
+            <select
+                className="border rounded px-2 py-1"
+                value={rowData.status}
+                onChange={e => handleStatusChange(rowData.id, e.currentTarget.value)}
+            >
+                {statuses.map(s => (
+                    <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+            </select>
 
         </div>
     );
@@ -101,7 +130,7 @@ export default function OpportunitiesList() {
                     )}
                 </div>
                 <DataTable
-                    value={opportunitiesList}
+                    value={opportunityList}
                     paginator
                     rows={10}
                     rowsPerPageOptions={[10, 25, 50, 100]}
