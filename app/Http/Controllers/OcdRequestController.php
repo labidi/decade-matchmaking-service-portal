@@ -190,11 +190,10 @@ class OcdRequestController extends Controller
         $documents = \App\Models\Document::where('parent_type', OCDRequest::class)
             ->where('parent_id', $OCDrequestId)
             ->get();
-
         return Inertia::render('Request/Show', [
-            'title' => 'Request #' . $OCDrequestId,
+            'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
             'banner' => [
-                'title' => 'Request #' . $OCDrequestId,
+                'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
@@ -203,7 +202,7 @@ class OcdRequestController extends Controller
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
-                ['name' => 'View Request #' . $ocdRequest->id, 'url' => route('partner.opportunity.show', ['id' => $ocdRequest->id])],
+                ['name' => 'View Request #' . $ocdRequest->id, 'url' => route('user.request.show', ['id' => $ocdRequest->id])],
             ],
             'requestDetail.actions' => [
                 'canEdit' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
