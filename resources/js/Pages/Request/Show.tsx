@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Head, usePage, Link, useForm } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDRequest, OCDRequestGrid } from '@/types';
+import { OCDRequest, OCDRequestGrid , DocumentList } from '@/types';
 import { UIRequestForm } from '@/Forms/UIRequestForm';
 import Attachements from '@/Pages/Request/Components/Attachements';
 
@@ -10,7 +10,7 @@ import Attachements from '@/Pages/Request/Components/Attachements';
 export default function ShowRequest() {
   const OcdRequest = usePage().props.request as OCDRequest;
   const RequestDetails = usePage().props.requestDetail as OCDRequestGrid;
-  
+  const documents = usePage().props.documents as DocumentList;
 
   return (
     <FrontendLayout>
@@ -60,8 +60,7 @@ export default function ShowRequest() {
               ))}
             </div>
           </div>
-
-          <Attachements />
+          <Attachements OcdRequest={OcdRequest} documents={documents} />
         </div>
         <div>
           <div className='py-2'>
@@ -79,23 +78,6 @@ export default function ShowRequest() {
         </div>
 
       </div>
-
-      <section id="offer_container" className='container'>
-        <div className='row-span-full'>
-          <table className="table-auto w-full">
-            <thead>
-              <tr>
-                <th>Attachement Type</th>
-                <th>File name</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
 
 
       {/* Separator */}

@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Request\RequestOffer;
+use App\Models\Request\RequestStatus;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\Request\RequestStatus;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
 class Request extends Model
@@ -42,5 +44,10 @@ class Request extends Model
     public function status(): belongsTo
     {
         return $this->belongsTo(RequestStatus::class);
+    }
+
+    public function offer(): HasMany
+    {
+        return $this->hasMany(RequestOffer::class);
     }
 }

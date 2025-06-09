@@ -167,3 +167,9 @@ export type OCDRequestGrid = {
         canExportPdf?:boolean;
     }
 }
+
+export interface AttachementsProps {
+  OcdRequest: OcdRequest;
+  canEdit?: boolean;
+  documents?: Document[];
+}
