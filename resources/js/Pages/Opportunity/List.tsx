@@ -58,7 +58,7 @@ export default function OpportunitiesList() {
                 break;
             case '3':
                 iconClass = 'pi pi-check-circle';
-                tagSeverity = 'success';
+                tagSeverity = 'danger';
                 iconColor = 'mr-1';
                 break;
             case '4':
@@ -95,7 +95,7 @@ export default function OpportunitiesList() {
             )}
 
             <Link
-                href={route('user.request.show', rowData.id)}
+                href={route('opportunity.show', rowData.id)}
                 className="flex items-center text-green-600 hover:text-green-800"
             >
                 <i className="pi pi-eye mr-1" aria-hidden="true" />

@@ -122,7 +122,7 @@ class OcdOpportunityController extends Controller
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Opportunities', 'url' => route('partner.opportunity.list')],
-                ['name' => 'View Opportunity', 'url' => route('partner.opportunity.show', ['id' => $id])],
+                ['name' => 'View Opportunity', 'url' => route('opportunity.show', ['id' => $id])],
             ],
         ]);
     }
