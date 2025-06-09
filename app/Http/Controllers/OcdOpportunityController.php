@@ -126,4 +126,27 @@ class OcdOpportunityController extends Controller
             ],
         ]);
     }
+
+    public function updateStatus(Request $httpRequest, int $opportunityId)
+    {
+        $statusCode = (int) $httpRequest->input('status');
+        $opportunity = Opportunity::find($opportunityId);
+        if (!$opportunity) {
+            return response()->json(['error' => 'Opportunity not found'], 404);
+        }
+        if (!in_array($statusCode, Opportunity::STATUS)) {
+            return response()->json(['error' => 'Status not found'], 422);
+        }
+
+        $opportunity->status = $statusCode;
+        $opportunity->save();
+
+        return response()->json([
+            'message' => 'Status updated successfully',
+            'status' => [
+                'status_code' => (string) $statusCode,
+                'status_label' => Opportunity::STATUS_LABELS[$statusCode] ?? ''
+            ]
+        ]);
+    }
 }
