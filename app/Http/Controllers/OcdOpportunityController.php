@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Partner;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Opportunity;
 use App\Http\Controllers\Controller;
 
-class OpportunityController extends Controller
+class OcdOpportunityController extends Controller
 {
 
     public function create()
@@ -74,6 +74,33 @@ class OpportunityController extends Controller
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Opportunities', 'url' => route('partner.opportunity.list')],
+            ],
+            'PageActions' => [
+                "canAddNew" => true
+            ],
+        ]);
+    }
+
+    public function browse(Request $httpRequest)
+    {
+        // Fetch all opportunities
+        $opportunities = Opportunity::where('user_id', $httpRequest->user()->id)->get();
+
+        // Return the opportunities to the view
+        return Inertia::render('Opportunity/List', [
+            'opportunities' => $opportunities,
+            'title' => 'Opportunities',
+            'banner' => [
+                'title' => 'List of Opportunities',
+                'description' => 'Manage your opportunities here.',
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Opportunities', 'url' => route('partner.opportunity.list')],
+            ],
+            'PageActions' => [
+                "canAddNew" => false
             ],
         ]);
     }

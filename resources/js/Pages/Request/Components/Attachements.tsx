@@ -1,10 +1,9 @@
 import { Head, usePage, Link, useForm } from '@inertiajs/react';
 import type { Auth } from '@/types';
-import { Document, OCDRequest, AttachementsProps } from '@/types';
+import { AttachementsProps } from '@/types';
 
 export default function Attachements({ OcdRequest, canEdit = false, documents = [] }: AttachementsProps) {
-    const { auth } = usePage<{ auth: Auth }>().props;
-
+    const { auth } = usePage<{ auth: Auth }>().props
     const form = useForm<{ file: File | null; document_type: string }>({
         file: null,
         document_type: 'financial_breakdown_report',

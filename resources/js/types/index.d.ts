@@ -164,12 +164,22 @@ export type OCDRequestGrid = {
         canView: boolean;
         canCreate?: boolean;
         canExpressInterrest?: boolean;
-        canExportPdf?:boolean;
+        canExportPdf?: boolean;
     }
 }
 
+export type OCDOpportunitiesListActions = {
+    canEdit: boolean;
+    canDelete: boolean;
+    canView: boolean;
+    canCreate?: boolean;
+    canExpressInterrest?: boolean;
+    canExportPdf?: boolean;
+
+}
+
 export interface AttachementsProps {
-  OcdRequest: OcdRequest;
-  canEdit?: boolean;
-  documents?: Document[];
+    OcdRequest: OcdRequest;
+    canEdit?: boolean;
+    documents?: Document[];
 }
