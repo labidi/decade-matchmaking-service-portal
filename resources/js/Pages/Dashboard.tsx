@@ -8,8 +8,8 @@ export default function Dashboard({
 }: PageProps<{ laravelVersion: string; phpVersion: string }>) {
 
     const { auth } = usePage<{ auth: Auth }>().props;
-    const LinkCardUserClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-300 hover:bg-firefly-600 text-white"
-    const LinkCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-500 hover:bg-firefly-600 text-white"
+    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-300 hover:bg-firefly-600 text-white"
+    const LinkOpportunityCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-500 hover:bg-firefly-600 text-white"
     return (
         <FrontendLayout>
             <Head title="Welcome" />
@@ -24,7 +24,7 @@ export default function Dashboard({
                     </div>
                     <div className="grid md:grid-cols-3 gap-8">
                         {auth.user && (
-                            <Link href={route('user.request.create')} className={LinkCardUserClassName}>
+                            <Link href={route('user.request.create')} className={LinkRequestCardClassName}>
                                 <div>
                                     <div className="px-6 py-4">
                                         <div className="font-bold text-xl mb-2">Submit new Request</div>
@@ -35,7 +35,7 @@ export default function Dashboard({
                             </Link>
                         )}
                         {auth.user && (
-                            <Link href={route('user.request.myrequests')} className={LinkCardUserClassName}>
+                            <Link href={route('user.request.myrequests')} className={LinkRequestCardClassName}>
                                 <div>
                                     <div className="px-6 py-4">
                                         <div className="font-bold text-xl mb-2">List of My Requests</div>
@@ -46,7 +46,7 @@ export default function Dashboard({
                             </Link>
                         )}
                         {auth.user && auth.user.is_partner && (
-                            <Link href={route("partner.request.list")} className={LinkCardClassName}>
+                            <Link href={route("partner.request.list")} className={LinkRequestCardClassName}>
                                 <div className="px-6 py-4">
                                     <div className="font-bold text-xl mb-2">View Request for Training & Workshops</div>
                                     <p className="text-base">
@@ -56,7 +56,7 @@ export default function Dashboard({
                             </Link>
                         )}
                         {auth.user && auth.user.is_partner && (
-                            <div className={LinkCardClassName}>
+                            <div className={LinkRequestCardClassName}>
                                 <div className="px-6 py-4">
                                     <div className="font-bold text-xl mb-2">My matched requests</div>
                                     <p className="text-base">
@@ -77,7 +77,7 @@ export default function Dashboard({
 
                     <div className="grid md:grid-cols-3 gap-8">
                         {auth.user && (
-                            <Link href={route('user.opportunity.list')} className={LinkCardUserClassName}>
+                            <Link href={route('user.opportunity.list')} className={LinkOpportunityCardClassName}>
                                 <div>
                                     <div className="px-6 py-4">
                                         <div className="font-bold text-xl mb-2">View and Apply for Partner Opportunities</div>
@@ -88,7 +88,7 @@ export default function Dashboard({
                             </Link>
                         )}
                         {auth.user && auth.user.is_partner && (
-                            <Link href={route("partner.opportunity.create")} className={LinkCardClassName}>
+                            <Link href={route("partner.opportunity.create")} className={LinkOpportunityCardClassName}>
                                 <div className="px-6 py-4">
                                     <div className="font-bold text-xl mb-2">Submit Opportunity</div>
                                     <p className="text-base">
@@ -99,7 +99,7 @@ export default function Dashboard({
 
                         )}
                         {auth.user && auth.user.is_partner && (
-                            <Link href={route("partner.opportunity.list")} className={LinkCardClassName}>
+                            <Link href={route("partner.opportunity.list")} className={LinkOpportunityCardClassName}>
                                 <div className="px-6 py-4">
                                     <div className="font-bold text-xl mb-2">View My submited Opportunities</div>
                                     <p className="text-base">

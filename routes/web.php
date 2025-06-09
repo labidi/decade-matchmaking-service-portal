@@ -62,7 +62,8 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::post('partner/opportunity/store', [OcdOpportunityController::class, 'store'])->name('partner.opportunity.store');
     Route::get('partner/opportunity/list', [OcdOpportunityController::class, 'list'])->name('partner.opportunity.list');
     Route::get('partner/opportunity/browse', [OcdOpportunityController::class, 'list'])->name('opportunity.browse');
-    Route::get('partner/opportunity/show/{id}', [OcdOpportunityController::class, 'show'])->name('partner.opportunity.show');
+    Route::get('partner/opportunity/show/{id}', [OcdOpportunityController::class, 'show'])->name('opportunity.show');
+    Route::patch('partner/opportunity/{id}/status', [OcdOpportunityController::class, 'updateStatus'])->name('partner.opportunity.status');
     Route::get('partner/request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
     Route::get('partner/request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
 });
