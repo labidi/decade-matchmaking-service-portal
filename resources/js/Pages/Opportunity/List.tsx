@@ -5,11 +5,87 @@ import FrontendLayout from '@/Layouts/FrontendLayout';
 import { OCDOpportunity, OCDOpportunitiesList } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { Auth, User } from '@/types';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Tag } from 'primereact/tag';
+import 'primereact/resources/themes/saga-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 
 
 export default function OpportunitiesList() {
-    const opportunities = usePage().props.opportunities as OCDOpportunitiesList;
+    const opportunitiesList = usePage().props.opportunities as OCDOpportunitiesList;
     const { auth } = usePage<{ auth: Auth }>().props;
+    const titleBodyTemplate = (rowData: OCDOpportunity) => rowData.title ?? 'N/A';
+    const ApplicationClosingDate = (rowData: OCDOpportunity) => new Date(rowData.closing_date).toLocaleDateString();
+    const statusBodyTemplate = (rowData: OCDOpportunity) => {
+        const code = rowData.status
+        const label = rowData.status_label
+
+        let iconClass = '';
+        let tagSeverity: 'success' | 'info' | 'warning' | 'danger' | undefined = undefined;
+        let iconColor = '';
+
+        switch (code) {
+            case '1':
+                iconClass = 'pi pi-file-edit';
+                tagSeverity = 'info';
+                iconColor = 'mr-1';
+                break;
+            case '2':
+                iconClass = 'pi pi-clock';
+                tagSeverity = 'info';
+                iconColor = 'mr-1';
+                break;
+            case '3':
+                iconClass = 'pi pi-check-circle';
+                tagSeverity = 'success';
+                iconColor = 'mr-1';
+                break;
+            case '4':
+                iconClass = 'pi pi-times-circle';
+                tagSeverity = 'danger';
+                iconColor = 'mr-1';
+                break;
+            default:
+                iconClass = 'pi pi-info-circle';
+                tagSeverity = undefined;
+                iconColor = 'mr-1';
+        }
+
+        return (
+            <Tag
+                value={label}
+                severity={tagSeverity}
+                icon={<i className={`${iconClass} ${iconColor}`} />}
+                className="cursor-default text-white"
+                data-pr-tooltip={label}
+            />
+        );
+    };
+
+    const actionsTemplate = (rowData: OCDOpportunity) => (
+        <div className="flex space-x-4 items-center">
+            {(rowData.can_edit) && (
+                <Link
+                    href="#"
+                    className="px-2 py-1 text-base font-medium text-blue-600 hover:text-blue-800"
+                >
+                    Edit
+                </Link>
+            )}
+
+            <Link
+                href={route('user.request.show', rowData.id)}
+                className="flex items-center text-green-600 hover:text-green-800"
+            >
+                <i className="pi pi-eye mr-1" aria-hidden="true" />
+                View
+            </Link>
+
+        </div>
+    );
+
     return (
         <FrontendLayout>
             <Head title="Welcome" />
@@ -24,62 +100,24 @@ export default function OpportunitiesList() {
                         </Link>
                     )}
                 </div>
-                <table className="min-w-full table-auto bg-white">
-                    <thead className="bg-gray-50">
-                        <tr>
-
-                            <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">
-                                ID
-                            </th>
-                            <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">
-                                title
-                            </th>
-                            <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">
-                                Submission Date
-                            </th>
-                            <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">
-                                Status
-                            </th>
-                            <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                        {opportunities.map((opportunity: OCDOpportunity) => (
-                            <tr key={opportunity.id} className="hover:bg-gray-100">
-                                <td className="px-4 py-2 whitespace-nowrap text-base text-gray-900">
-                                    {opportunity.id}
-                                </td>
-                                <td className="px-4 py-2 whitespace-nowrap text-base text-gray-900">
-                                    {opportunity.title}
-                                </td>
-                                <td className="px-4 py-2 whitespace-nowrap text-base text-gray-900">
-                                    {new Date(opportunity.created_at).toLocaleDateString()}
-                                </td>
-                                <td className="px-4 py-2 whitespace-nowrap text-base text-gray-900">
-                                    {opportunity.status_label}
-                                </td>
-                                <td className="px-4 py-2 whitespace-nowrap flex space-x-2">
-                                    {(opportunity.can_edit) && (
-                                        <Link
-                                            href="#"
-                                            className="px-2 py-1 text-base font-medium text-blue-600 hover:text-blue-800"
-                                        >
-                                            Edit
-                                        </Link>
-                                    )}
-                                    <Link
-                                        href={route('partner.opportunity.show', opportunity.id)}
-                                        className="px-2 py-1 text-base font-medium text-green-600 hover:text-green-800"
-                                    >
-                                        View
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <DataTable
+                    value={opportunitiesList}
+                    paginator
+                    rows={10}
+                    rowsPerPageOptions={[10, 25, 50, 100]}
+                    showGridlines
+                    emptyMessage="No Opportunities found."
+                    className="p-datatable-sm .datatable-rows"
+                >
+                    <Column field="id" header="ID" sortable />
+                    <Column body={titleBodyTemplate} header="Title" />
+                    <Column field="type" header="Type" />
+                    <Column field="created_at" body={ApplicationClosingDate} header="Application closing date" sortable />
+                    <Column field="status.status_code" body={statusBodyTemplate} header="Status" sortable />
+                    <Column field="coverage_activity" header="Coverage of CD Activity" sortable />
+                    <Column field="implementation_location" header="Implementation location" sortable />
+                    <Column body={actionsTemplate} header="Actions" />
+                </DataTable>
             </div>
         </FrontendLayout>
     )

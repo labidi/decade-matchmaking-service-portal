@@ -6,7 +6,7 @@ use App\Http\Controllers\OcdRequestController;
 use Inertia\Inertia;
 use App\Http\Controllers\Partner\OpportunityController as PartnerOpportunityController;
 use App\Http\Controllers\User\OpportunityController as UserOpportunityController;
-use App\Http\Controllers\Partner\OpportunityController;
+use App\Http\Controllers\OcdOpportunityController;
 use App\Http\Controllers\UserGuideController;
 use App\Http\Controllers\Admin\UserRoleController;
 
@@ -58,10 +58,11 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 Route::middleware(['auth', 'role:partner'])->group(function () {
     
     // Opportunity routes
-    Route::get('partner/opportunity/create', [PartnerOpportunityController::class, 'create'])->name('partner.opportunity.create');
-    Route::post('partner/opportunity/store', [PartnerOpportunityController::class, 'store'])->name('partner.opportunity.store');
-    Route::get('partner/opportunity/list', [PartnerOpportunityController::class, 'list'])->name('partner.opportunity.list');
-    Route::get('partner/opportunity/show/{id}', [PartnerOpportunityController::class, 'show'])->name('partner.opportunity.show');
+    Route::get('partner/opportunity/create', [OcdOpportunityController::class, 'create'])->name('partner.opportunity.create');
+    Route::post('partner/opportunity/store', [OcdOpportunityController::class, 'store'])->name('partner.opportunity.store');
+    Route::get('partner/opportunity/list', [OcdOpportunityController::class, 'list'])->name('partner.opportunity.list');
+    Route::get('partner/opportunity/browse', [OcdOpportunityController::class, 'list'])->name('opportunity.browse');
+    Route::get('partner/opportunity/show/{id}', [OcdOpportunityController::class, 'show'])->name('partner.opportunity.show');
     Route::get('partner/request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
     Route::get('partner/request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
 });
