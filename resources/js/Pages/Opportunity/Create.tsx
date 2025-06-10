@@ -8,6 +8,8 @@ import { Tag } from 'react-tag-input';
 import axios from 'axios';
 import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
 import { FormEventHandler } from 'react';
+import { MultiSelect } from 'primereact/multiselect';
+
 
 import { Chips } from 'primereact/chips';
 
@@ -279,22 +281,6 @@ export default function CreateOpportunity() {
                         />
                         {errors.summary && (
                             <p className="text-red-600 text-base mt-1">{errors.summary}</p>
-                        )}
-                    </div>
-
-                    <div className="mt-4">
-                        <label htmlFor="url" className="block font-medium">
-                            Url
-                        </label>
-                        <input
-                            id="url"
-                            type="text"
-                            className={getInputClass()}
-                            value={data.url}
-                            onChange={(e) => setData('url' as keyof typeof data, e.currentTarget.value)}
-                        />
-                        {errors.url && (
-                            <p className="text-red-600 text-base mt-1">{errors.url}</p>
                         )}
                     </div>
 

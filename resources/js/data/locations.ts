@@ -199,18 +199,20 @@ export const countryOptions: Option[] = [
 
 export const regionOptions: Option[] = [
   { label: 'Africa', value: 'Africa' },
-  { label: 'Asia', value: 'Asia' },
+  { label: 'Asia and the Pacific', value: 'Asia and the Pacific' },
   { label: 'Europe', value: 'Europe' },
+  { label: 'Latin America and the Caribbean', value: 'Latin America and the Caribbean' },
   { label: 'North America', value: 'North America' },
-  { label: 'South America', value: 'South America' },
-  { label: 'Oceania', value: 'Oceania' },
-  { label: 'Antarctica', value: 'Antarctica' },
+  { label: 'Middle East', value: 'Middle East' },
+  { label: 'Polar Regions (Arctic and Antarctic)', value: 'Polar Regions (Arctic and Antarctic)' },
 ];
 
 export const oceanOptions: Option[] = [
-  { label: 'Atlantic Ocean', value: 'Atlantic' },
-  { label: 'Pacific Ocean', value: 'Pacific' },
-  { label: 'Indian Ocean', value: 'Indian' },
-  { label: 'Arctic Ocean', value: 'Arctic' },
-  { label: 'Southern Ocean', value: 'Southern' },
+  { label: 'Atlantic Ocean', value: 'Atlantic Ocean' },
+  { label: 'Pacific Ocean', value: 'Pacific Ocean' },
+  { label: 'Indian Ocean', value: 'Indian Ocean' },
+  { label: 'Arctic Ocean', value: 'Arctic Ocean' },
+  { label: 'Southern Ocean', value: 'Southern Ocean' },
+  { label: 'Mediterranean Sea', value: 'Mediterranean Sea Ocean' },
+  { label: 'Caspian Sea', value: 'Caspian Sea Ocean' },
 ];
