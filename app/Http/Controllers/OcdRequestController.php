@@ -58,7 +58,6 @@ class OcdRequestController extends Controller
         ];
     }
 
-
     /**
      * Display a listing of the resource.
      */
