@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
 use App\Models\Request\RequestStatus;
-use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -182,6 +181,7 @@ class OcdRequestController extends Controller
     {
         $validated = $httpRequest->validate($this->validationRules());
         try {
+            $validated = $httpRequest->validate($this->validationRules());
             if ($requestId) {
                 $ocdRequest = OCDRequest::find($requestId);
                 if (!$ocdRequest) {
