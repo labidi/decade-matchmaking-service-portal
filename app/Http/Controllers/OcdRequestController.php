@@ -20,7 +20,7 @@ class OcdRequestController extends Controller
     private function validationRules(): array
     {
         return [
-            'id' => ['sometimes', 'integer', 'exists:requests,id'],
+            //'id' => ['sometimes', 'integer', 'exists:requests,id'],
             'is_related_decade_action' => ['required', Rule::in(['Yes', 'No'])],
             'unique_related_decade_action_id' => ['required_if:is_related_decade_action,Yes', 'string'],
             'first_name' => ['required', 'string'],
@@ -36,10 +36,10 @@ class OcdRequestController extends Controller
             'related_activity' => ['required', Rule::in(['Training', 'Workshop', 'Both'])],
             'subthemes' => ['required', 'array'],
             'subthemes.*' => ['string'],
-            'subthemes_other' => ['required_if:subthemes,Other', 'string'],
+         //   'subthemes_other' => ['required_if:subthemes,Other', 'string'],
             'support_types' => ['required', 'array'],
             'support_types.*' => ['string'],
-            'support_types_other' => ['required_if:support_types,Other', 'string'],
+          //  'support_types_other' => ['required_if:support_types,Other', 'string'],
             'gap_description' => ['required', 'string'],
             'has_partner' => ['required', Rule::in(['Yes', 'No'])],
             //'partner_name' => ['required_if:has_partner,Yes', 'string'],
