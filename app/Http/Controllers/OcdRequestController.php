@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
 use App\Models\Request\RequestStatus;
+use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,6 +13,50 @@ use Inertia\Response;
 
 class OcdRequestController extends Controller
 {
+
+    /**
+     * Validation rules for request submission.
+     */
+    private function validationRules(): array
+    {
+        return [
+            'id' => ['sometimes', 'integer', 'exists:requests,id'],
+            'is_related_decade_action' => ['required', Rule::in(['Yes', 'No'])],
+            'unique_related_decade_action_id' => ['required_if:is_related_decade_action,Yes', 'string'],
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'capacity_development_title' => ['required', 'string'],
+            'request_link_type' => ['required_unless:is_related_decade_action,Yes', 'string'],
+            'project_stage' => ['required_unless:is_related_decade_action,Yes', 'string'],
+            'project_url' => ['nullable', 'url'],
+            'activity_name' => ['required_unless:is_related_decade_action,Yes', 'string'],
+            'has_significant_changes' => ['required_if:is_related_decade_action,Yes', Rule::in(['Yes', 'No'])],
+            'changes_description' => ['required_if:has_significant_changes,Yes', 'string'],
+            'related_activity' => ['required', Rule::in(['Training', 'Workshop', 'Both'])],
+            'subthemes' => ['required', 'array'],
+            'subthemes.*' => ['string'],
+            'subthemes_other' => ['required_if:subthemes,Other', 'string'],
+            'support_types' => ['required', 'array'],
+            'support_types.*' => ['string'],
+            'support_types_other' => ['required_if:support_types,Other', 'string'],
+            'gap_description' => ['required', 'string'],
+            'has_partner' => ['required', Rule::in(['Yes', 'No'])],
+            'partner_name' => ['required_if:has_partner,Yes', 'string'],
+            'partner_confirmed' => ['required_if:has_partner,Yes', Rule::in(['Yes', 'No'])],
+            'needs_financial_support' => ['required', Rule::in(['Yes', 'No'])],
+            'budget_breakdown' => ['required_if:needs_financial_support,Yes', 'string'],
+            'support_months' => ['required_if:needs_financial_support,Yes', 'integer'],
+            'completion_date' => ['required_if:needs_financial_support,Yes', 'date'],
+            'risks' => ['required', 'string'],
+            'personnel_expertise' => ['required', 'string'],
+            'direct_beneficiaries' => ['required', 'string'],
+            'direct_beneficiaries_number' => ['required', 'numeric'],
+            'expected_outcomes' => ['required', 'string'],
+            'success_metrics' => ['required', 'string'],
+            'long_term_impact' => ['required', 'string'],
+        ];
+    }
 
 
     /**
@@ -136,6 +181,7 @@ class OcdRequestController extends Controller
     public function store(Request $httpRequest, $requestId = null)
     {
         try {
+            $validated = $httpRequest->validate($this->validationRules());
             if ($requestId) {
                 $ocdRequest = OCDRequest::find($requestId);
                 if (!$ocdRequest) {
@@ -145,7 +191,7 @@ class OcdRequestController extends Controller
                 $ocdRequest = new OCDRequest();
                 $ocdRequest->user()->associate($httpRequest->user());
             }
-            $ocdRequest->request_data = json_encode($httpRequest->all());
+            $ocdRequest->request_data = json_encode($validated);
             $ocdRequest->status()->associate(RequestStatus::getUnderReviewStatus());
             $ocdRequest->save();
             return response()->json([
