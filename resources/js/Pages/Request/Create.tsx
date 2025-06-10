@@ -74,6 +74,7 @@ export default function RequestForm() {
 
 
   const handleSubmitV2 = (mode: 'submit' | 'draft') => {
+    form.clearErrors();
     axios
       .post(
         route(`user.request.submit`, { mode }),
