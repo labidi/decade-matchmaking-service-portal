@@ -181,7 +181,6 @@ class OcdRequestController extends Controller
     {
         $validated = $httpRequest->validate($this->validationRules());
         try {
-            $validated = $httpRequest->validate($this->validationRules());
             if ($requestId) {
                 $ocdRequest = OCDRequest::find($requestId);
                 if (!$ocdRequest) {
