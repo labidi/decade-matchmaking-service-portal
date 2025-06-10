@@ -1,6 +1,7 @@
 // resources/js/Pages/Requests/Show.tsx
 import React, { useState } from 'react';
 import { Head, usePage, Link, useForm } from '@inertiajs/react';
+import jsPDF from 'jspdf';
 import FrontendLayout from '@/Layouts/FrontendLayout';
 import { OCDRequest, OCDRequestGrid,DocumentList} from '@/types';
 import { UIRequestForm } from '@/Forms/UIRequestForm';
@@ -11,6 +12,48 @@ export default function ShowRequest() {
   const OcdRequest = usePage().props.request as OCDRequest;
   const RequestDetails = usePage().props.requestDetail as OCDRequestGrid;
   const documents = usePage().props.documents as DocumentList;
+
+  const exportPdf = () => {
+    const doc = new jsPDF();
+    let y = 10;
+
+    doc.setFontSize(18);
+    doc.text(`Request #${OcdRequest.id}`, 10, y);
+    y += 10;
+
+    UIRequestForm.forEach(step => {
+      doc.setFontSize(14);
+      doc.text(step.label, 10, y);
+      y += 7;
+
+      Object.entries(step.fields).forEach(([key, field]) => {
+        if (!field.label || field.type === 'hidden') return;
+        if (field.show && !field.show(OcdRequest.request_data as any)) return;
+        const value = (OcdRequest.request_data as any)[key];
+        if (value === undefined || value === '') return;
+        const formatted = Array.isArray(value) ? value.join(', ') : String(value);
+
+        const lines = doc.splitTextToSize(`${field.label}: ${formatted}`, 180);
+        doc.setFontSize(12);
+        lines.forEach(line => {
+          if (y > 280) {
+            doc.addPage();
+            y = 10;
+          }
+          doc.text(line, 10, y);
+          y += 6;
+        });
+      });
+
+      y += 4;
+      if (y > 280) {
+        doc.addPage();
+        y = 10;
+      }
+    });
+
+    doc.save(`request-${OcdRequest.id}.pdf`);
+  };
 
   return (
     <FrontendLayout>
@@ -105,12 +148,13 @@ export default function ShowRequest() {
       <div className="mt-8 flex space-x-4">
 
         {RequestDetails.actions.canExportPdf && (
-          <Link
-            href={route('user.request.myrequests')}
+          <button
+            type="button"
+            onClick={exportPdf}
             className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
           >
             Export the Request as PDF
-          </Link>
+          </button>
         )}
 
         {RequestDetails.actions.canEdit && (
