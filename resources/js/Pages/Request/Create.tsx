@@ -88,7 +88,6 @@ export default function RequestForm() {
         form.setData('id', responseXhr.data.request_data.id);
         form.setData('unique_id', responseXhr.data.request_data.unique_id);
         setXhrDialogResponseMessage(responseXhr.data.request_data.message);
-
         if (mode === 'draft') {
           setXhrDialogResponseType('success');
           router.push({
@@ -103,8 +102,22 @@ export default function RequestForm() {
         }
       })
       .catch(function (responseXhr) {
-        setXhrDialogResponseType('error');
-        setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
+        if (responseXhr.response?.status === 422) {
+          form.setError(responseXhr.response.data.errors);
+          const stepsWithError: number[] = [];
+          Object.keys(responseXhr.response.data.errors).forEach(field => {
+            const idx = UIRequestForm.findIndex(step => step.fields[field]);
+            if (idx !== -1 && !stepsWithError.includes(idx + 1)) {
+              stepsWithError.push(idx + 1);
+            }
+          });
+          setErrorSteps(stepsWithError);
+          setXhrDialogResponseType('error');
+          setXhrDialogResponseMessage('Please correct the highlighted errors.');
+        } else {
+          setXhrDialogResponseType('error');
+          setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
+        }
       })
       .finally(() => {
         // window.history.replaceState(null, "Submit Request", "/request/create/" + form.data.id);
