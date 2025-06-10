@@ -6,19 +6,7 @@ import XHRMessageDialog from '@/Components/Dialog/XHRAlertDialog';
 import axios from 'axios';
 import { OCDRequest } from '@/types';
 
-
-
 type Mode = 'submit' | 'draft';
-
-type ValidationRule = {
-  field: string;
-  message: string;
-  condition?: () => boolean;
-};
-
-type RequestFormData = {
-  request_data: OCDRequest
-}
 
 export default function RequestForm() {
 
@@ -72,257 +60,76 @@ export default function RequestForm() {
   const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
   const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect'>('info');
 
-  const isPartner = form.data.is_partner === 'Yes';
-
-  const validationSchema: Record<number, ValidationRule[]> = {
-    1: [
-      { field: 'is_partner', message: 'This field is required.' },
-      { field: 'first_name', message: 'This field is required.' },
-      { field: 'last_name', message: 'This field is required.' },
-      {
-        field: 'email',
-        message: 'This field is required.',
-      },
-      {
-        field: 'email',
-        message: 'Email format is invalid.',
-        condition: () =>
-          !!form.data.email &&
-          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.data.email),
-      },
-      ...(form.data.is_partner === 'Yes'
-        ? [
-          { field: 'unique_id', message: 'This field is required.' },
-        ]
-        : []),
-    ],
-    2: [
-      ...(!isPartner
-        ? [
-          { field: 'request_link_type', message: 'This field is required.' },
-          { field: 'project_stage', message: 'This field is required.' },
-          { field: 'project_url', message: 'This field is required.' },
-          { field: 'activity_name', message: 'This field is required.' },
-        ]
-        : []),
-      ...(isPartner
-        ? [
-          { field: 'capacity_development_title', message: 'This field is required.' },
-          { field: 'has_significant_changes', message: 'This field is required.' },
-          { field: 'changes_description', message: 'This field is required.', condition: () => form.data.has_significant_changes === 'Yes' },
-        ]
-        : []),
-    ],
-    3: [
-      { field: 'related_activity', message: 'This field is required.' },
-      { field: 'subthemes', message: 'This field is required.', condition: () => form.data.subthemes.length === 0 },
-      { field: 'support_types', message: 'This field is required.', condition: () => form.data.support_types.length === 0 },
-      { field: 'gap_description', message: 'This field is required.' },
-      ...(form.data.subthemes.includes('Other')
-        ? [
-          { field: 'subthemes_other', message: 'This field is required.' },
-        ]
-        : []),
-      ...(form.data.support_types.includes('Other')
-        ? [
-          { field: 'support_types_other', message: 'This field is required.' },
-        ]
-        : []),
-    ],
-    4: [
-      { field: 'has_partner', message: 'This field is required.' },
-      ...(form.data.has_partner === 'Yes'
-        ? [
-          { field: 'partner_name', message: 'This field is required.' },
-          { field: 'partner_confirmed', message: 'This field is required.' },
-        ]
-        : []),
-      { field: 'needs_financial_support', message: 'This field is required.' },
-      ...(form.data.needs_financial_support === 'Yes'
-        ? [
-          { field: 'budget_breakdown', message: 'This field is required.' },
-          { field: 'support_months', message: 'This field is required.' },
-          { field: 'completion_date', message: 'This field is required.' },
-        ]
-        : []),
-    ],
-    5: [
-      { field: 'risks', message: 'This field is required.' },
-      { field: 'personnel_expertise', message: 'This field is required.' },
-      { field: 'direct_beneficiaries', message: 'This field is required.' },
-      { field: 'direct_beneficiaries_number', message: 'This field is required.' },
-      { field: 'expected_outcomes', message: 'This field is required.' },
-      { field: 'success_metrics', message: 'This field is required.' },
-      { field: 'long_term_impact', message: 'This field is required.' },
-    ],
-  };
-
-  const isEmptyValue = (value: any): boolean => {
-    return (
-      value === undefined ||
-      value === null ||
-      (typeof value === 'string' && value.trim() === '') ||
-      (Array.isArray(value) && value.length === 0) ||
-      (typeof value === 'boolean' && value === false)
-    );
-  };
-
-  const validateAllSteps = (currentStep: unknown = null) => {
-    const arrayErrorSteps: number[] = [];
-    const stepsToValidate = currentStep ? [currentStep] : steps.map((_, idx) => idx + 1);
-    let hasError = false;
-
-    stepsToValidate.forEach((_, idx) => {
-      const currentStep = idx + 1;
-      const schema = validationSchema[currentStep];
-      if (!schema) return;
-
-      const fieldsWithError = new Set<string>();
-
-      schema.forEach(({ field, message, condition }) => {
-        const value = (form.data as Record<string, any>)[field];
-
-        const shouldTrigger = condition
-          ? condition() // ex: subthemes.length === 0
-          : isEmptyValue(value); // required classique
-
-        if (shouldTrigger) {
-          form.setError(field as keyof typeof form.data, message);
-          hasError = true;
-          fieldsWithError.add(field);
-
-          const errorStep = getErrorStepByField(field as keyof typeof form.data);
-          if (!arrayErrorSteps.includes(errorStep)) {
-            arrayErrorSteps.push(errorStep);
-          }
-        }
-      });
-
-      // Clear les erreurs pour les champs sans problème
-      schema.forEach(({ field }) => {
-        if (!fieldsWithError.has(field)) {
-          form.clearErrors(field as keyof typeof form.data);
-        }
-      });
-    });
-
-    setErrorSteps(arrayErrorSteps);
-    return !hasError;
-  };
-
-
-  const getErrorStepByField = (field: keyof typeof form.data): number => {
-    for (const step in validationSchema) {
-      const rules = validationSchema[step as unknown as number];
-      if (rules.some(rule => rule.field === field)) {
-        return parseInt(step, 10);
-      }
-    }
-    return -1;
-  };
-
-
-  const validateForm = (currentMode: 'submit' | 'draft' = 'submit'): boolean => {
-    form.clearErrors();
-
-    const errors: Record<string, string> = {};
-
-    if (currentMode === 'draft') return true;
-
-    const schema = validationSchema[step as keyof typeof validationSchema];
-    const allSchema = validationSchema as Record<number, ValidationRule[]>;
-    if (!schema) return true;
-
-    schema.forEach(({ field, message, condition }) => {
-      // if (condition && !condition()) return;
-      const value = (form.data as Record<string, any>)[field];
-      if (
-        value === undefined ||
-        value === null ||
-        (typeof value === 'string' && value.trim() === '') ||
-        (Array.isArray(value) && value.length === 0)
-      ) {
-        errors[field] = message;
-      }
-    });
-
-    Object.entries(errors).forEach(([key, message]) => {
-      form.setError(key as keyof typeof form.data, message);
-    });
-
-    return Object.keys(errors).length === 0;
-  };
-
   const getInputClass = (fieldName: keyof typeof form.errors) => {
     return `mt-2 block w-full border rounded ${form.errors[fieldName] ? 'border-red-600' : 'border-gray-300'}`;
   };
 
   const handleNext = () => {
-    setXhrDialogResponseMessage('');
-    setXhrDialogResponseType('info');
-    const isValid = validateAllSteps(step);
-    if (isValid) {
-      setStep(prev => Math.min(prev + 1, steps.length));
-    }
+    setStep(prev => Math.min(prev + 1, steps.length));
   };
 
   const handleBack = () => {
-    setXhrDialogResponseMessage('');
-    setXhrDialogResponseType('info');
-    const isValid = validateAllSteps(step);
-    if (isValid) {
-      setStep(prev => Math.max(prev - 1, 1));
-    }
+    setStep(prev => Math.max(prev - 1, 1));
   };
 
 
   const handleSubmitV2 = (mode: 'submit' | 'draft') => {
-    const isValid = mode === 'submit' ? validateAllSteps() : true;
-    // const isValid = validateForm(mode);
-    if (isValid) {
-      axios
-        .post(
-          route(`user.request.submit`, { mode }),
-          { ...form.data },
-          {
-            headers: {
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            },
-          }
-        )
-        .then(function (responseXhr) {
-          form.setData('id', responseXhr.data.request_data.id);
-          form.setData('unique_id', responseXhr.data.request_data.unique_id);
-          setXhrDialogResponseMessage(responseXhr.data.request_data.message);
-
-          if (mode === 'draft') {
-            setXhrDialogResponseType('success');
-            router.push({
-              url: route(`user.request.edit`, { id: responseXhr.data.request_data.id }),
-              clearHistory: false,
-              encryptHistory: false,
-              preserveScroll: true,
-              preserveState: true,
-            })
-          } else {
-            setXhrDialogResponseType('redirect');
-          }
-        })
-        .catch(function (responseXhr) {
+    axios
+      .post(
+        route(`user.request.submit`, { mode }),
+        { ...form.data },
+        {
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          },
+        }
+      )
+      .then(function (responseXhr) {
+        form.setData('id', responseXhr.data.request_data.id);
+        form.setData('unique_id', responseXhr.data.request_data.unique_id);
+        setXhrDialogResponseMessage(responseXhr.data.request_data.message);
+        if (mode === 'draft') {
+          setXhrDialogResponseType('success');
+          router.push({
+            url: route(`user.request.edit`, { id: responseXhr.data.request_data.id }),
+            clearHistory: false,
+            encryptHistory: false,
+            preserveScroll: true,
+            preserveState: true,
+          })
+        } else {
+          setXhrDialogResponseType('redirect');
+        }
+      })
+      .catch(function (responseXhr) {
+        if (responseXhr.response?.status === 422) {
+          form.setError(responseXhr.response.data.errors);
+          const stepsWithError: number[] = [];
+          Object.keys(responseXhr.response.data.errors).forEach(field => {
+            const idx = UIRequestForm.findIndex(step => step.fields[field]);
+            if (idx !== -1 && !stepsWithError.includes(idx + 1)) {
+              stepsWithError.push(idx + 1);
+            }
+          });
+          setErrorSteps(stepsWithError);
+          setXhrDialogResponseType('error');
+          setXhrDialogResponseMessage('Please correct the highlighted errors.');
+        } else {
           setXhrDialogResponseType('error');
           setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
-        })
-        .finally(() => {
-          // window.history.replaceState(null, "Submit Request", "/request/create/" + form.data.id);
-          setXhrDialogOpen(true);
-        });
-    }
+        }
+      })
+      .finally(() => {
+        // window.history.replaceState(null, "Submit Request", "/request/create/" + form.data.id);
+        setXhrDialogOpen(true);
+      });
+
   };
 
   const renderField = (name: FormDataKeys, field: UIField) => {
-   // if (field.show && !field.show(form.data as unknown as Request)) {
-     // return null;
-    //}
+    if (field.show && !field.show(form.data as unknown as RequestFields)) {
+      return null;
+    }
     const error = form.errors[name];
     const common = {
       id: field.id,
@@ -453,7 +260,7 @@ export default function RequestForm() {
         onConfirm={() => {
           setXhrDialogOpen(false);
           if (xhrdialogResponseType === 'redirect') {
-            router.visit(route(`user.request.list`), { method: 'get' });
+            router.visit(route(`user.request.myrequests`), { method: 'get' });
           }
         }}
       />
