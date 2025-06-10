@@ -65,7 +65,12 @@ export default function RequestForm() {
   };
 
   const handleNext = () => {
-    setStep(prev => Math.min(prev + 1, steps.length));
+    setXhrDialogResponseMessage('');
+    setXhrDialogResponseType('info');
+    const isValid = validateAllSteps(step);
+    if (isValid) {
+      setStep(prev => Math.min(prev + 1, steps.length));
+    }
   };
 
   const handleBack = () => {
