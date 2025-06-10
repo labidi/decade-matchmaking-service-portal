@@ -14,6 +14,7 @@ import { Chips } from 'primereact/chips';
 import 'primereact/resources/themes/saga-blue/theme.css'; // ou un autre thème
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+import { countryOptions, regionOptions, oceanOptions, Option } from '@/data/locations';
 
 export default function CreateOpportunity() {
     const opportunity = usePage().props.request as OCDOpportunity;
@@ -58,10 +59,28 @@ export default function CreateOpportunity() {
     const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
     const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect'>('info');
     const [tags, setTags] = useState<string[]>([]);
-    
+    const [implementationOptions, setImplementationOptions] = useState<Option[]>([]);
+
     useEffect(() => {
         setData('key_words', tags.join(','));
     }, [tags]);
+
+    useEffect(() => {
+        switch (data.coverage_activity) {
+            case 'country':
+                setImplementationOptions(countryOptions);
+                break;
+            case 'Regions':
+                setImplementationOptions(regionOptions);
+                break;
+            case 'Ocean-based':
+                setImplementationOptions(oceanOptions);
+                break;
+            default:
+                setImplementationOptions([]);
+        }
+        setData('implementation_location' as keyof typeof data, '');
+    }, [data.coverage_activity]);
 
     return (
 
@@ -185,8 +204,9 @@ export default function CreateOpportunity() {
                             onChange={(e) => setData('implementation_location' as keyof typeof data, e.currentTarget.value)}
                         >
                             <option value="">— Select —</option>
-                            <option value="test">Test</option>
-
+                            {implementationOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
                         </select>
                         {errors.implementation_location && (
                             <p className="text-red-600 text-base mt-1">{errors.implementation_location}</p>
