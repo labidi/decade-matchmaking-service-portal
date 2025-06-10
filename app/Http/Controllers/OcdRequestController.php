@@ -31,8 +31,8 @@ class OcdRequestController extends Controller
             'project_stage' => ['required_unless:is_related_decade_action,Yes', 'string'],
             'project_url' => ['nullable', 'url'],
             'activity_name' => ['required_unless:is_related_decade_action,Yes', 'string'],
-            'has_significant_changes' => ['required_if:is_related_decade_action,Yes', Rule::in(['Yes', 'No'])],
-            'changes_description' => ['required_if:has_significant_changes,Yes', 'string'],
+            //'has_significant_changes' => ['required_if:is_related_decade_action,Yes', Rule::in(['Yes', 'No'])],
+            //'changes_description' => ['required_if:has_significant_changes,Yes', 'string'],
             'related_activity' => ['required', Rule::in(['Training', 'Workshop', 'Both'])],
             'subthemes' => ['required', 'array'],
             'subthemes.*' => ['string'],
@@ -42,8 +42,8 @@ class OcdRequestController extends Controller
             'support_types_other' => ['required_if:support_types,Other', 'string'],
             'gap_description' => ['required', 'string'],
             'has_partner' => ['required', Rule::in(['Yes', 'No'])],
-            'partner_name' => ['required_if:has_partner,Yes', 'string'],
-            'partner_confirmed' => ['required_if:has_partner,Yes', Rule::in(['Yes', 'No'])],
+            //'partner_name' => ['required_if:has_partner,Yes', 'string'],
+            //'partner_confirmed' => ['required_if:has_partner,Yes', Rule::in(['Yes', 'No'])],
             'needs_financial_support' => ['required', Rule::in(['Yes', 'No'])],
             'budget_breakdown' => ['required_if:needs_financial_support,Yes', 'string'],
             'support_months' => ['required_if:needs_financial_support,Yes', 'integer'],
@@ -180,8 +180,8 @@ class OcdRequestController extends Controller
      */
     public function store(Request $httpRequest, $requestId = null)
     {
+        $validated = $httpRequest->validate($this->validationRules());
         try {
-            $validated = $httpRequest->validate($this->validationRules());
             if ($requestId) {
                 $ocdRequest = OCDRequest::find($requestId);
                 if (!$ocdRequest) {

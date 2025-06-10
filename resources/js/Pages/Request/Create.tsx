@@ -88,7 +88,6 @@ export default function RequestForm() {
         form.setData('id', responseXhr.data.request_data.id);
         form.setData('unique_id', responseXhr.data.request_data.unique_id);
         setXhrDialogResponseMessage(responseXhr.data.request_data.message);
-
         if (mode === 'draft') {
           setXhrDialogResponseType('success');
           router.push({
