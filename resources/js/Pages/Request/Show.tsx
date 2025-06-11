@@ -1,14 +1,17 @@
+import React, { useState } from 'react';
 import { Head, usePage, Link } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
 import { OCDRequest, OCDRequestGrid, DocumentList, RequestOffer } from '@/types';
 import OfferSection from '@/Pages/Request/Components/OfferSection';
 import RequestDetailsSection from '@/Pages/Request/Components/RequestDetailsSection';
+import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
 
 
 export default function ShowRequest() {
   const OcdRequest = usePage().props.request as OCDRequest;
   const RequestPageDetails = usePage().props.requestDetail as OCDRequestGrid;
   const OcdRequestOffer = usePage().props.offer as RequestOffer;
+  const [clarificationOpen, setClarificationOpen] = useState(false);
 
   return (
     <FrontendLayout>
@@ -61,17 +64,22 @@ export default function ShowRequest() {
         )}
 
         {RequestPageDetails.actions.canRequestClarificationForOffer && (
-          <Link
-            href={route('user.request.myrequests')}
+          <button
+            id="request-clarification-from-ioc"
+            type="button"
+            onClick={() => setClarificationOpen(true)}
             className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
           >
             Request clarification from IOC
-          </Link>
+          </button>
         )}
-
-
-
       </div>
+      <XHRAlertDialog
+        open={clarificationOpen}
+        onOpenChange={setClarificationOpen}
+        type="info"
+        message="A request for clarification has been sent to the IOC Secretariat."
+      />
     </FrontendLayout>
   );
 }
