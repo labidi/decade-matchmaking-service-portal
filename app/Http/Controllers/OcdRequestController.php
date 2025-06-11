@@ -271,10 +271,10 @@ class OcdRequestController extends Controller
         }
 
         return Inertia::render('Request/Create', [
-            'title' => 'Create a new request',
+            'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
             'banner' => [
-                'title' => 'Create a new request',
-                'description' => 'Create a new request to get started.',
+                'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
+                'description' => 'Edit my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
             'request' => $ocdRequest->toArray(),

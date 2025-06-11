@@ -19,24 +19,22 @@ import 'primeicons/primeicons.css';
 import { countryOptions, regionOptions, oceanOptions, Option } from '@/data/locations';
 
 export default function CreateOpportunity() {
-    const opportunity = usePage().props.request as OCDOpportunity;
+    const OcdOpportunityData = usePage().props.request as OCDOpportunity;
 
-    const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
-        id: '',
-        title: '',
-        type: '',
-        closing_date: '',
-        coverage_activity: '',
-        implementation_location: '',
-        target_audience: '',
-        target_audience_other: '',
-        summary: '',
-        url: '',
-        created_at: '',
-        updated_at: '',
-        user_id: '',
-        key_words: '',
+    const { data, setData, post, processing, errors, reset, setError, clearErrors, setDefaults } = useForm({
+        id: OcdOpportunityData.id,
+        title: OcdOpportunityData.title,
+        type: OcdOpportunityData.type,
+        closing_date: OcdOpportunityData.closing_date,
+        coverage_activity: OcdOpportunityData.coverage_activity,
+        implementation_location: OcdOpportunityData.implementation_location,
+        target_audience: OcdOpportunityData.target_audience,
+        target_audience_other: OcdOpportunityData.target_audience_other,
+        summary: OcdOpportunityData.summary,
+        url: OcdOpportunityData.url,
+        key_words: OcdOpportunityData.keywords ? OcdOpportunityData.keywords.split(','):'',
     });
+
 
     const getInputClass = () => {
         return "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500";
@@ -60,12 +58,12 @@ export default function CreateOpportunity() {
     const [xhrdialogOpen, setXhrDialogOpen] = useState(false);
     const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
     const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect'>('info');
-    const [tags, setTags] = useState<string[]>([]);
+    const [keyWords, setkeyWords] = useState<string[]>([]);
     const [implementationOptions, setImplementationOptions] = useState<Option[]>([]);
 
     useEffect(() => {
-        setData('key_words', tags.join(','));
-    }, [tags]);
+        setData('key_words', keyWords);
+    }, [keyWords]);
 
     useEffect(() => {
         switch (data.coverage_activity) {
@@ -84,6 +82,8 @@ export default function CreateOpportunity() {
         setData('implementation_location' as keyof typeof data, '');
     }, [data.coverage_activity]);
 
+   
+
     return (
 
         <FrontendLayout>
@@ -96,7 +96,7 @@ export default function CreateOpportunity() {
                 onConfirm={() => {
                     setXhrDialogOpen(false);
                     if (xhrdialogResponseType === 'redirect') {
-                        router.visit(route(`partner.opportunity.list`), { method: 'get' });
+                        router.visit(route(`opportunity.list`), { method: 'get' });
                     }
                 }}
             />
@@ -306,8 +306,8 @@ export default function CreateOpportunity() {
                         </label>
                         <p className="mt-1 text-base text-gray-500">Add comma (,) to seperate key words or press enter</p>
                         <Chips
-                            value={tags}
-                            onChange={(e) => setTags(e.value ?? [])}
+                            value={keyWords}
+                            onChange={(e) => setkeyWords(e.value ?? [])}
                             separator=","
                             max={3}
                             allowDuplicate={false}

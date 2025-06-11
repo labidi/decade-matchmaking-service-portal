@@ -58,14 +58,15 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 Route::middleware(['auth', 'role:partner'])->group(function () {
     
     // Opportunity routes
-    Route::get('partner/opportunity/create', [OcdOpportunityController::class, 'create'])->name('partner.opportunity.create');
-    Route::post('partner/opportunity/store', [OcdOpportunityController::class, 'store'])->name('partner.opportunity.store');
-    Route::get('partner/opportunity/list', [OcdOpportunityController::class, 'list'])->name('partner.opportunity.list');
-    Route::get('partner/opportunity/browse', [OcdOpportunityController::class, 'list'])->name('opportunity.browse');
-    Route::get('partner/opportunity/show/{id}', [OcdOpportunityController::class, 'show'])->name('opportunity.show');
-    Route::patch('partner/opportunity/{id}/status', [OcdOpportunityController::class, 'updateStatus'])->name('partner.opportunity.status');
-    Route::get('partner/request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
-    Route::get('partner/request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
+    Route::get('opportunity/create', [OcdOpportunityController::class, 'create'])->name('partner.opportunity.create');
+    Route::post('opportunity/store', [OcdOpportunityController::class, 'store'])->name('partner.opportunity.store');
+    Route::get('opportunity/list', [OcdOpportunityController::class, 'list'])->name('opportunity.list');
+    Route::get('opportunity/browse', [OcdOpportunityController::class, 'list'])->name('opportunity.browse');
+    Route::get('opportunity/show/{id}', [OcdOpportunityController::class, 'show'])->name('opportunity.show');
+    Route::patch('opportunity/{id}/status', [OcdOpportunityController::class, 'updateStatus'])->name('partner.opportunity.status');
+    Route::get('request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
+    Route::get('opportunity/edit/{id}', [OcdOpportunityController::class, 'edit'])->name('opportunity.edit');
+    Route::get('request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
 });
 
 // Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
