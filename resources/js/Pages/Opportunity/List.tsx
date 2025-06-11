@@ -87,9 +87,10 @@ export default function OpportunitiesList() {
         <div className="flex space-x-4 items-center">
             {rowData.can_edit && (
                 <Link
-                    href="#"
+                    href={route('opportunity.edit', rowData.id)}
                     className="px-2 py-1 text-base font-medium text-blue-600 hover:text-blue-800"
                 >
+                    <i className="pi pi-pencil mr-1" aria-hidden="true" />
                     Edit
                 </Link>
             )}

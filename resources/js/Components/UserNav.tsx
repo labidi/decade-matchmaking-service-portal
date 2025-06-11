@@ -79,7 +79,7 @@ export default function UserDropdown() {
                     </Link>
                     {user.is_partner && (
                     <Link
-                        href={route('partner.opportunity.list')}
+                        href={route('opportunity.list')}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         role="menuitem"
                     >

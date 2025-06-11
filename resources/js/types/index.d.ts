@@ -121,6 +121,7 @@ export interface OCDRequest {
         risks: string;
         personnel_expertise: string;
         direct_beneficiaries: string;
+        direct_beneficiaries: string;
         direct_beneficiaries_number: string;
         expected_outcomes: string;
         success_metrics: string;
@@ -141,9 +142,10 @@ export interface OCDOpportunity {
     title: string;
     type: string[];
     closing_date: string;
-    coverage_activity: string[];
-    implementation_location: string[];
-    target_audience: string[];
+    coverage_activity: string;
+    implementation_location: string;
+    target_audience: string;
+    target_audience_other: string;
     summary: string;
     url: string;
     created_at: string;
@@ -152,7 +154,7 @@ export interface OCDOpportunity {
     status: string;
     status_label: string;
     can_edit: boolean;
-    tags: string[]
+    keywords: string
 }
 
 export type OCDOpportunitiesList = OCDOpportunity[];

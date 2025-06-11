@@ -21,7 +21,7 @@ class OcdOpportunityController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('dashboard')],
-                ['name' => 'Opportunities', 'url' => route('partner.opportunity.list')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
                 ['name' => 'Create Opportunity', 'url' => route('partner.opportunity.create')],
             ],
         ]);
@@ -30,7 +30,6 @@ class OcdOpportunityController extends Controller
     public function store(Request $httpRequest)
     {
 
-        // Validate the request data
         $validatedData = $httpRequest->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|string',
@@ -44,7 +43,6 @@ class OcdOpportunityController extends Controller
         ]);
 
         try {
-            // Check if the user has already submitted an opportunity
             $opportunity = new Opportunity($validatedData);
             $opportunity->user_id = $httpRequest->user()->id;
             $opportunity->status = Opportunity::STATUS['PENDING_REVIEW'];
@@ -52,8 +50,6 @@ class OcdOpportunityController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error saving Opportunity' . $e->getMessage()], 500);
         }
-
-        // Return a response
         return response()->json(['message' => 'Opportunity created successfully', 'opportunity' => $opportunity], 201);
     }
 
@@ -73,7 +69,7 @@ class OcdOpportunityController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
-                ['name' => 'Opportunities', 'url' => route('partner.opportunity.list')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
             ],
             'PageActions' => [
                 "canAddNew" => true
@@ -97,7 +93,7 @@ class OcdOpportunityController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
-                ['name' => 'Opportunities', 'url' => route('partner.opportunity.list')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
             ],
             'PageActions' => [
                 "canAddNew" => false
@@ -105,7 +101,7 @@ class OcdOpportunityController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         // Fetch the opportunity by ID
         $opportunity = Opportunity::findOrFail($id);
@@ -121,8 +117,35 @@ class OcdOpportunityController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
-                ['name' => 'Opportunities', 'url' => route('partner.opportunity.list')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
                 ['name' => 'View Opportunity', 'url' => route('opportunity.show', ['id' => $id])],
+            ],
+        ]);
+    }
+
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(int $id)
+    {
+        $opportunity = Opportunity::findOrFail($id);
+        if (!$opportunity) {
+            return response()->json(['error' => 'Ocd Opportunity not found'], 404);
+        }
+
+        return Inertia::render('Opportunity/Create', [
+            'title' => 'Edit Opportunity : '.$opportunity->title,
+            'banner' => [
+                'title' => 'Edit Opportunity : '.$opportunity->title,
+                'description' => 'Edit my Opportunity details here.',
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'request' => $opportunity->toArray(),
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
+                ['name' => 'Edit Request #' . $opportunity->id, 'url' => route('opportunity.edit', ['id' => $opportunity->id])],
             ],
         ]);
     }

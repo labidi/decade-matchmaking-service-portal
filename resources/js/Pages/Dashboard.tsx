@@ -99,7 +99,7 @@ export default function Dashboard({
 
                         )}
                         {auth.user && auth.user.is_partner && (
-                            <Link href={route("partner.opportunity.list")} className={LinkOpportunityCardClassName}>
+                            <Link href={route("opportunity.list")} className={LinkOpportunityCardClassName}>
                                 <div className="px-6 py-4">
                                     <div className="font-bold text-xl mb-2">View My submited Opportunities</div>
                                     <p className="text-base">
