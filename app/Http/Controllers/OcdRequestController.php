@@ -236,6 +236,10 @@ class OcdRequestController extends Controller
         $documents = \App\Models\Document::where('parent_type', OCDRequest::class)
             ->where('parent_id', $OCDrequestId)
             ->get();
+
+        $offers = \App\Models\Request\RequestOffer::with('documents')
+            ->where('request_id', $OCDrequestId)
+            ->get();
         return Inertia::render('Request/Show', [
             'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
             'banner' => [
@@ -245,6 +249,7 @@ class OcdRequestController extends Controller
             ],
             'request' => $ocdRequest->toArray(),
             'documents' => $documents,
+            'offers' => $offers,
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],

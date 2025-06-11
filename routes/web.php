@@ -67,6 +67,8 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::get('request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
     Route::get('opportunity/edit/{id}', [OcdOpportunityController::class, 'edit'])->name('opportunity.edit');
     Route::get('request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
+
+    Route::post('request/{request}/offer', [\App\Http\Controllers\RequestOfferController::class, 'store'])->name('partner.request.offer.store');
 });
 
 // Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {

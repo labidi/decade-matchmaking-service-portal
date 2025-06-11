@@ -1,7 +1,8 @@
 import { Head, usePage, Link } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDRequest, OCDRequestGrid, DocumentList } from '@/types';
+import { OCDRequest, OCDRequestGrid, DocumentList, RequestOfferList } from '@/types';
 import AttachementsSection from '@/Pages/Request/Components/AttachementsSection';
+import OfferSection from '@/Pages/Request/Components/OfferSection';
 import RequestDetailsSection from '@/Pages/Request/Components/RequestDetailsSection';
 
 
@@ -9,6 +10,7 @@ export default function ShowRequest() {
   const OcdRequest = usePage().props.request as OCDRequest;
   const RequestPageDetails = usePage().props.requestDetail as OCDRequestGrid;
   const documents = usePage().props.documents as DocumentList;
+  const offers = usePage().props.offers as RequestOfferList;
 
   return (
     <FrontendLayout>
@@ -16,6 +18,7 @@ export default function ShowRequest() {
 
       <RequestDetailsSection OcdRequest={OcdRequest} />
       <AttachementsSection OcdRequest={OcdRequest} documents={documents} />
+      <OfferSection OcdRequest={OcdRequest} offers={offers} />
 
       {/* Separator */}
       <div className="border-t border-gray-200 my-6" />
