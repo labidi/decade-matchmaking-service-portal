@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Enums\OpportunityStatus;
 
 
 class Opportunity extends Model
@@ -16,18 +17,15 @@ class Opportunity extends Model
     protected $appends = ['status_label', 'can_edit'];
 
 
-    const STATUS = [
-        'ACTIVE' => 1,
-        'CLOSED' => 2,
-        'REJECTED' => 3,
-        'PENDING_REVIEW' => 4,
+    const STATUS_LABELS = [
+        OpportunityStatus::ACTIVE->value => 'Active',
+        OpportunityStatus::CLOSED->value => 'Closed',
+        OpportunityStatus::REJECTED->value => 'Rejected',
+        OpportunityStatus::PENDING_REVIEW->value => 'Pending Review',
     ];
 
-    const STATUS_LABELS = [
-        self::STATUS['ACTIVE'] => 'Active',
-        self::STATUS['CLOSED'] => 'Closed',
-        self::STATUS['REJECTED'] => 'Rejected',
-        self::STATUS['PENDING_REVIEW'] => 'Pending Review',
+    protected $casts = [
+        'status' => OpportunityStatus::class,
     ];
 
 
@@ -51,14 +49,14 @@ class Opportunity extends Model
     protected function statusLabel(): Attribute
     {
         return Attribute::make(
-            get: fn() => self::STATUS_LABELS[$this->status] ?? '',
+            get: fn() => self::STATUS_LABELS[$this->status->value] ?? '',
         );
     }
 
     protected function canEdit(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->status === self::STATUS['PENDING_REVIEW'] ,
+            get: fn() => $this->status === OpportunityStatus::PENDING_REVIEW ,
         );
     }
 }

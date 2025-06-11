@@ -28,14 +28,7 @@ Route::get('/', function () {
             'description' => 'A user guide to help you navigate the platform.',
             'url' => '/assets/pdf/user-guide.pdf',
         ],
-        'metrics' => [
-            'number_of_open_partner_opertunities' => 63,
-            'number_successful_matches' => 23,
-            'number_fully_closed_matches' => 12,
-            'number_user_requests_in_implementation' => 12,
-            'committed_funding_amount' => 200000,
-            'number_of_open_partner_opertunities' => 10,
-        ]
+        'metrics' => config('metrics')
     ]);
 })->name('index');
 
