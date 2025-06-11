@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Document;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Enums\RequestOfferStatus;
 
 class RequestOffer extends Model
 {
@@ -15,14 +16,13 @@ class RequestOffer extends Model
     protected $appends = ['status_label'];
 
 
-    const STATUS = [
-        'ACTIVE' => 1,
-        'REJECTED' => 2,
+    const STATUS_LABELS = [
+        RequestOfferStatus::ACTIVE->value => 'Active',
+        RequestOfferStatus::REJECTED->value => 'Rejected',
     ];
 
-    const STATUS_LABELS = [
-        self::STATUS['ACTIVE'] => 'Active',
-        self::STATUS['REJECTED'] => 'Rejected',
+    protected $casts = [
+        'status' => RequestOfferStatus::class,
     ];
 
 

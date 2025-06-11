@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Opportunity;
+use App\Enums\OpportunityStatus;
 use App\Http\Controllers\Controller;
 
 class OcdOpportunityController extends Controller
@@ -45,7 +46,7 @@ class OcdOpportunityController extends Controller
         try {
             $opportunity = new Opportunity($validatedData);
             $opportunity->user_id = $httpRequest->user()->id;
-            $opportunity->status = Opportunity::STATUS['PENDING_REVIEW'];
+            $opportunity->status = OpportunityStatus::PENDING_REVIEW;
             $opportunity->save();
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error saving Opportunity' . $e->getMessage()], 500);
@@ -157,7 +158,7 @@ class OcdOpportunityController extends Controller
         if (!$opportunity) {
             return response()->json(['error' => 'Opportunity not found'], 404);
         }
-        if (!in_array($statusCode, Opportunity::STATUS)) {
+        if (!in_array($statusCode, array_column(OpportunityStatus::cases(), 'value'))) {
             return response()->json(['error' => 'Status not found'], 422);
         }
 
