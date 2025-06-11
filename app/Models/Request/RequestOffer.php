@@ -3,6 +3,8 @@
 namespace App\Models\Request;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\Document ;
 
 class RequestOffer extends Model
 {
@@ -15,5 +17,9 @@ class RequestOffer extends Model
         'description',
         'status',
     ];
-u
+
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'parent');
+    }
 }
