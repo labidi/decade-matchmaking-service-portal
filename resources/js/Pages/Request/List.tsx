@@ -36,6 +36,16 @@ export default function RequestsList() {
                 ));
             });
     };
+
+    const handleDelete = (id: string) => {
+        if (!confirm('Are you sure you want to delete this request?')) {
+            return;
+        }
+        axios.delete(route('user.request.destroy', id))
+            .then(() => {
+                setRequestList(prev => prev.filter(req => req.id !== id));
+            });
+    };
     const titleBodyTemplate = (rowData: OCDRequest) => rowData.request_data.capacity_development_title ?? 'N/A';
     const submissionDateTemplate = (rowData: OCDRequest) => new Date(rowData.created_at).toLocaleDateString();
 
@@ -49,6 +59,15 @@ export default function RequestsList() {
                     <i className="pi pi-pencil mr-1" aria-hidden="true" />
                     Edit
                 </Link>
+            )}
+            {grid.actions.canDelete && rowData.status.status_code === 'draft' && (
+                <button
+                    onClick={() => handleDelete(rowData.id)}
+                    className="flex items-center text-red-600 hover:text-red-800"
+                >
+                    <i className="pi pi-trash mr-1" aria-hidden="true" />
+                    Delete
+                </button>
             )}
             {grid.actions.canView && (
                 <Link
