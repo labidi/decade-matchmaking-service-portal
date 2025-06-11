@@ -19,11 +19,7 @@ export default function Show() {
                     <h2 className="text-xl font-semibold mb-4 text-firefly-800">Basic Information</h2>
                     <dl className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <dt className="text-sm font-medium text-gray-500">ID</dt>
-                            <dd className="mt-1 text-gray-900">#{opportunity.id}</dd>
-                        </div>
-                        <div>
-                            <dt className="text-sm font-medium text-gray-500">Status</dt>
+                            <dt className="text-2xl text-firefly-800">Status</dt>
                             <dd className="mt-1">
                                 <span
                                     className={`inline-block px-2 py-1 text-sm font-medium rounded-full ${opportunity.status === 'Open'
@@ -38,40 +34,40 @@ export default function Show() {
                             </dd>
                         </div>
                         <div>
-                            <dt className="text-sm font-medium text-gray-500">Type</dt>
-                            <dd className="mt-1 text-gray-900">{opportunity.type}</dd>
+                            <dt className="text-2xl text-firefly-800">Type</dt>
+                            <dd className="text-2xl mt-1 text-gray-900">{opportunity.type}</dd>
                         </div>
                         <div>
-                            <dt className="text-sm font-medium text-gray-500">Closing Date</dt>
-                            <dd className="mt-1 text-gray-900">{new Date(opportunity.closing_date).toLocaleDateString()}</dd>
+                            <dt className="text-2xl text-firefly-800">Closing Date</dt>
+                            <dd className="text-2xl mt-1 text-gray-900">{new Date(opportunity.closing_date).toLocaleDateString()}</dd>
                         </div>
                         <div>
-                            <dt className="text-sm font-medium text-gray-500">Coverage of CD Activity</dt>
-                            <dd className="mt-1 text-gray-900">{opportunity.coverage_activity}</dd>
+                            <dt className="text-2xl text-firefly-800">Coverage of CD Activity</dt>
+                            <dd className="text-2xl mt-1 text-gray-900">{opportunity.coverage_activity}</dd>
                         </div>
                         <div>
-                            <dt className="text-sm font-medium text-gray-500">Implementation Location</dt>
-                            <dd className="mt-1 text-gray-900">{opportunity.implementation_location}</dd>
+                            <dt className="text-2xl text-firefly-800">Implementation Location</dt>
+                            <dd className="text-2xl mt-1 text-gray-900">{opportunity.implementation_location}</dd>
                         </div>
                         <div>
-                            <dt className="text-sm font-medium text-gray-500">Target Audience</dt>
-                            <dd className="mt-1 text-gray-900">
+                            <dt className="text-2xl text-firefly-800">Target Audience</dt>
+                            <dd className="text-2xl mt-1 text-gray-900">
                                 {opportunity.target_audience === 'other' ? opportunity.target_audience_other : opportunity.target_audience}
                             </dd>
                         </div>
                         <div>
-                            <dt className="text-sm font-medium text-gray-500">Created</dt>
-                            <dd className="mt-1 text-gray-900">{new Date(opportunity.created_at).toLocaleDateString()}</dd>
+                            <dt className="text-2xl text-firefly-800">Created</dt>
+                            <dd className="text-2xl mt-1 text-gray-900">{new Date(opportunity.created_at).toLocaleDateString()}</dd>
                         </div>
                         {opportunity.updated_at && (
                             <div>
-                                <dt className="text-sm font-medium text-gray-500">Last Updated</dt>
-                                <dd className="mt-1 text-gray-900">{new Date(opportunity.updated_at).toLocaleDateString()}</dd>
+                                <dt className="text-2xl text-firefly-800">Last Updated</dt>
+                                <dd className="text-2xl mt-1 text-gray-900">{new Date(opportunity.updated_at).toLocaleDateString()}</dd>
                             </div>
                         )}
                         {opportunity.url && (
                             <div className="md:col-span-2">
-                                <dt className="text-sm font-medium text-gray-500">Related Link</dt>
+                                <dt className="text-2xl text-firefly-800">Related Link</dt>
                                 <dd className="mt-1">
                                     <a
                                         href={opportunity.url}

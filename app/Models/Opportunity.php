@@ -49,7 +49,7 @@ class Opportunity extends Model
     protected function statusLabel(): Attribute
     {
         return Attribute::make(
-            get: fn() => self::STATUS_LABELS[$this->status] ?? '',
+            get: fn() => self::STATUS_LABELS[$this->status->value] ?? '',
         );
     }
 
