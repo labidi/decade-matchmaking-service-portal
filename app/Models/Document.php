@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Enums\DocumentType;
 
 class Document extends Model
 {
@@ -18,7 +19,10 @@ class Document extends Model
         'uploader_id',
     ];
 
-    const TYPE_OFFER = 'offer_document';
+
+    protected $casts = [
+        'document_type' => DocumentType::class,
+    ];
 
     public function parent(): MorphTo
     {
