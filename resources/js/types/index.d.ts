@@ -79,6 +79,19 @@ export interface Document {
 
 export type DocumentList = Document[];
 
+export interface RequestOffer {
+    id: number;
+    description: string;
+    matched_partner_id: number;
+    request_id: number;
+    status: number;
+    created_at: string;
+    updated_at: string;
+    documents?: Document[];
+}
+
+export type RequestOfferList = RequestOffer[];
+
 export interface OCDRequest {
     id: string;
     type: string;
@@ -131,7 +144,6 @@ export interface OCDRequest {
     matched_partner_id: string | null;
     status_id: string;
     user_id: string;
-
 };
 
 export type OCDRequestList = OCDRequest[];
@@ -167,6 +179,8 @@ export type OCDRequestGrid = {
         canCreate?: boolean;
         canExpressInterrest?: boolean;
         canExportPdf?: boolean;
+        canAcceptOffer?:boolean;
+        canRequestClarificationForOffer?:boolean
     }
 }
 
@@ -184,4 +198,9 @@ export interface AttachementsProps {
     OcdRequest: OcdRequest;
     canEdit?: boolean;
     documents?: Document[];
+}
+
+export interface OfferProps {
+    OcdRequest: OcdRequest;
+    OcdRequestOffer: RequestOffer;
 }
