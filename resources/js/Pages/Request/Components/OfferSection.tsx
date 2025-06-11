@@ -1,14 +1,19 @@
 import { useForm } from '@inertiajs/react';
 import { OfferProps } from '@/types';
+import AttachementsSection from '@/Pages/Request/Components/AttachementsSection';
 
-export default function OfferSection({ OcdRequest, offers }: OfferProps) {
+export default function OfferSection({ OcdRequest, OcdRequestOffer }: OfferProps) {
+    console.log(OcdRequestOffer);
     const form = useForm<{ description: string; partner_id: string; file: File | null }>({
         description: '',
         partner_id: '',
         file: null,
     });
+    const getInputClass = () => {
+        return "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500";
+    }
     return (
-        <section id="attachements">
+        <section id="attachements" className='my-8'>
             <div className="grid grid-cols-1">
                 <div>
                     <h1 className="border-b-2 border-black-500 pb-4 text-2xl font-semibold tracking-tight text-pretty text-firefly-900 sm:text-3xl">
@@ -17,72 +22,86 @@ export default function OfferSection({ OcdRequest, offers }: OfferProps) {
                 </div>
             </div>
             <div className="grid grid-cols-1">
-                <form
-                    onSubmit={e => {
-                        e.preventDefault();
-                        form.post(route('partner.request.offer.store', { request: OcdRequest.id }), {
-                            forceFormData: true,
-                            onSuccess: () => form.reset(),
-                        });
-                    }}
-                >
-                    <div className="flex flex-col space-y-2">
-                        <input
-                            type="text"
-                            className="border rounded px-2 py-1"
-                            placeholder="Partner ID"
-                            value={form.data.partner_id}
-                            onChange={e => form.setData('partner_id', e.currentTarget.value)}
-                        />
-                        <textarea
-                            className="border rounded px-2 py-1"
-                            placeholder="Description"
-                            value={form.data.description}
-                            onChange={e => form.setData('description', e.currentTarget.value)}
-                        />
-                        <input
-                            type="file"
-                            accept="application/pdf"
-                            className="border rounded px-2 py-1"
-                            onChange={e => form.setData('file', e.currentTarget.files ? e.currentTarget.files[0] : null)}
-                        />
-                        <button
-                            type="submit"
-                            className="px-4 py-1 bg-firefly-600 text-white rounded disabled:opacity-50"
-                            disabled={form.processing || !form.data.file || !form.data.partner_id}
+                <div className='my-5'>
+                    <p>{OcdRequestOffer.description}</p>
+                </div>
+                {!OcdRequestOffer  && (
+                    <div>
+                        <form className="mx-auto bg-white"
+                            onSubmit={e => {
+                                e.preventDefault();
+                                form.post(route('admin.request.offer.store', { request: OcdRequest.id }), {
+                                    forceFormData: true,
+                                    onSuccess: () => form.reset(),
+                                });
+                            }}
                         >
-                            Submit Offer
-                        </button>
-                    </div>
-                </form>
+                            <div className='mt-8'>
+                                <label htmlFor="partner_id" className="block font-medium">
+                                    Partner ID
+                                </label>
+                                <p className="mt-1 text-base text-gray-500">Enter Unique ID (for partner)</p>
+                                <input
+                                    id="partner_id"
+                                    type="text"
+                                    className={getInputClass()}
+                                    placeholder="Partner ID"
+                                    value={form.data.partner_id}
+                                    onChange={e => form.setData('partner_id', e.currentTarget.value)}
+                                />
+                                {form.errors.partner_id && (
+                                    <p className="text-red-600 text-base mt-1">{form.errors.partner_id}</p>
+                                )}
+                            </div>
 
-                {offers.length > 0 && (
-                    <table className="mt-4 w-full text-left border">
-                        <thead>
-                            <tr className="bg-gray-100">
-                                <th className="p-2">Description</th>
-                                <th className="p-2">Partner</th>
-                                <th className="p-2">File</th>
-                                <th className="p-2">Submitted At</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {offers.map(offer => (
-                                <tr key={offer.id} className="border-t">
-                                    <td className="p-2">{offer.description}</td>
-                                    <td className="p-2">{offer.matched_partner_id}</td>
-                                    <td className="p-2">
-                                        {offer.documents && offer.documents[0] && (
-                                            <a href={`/storage/${offer.documents[0].path}`} className="text-blue-600 underline">
-                                                {offer.documents[0].name}
-                                            </a>
-                                        )}
-                                    </td>
-                                    <td className="p-2">{new Date(offer.created_at).toLocaleDateString()}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            <div className='mt-8'>
+                                <label htmlFor="description" className="block font-medium">
+                                    Offer Description
+                                </label>
+                                <p className="mt-1 text-base text-gray-500">Add Offer Description</p>
+                                <textarea
+                                    id="description"
+                                    className={getInputClass()}
+                                    placeholder="Offer Description"
+                                    value={form.data.description}
+                                    onChange={e => form.setData('description', e.currentTarget.value)}
+                                />
+                                {form.errors.description && (
+                                    <p className="text-red-600 text-base mt-1">{form.errors.description}</p>
+                                )}
+                            </div>
+
+                            <div className='mt-8'>
+                                <label htmlFor="file" className="block font-medium">
+                                    Offer Document
+                                </label>
+                                <p className="mt-1 text-base text-gray-500">Add Offer Document</p>
+                                <input
+                                    id="file"
+                                    type="file"
+                                    accept="application/pdf"
+                                    className={getInputClass()}
+                                    onChange={e => form.setData('file', e.currentTarget.files ? e.currentTarget.files[0] : null)}
+                                />
+                                {form.errors.description && (
+                                    <p className="text-red-600 text-base mt-1">{form.errors.description}</p>
+                                )}
+                            </div>
+
+                            <div className="flex flex-col space-y-2">
+                                <button
+                                    type="submit"
+                                    className="px-4 py-1 bg-firefly-600 text-white rounded disabled:opacity-50"
+                                    disabled={form.processing || !form.data.file || !form.data.partner_id}
+                                >
+                                    Submit Offer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                )}
+                {OcdRequestOffer && (
+                    <AttachementsSection OcdRequest={OcdRequest} documents={OcdRequestOffer.documents} />
                 )}
             </div>
         </section>

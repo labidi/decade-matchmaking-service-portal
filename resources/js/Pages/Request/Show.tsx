@@ -1,7 +1,6 @@
 import { Head, usePage, Link } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDRequest, OCDRequestGrid, DocumentList, RequestOfferList } from '@/types';
-import AttachementsSection from '@/Pages/Request/Components/AttachementsSection';
+import { OCDRequest, OCDRequestGrid, DocumentList, RequestOffer } from '@/types';
 import OfferSection from '@/Pages/Request/Components/OfferSection';
 import RequestDetailsSection from '@/Pages/Request/Components/RequestDetailsSection';
 
@@ -9,16 +8,14 @@ import RequestDetailsSection from '@/Pages/Request/Components/RequestDetailsSect
 export default function ShowRequest() {
   const OcdRequest = usePage().props.request as OCDRequest;
   const RequestPageDetails = usePage().props.requestDetail as OCDRequestGrid;
-  const documents = usePage().props.documents as DocumentList;
-  const offers = usePage().props.offers as RequestOfferList;
+  const OcdRequestOffer = usePage().props.offer as RequestOffer;
 
   return (
     <FrontendLayout>
       <Head title={`Request: ${OcdRequest.id}`} />
 
       <RequestDetailsSection OcdRequest={OcdRequest} />
-      <AttachementsSection OcdRequest={OcdRequest} documents={documents} />
-      <OfferSection OcdRequest={OcdRequest} offers={offers} />
+      <OfferSection OcdRequest={OcdRequest} OcdRequestOffer={OcdRequestOffer} />
 
       {/* Separator */}
       <div className="border-t border-gray-200 my-6" />
@@ -29,7 +26,7 @@ export default function ShowRequest() {
         {RequestPageDetails.actions.canExportPdf && (
           <Link
             href={route('user.request.myrequests')}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+            className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
           >
             Export the Request as PDF
           </Link>
@@ -38,7 +35,7 @@ export default function ShowRequest() {
         {RequestPageDetails.actions.canEdit && (
           <Link
             href={route('user.request.myrequests')}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+            className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
           >
             Edit
           </Link>
@@ -47,20 +44,32 @@ export default function ShowRequest() {
         {RequestPageDetails.actions.canDelete && (
           <Link
             href={route('user.request.myrequests')}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+            className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
           >
             Delete
           </Link>
         )}
 
-        {RequestPageDetails.actions.canDelete && (
+
+        {RequestPageDetails.actions.canAcceptOffer && (
           <Link
             href={route('user.request.myrequests')}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+            className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
           >
-            Delete
+            Accept Offer
           </Link>
         )}
+
+        {RequestPageDetails.actions.canRequestClarificationForOffer && (
+          <Link
+            href={route('user.request.myrequests')}
+            className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
+          >
+            Request clarification from IOC
+          </Link>
+        )}
+
+
 
       </div>
     </FrontendLayout>

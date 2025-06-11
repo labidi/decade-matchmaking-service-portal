@@ -13,7 +13,7 @@ class RequestOfferController extends Controller
     {
         $validated = $httpRequest->validate([
             'description' => 'required|string',
-            'partner_id' => 'required|exists:users,id',
+            'partner_id' => 'required',
             'file' => 'required|file|mimes:pdf',
         ]);
 
@@ -23,19 +23,20 @@ class RequestOfferController extends Controller
         $offer->request_id = $request->id;
         $offer->status = 1;
         $offer->save();
-
         $path = $httpRequest->file('file')->store('documents', 'public');
+
+
+//        $ocdRequest = 
 
         Document::create([
             'name' => $httpRequest->file('file')->getClientOriginalName(),
             'path' => $path,
             'file_type' => $httpRequest->file('file')->getClientMimeType(),
-            'document_type' => 'offer_document',
+            'document_type' => Document::TYPE_OFFER,
             'parent_id' => $offer->id,
             'parent_type' => RequestOffer::class,
             'uploader_id' => $httpRequest->user()->id,
         ]);
-
         return back();
     }
 }

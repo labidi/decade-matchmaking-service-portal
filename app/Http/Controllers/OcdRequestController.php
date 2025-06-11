@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Request\RequestOffer;
 
 class OcdRequestController extends Controller
 {
@@ -36,10 +37,10 @@ class OcdRequestController extends Controller
             'related_activity' => ['required', Rule::in(['Training', 'Workshop', 'Both'])],
             'subthemes' => ['required', 'array'],
             'subthemes.*' => ['string'],
-         //   'subthemes_other' => ['required_if:subthemes,Other', 'string'],
+            //   'subthemes_other' => ['required_if:subthemes,Other', 'string'],
             'support_types' => ['required', 'array'],
             'support_types.*' => ['string'],
-          //  'support_types_other' => ['required_if:support_types,Other', 'string'],
+            //  'support_types_other' => ['required_if:support_types,Other', 'string'],
             'gap_description' => ['required', 'string'],
             'has_partner' => ['required', Rule::in(['Yes', 'No'])],
             //'partner_name' => ['required_if:has_partner,Yes', 'string'],
@@ -99,7 +100,6 @@ class OcdRequestController extends Controller
                 $query->orWhere('status_code', 'closed');
             }
         )->get();
-
         return Inertia::render('Request/List', [
             'title' => 'View Request for Training workshops',
             'banner' => [
@@ -228,18 +228,19 @@ class OcdRequestController extends Controller
      */
     public function show(Request $httpRequest, int $OCDrequestId)
     {
-        $ocdRequest = OCDRequest::with(['status', 'user'])->find($OCDrequestId);
+        $ocdRequest = OCDRequest::with(['status', 'user','offer'])->find($OCDrequestId);
         if (!$ocdRequest) {
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }
 
-        $documents = \App\Models\Document::where('parent_type', OCDRequest::class)
+        $documents = \App\Models\Document::where('parent_type', RequestOffer::class)
             ->where('parent_id', $OCDrequestId)
             ->get();
 
-        $offers = \App\Models\Request\RequestOffer::with('documents')
+        $offer = RequestOffer::with('documents')
             ->where('request_id', $OCDrequestId)
-            ->get();
+            ->where('status', RequestOffer::STATUS['ACTIVE'])
+            ->first();
         return Inertia::render('Request/Show', [
             'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
             'banner' => [
@@ -248,8 +249,7 @@ class OcdRequestController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'request' => $ocdRequest->toArray(),
-            'documents' => $documents,
-            'offers' => $offers,
+            'offer'=>$offer,
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
@@ -260,7 +260,9 @@ class OcdRequestController extends Controller
                 'canDelete' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
                 'canCreate' => false,
                 'canExpressInterrest' => $ocdRequest->user->id !== $httpRequest->user()->id,
-                'canExportPdf' => true
+                'canExportPdf' => true,
+                'canAcceptOffer'=>$offer &&  $ocdRequest->user->id == $httpRequest->user()->id,
+                'canRequestClarificationForOffer'=>$offer &&  $ocdRequest->user->id == $httpRequest->user()->id
             ],
         ]);
     }

@@ -144,7 +144,6 @@ export interface OCDRequest {
     matched_partner_id: string | null;
     status_id: string;
     user_id: string;
-
 };
 
 export type OCDRequestList = OCDRequest[];
@@ -180,6 +179,8 @@ export type OCDRequestGrid = {
         canCreate?: boolean;
         canExpressInterrest?: boolean;
         canExportPdf?: boolean;
+        canAcceptOffer?:boolean;
+        canRequestClarificationForOffer?:boolean
     }
 }
 
@@ -201,5 +202,5 @@ export interface AttachementsProps {
 
 export interface OfferProps {
     OcdRequest: OcdRequest;
-    offers: RequestOfferList;
+    OcdRequestOffer: RequestOffer;
 }

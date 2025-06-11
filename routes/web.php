@@ -9,6 +9,7 @@ use App\Http\Controllers\User\OpportunityController as UserOpportunityController
 use App\Http\Controllers\OcdOpportunityController;
 use App\Http\Controllers\UserGuideController;
 use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\RequestOfferController;
 
 Route::get('/', function () {
     return Inertia::render('Index', [
@@ -56,7 +57,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:partner'])->group(function () {
-    
+
     // Opportunity routes
     Route::get('opportunity/create', [OcdOpportunityController::class, 'create'])->name('partner.opportunity.create');
     Route::post('opportunity/store', [OcdOpportunityController::class, 'store'])->name('partner.opportunity.store');
@@ -67,13 +68,12 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::get('request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
     Route::get('opportunity/edit/{id}', [OcdOpportunityController::class, 'edit'])->name('opportunity.edit');
     Route::get('request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
-
-    Route::post('request/{request}/offer', [\App\Http\Controllers\RequestOfferController::class, 'store'])->name('partner.request.offer.store');
 });
 
 // Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
-    Route::get('users', [UserRoleController::class, 'index'])->name('admin.users.index');
-    Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
+Route::get('users', [UserRoleController::class, 'index'])->name('admin.users.index');
+Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
+Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('admin.request.offer.store');
 // });
 
 

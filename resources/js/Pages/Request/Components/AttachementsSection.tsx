@@ -9,7 +9,7 @@ export default function AttachementsSection({ OcdRequest, canEdit = false, docum
         document_type: 'financial_breakdown_report',
     });
     return (
-        <section id="attachements">
+        <section id="attachements" className='my-8'>
             <div className="grid grid-cols-1">
                 <div>
                     <h1 className="border-b-2 border-black-500 pb-4 text-2xl font-semibold tracking-tight text-pretty text-firefly-900 sm:text-3xl">
