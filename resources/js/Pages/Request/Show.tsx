@@ -69,8 +69,6 @@ export default function ShowRequest() {
           </Link>
         )}
 
-
-
       </div>
     </FrontendLayout>
   );

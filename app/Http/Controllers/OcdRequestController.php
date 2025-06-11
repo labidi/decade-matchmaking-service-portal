@@ -102,7 +102,7 @@ class OcdRequestController extends Controller
         ]);
     }
 
-    public function submit(Request $httpRequest, $mode = 'submit')
+    public function submit(\App\Http\Requests\StoreOcdRequest $httpRequest, $mode = 'submit')
     {
         $requestId = $httpRequest->input('id') ?? null;
         if ($mode == 'draft') {
