@@ -73,16 +73,16 @@ export default function Show() {
                 </div>
 
                 {/* Tags */}
-                {opportunity.tags && opportunity.tags.length > 0 && (
+                {opportunity.keywords && opportunity.keywords.split(',').length > 0 && (
                     <div className="mb-6">
                         <h2 className="text-sm font-semibold text-gray-500">Tags</h2>
                         <div className="mt-2 flex flex-wrap gap-2">
-                            {opportunity.tags.map(tag => (
+                            {opportunity.keywords.split(',').map(keyword => (
                                 <span
-                                    key={tag}
+                                    key={keyword}
                                     className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
                                 >
-                                    {tag}
+                                    {keyword}
                                 </span>
                             ))}
                         </div>
