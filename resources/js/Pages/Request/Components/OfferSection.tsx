@@ -3,7 +3,6 @@ import { OfferProps } from '@/types';
 import AttachementsSection from '@/Pages/Request/Components/AttachementsSection';
 
 export default function OfferSection({ OcdRequest, OcdRequestOffer }: OfferProps) {
-    console.log(OcdRequestOffer);
     const form = useForm<{ description: string; partner_id: string; file: File | null }>({
         description: '',
         partner_id: '',
@@ -103,7 +102,6 @@ export default function OfferSection({ OcdRequest, OcdRequestOffer }: OfferProps
                             <p>{OcdRequestOffer.description}</p>
                         </div>
                         <AttachementsSection OcdRequest={OcdRequest} documents={OcdRequestOffer.documents} />
-
                     </>
                 )}
             </div>
