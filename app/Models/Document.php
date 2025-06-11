@@ -18,6 +18,8 @@ class Document extends Model
         'uploader_id',
     ];
 
+    const TYPE_OFFER = 'offer_document';
+
     public function parent(): MorphTo
     {
         return $this->morphTo();

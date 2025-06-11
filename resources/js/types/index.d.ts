@@ -79,6 +79,19 @@ export interface Document {
 
 export type DocumentList = Document[];
 
+export interface RequestOffer {
+    id: number;
+    description: string;
+    matched_partner_id: number;
+    request_id: number;
+    status: number;
+    created_at: string;
+    updated_at: string;
+    documents?: Document[];
+}
+
+export type RequestOfferList = RequestOffer[];
+
 export interface OCDRequest {
     id: string;
     type: string;
@@ -121,6 +134,7 @@ export interface OCDRequest {
         risks: string;
         personnel_expertise: string;
         direct_beneficiaries: string;
+        direct_beneficiaries: string;
         direct_beneficiaries_number: string;
         expected_outcomes: string;
         success_metrics: string;
@@ -130,7 +144,6 @@ export interface OCDRequest {
     matched_partner_id: string | null;
     status_id: string;
     user_id: string;
-
 };
 
 export type OCDRequestList = OCDRequest[];
@@ -141,9 +154,10 @@ export interface OCDOpportunity {
     title: string;
     type: string[];
     closing_date: string;
-    coverage_activity: string[];
-    implementation_location: string[];
-    target_audience: string[];
+    coverage_activity: string;
+    implementation_location: string;
+    target_audience: string;
+    target_audience_other: string;
     summary: string;
     url: string;
     created_at: string;
@@ -152,7 +166,7 @@ export interface OCDOpportunity {
     status: string;
     status_label: string;
     can_edit: boolean;
-    tags: string[]
+    keywords: string
 }
 
 export type OCDOpportunitiesList = OCDOpportunity[];
@@ -165,6 +179,8 @@ export type OCDRequestGrid = {
         canCreate?: boolean;
         canExpressInterrest?: boolean;
         canExportPdf?: boolean;
+        canAcceptOffer?:boolean;
+        canRequestClarificationForOffer?:boolean
     }
 }
 
@@ -182,4 +198,9 @@ export interface AttachementsProps {
     OcdRequest: OcdRequest;
     canEdit?: boolean;
     documents?: Document[];
+}
+
+export interface OfferProps {
+    OcdRequest: OcdRequest;
+    OcdRequestOffer: RequestOffer;
 }
