@@ -22,10 +22,7 @@ export default function OfferSection({ OcdRequest, OcdRequestOffer }: OfferProps
                 </div>
             </div>
             <div className="grid grid-cols-1">
-                <div className='my-5'>
-                    <p>{OcdRequestOffer.description}</p>
-                </div>
-                {!OcdRequestOffer  && (
+                {!OcdRequestOffer && (
                     <div>
                         <form className="mx-auto bg-white"
                             onSubmit={e => {
@@ -101,7 +98,13 @@ export default function OfferSection({ OcdRequest, OcdRequestOffer }: OfferProps
                     </div>
                 )}
                 {OcdRequestOffer && (
-                    <AttachementsSection OcdRequest={OcdRequest} documents={OcdRequestOffer.documents} />
+                    <>
+                        <div className='my-5'>
+                            <p>{OcdRequestOffer.description}</p>
+                        </div>
+                        <AttachementsSection OcdRequest={OcdRequest} documents={OcdRequestOffer.documents} />
+
+                    </>
                 )}
             </div>
         </section>
