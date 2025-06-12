@@ -67,7 +67,7 @@ export default function Show() {
                         )}
                         {opportunity.url && (
                             <div className="md:col-span-2">
-                                <dt className="text-2xl text-firefly-800">Related Link</dt>
+                                <dt className="text-2xl text-firefly-800">Link to Application</dt>
                                 <dd className="mt-1">
                                     <a
                                         href={opportunity.url}

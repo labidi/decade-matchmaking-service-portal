@@ -1,10 +1,10 @@
 import {Head, usePage, useForm} from '@inertiajs/react';
 import type {Auth, Document} from '@/types';
-import {AttachementsProps} from '@/types';
+import {AttachmentsProps} from '@/types';
 import React, {useState} from 'react';
 import axios from 'axios';
 
-export default function AttachmentsSection({OcdRequest, canEdit = false, documents = []}: AttachementsProps) {
+export default function AttachmentsSection({OcdRequest, canEdit = false, documents = []}: AttachmentsProps) {
     const {auth} = usePage<{ auth: Auth }>().props
     const [documentList, setDocumentList] = useState<Document[]>(documents);
     const form = useForm<{ file: File | null; document_type: string }>({

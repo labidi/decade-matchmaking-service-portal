@@ -1,36 +1,37 @@
 // resources/js/Components/RequestsList.tsx
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
-import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDOpportunity, OCDOpportunitiesList } from '@/types';
-import { usePage } from '@inertiajs/react';
-import { Auth, User } from '@/types';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Tag } from 'primereact/tag';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+import 'primereact/resources/primereact.min.css';
+import 'primereact/resources/themes/saga-blue/theme.css';
+import FrontendLayout from '@/Layouts/FrontendLayout';
+import React from 'react';
 import axios from 'axios';
+import {Auth, OCDOpportunity, OCDOpportunitiesList, OCDOpportunitiesListPageActions} from '@/types';
+import {Column} from 'primereact/column';
+import {DataTable} from 'primereact/datatable';
+import {Head, Link, usePage} from '@inertiajs/react';
+import {Tag} from 'primereact/tag';
 
 
 export default function OpportunitiesList() {
     const opportunitiesList = usePage().props.opportunities as OCDOpportunitiesList;
-    const { auth } = usePage<{ auth: Auth }>().props;
+    const pageActions = usePage().props.pageActions as OCDOpportunitiesListPageActions;
+
+    const {auth} = usePage<{ auth: Auth }>().props;
     const [opportunityList, setOpportunityList] = React.useState<OCDOpportunitiesList>(opportunitiesList);
+
     const statuses = [
-        { value: '1', label: 'ACTIVE' },
-        { value: '2', label: 'Closed' },
-        { value: '3', label: 'Rejected' },
-        { value: '4', label: 'Pending review' },
+        {value: '1', label: 'ACTIVE'},
+        {value: '2', label: 'Closed'},
+        {value: '3', label: 'Rejected'},
+        {value: '4', label: 'Pending review'},
     ];
 
     const handleStatusChange = (id: string, status: string) => {
-        axios.patch(route('partner.opportunity.status', id), { status })
+        axios.patch(route('partner.opportunity.status', id), {status})
             .then(res => {
                 setOpportunityList(prev => prev.map(op =>
                     op.id === id
-                        ? { ...op, status: res.data.status.status_code, status_label: res.data.status.status_label }
+                        ? {...op, status: res.data.status.status_code, status_label: res.data.status.status_label}
                         : op
                 ));
             });
@@ -86,7 +87,7 @@ export default function OpportunitiesList() {
             <Tag
                 value={label}
                 severity={tagSeverity}
-                icon={<i className={`${iconClass} ${iconColor}`} />}
+                icon={<i className={`${iconClass} ${iconColor}`}/>}
                 className="cursor-default text-white"
                 data-pr-tooltip={label}
             />
@@ -100,17 +101,17 @@ export default function OpportunitiesList() {
                     href={route('opportunity.edit', rowData.id)}
                     className="px-2 py-1 text-base font-medium text-blue-600 hover:text-blue-800"
                 >
-                    <i className="pi pi-pencil mr-1" aria-hidden="true" />
+                    <i className="pi pi-pencil mr-1" aria-hidden="true"/>
                     Edit
                 </Link>
             )}
 
-            {rowData.can_edit && (
+            {pageActions.canChangeStatus && (
                 <button
                     onClick={() => handleDelete(rowData.id)}
                     className="flex items-center text-red-600 hover:text-red-800"
                 >
-                    <i className="pi pi-trash mr-1" aria-hidden="true" />
+                    <i className="pi pi-trash mr-1" aria-hidden="true"/>
                     Delete
                 </button>
             )}
@@ -119,26 +120,26 @@ export default function OpportunitiesList() {
                 href={route('opportunity.show', rowData.id)}
                 className="flex items-center text-green-600 hover:text-green-800"
             >
-                <i className="pi pi-eye mr-1" aria-hidden="true" />
+                <i className="pi pi-eye mr-1" aria-hidden="true"/>
                 View
             </Link>
-
-            <select
-                className="border rounded px-2 py-1"
-                value={rowData.status}
-                onChange={e => handleStatusChange(rowData.id, e.currentTarget.value)}
-            >
-                {statuses.map(s => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
-                ))}
-            </select>
-
+            {pageActions.canChangeStatus && (
+                <select
+                    className="border rounded px-2 py-1"
+                    value={rowData.status}
+                    onChange={e => handleStatusChange(rowData.id, e.currentTarget.value)}
+                >
+                    {statuses.map(s => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                </select>
+            )}
         </div>
     );
 
     return (
         <FrontendLayout>
-            <Head title="Welcome" />
+            <Head title="Welcome"/>
             <div className="overflow-x-auto">
                 <div className='flex justify-between items-center mb-6'>
                     {auth.user.is_partner && (
@@ -159,14 +160,15 @@ export default function OpportunitiesList() {
                     emptyMessage="No Opportunities found."
                     className="p-datatable-sm .datatable-rows"
                 >
-                    <Column field="id" header="ID" sortable />
-                    <Column body={titleBodyTemplate} header="Title" />
-                    <Column field="type" header="Type" />
-                    <Column field="created_at" body={ApplicationClosingDate} header="Application closing date" sortable />
-                    <Column field="status.status_code" body={statusBodyTemplate} header="Status" sortable />
-                    <Column field="coverage_activity" header="Coverage of CD Activity" sortable />
-                    <Column field="implementation_location" header="Implementation location" sortable />
-                    <Column body={actionsTemplate} header="Actions" />
+                    <Column field="id" header="ID" sortable/>
+                    <Column body={titleBodyTemplate} header="Title"/>
+                    <Column field="type" header="Type"/>
+                    <Column field="created_at" body={ApplicationClosingDate} header="Application closing date"
+                            sortable/>
+                    <Column field="status.status_code" body={statusBodyTemplate} header="Status" sortable/>
+                    <Column field="coverage_activity" header="Coverage of CD Activity" sortable/>
+                    <Column field="implementation_location" header="Implementation location" sortable/>
+                    <Column body={actionsTemplate} header="Actions"/>
                 </DataTable>
             </div>
         </FrontendLayout>

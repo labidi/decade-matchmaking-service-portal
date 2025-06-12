@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\Opportunity;
 use App\Enums\OpportunityStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Opportunity;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class OcdOpportunityController extends Controller
 {
@@ -58,7 +59,7 @@ class OcdOpportunityController extends Controller
     {
         // Fetch all opportunities
         $opportunities = Opportunity::where('user_id', $httpRequest->user()->id)->get();
-
+        $user = Auth::user();
         // Return the opportunities to the view
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
@@ -72,8 +73,9 @@ class OcdOpportunityController extends Controller
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
             ],
-            'PageActions' => [
-                "canAddNew" => true
+            'pageActions' => [
+                "canAddNew" => true,
+                "canChangeStatus"=>$user->is_admin
             ],
         ]);
     }

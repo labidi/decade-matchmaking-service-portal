@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head, usePage, Link } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDRequest, OCDRequestGrid, DocumentList, RequestOffer } from '@/types';
+import { OCDRequest, OCDRequestGrid, RequestOffer } from '@/types';
 import OfferSection from '@/Pages/Request/Components/OfferSection';
 import RequestDetailsSection from '@/Pages/Request/Components/RequestDetailsSection';
 import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';

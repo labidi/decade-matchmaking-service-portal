@@ -22,17 +22,17 @@ export default function CreateOpportunity() {
     const OcdOpportunityData = usePage().props.request as OCDOpportunity;
 
     const { data, setData, post, processing, errors, reset, setError, clearErrors, setDefaults } = useForm({
-        id: OcdOpportunityData.id,
-        title: OcdOpportunityData.title,
-        type: OcdOpportunityData.type,
-        closing_date: OcdOpportunityData.closing_date,
-        coverage_activity: OcdOpportunityData.coverage_activity,
-        implementation_location: OcdOpportunityData.implementation_location,
-        target_audience: OcdOpportunityData.target_audience,
-        target_audience_other: OcdOpportunityData.target_audience_other,
-        summary: OcdOpportunityData.summary,
-        url: OcdOpportunityData.url,
-        key_words: OcdOpportunityData.keywords ? OcdOpportunityData.keywords.split(','):'',
+        id: OcdOpportunityData?.id,
+        title: OcdOpportunityData?.title,
+        type: OcdOpportunityData?.type,
+        closing_date: OcdOpportunityData?.closing_date,
+        coverage_activity: OcdOpportunityData?.coverage_activity,
+        implementation_location: OcdOpportunityData?.implementation_location,
+        target_audience: OcdOpportunityData?.target_audience,
+        target_audience_other: OcdOpportunityData?.target_audience_other,
+        summary: OcdOpportunityData?.summary,
+        url: OcdOpportunityData?.url,
+        key_words: OcdOpportunityData?.keywords ? OcdOpportunityData.keywords.split(','):'',
     });
 
 
@@ -82,7 +82,7 @@ export default function CreateOpportunity() {
         setData('implementation_location' as keyof typeof data, '');
     }, [data.coverage_activity]);
 
-   
+
 
     return (
 
@@ -304,7 +304,7 @@ export default function CreateOpportunity() {
                         <label htmlFor="tags" className="block font-medium">
                             Three key words
                         </label>
-                        <p className="mt-1 text-base text-gray-500">Add comma (,) to seperate key words or press enter</p>
+                        <p className="mt-1 text-base text-gray-500">Add comma (,) to separate key words or press enter</p>
                         <Chips
                             value={keyWords}
                             onChange={(e) => setkeyWords(e.value ?? [])}
@@ -322,7 +322,7 @@ export default function CreateOpportunity() {
                             disabled={processing}
                             className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
                         >
-                            {processing ? 'Create Opportunity...' : 'Create Opportunity'}
+                            {processing ? 'Saving Opportunity...' : 'Save Opportunity'}
                         </button>
                     </div>
                 </form>
