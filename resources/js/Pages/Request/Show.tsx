@@ -28,12 +28,12 @@ export default function ShowRequest() {
       <div className="mt-8 flex space-x-4">
 
         {RequestPageDetails.actions.canExportPdf && (
-          <Link
+          <a
             href={route('user.request.pdf', { id: OcdRequest.id })}
             className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
           >
             Export the Request as PDF
-          </Link>
+          </a>
         )}
 
         {RequestPageDetails.actions.canEdit && (

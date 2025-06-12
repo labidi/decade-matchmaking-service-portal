@@ -59,6 +59,7 @@ class OcdRequestController extends Controller
                 $query->orWhere('status_code', 'offer_made');
                 $query->orWhere('status_code', 'match_made');
                 $query->orWhere('status_code', 'closed');
+                $query->orWhere('status_code', 'in_implementation');
             }
         )->get();
         return Inertia::render('Request/List', [
@@ -181,14 +182,11 @@ class OcdRequestController extends Controller
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }
 
-        $documents = \App\Models\Document::where('parent_type', RequestOffer::class)
-            ->where('parent_id', $OCDrequestId)
-            ->get();
-
         $offer = RequestOffer::with('documents')
             ->where('request_id', $OCDrequestId)
             ->where('status', RequestOfferStatus::ACTIVE)
             ->first();
+
         return Inertia::render('Request/Show', [
             'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
             'banner' => [
@@ -207,7 +205,7 @@ class OcdRequestController extends Controller
                 'canEdit' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
                 'canDelete' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
                 'canCreate' => false,
-                'canExpressInterrest' => $ocdRequest->user->id !== $httpRequest->user()->id,
+                'canExpressInterest' => $ocdRequest->user->id !== $httpRequest->user()->id,
                 'canExportPdf' => true,
                 'canAcceptOffer'=>$offer &&  $ocdRequest->user->id == $httpRequest->user()->id,
                 'canRequestClarificationForOffer'=>$offer &&  $ocdRequest->user->id == $httpRequest->user()->id
@@ -251,7 +249,6 @@ class OcdRequestController extends Controller
         $pdf = Pdf::loadView('pdf.ocdrequest', [
             'ocdRequest' => $ocdRequest,
         ]);
-
         return $pdf->download('request_' . $ocdRequest->id . '.pdf');
     }
 

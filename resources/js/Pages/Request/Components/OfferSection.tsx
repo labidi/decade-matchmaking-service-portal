@@ -1,13 +1,14 @@
-import { useForm } from '@inertiajs/react';
-import { OfferProps } from '@/types';
-import AttachementsSection from '@/Pages/Request/Components/AttachementsSection';
+import {useForm} from '@inertiajs/react';
+import {OfferProps} from '@/types';
+import AttachmentsSection from '@/Pages/Request/Components/AttachmentsSection';
 
-export default function OfferSection({ OcdRequest, OcdRequestOffer }: OfferProps) {
+export default function OfferSection({OcdRequest, OcdRequestOffer}: OfferProps) {
     const form = useForm<{ description: string; partner_id: string; file: File | null }>({
         description: '',
         partner_id: '',
         file: null,
     });
+    console.log(OcdRequest);
     const getInputClass = () => {
         return "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500";
     }
@@ -21,16 +22,16 @@ export default function OfferSection({ OcdRequest, OcdRequestOffer }: OfferProps
                 </div>
             </div>
             <div className="grid grid-cols-1">
-                {!OcdRequestOffer && (
+                {!OcdRequestOffer && OcdRequest.status.status_code == "validated" && (
                     <div>
                         <form className="mx-auto bg-white"
-                            onSubmit={e => {
-                                e.preventDefault();
-                                form.post(route('admin.request.offer.store', { request: OcdRequest.id }), {
-                                    forceFormData: true,
-                                    onSuccess: () => form.reset(),
-                                });
-                            }}
+                              onSubmit={e => {
+                                  e.preventDefault();
+                                  form.post(route('admin.request.offer.store', {request: OcdRequest.id}), {
+                                      forceFormData: true,
+                                      onSuccess: () => form.reset(),
+                                  });
+                              }}
                         >
                             <div className='mt-8'>
                                 <label htmlFor="partner_id" className="block font-medium">
@@ -96,12 +97,12 @@ export default function OfferSection({ OcdRequest, OcdRequestOffer }: OfferProps
                         </form>
                     </div>
                 )}
-                {OcdRequestOffer && (
+                {OcdRequestOffer && ['in_implementation','validated','offer_made'].includes(OcdRequest.status.status_code) && (
                     <>
                         <div className='my-5'>
                             <p>{OcdRequestOffer.description}</p>
                         </div>
-                        <AttachementsSection OcdRequest={OcdRequest} documents={OcdRequestOffer.documents} />
+                        <AttachmentsSection OcdRequest={OcdRequest} documents={OcdRequestOffer.documents}/>
                     </>
                 )}
             </div>
