@@ -1,11 +1,11 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import {Head, Link} from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDRequest, OCDRequestList, OCDRequestGrid } from '@/types';
-import { usePage } from '@inertiajs/react';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Tag } from 'primereact/tag';
+import {OCDRequest, OCDRequestList, OCDRequestGrid} from '@/types';
+import {usePage} from '@inertiajs/react';
+import {DataTable} from 'primereact/datatable';
+import {Column} from 'primereact/column';
+import {Tag} from 'primereact/tag';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -27,13 +27,23 @@ export default function RequestsList() {
     ];
 
     const handleStatusChange = (id: string, status: string) => {
-        axios.patch(route('user.request.status', id), { status })
+        axios.patch(route('user.request.status', id), {status})
             .then(res => {
                 setRequestList(prev => prev.map(req =>
                     req.id === id
-                        ? { ...req, status: { ...req.status, ...res.data.status } }
+                        ? {...req, status: {...req.status, ...res.data.status}}
                         : req
                 ));
+            });
+    };
+
+    const handleDelete = (id: string) => {
+        if (!confirm('Are you sure you want to delete this request?')) {
+            return;
+        }
+        axios.delete(route('user.request.destroy', id))
+            .then(() => {
+                setRequestList(prev => prev.filter(req => req.id !== id));
             });
     };
     const titleBodyTemplate = (rowData: OCDRequest) => rowData.request_data.capacity_development_title ?? 'N/A';
@@ -46,25 +56,34 @@ export default function RequestsList() {
                     href={route('user.request.edit', rowData.id)}
                     className="flex items-center text-blue-600 hover:text-blue-800"
                 >
-                    <i className="pi pi-pencil mr-1" aria-hidden="true" />
+                    <i className="pi pi-pencil mr-1" aria-hidden="true"/>
                     Edit
                 </Link>
+            )}
+            {grid.actions.canDelete && rowData.status.status_code === 'draft' && (
+                <button
+                    onClick={() => handleDelete(rowData.id)}
+                    className="flex items-center text-red-600 hover:text-red-800"
+                >
+                    <i className="pi pi-trash mr-1" aria-hidden="true"/>
+                    Delete
+                </button>
             )}
             {grid.actions.canView && (
                 <Link
                     href={route('user.request.show', rowData.id)}
                     className="flex items-center text-green-600 hover:text-green-800"
                 >
-                    <i className="pi pi-eye mr-1" aria-hidden="true" />
+                    <i className="pi pi-eye mr-1" aria-hidden="true"/>
                     View
                 </Link>
             )}
-            {grid.actions.canExpressInterrest && (
+            {grid.actions.canExpressInterest && (
                 <Link
                     href={route('user.request.show', rowData.id)}
                     className="flex items-center text-green-700 hover:text-green-800"
                 >
-                    <i className="pi pi-star-fill mr-1" aria-hidden="true" />
+                    <i className="pi pi-star-fill mr-1" aria-hidden="true"/>
                     Express interrest
                 </Link>
             )}
@@ -105,6 +124,7 @@ export default function RequestsList() {
                 iconColor = 'mr-1';
                 break;
             case 'rejected':
+            case 'unmatched':
                 iconClass = 'pi pi-times-circle';
                 tagSeverity = 'danger';
                 iconColor = 'mr-1';
@@ -119,7 +139,7 @@ export default function RequestsList() {
             <Tag
                 value={label}
                 severity={tagSeverity}
-                icon={<i className={`${iconClass} ${iconColor}`} />}
+                icon={<i className={`${iconClass} ${iconColor}`}/>}
                 className="cursor-default text-white"
                 data-pr-tooltip={label}
             />
@@ -128,7 +148,7 @@ export default function RequestsList() {
 
     return (
         <FrontendLayout>
-            <Head title="Welcome" />
+            <Head title="Welcome"/>
             <div>
                 {grid.actions.canCreate && (
                     <div className='flex justify-between items-center mb-6'>
@@ -150,11 +170,11 @@ export default function RequestsList() {
                     emptyMessage="No requests found."
                     className="p-datatable-sm .datatable-rows"
                 >
-                    <Column field="id" header="ID" sortable />
-                    <Column body={titleBodyTemplate} header="Title" />
-                    <Column field="created_at" body={submissionDateTemplate} header="Submission Date" sortable />
-                    <Column field="status.status_code" body={statusBodyTemplate} header="Status" sortable />
-                    <Column body={actionsTemplate} header="Actions" />
+                    <Column field="id" header="ID" sortable/>
+                    <Column body={titleBodyTemplate} header="Title"/>
+                    <Column field="created_at" body={submissionDateTemplate} header="Submission Date" sortable/>
+                    <Column field="status.status_code" body={statusBodyTemplate} header="Status" sortable/>
+                    <Column body={actionsTemplate} header="Actions"/>
                 </DataTable>
             </div>
         </FrontendLayout>

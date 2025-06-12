@@ -18,11 +18,11 @@ const columnsOP = [
 ];
 
 
-const data = [{ id: "Devify", name: "Global", country: "Norway", link: "eklimochkin0@ucla.edu" },
-{ id: "Skaboo", name: "National", country: "Central African Republic", link: "ltaft1@google.nl" },
-{ id: "Quimm", name: "Global", country: "Peru", link: "orevance2@hatena.ne.jp" },
-{ id: "Kare", name: "Regional", country: "Palau", link: "jtaborre3@angelfire.com" },
-{ id: "Skippad", name: "Regional", country: "China", link: "mgerhold4@ning.com" }];
+const data = [{ id: "Partner 1", name: "Global", country: "Norway", link: "https://www.uuuu.com" },
+{ id: "Partner 2", name: "National", country: "Central African Republic", link: "https://www.uuuu.com" },
+{ id: "Partner 3", name: "Global", country: "Peru", link: "https://www.fffppp.com" },
+{ id: "Partner 4", name: "Regional", country: "Palau", link: "https://www.uuqsduau.com" },
+{ id: "Partner 5", name: "Regional", country: "China", link: "https://www.uuuu.com" }];
 
 
 
@@ -40,18 +40,17 @@ export default function Welcome({
             <section id="features" className="py-20 px-4">
                 <div className="max-w-6xl mx-auto text-center">
                     <div className="grid md:grid-cols-2 gap-8">
-                        <div className="p-6 bg-firefly-200 rounded-xl shadow">
-                            <h4 className="text-xl font-semibold mb-2">
+                        <Link href="#" onClick={e=>e.preventDefault()} className="p-12 bg-firefly-600 shadow">
+                            <h4 className="text-xl font-semibold mb-2 text-white">
                                 Click to view CDF Partners supporting capacity development through the Matchmaking Platform.<br />
                                 <DataTableDialog columns={columnsCDF} data={data} triggerLabel="Show Records" />
                             </h4>
-                        </div>
-                        <div className="p-6 bg-firefly-200 rounded-xl shadow">
-                            <h4 className="text-xl font-semibold mb-2">
+                        </Link>
+                        <a target="_blank" href="https://www.oceancd.org/landingpage" className="p-12 bg-firefly-600 shadow">
+                            <h4 className="text-xl font-semibold text-white mb-2">
                                 Search across IOC platforms for available capacity development opportunities in one place.<br />
-                                <DataTableDialog columns={columnsOP} data={dataOP} triggerLabel="Show Records" />
                             </h4>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </section>

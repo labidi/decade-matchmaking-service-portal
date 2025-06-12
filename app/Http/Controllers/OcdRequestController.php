@@ -12,6 +12,7 @@ use Inertia\Response;
 use App\Models\Request\RequestOffer;
 use App\Enums\RequestOfferStatus;
 use App\Services\OcdRequestService;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OcdRequestController extends Controller
 {
@@ -39,7 +40,7 @@ class OcdRequestController extends Controller
             ],
             'grid.actions' => [
                 'canEdit' => true,
-                'canDelete' => false,
+                'canDelete' => true,
                 'canView' => true,
                 'canCreate' => true,
             ],
@@ -58,6 +59,7 @@ class OcdRequestController extends Controller
                 $query->orWhere('status_code', 'offer_made');
                 $query->orWhere('status_code', 'match_made');
                 $query->orWhere('status_code', 'closed');
+                $query->orWhere('status_code', 'in_implementation');
             }
         )->get();
         return Inertia::render('Request/List', [
@@ -102,9 +104,10 @@ class OcdRequestController extends Controller
         ]);
     }
 
-    public function submit(\App\Http\Requests\StoreOcdRequest $httpRequest, $mode = 'submit')
+    public function submit(\App\Http\Requests\StoreOcdRequest $httpRequest)
     {
         $requestId = $httpRequest->input('id') ?? null;
+        $mode = $httpRequest->input('mode', 'submit');
         if ($mode == 'draft') {
             return $this->saveRequestAsDraft($httpRequest, $requestId);
         }
@@ -179,14 +182,11 @@ class OcdRequestController extends Controller
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }
 
-        $documents = \App\Models\Document::where('parent_type', RequestOffer::class)
-            ->where('parent_id', $OCDrequestId)
-            ->get();
-
         $offer = RequestOffer::with('documents')
             ->where('request_id', $OCDrequestId)
             ->where('status', RequestOfferStatus::ACTIVE)
             ->first();
+
         return Inertia::render('Request/Show', [
             'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
             'banner' => [
@@ -205,7 +205,7 @@ class OcdRequestController extends Controller
                 'canEdit' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
                 'canDelete' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
                 'canCreate' => false,
-                'canExpressInterrest' => $ocdRequest->user->id !== $httpRequest->user()->id,
+                'canExpressInterest' => $ocdRequest->user->id !== $httpRequest->user()->id,
                 'canExportPdf' => true,
                 'canAcceptOffer'=>$offer &&  $ocdRequest->user->id == $httpRequest->user()->id,
                 'canRequestClarificationForOffer'=>$offer &&  $ocdRequest->user->id == $httpRequest->user()->id
@@ -239,12 +239,42 @@ class OcdRequestController extends Controller
         ]);
     }
 
+    public function exportPdf(int $OCDrequestId)
+    {
+        $ocdRequest = OCDRequest::with(['status', 'user'])->find($OCDrequestId);
+        if (!$ocdRequest) {
+            return redirect()->back()->with('error', 'Ocd Request not found');
+        }
+
+        $pdf = Pdf::loadView('pdf.ocdrequest', [
+            'ocdRequest' => $ocdRequest,
+        ]);
+        return $pdf->download('request_' . $ocdRequest->id . '.pdf');
+    }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Request $request)
     {
-        //
+        $ocdRequestId = (int) $request->route('id');
+        $ocdRequest = OCDRequest::with('status')->find($ocdRequestId);
+
+        if (!$ocdRequest) {
+            return response()->json(['error' => 'Request not found'], 404);
+        }
+
+        if ($ocdRequest->user_id !== $request->user()->id) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        if ($ocdRequest->status->status_code !== 'draft') {
+            return response()->json(['error' => 'Only draft requests can be deleted'], 422);
+        }
+
+        $ocdRequest->delete();
+
+        return response()->json(['message' => 'Request deleted successfully']);
     }
 }

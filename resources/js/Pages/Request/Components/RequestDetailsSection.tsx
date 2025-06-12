@@ -1,8 +1,8 @@
-import { usePage } from '@inertiajs/react';
-import { AttachementsProps } from '@/types';
-import { UIRequestForm } from '@/Forms/UIRequestForm';
+import {usePage} from '@inertiajs/react';
+import {AttachementsProps} from '@/types';
+import {UIRequestForm} from '@/Forms/UIRequestForm';
 
-export default function RequestDetailsSection({ OcdRequest, canEdit = false, documents = [] }: AttachementsProps) {
+export default function RequestDetailsSection({OcdRequest, canEdit = false, documents = []}: AttachementsProps) {
     return (
         <section id="request_details" className='my-8'>
             <div className="grid grid-cols-1">
@@ -13,14 +13,14 @@ export default function RequestDetailsSection({ OcdRequest, canEdit = false, doc
                 </div>
             </div>
             <div className="grid grid-cols-3 gap-4">
-
                 <div className="col-span-2">
                     <div className="max-w-screen-xl mx-auto px-5 bg-white min-h-sceen">
                         <div className="grid divide-y divide-neutral-200 mx-auto">
                             {UIRequestForm.map(step => (
                                 <div className="py-5" key={step.label}>
                                     <details className="group">
-                                        <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
+                                        <summary
+                                            className="flex justify-between items-center font-medium cursor-pointer list-none">
                                             <span className="text-2xl text-firefly-800">{step.label}</span>
                                             <span className="transition group-open:rotate-180">
                                                 <svg
@@ -47,7 +47,7 @@ export default function RequestDetailsSection({ OcdRequest, canEdit = false, doc
                                                 const formatted = Array.isArray(value) ? value.join(', ') : value;
                                                 return (
                                                     <li key={key} className='py-2 text-xl'>
-                                                        <span className="text-firefly-600">{field.label}: </span> <br />
+                                                        <span className="text-firefly-600">{field.label}: </span> <br/>
                                                         {formatted ?? 'N/A'}
                                                     </li>
                                                 );
@@ -72,6 +72,22 @@ export default function RequestDetailsSection({ OcdRequest, canEdit = false, doc
                         <p className="mt-1 text-xl text-gray-900">
                             {OcdRequest.status.status_label}
                         </p>
+                        {OcdRequest.status.status_code == "rejected" && (
+                            <p className="text-red-500 mt-2 text-lg">
+                                Your request has been carefully reviewed IOC Review Panel, and we regret to tell you
+                                that Capacity Development Facility is not able to meet your request.
+                            </p>
+                        )}
+                        {OcdRequest.status.status_code == "unmatched" && (
+                            <p className="text-red-500 mt-2 text-lg">
+                                The CDF Secretariat explored multiple potential partnerships on your behalf. However,
+                                after three months of outreach, your request was not accepted by any of our partners.
+                                That said, your submission has helped inform both the CDF and IOC/UNESCO of an important
+                                gap in current training and workshop offerings, and we recognize its relevance. We will
+                                continue to keep your request in mind and will reach out if similar opportunities arise
+                                in the future. We encourage you to check back with us for updates.
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
