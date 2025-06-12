@@ -12,6 +12,7 @@ use Inertia\Response;
 use App\Models\Request\RequestOffer;
 use App\Enums\RequestOfferStatus;
 use App\Services\OcdRequestService;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OcdRequestController extends Controller
 {
@@ -237,6 +238,20 @@ class OcdRequestController extends Controller
                 ['name' => 'Edit Request #' . $ocdRequest->id, 'url' => route('user.request.edit', ['id' => $ocdRequest->id])],
             ],
         ]);
+    }
+
+    public function exportPdf(int $OCDrequestId)
+    {
+        $ocdRequest = OCDRequest::with(['status', 'user'])->find($OCDrequestId);
+        if (!$ocdRequest) {
+            return redirect()->back()->with('error', 'Ocd Request not found');
+        }
+
+        $pdf = Pdf::loadView('pdf.ocdrequest', [
+            'ocdRequest' => $ocdRequest,
+        ]);
+
+        return $pdf->download('request_' . $ocdRequest->id . '.pdf');
     }
 
 

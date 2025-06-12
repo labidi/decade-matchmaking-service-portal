@@ -29,7 +29,7 @@ export default function ShowRequest() {
 
         {RequestPageDetails.actions.canExportPdf && (
           <Link
-            href={route('user.request.myrequests')}
+            href={route('user.request.pdf', { id: OcdRequest.id })}
             className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
           >
             Export the Request as PDF
