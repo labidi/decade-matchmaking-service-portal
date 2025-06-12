@@ -1,13 +1,21 @@
-import { Head, usePage, Link, useForm } from '@inertiajs/react';
-import type { Auth } from '@/types';
+import { Head, usePage, useForm } from '@inertiajs/react';
+import type { Auth, Document } from '@/types';
 import { AttachementsProps } from '@/types';
+import React, { useState } from 'react';
+import axios from 'axios';
 
 export default function AttachementsSection({ OcdRequest, canEdit = false, documents = [] }: AttachementsProps) {
     const { auth } = usePage<{ auth: Auth }>().props
+    const [documentList, setDocumentList] = useState<Document[]>(documents);
     const form = useForm<{ file: File | null; document_type: string }>({
         file: null,
         document_type: 'financial_breakdown_report',
     });
+    const handleDelete = (id: number) => {
+        axios.delete(route('user.document.destroy', id)).then(() => {
+            setDocumentList(prev => prev.filter(d => d.id !== id));
+        });
+    };
     return (
         <section id="attachements" className='my-8'>
             <div className="grid grid-cols-1">
@@ -51,25 +59,28 @@ export default function AttachementsSection({ OcdRequest, canEdit = false, docum
                         </button>
                     </div>
                 </form>
-                {documents.length > 0 && (
+                {documentList.length > 0 && (
                     <table className="mt-4 w-full text-left border">
                         <thead>
                             <tr className="bg-gray-100">
                                 <th className="p-2">Name</th>
                                 <th className="p-2">Type</th>
                                 <th className="p-2">Uploaded At</th>
+                                <th className="p-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {documents.map(doc => (
+                            {documentList.map(doc => (
                                 <tr key={doc.id} className="border-t">
                                     <td className="p-2">
-                                        <a href={`/storage/${doc.path}`} className="text-blue-600 underline">
-                                            {doc.name}
-                                        </a>
+                                        {doc.name}
                                     </td>
                                     <td className="p-2">{doc.document_type}</td>
                                     <td className="p-2">{new Date(doc.created_at).toLocaleDateString()}</td>
+                                    <td className="p-2 space-x-2">
+                                        <a href={route('user.document.download', doc.id)} className="text-blue-600 underline">Download</a>
+                                        <button type="button" onClick={() => handleDelete(doc.id)} className="text-red-600 underline">Delete</button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
