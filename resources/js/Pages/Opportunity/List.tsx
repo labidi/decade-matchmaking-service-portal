@@ -115,6 +115,16 @@ export default function OpportunitiesList() {
                 </button>
             )}
 
+            {pageActions.canChangeStatus && (
+                <button
+                    onClick={() => handleDelete(rowData.id)}
+                    className="flex items-center text-red-600 hover:text-red-800"
+                >
+                    <i className="pi pi-trash mr-1" aria-hidden="true"/>
+                    Delete
+                </button>
+            )}
+
             <Link
                 href={route('opportunity.show', rowData.id)}
                 className="flex items-center text-green-600 hover:text-green-800"
