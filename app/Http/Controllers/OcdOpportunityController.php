@@ -31,7 +31,6 @@ class OcdOpportunityController extends Controller
 
     public function store(Request $httpRequest)
     {
-
         $validatedData = $httpRequest->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|string',
@@ -75,7 +74,8 @@ class OcdOpportunityController extends Controller
             ],
             'pageActions' => [
                 "canAddNew" => true,
-                "canChangeStatus"=>$user->is_admin
+                "canChangeStatus" => $user->is_admin,
+                "canDelete" => true
             ],
         ]);
     }
@@ -138,9 +138,9 @@ class OcdOpportunityController extends Controller
         }
 
         return Inertia::render('Opportunity/Create', [
-            'title' => 'Edit Opportunity : '.$opportunity->title,
+            'title' => 'Edit Opportunity : ' . $opportunity->title,
             'banner' => [
-                'title' => 'Edit Opportunity : '.$opportunity->title,
+                'title' => 'Edit Opportunity : ' . $opportunity->title,
                 'description' => 'Edit my Opportunity details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
@@ -148,14 +148,17 @@ class OcdOpportunityController extends Controller
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
-                ['name' => 'Edit Request #' . $opportunity->id, 'url' => route('opportunity.edit', ['id' => $opportunity->id])],
+                [
+                    'name' => 'Edit Request #' . $opportunity->id,
+                    'url' => route('opportunity.edit', ['id' => $opportunity->id])
+                ],
             ],
         ]);
     }
 
     public function updateStatus(Request $httpRequest, int $opportunityId)
     {
-        $statusCode = (int) $httpRequest->input('status');
+        $statusCode = (int)$httpRequest->input('status');
         $opportunity = Opportunity::find($opportunityId);
         if (!$opportunity) {
             return response()->json(['error' => 'Opportunity not found'], 404);
@@ -170,7 +173,7 @@ class OcdOpportunityController extends Controller
         return response()->json([
             'message' => 'Status updated successfully',
             'status' => [
-                'status_code' => (string) $statusCode,
+                'status_code' => (string)$statusCode,
                 'status_label' => Opportunity::STATUS_LABELS[$statusCode] ?? ''
             ]
         ]);

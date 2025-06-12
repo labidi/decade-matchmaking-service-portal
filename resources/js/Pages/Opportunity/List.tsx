@@ -105,8 +105,7 @@ export default function OpportunitiesList() {
                     Edit
                 </Link>
             )}
-
-            {pageActions.canChangeStatus && (
+            {pageActions.canDelete && (
                 <button
                     onClick={() => handleDelete(rowData.id)}
                     className="flex items-center text-red-600 hover:text-red-800"

@@ -13,6 +13,7 @@ use App\Models\Request\RequestOffer;
 use App\Enums\RequestOfferStatus;
 use App\Services\OcdRequestService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 
 class OcdRequestController extends Controller
 {
@@ -52,6 +53,7 @@ class OcdRequestController extends Controller
      */
     public function list(Request $httpRequest)
     {
+        $user = Auth::user();
         $request = OCDRequest::with('status')->whereHas(
             'status',
             function (Builder $query) {
@@ -61,7 +63,7 @@ class OcdRequestController extends Controller
                 $query->orWhere('status_code', 'closed');
                 $query->orWhere('status_code', 'in_implementation');
             }
-        )->get();
+        )->where('user_id', '!=', $user->id)->get();
         return Inertia::render('Request/List', [
             'title' => 'View Request for Training workshops',
             'banner' => [
@@ -79,7 +81,8 @@ class OcdRequestController extends Controller
                 'canDelete' => false,
                 'canView' => true,
                 'canCreate' => false,
-                'canExpressInterrest' => true
+                'canExpressInterest' => true,
+                'canChangeStatus' => $user->is_admin
             ],
         ]);
     }
@@ -118,7 +121,7 @@ class OcdRequestController extends Controller
     {
         try {
             $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
-            if ($requestId && ! $ocdRequest) {
+            if ($requestId && !$ocdRequest) {
                 throw new \Exception('Request not found');
             }
             $ocdRequest = $this->service->saveDraft($httpRequest->user(), $httpRequest->all(), $ocdRequest);
@@ -139,7 +142,7 @@ class OcdRequestController extends Controller
         $validated = $httpRequest->validated();
         try {
             $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
-            if ($requestId && ! $ocdRequest) {
+            if ($requestId && !$ocdRequest) {
                 throw new \Exception('Request not found');
             }
             $ocdRequest = $this->service->storeRequest($httpRequest->user(), $validated, $ocdRequest);
@@ -177,7 +180,7 @@ class OcdRequestController extends Controller
      */
     public function show(Request $httpRequest, int $OCDrequestId)
     {
-        $ocdRequest = OCDRequest::with(['status', 'user','offer'])->find($OCDrequestId);
+        $ocdRequest = OCDRequest::with(['status', 'user', 'offer'])->find($OCDrequestId);
         if (!$ocdRequest) {
             return response()->json(['error' => 'Ocd Request not found'], 404);
         }
@@ -195,20 +198,25 @@ class OcdRequestController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'request' => $ocdRequest->toArray(),
-            'offer'=>$offer,
+            'offer' => $offer,
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
-                ['name' => 'View Request #' . $ocdRequest->id, 'url' => route('user.request.show', ['id' => $ocdRequest->id])],
+                [
+                    'name' => 'View Request #' . $ocdRequest->id,
+                    'url' => route('user.request.show', ['id' => $ocdRequest->id])
+                ],
             ],
             'requestDetail.actions' => [
-                'canEdit' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
-                'canDelete' => $ocdRequest->user->id === $httpRequest->user()->id && $ocdRequest->status->status_code === "draft",
+                'canEdit' => $ocdRequest->user->id === $httpRequest->user(
+                    )->id && $ocdRequest->status->status_code === "draft",
+                'canDelete' => $ocdRequest->user->id === $httpRequest->user(
+                    )->id && $ocdRequest->status->status_code === "draft",
                 'canCreate' => false,
                 'canExpressInterest' => $ocdRequest->user->id !== $httpRequest->user()->id,
                 'canExportPdf' => true,
-                'canAcceptOffer'=>$offer &&  $ocdRequest->user->id == $httpRequest->user()->id,
-                'canRequestClarificationForOffer'=>$offer &&  $ocdRequest->user->id == $httpRequest->user()->id
+                'canAcceptOffer' => $offer && $ocdRequest->user->id == $httpRequest->user()->id,
+                'canRequestClarificationForOffer' => $offer && $ocdRequest->user->id == $httpRequest->user()->id
             ],
         ]);
     }
@@ -234,7 +242,10 @@ class OcdRequestController extends Controller
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
-                ['name' => 'Edit Request #' . $ocdRequest->id, 'url' => route('user.request.edit', ['id' => $ocdRequest->id])],
+                [
+                    'name' => 'Edit Request #' . $ocdRequest->id,
+                    'url' => route('user.request.edit', ['id' => $ocdRequest->id])
+                ],
             ],
         ]);
     }
@@ -258,7 +269,7 @@ class OcdRequestController extends Controller
      */
     public function destroy(Request $request)
     {
-        $ocdRequestId = (int) $request->route('id');
+        $ocdRequestId = (int)$request->route('id');
         $ocdRequest = OCDRequest::with('status')->find($ocdRequestId);
 
         if (!$ocdRequest) {

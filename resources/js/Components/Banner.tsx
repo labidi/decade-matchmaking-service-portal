@@ -1,5 +1,5 @@
-import { usePage } from '@inertiajs/react';
-import { BannerData, YoutubeEmbed, OCDMetrics } from '@/types';
+import {usePage} from '@inertiajs/react';
+import {BannerData, YoutubeEmbed, OCDMetrics} from '@/types';
 import YouTube from 'react-youtube';
 
 export default function Banner() {
@@ -14,26 +14,26 @@ export default function Banner() {
         },
     };
     return (
-        <>
-            <section style={{ backgroundImage: `url(${BannerData.image})` }} className="bg-cover bg-center bg-casal-700 py-20 px-4 text-center text-white" >
-                {BannerData && (
-                    <>
-                        <div className="max-w-4xl mx-auto">
-                            <h2 className="text-5xl font-bold mb-6">{BannerData.title}</h2>
-                            <p className="text-xl mb-8">
-                                {BannerData.description}
-                            </p>
-                        </div>
-                        {YoutubeEmbed?.src && (
-                            <div className="max-w-5xl mx-auto">
-                                <div className="aspect-w-16 aspect-h-9">
-                                    <YouTube videoId="nfpELa_Jqb0" opts={opts} />
-                                </div>
+        <section style={{backgroundImage: `url(${BannerData.image})`}}
+                 className="bg-cover bg-center bg-casal-700 py-20 px-4 text-center text-white">
+            {BannerData && (
+                <>
+                    <div className="max-w-4xl mx-auto">
+                        <h2 className="text-5xl font-bold mb-6">{BannerData.title}</h2>
+                        <p className="text-xl mb-8">
+                            {BannerData.description}
+                        </p>
+                    </div>
+                    {YoutubeEmbed?.src && (
+                        <div className="max-w-5xl mx-auto">
+                            <div className="aspect-w-16 aspect-h-9">
+                                <YouTube videoId="nfpELa_Jqb0" opts={opts}/>
                             </div>
-                        )}
-                    </>
-                )}
-{metrics && (
+                        </div>
+                    )}
+                </>
+            )}
+            {metrics && (
                 <div className="py-20 px-4">
                     <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 text-center">
                         <div>
@@ -66,13 +66,12 @@ export default function Banner() {
                         </div>
                         <div>
                             <span className="block text-5xl font-bold">
-                                {metrics.number_of_open_partner_opertunities}
+                                {metrics.number_of_open_partner_opportunities}
                             </span>
                             <span className="mt-2 text-2xl">Open Partner Opportunities</span>
                         </div>
                     </div>
-                </div> )}
-            </section >
-        </>
+                </div>)}
+        </section>
     );
 }
