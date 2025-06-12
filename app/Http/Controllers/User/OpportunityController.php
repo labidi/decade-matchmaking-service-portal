@@ -13,8 +13,7 @@ class OpportunityController extends Controller
     public function list(Request $httpRequest)
     {
         // Fetch all opportunities
-        $opportunities = Opportunity::where('status', OpportunityStatus::ACTIVE)->get();
-
+        $opportunities = Opportunity::where('status', '=', OpportunityStatus::ACTIVE)->get();
         // Return the opportunities to the view
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
@@ -27,6 +26,11 @@ class OpportunityController extends Controller
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Opportunities', 'url' => route('user.opportunity.list')],
+            ],
+            'pageActions' => [
+                "canAddNew" => false,
+                "canChangeStatus" => false,
+                "canDelete" => false
             ],
         ]);
     }
