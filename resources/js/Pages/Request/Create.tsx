@@ -47,6 +47,7 @@ export default function RequestForm() {
     expected_outcomes: '',
     success_metrics: '',
     long_term_impact: '',
+    mode: 'submit' as Mode,
   });
 
 
@@ -75,9 +76,10 @@ export default function RequestForm() {
 
   const handleSubmitV2 = (mode: 'submit' | 'draft') => {
     form.clearErrors();
+    form.setData('mode', mode);
     axios
       .post(
-        route(`user.request.submit`, { mode }),
+        route(`user.request.submit`),
         { ...form.data },
         {
           headers: {
@@ -266,6 +268,7 @@ export default function RequestForm() {
         }}
       />
       <form className="mx-auto bg-white">
+        <input type="hidden" name="mode" value={form.data.mode} />
         {/* Stepper */}
         <div className="flex mb-6">
           {steps.map((label, idx) => (
