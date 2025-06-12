@@ -3,6 +3,7 @@ import {AttachmentsProps} from '@/types';
 import {UIRequestForm} from '@/Forms/UIRequestForm';
 
 export default function RequestDetailsSection({OcdRequest, canEdit = false, documents = []}: AttachmentsProps) {
+
     return (
         <section id="request_details" className='my-8'>
             <div className="grid grid-cols-1">
