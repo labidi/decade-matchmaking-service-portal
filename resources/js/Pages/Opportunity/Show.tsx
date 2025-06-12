@@ -83,17 +83,19 @@ export default function Show() {
                     </dl>
                 </section>
 
-                {/* Summary */}
-                <section>
-                    <h2 className="text-xl font-semibold mb-4 text-firefly-800">Summary</h2>
-                    <p className="text-gray-900 whitespace-pre-line">{opportunity.summary}</p>
-                </section>
+                {/* summary */}
+                <div className="mb-6">
+                    <h2 className="text-sm font-semibold text-gray-500">Summary</h2>
+                    <p className="mt-1 text-gray-900 whitespace-pre-line">
+                        {opportunity.summary}
+                    </p>
+                </div>
 
                 {/* Tags */}
                 {opportunity.keywords && opportunity.keywords.split(',').length > 0 && (
-                    <section>
-                        <h2 className="text-xl font-semibold mb-4 text-firefly-800">Keywords</h2>
-                        <div className="flex flex-wrap gap-2">
+                    <div className="mb-6">
+                        <h2 className="text-sm font-semibold text-gray-500">Tags</h2>
+                        <div className="mt-2 flex flex-wrap gap-2">
                             {opportunity.keywords.split(',').map(keyword => (
                                 <span
                                     key={keyword}
@@ -103,20 +105,22 @@ export default function Show() {
                                 </span>
                             ))}
                         </div>
-                    </section>
+                    </div>
                 )}
 
                 {/* Actions */}
-                {opportunity.can_edit && (
-                    <div className="pt-4 border-t">
+                <div className="mt-8 flex space-x-4">
+                    {(opportunity.can_edit &&
                         <Link
                             href={`/opportunities/${opportunity.id}/edit`}
                             className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
                         >
                             Edit Opportunity
                         </Link>
-                    </div>
-                )}
+                    )
+
+                    }
+                </div>
             </div>
         </FrontendLayout>
     );

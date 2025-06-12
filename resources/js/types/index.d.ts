@@ -177,7 +177,7 @@ export type OCDRequestGrid = {
         canDelete: boolean;
         canView: boolean;
         canCreate?: boolean;
-        canExpressInterrest?: boolean;
+        canExpressInterest?: boolean;
         canExportPdf?: boolean;
         canAcceptOffer?:boolean;
         canRequestClarificationForOffer?:boolean

@@ -84,7 +84,6 @@ export const UIRequestForm: UIStep[] = [
     {
         label: 'Identification',
         fields: {
-            id: { id: 'id', type: 'hidden' },
             is_related_decade_action: {
                 id: 'is_related_decade_action',
                 type: 'radio',
