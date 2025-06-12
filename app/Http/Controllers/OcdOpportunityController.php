@@ -173,4 +173,24 @@ class OcdOpportunityController extends Controller
             ]
         ]);
     }
+
+    public function destroy(Request $request, int $id)
+    {
+        $opportunity = Opportunity::find($id);
+        if (!$opportunity) {
+            return response()->json(['error' => 'Opportunity not found'], 404);
+        }
+
+        if ($opportunity->user_id !== $request->user()->id) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        if ($opportunity->status !== OpportunityStatus::PENDING_REVIEW) {
+            return response()->json(['error' => 'Only pending review opportunities can be deleted'], 422);
+        }
+
+        $opportunity->delete();
+
+        return response()->json(['message' => 'Opportunity deleted successfully']);
+    }
 }

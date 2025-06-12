@@ -35,6 +35,16 @@ export default function OpportunitiesList() {
                 ));
             });
     };
+
+    const handleDelete = (id: string) => {
+        if (!confirm('Are you sure you want to delete this opportunity?')) {
+            return;
+        }
+        axios.delete(route('partner.opportunity.destroy', id))
+            .then(() => {
+                setOpportunityList(prev => prev.filter(op => op.id !== id));
+            });
+    };
     const titleBodyTemplate = (rowData: OCDOpportunity) => rowData.title ?? 'N/A';
     const ApplicationClosingDate = (rowData: OCDOpportunity) => new Date(rowData.closing_date).toLocaleDateString();
     const statusBodyTemplate = (rowData: OCDOpportunity) => {
@@ -93,6 +103,16 @@ export default function OpportunitiesList() {
                     <i className="pi pi-pencil mr-1" aria-hidden="true" />
                     Edit
                 </Link>
+            )}
+
+            {rowData.can_edit && (
+                <button
+                    onClick={() => handleDelete(rowData.id)}
+                    className="flex items-center text-red-600 hover:text-red-800"
+                >
+                    <i className="pi pi-trash mr-1" aria-hidden="true" />
+                    Delete
+                </button>
             )}
 
             <Link
