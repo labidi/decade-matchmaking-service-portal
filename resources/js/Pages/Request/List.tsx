@@ -84,9 +84,10 @@ export default function RequestsList() {
                     className="flex items-center text-green-700 hover:text-green-800"
                 >
                     <i className="pi pi-star-fill mr-1" aria-hidden="true"/>
-                    Express interrest
+                    Express interest
                 </Link>
             )}
+            {grid.actions.canChangeStatus && (
             <select
                 className="border rounded px-2 py-1"
                 value={rowData.status.status_code}
@@ -96,6 +97,7 @@ export default function RequestsList() {
                     <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
                 ))}
             </select>
+            )}
         </div>
     );
 

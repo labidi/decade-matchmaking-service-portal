@@ -105,6 +105,15 @@ export default function OpportunitiesList() {
                     Edit
                 </Link>
             )}
+            {pageActions.canDelete && (
+                <button
+                    onClick={() => handleDelete(rowData.id)}
+                    className="flex items-center text-red-600 hover:text-red-800"
+                >
+                    <i className="pi pi-trash mr-1" aria-hidden="true"/>
+                    Delete
+                </button>
+            )}
 
             {pageActions.canChangeStatus && (
                 <button

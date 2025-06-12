@@ -30,6 +30,7 @@ export interface SharedData {
     name: string;
     auth: Auth;
     ziggy: Config & { location: string };
+
     [key: string]: unknown;
 }
 
@@ -61,7 +62,7 @@ export interface OCDMetrics {
     number_fully_closed_matches: number;
     number_user_requests_in_implementation: number;
     committed_funding_amount: number;
-    number_of_open_partner_opertunities: number;
+    number_of_open_partner_opportunities: number;
 }
 
 export interface Document {
@@ -179,8 +180,9 @@ export type OCDRequestGrid = {
         canCreate?: boolean;
         canExpressInterest?: boolean;
         canExportPdf?: boolean;
-        canAcceptOffer?:boolean;
-        canRequestClarificationForOffer?:boolean
+        canAcceptOffer?: boolean;
+        canRequestClarificationForOffer?: boolean,
+        canChangeStatus?: boolean
     }
 }
 
