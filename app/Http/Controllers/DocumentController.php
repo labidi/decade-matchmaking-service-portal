@@ -32,4 +32,17 @@ class DocumentController extends Controller
 
         return back();
     }
+
+    public function destroy(Document $document)
+    {
+        Storage::disk('public')->delete($document->path);
+        $document->delete();
+
+        return back();
+    }
+
+    public function download(Document $document)
+    {
+        return Storage::disk('public')->download($document->path, $document->name);
+    }
 }
