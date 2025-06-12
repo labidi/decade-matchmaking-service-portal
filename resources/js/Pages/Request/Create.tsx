@@ -76,11 +76,12 @@ export default function RequestForm() {
 
   const handleSubmitV2 = (mode: 'submit' | 'draft') => {
     form.clearErrors();
+    const payload = { ...form.data, mode };
     form.setData('mode', mode);
     axios
       .post(
         route(`user.request.submit`),
-        { ...form.data },
+        payload,
         {
           headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
