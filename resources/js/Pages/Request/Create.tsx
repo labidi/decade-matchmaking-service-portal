@@ -82,6 +82,7 @@ export default function RequestForm() {
       .post(
         route(`user.request.submit`),
         payload,
+        { ...form.data },
         {
           headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
