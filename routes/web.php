@@ -42,7 +42,10 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('user/request/myrequests', [OcdRequestController::class, 'myRequestsList'])->name('user.request.myrequests');
     Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
     Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('user.request.show');
+
+    Route::get('user/request/pdf/{id}', [OcdRequestController::class, 'exportPdf'])->name('user.request.pdf');
     Route::post('user/request/submit', [OcdRequestController::class, 'submit'])->name('user.request.submit');
+
     Route::patch('user/request/{id}/status', [OcdRequestController::class, 'updateStatus'])->name('user.request.status');
     Route::post('user/request/{request}/document', [\App\Http\Controllers\DocumentController::class, 'store'])->name('user.request.document.store');
     Route::delete('user/request/{id}', [OcdRequestController::class, 'destroy'])->name('user.request.destroy');
