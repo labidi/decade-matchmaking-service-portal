@@ -39,7 +39,7 @@ class OcdRequestController extends Controller
             ],
             'grid.actions' => [
                 'canEdit' => true,
-                'canDelete' => false,
+                'canDelete' => true,
                 'canView' => true,
                 'canCreate' => true,
             ],
@@ -246,6 +246,23 @@ class OcdRequestController extends Controller
      */
     public function destroy(Request $request)
     {
-        //
+        $ocdRequestId = (int) $request->route('id');
+        $ocdRequest = OCDRequest::with('status')->find($ocdRequestId);
+
+        if (!$ocdRequest) {
+            return response()->json(['error' => 'Request not found'], 404);
+        }
+
+        if ($ocdRequest->user_id !== $request->user()->id) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        if ($ocdRequest->status->status_code !== 'draft') {
+            return response()->json(['error' => 'Only draft requests can be deleted'], 422);
+        }
+
+        $ocdRequest->delete();
+
+        return response()->json(['message' => 'Request deleted successfully']);
     }
 }

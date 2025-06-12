@@ -45,6 +45,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('user/request/submit', [OcdRequestController::class, 'submit'])->name('user.request.submit');
     Route::patch('user/request/{id}/status', [OcdRequestController::class, 'updateStatus'])->name('user.request.status');
     Route::post('user/request/{request}/document', [\App\Http\Controllers\DocumentController::class, 'store'])->name('user.request.document.store');
+    Route::delete('user/request/{id}', [OcdRequestController::class, 'destroy'])->name('user.request.destroy');
     Route::get('user/opportunity/list', [UserOpportunityController::class, 'list'])->name('user.opportunity.list');
     Route::get('user/opportunity/show/{id}', [UserOpportunityController::class, 'show'])->name('user.opportunity.show');
 });
