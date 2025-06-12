@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\Opportunity;
 use App\Enums\OpportunityStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Opportunity;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class OcdOpportunityController extends Controller
 {
@@ -58,7 +59,7 @@ class OcdOpportunityController extends Controller
     {
         // Fetch all opportunities
         $opportunities = Opportunity::where('user_id', $httpRequest->user()->id)->get();
-
+        $user = Auth::user();
         // Return the opportunities to the view
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
@@ -72,8 +73,9 @@ class OcdOpportunityController extends Controller
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
             ],
-            'PageActions' => [
-                "canAddNew" => true
+            'pageActions' => [
+                "canAddNew" => true,
+                "canChangeStatus"=>$user->is_admin
             ],
         ]);
     }
@@ -172,5 +174,25 @@ class OcdOpportunityController extends Controller
                 'status_label' => Opportunity::STATUS_LABELS[$statusCode] ?? ''
             ]
         ]);
+    }
+
+    public function destroy(Request $request, int $id)
+    {
+        $opportunity = Opportunity::find($id);
+        if (!$opportunity) {
+            return response()->json(['error' => 'Opportunity not found'], 404);
+        }
+
+        if ($opportunity->user_id !== $request->user()->id) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        if ($opportunity->status !== OpportunityStatus::PENDING_REVIEW) {
+            return response()->json(['error' => 'Only pending review opportunities can be deleted'], 422);
+        }
+
+        $opportunity->delete();
+
+        return response()->json(['message' => 'Opportunity deleted successfully']);
     }
 }

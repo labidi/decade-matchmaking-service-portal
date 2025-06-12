@@ -64,6 +64,7 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::get('opportunity/browse', [OcdOpportunityController::class, 'list'])->name('opportunity.browse');
     Route::get('opportunity/show/{id}', [OcdOpportunityController::class, 'show'])->name('opportunity.show');
     Route::patch('opportunity/{id}/status', [OcdOpportunityController::class, 'updateStatus'])->name('partner.opportunity.status');
+    Route::delete('opportunity/{id}', [OcdOpportunityController::class, 'destroy'])->name('partner.opportunity.destroy');
     Route::get('request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
     Route::get('opportunity/edit/{id}', [OcdOpportunityController::class, 'edit'])->name('opportunity.edit');
     Route::get('request/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('partner.request.matchedrequests');
