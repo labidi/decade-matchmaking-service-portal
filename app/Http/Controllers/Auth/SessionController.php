@@ -67,6 +67,12 @@ class SessionController extends Controller
                 'city' => $oceanExpertProfile['city'],
             ]
         );
+
+        if ($user->is_blocked) {
+            throw ValidationException::withMessages([
+                'email' => 'Your account is blocked.',
+            ]);
+        }
         Auth::login($user, false);
         $request->session()->put('external_api_token', $token);
         $request->session()->regenerate();
