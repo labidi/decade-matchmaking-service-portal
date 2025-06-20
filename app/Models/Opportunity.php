@@ -14,7 +14,7 @@ class Opportunity extends Model
     protected $table = 'opportunities';
     protected $primaryKey = 'id';
     public $timestamps = true;
-    protected $appends = ['status_label', 'can_edit'];
+    protected $appends = ['status_label'];
 
 
     const STATUS_LABELS = [
@@ -53,10 +53,4 @@ class Opportunity extends Model
         );
     }
 
-    protected function canEdit(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => $this->status === OpportunityStatus::PENDING_REVIEW ,
-        );
-    }
 }

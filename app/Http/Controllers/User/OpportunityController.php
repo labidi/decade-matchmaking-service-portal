@@ -25,7 +25,7 @@ class OpportunityController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('user.opportunity.list')],
             ],
         ]);
@@ -47,7 +47,7 @@ class OpportunityController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('user.opportunity.list')],
             ],
         ]);

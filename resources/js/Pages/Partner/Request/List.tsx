@@ -14,7 +14,6 @@ export default function RequestsList() {
                 <table className="min-w-full table-auto bg-white">
                     <thead className="bg-gray-50">
                         <tr>
-
                             <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">
                                 ID
                             </th>
