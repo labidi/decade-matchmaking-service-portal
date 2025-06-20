@@ -27,7 +27,6 @@ class StoreOcdRequest extends FormRequest
             'request_link_type' => ['required_unless:is_related_decade_action,Yes', 'string'],
             'project_stage' => ['required_unless:is_related_decade_action,Yes', 'string'],
             'project_url' => ['nullable', 'url'],
-            'activity_name' => ['required_unless:is_related_decade_action,Yes', 'string'],
             'related_activity' => ['required', Rule::in(['Training', 'Workshop', 'Both'])],
             'subthemes' => ['required', 'array'],
             'subthemes.*' => ['string'],

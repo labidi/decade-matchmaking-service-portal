@@ -10,8 +10,6 @@ export default function Header() {
     <header className="bg-firefly-900 text-white py-2 px-4 shadow">
       <div className="container mx-auto flex items-center justify-between">
         <ApplicationLogo />
-        <span className="md:text-4xl text-base font-semibold text-white flex items-center gap-2">Capacity Development Matchmaking Platform</span>
-        
         <nav className="relative">
           {!auth.user ? (
             <LoginDialog />

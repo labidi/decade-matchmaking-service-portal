@@ -118,7 +118,6 @@ export interface OCDRequest {
         request_link_type: string;
         project_stage: string;
         project_url: string;
-        activity_name: string;
         related_activity: 'Training' | 'Workshop' | 'Both';
         subthemes: string[];
         subthemes_other: string;

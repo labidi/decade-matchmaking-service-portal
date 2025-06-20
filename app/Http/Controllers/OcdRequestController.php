@@ -87,6 +87,40 @@ class OcdRequestController extends Controller
         ]);
     }
 
+    public function matchedRequest(Request $httpRequest)
+    {
+        $user = Auth::user();
+        $request = OCDRequest::with('status')->whereHas(
+            'status',
+            function (Builder $query) {
+                $query->orWhere('status_code', 'in_implementation');
+                $query->orWhere('status_code', 'closed');
+            }
+        )->where('user_id', '==', $user->id)->get();
+
+        return Inertia::render('Request/List', [
+            'title' => 'View my matched requests',
+            'banner' => [
+                'title' => 'View my matched requests',
+                'description' => 'View and browse my matched Request with OCD partners',
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'requests' => $request,
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => route('user.home')],
+                ['name' => 'Requests', 'url' => route('partner.request.list')],
+            ],
+            'grid.actions' => [
+                'canEdit' => false,
+                'canDelete' => false,
+                'canView' => true,
+                'canCreate' => false,
+                'canExpressInterest' => false,
+                'canChangeStatus' => false
+            ],
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
