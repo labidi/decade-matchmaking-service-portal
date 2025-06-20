@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, usePage } from '@inertiajs/react';
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import BackendLayout from '@/Layouts/BackendLayout';
+import AdminMenu from '@/Components/AdminMenu';
 import axios from 'axios';
 import { Role, UserWithRoles } from '@/types';
 
@@ -28,7 +29,7 @@ export default function UserRolesList() {
     };
 
     return (
-        <FrontendLayout>
+        <BackendLayout menu={<AdminMenu />}>
             <Head title="Manage User Roles" />
             <div className="overflow-x-auto">
                 <table className="min-w-full table-auto bg-white">
@@ -64,6 +65,6 @@ export default function UserRolesList() {
                     </tbody>
                 </table>
             </div>
-        </FrontendLayout>
+        </BackendLayout>
     );
 }
