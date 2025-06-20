@@ -18,8 +18,8 @@ export default function Banner() {
                  className="bg-cover bg-center bg-casal-700 py-20 px-4 text-center text-white">
             {BannerData && (
                 <>
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-5xl font-bold mb-6">{BannerData.title}</h2>
+                    <div className="max-w-5xl mx-auto">
+                        <h2 className="text-5xl font-bold mb-6">Capacity Development Matchmaking Platform</h2>
                         <p className="text-xl mb-8">
                             {BannerData.description}
                         </p>

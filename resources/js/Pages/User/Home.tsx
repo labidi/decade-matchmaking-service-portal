@@ -56,13 +56,13 @@ export default function Home({
                             </Link>
                         )}
                         {auth.user && auth.user.is_partner && (
-                            <div className={LinkRequestCardClassName}>
+                            <Link href={route('request.me.matchedrequests')} className={LinkRequestCardClassName}>
                                 <div className="px-6 py-4">
                                     <div className="font-bold text-xl mb-2">My matched requests</div>
                                     <p className="text-base">
                                         Manage training and workshop requests that you matched with as a Partner                                        </p>
                                 </div>
-                            </div>
+                            </Link>
                         )}
 
 
@@ -71,9 +71,7 @@ export default function Home({
                         <div>
                             <h4 className="text-2xl font-bold leading-tight text-gray-800 dark:text-gray-100">Opportunity section</h4>
                         </div>
-
                     </div>
-
 
                     <div className="grid md:grid-cols-3 gap-8">
                         {auth.user && (

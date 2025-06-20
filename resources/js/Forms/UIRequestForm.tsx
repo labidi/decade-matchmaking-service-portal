@@ -12,7 +12,6 @@ export interface Request {
     request_link_type: string;
     project_stage: string;
     project_url: string;
-    activity_name: string;
     related_activity: 'Training' | 'Workshop' | 'Both';
     subthemes: string[];
     subthemes_other: string;
@@ -100,7 +99,7 @@ export const UIRequestForm: UIStep[] = [
                 type: 'text',
                 required: true,
                 label: 'Unique Action ID',
-                description: 'Uniqe Action ID.  If you do not know your unique ID, please provide the title of your Action as submitted for the Call for Decade Action.',
+                description: 'Unique Action ID.  If you do not know your unique ID, please provide the title of your Action as submitted for the Call for Decade Action.',
                 show: data => data.is_related_decade_action === 'Yes',
             },
             first_name: {
@@ -139,11 +138,10 @@ export const UIRequestForm: UIStep[] = [
                 id: 'request_link_type',
                 type: 'select',
                 required: true,
-                label: 'Is this request linked to a broader programme, project, activity or initiative—whether planned, approved, implemented, or closed—or is it an independent capacity development request?',
+                label: 'Is this request linked to a broader initiative ?',
                 options: [
-                    { value: 'Broader', label: 'Part of a Broader Project/Programme/Initiative' },
-                    { value: 'Standalone', label: 'Standalone Capacity Development Request' },
-                    { value: 'Other', label: 'Other' },
+                    { value: 'yes', label: 'Yes' },
+                    { value: 'no', label: 'No' },
                 ],
                 show: data => data.is_related_decade_action !== 'Yes',
             },
@@ -151,7 +149,7 @@ export const UIRequestForm: UIStep[] = [
                 id: 'project_stage',
                 type: 'select',
                 required: true,
-                label: 'Could you specify the current stage of the programme, project, activity or initiative?',
+                label: 'Could you specify the current stage of the initiative?',
                 options: [
                     { value: 'Planning', label: 'Planning' },
                     { value: 'Approved', label: 'Approved' },
@@ -159,19 +157,12 @@ export const UIRequestForm: UIStep[] = [
                     { value: 'Closed', label: 'Closed' },
                     { value: 'Other', label: 'Other' },
                 ],
-                show: data => data.is_related_decade_action !== 'Yes',
+                show: data => data.request_link_type === 'yes',
             },
             project_url: {
                 id: 'project_url',
                 type: 'url',
                 label: 'Please share any URLs related to the project document or information to help us better understand how this request fits within the broader framework.',
-                show: data => data.is_related_decade_action !== 'Yes',
-            },
-            activity_name: {
-                id: 'activity_name',
-                type: 'text',
-                required: true,
-                label: 'Could you please provide the name of the proposal, programme, or initiative—or, if this is a standalone request, the name of the capacity development activity?',
                 show: data => data.is_related_decade_action !== 'Yes',
             },
             has_significant_changes: {
@@ -209,6 +200,21 @@ export const UIRequestForm: UIStep[] = [
                     { value: 'Workshop', label: 'Workshop' },
                     { value: 'Both', label: 'Both' },
                 ],
+            },
+            delivery_format: {
+                id: 'delivery_format',
+                type: 'select',
+                required: true,
+                label: 'What is the delivery format of this training/workshop? ',
+                options: []
+            },
+            target_audience: {
+                id: 'delivery_format',
+                type: 'select',
+                required: true,
+                label: 'Who is the target audience (multiple choice allowed)?',
+                options: [
+                ]
             },
             subthemes: {
                 id: 'subthemes',
@@ -295,7 +301,13 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'To better understand the financial requirements for this request, please provide a budget breakdown by category relevant to your needs.',
                 description: 'Please provide the figures in USD (e.g., Personnel & Staffing: 5,000, Other (Fellowship): 40,000)',
-                placeholder: '- Personnel & Staffing (e.g., salaries, stipends, consultant fees) ... ',
+                placeholder: 'Personnel  & Staffing (e.g., salaries, stipends, consultant fees)\n' +
+                    'Training & Capacity Building (e.g., workshops, courses, mentoring programs) \n' +
+                    'Equipment & Materials (e.g., research instruments,  software, educational materials) Travel & Logistics (e.g., flights, accommodation, local transport)\n' +
+                    'Technology  & Digital Infrastructure (e.g., data platforms, software development, online tools) Event & Meeting Costs (e.g., venue rental, catering, interpretation services)\n' +
+                    '0utreach  & Communication (e.g., awareness campaigns, publications, media) Monitoring  & Evaluation (e.g., impact assessments, reporting, data collection)\n' +
+                    'Administration & Overhead (e.g., office costs, operational expenses, institutional support)\n' +
+                    'Other (please specify)',
                 show: data => data.needs_financial_support === 'Yes',
             },
             support_months: {
@@ -303,7 +315,7 @@ export const UIRequestForm: UIStep[] = [
                 type: 'number',
                 required: true,
                 label: 'How many months from the submission date do you need this support?',
-                description: 'Please provide the figures in USD (e.g., Personnel & Staffing: 5,000, Other (Fellowship): 40,000)',
+                description: 'For example, if you need support within six months, simply reply “6.”',
                 show: data => data.needs_financial_support === 'Yes',
             },
             completion_date: {
@@ -311,7 +323,6 @@ export const UIRequestForm: UIStep[] = [
                 type: 'date',
                 required: true,
                 label: 'By when do you anticipate completing this activity?',
-                description: '(For example, if you need support within six months, simply reply “6.”)',
                 show: data => data.needs_financial_support === 'Yes',
             },
         },
@@ -363,7 +374,7 @@ export const UIRequestForm: UIStep[] = [
                 id: 'long_term_impact',
                 type: 'textarea',
                 required: true,
-                label: 'What is the anticipated long-term impact of the support received through the Capacity Development Facility on your Action and beyond?',
+                label: 'How will this activity contribute to or strengthen co-design, co-production, and co-delivery—helping close geographic, generational, and gender gaps?',
             },
         },
     },

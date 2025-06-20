@@ -26,7 +26,6 @@ export default function RequestForm() {
         request_link_type: '',
         project_stage: '',
         project_url: '',
-        activity_name: '',
         related_activity: '',
         subthemes: [] as string[],
         subthemes_other: '',
@@ -166,7 +165,7 @@ export default function RequestForm() {
                     <div key={name} className="mt-8">
                         {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
                         {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                        <textarea {...common} />
+                        <textarea placeholder={field.placeholder} {...common} />
                         {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                     </div>
                 );
@@ -228,7 +227,7 @@ export default function RequestForm() {
                                             }
                                         }}
                                     />
-                                    <span className="ml-2">{opt.label}</span>
+                                    <span className="ml-2"> {opt.label}</span>
                                 </label>
                             ))}
                         </div>

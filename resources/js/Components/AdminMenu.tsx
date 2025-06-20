@@ -19,7 +19,7 @@ const AdminMenu: React.FC = () => {
                                     <ul className="space-y-1">
                                         <li>
                                             <Link className="text-firefly-700 hover:underline" href={route('admin.users.index')}>
-                                                Configuration
+                                                Portal configurations
                                             </Link>
                                         </li>
                                     </ul>
@@ -60,7 +60,7 @@ const AdminMenu: React.FC = () => {
                                 <Disclosure.Panel as="div" className="mt-2 pl-4">
                                     <ul className="space-y-1">
                                         <li>
-                                            <Link className="text-firefly-700 hover:underline" href={"#"}>
+                                            <Link className="text-firefly-700 hover:underline" href={route('admin.users.index')}>
                                                 Manage Requests
                                             </Link>
                                         </li>
@@ -81,8 +81,8 @@ const AdminMenu: React.FC = () => {
                                 <Disclosure.Panel as="div" className="mt-2 pl-4">
                                     <ul className="space-y-1">
                                         <li>
-                                            <Link className="text-firefly-700 hover:underline" href={"#"}>
-                                                Manage Opportunities
+                                            <Link className="text-firefly-700 hover:underline" href={'#'}>
+                                                Dashboard
                                             </Link>
                                         </li>
                                     </ul>
