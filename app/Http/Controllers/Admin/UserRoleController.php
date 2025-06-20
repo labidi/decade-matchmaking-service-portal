@@ -21,8 +21,6 @@ class UserRoleController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
-                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
             ],
             'users' => User::with('roles')->get()->makeVisible('id'),
             'roles' => Role::all(),
