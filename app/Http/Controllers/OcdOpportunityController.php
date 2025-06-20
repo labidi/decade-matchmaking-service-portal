@@ -106,6 +106,8 @@ class OcdOpportunityController extends Controller
                 "canEdit" => false,
                 "canSubmitNew" => false,
                 'canApply' => true
+                "canChangeStatus" => false,
+                "canDelete" => true
             ],
         ]);
     }
