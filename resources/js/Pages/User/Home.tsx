@@ -4,11 +4,11 @@ import FrontendLayout from '@/Layouts/FrontendLayout';
 import { Auth, User } from '@/types';
 import { usePage } from '@inertiajs/react';
 
-export default function Dashboard({
+export default function Home({
 }: PageProps<{ laravelVersion: string; phpVersion: string }>) {
 
     const { auth } = usePage<{ auth: Auth }>().props;
-    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-300 hover:bg-firefly-600 text-white"
+    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-900 hover:bg-firefly-600 text-white"
     const LinkOpportunityCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-500 hover:bg-firefly-600 text-white"
     return (
         <FrontendLayout>
@@ -77,7 +77,7 @@ export default function Dashboard({
 
                     <div className="grid md:grid-cols-3 gap-8">
                         {auth.user && (
-                            <Link href={route('user.opportunity.list')} className={LinkOpportunityCardClassName}>
+                            <Link href={route('opportunity.list')} className={LinkOpportunityCardClassName}>
                                 <div>
                                     <div className="px-6 py-4">
                                         <div className="font-bold text-xl mb-2">View and Apply for Partner Opportunities</div>
@@ -99,7 +99,7 @@ export default function Dashboard({
 
                         )}
                         {auth.user && auth.user.is_partner && (
-                            <Link href={route("opportunity.list")} className={LinkOpportunityCardClassName}>
+                            <Link href={route("opportunity.me.list")} className={LinkOpportunityCardClassName}>
                                 <div className="px-6 py-4">
                                     <div className="font-bold text-xl mb-2">View My submited Opportunities</div>
                                     <p className="text-base">

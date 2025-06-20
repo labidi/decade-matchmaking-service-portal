@@ -64,11 +64,11 @@ export default function UserDropdown() {
                     aria-orientation="vertical"
                 >
                     <Link
-                        href={route('dashboard')}
+                        href={route('user.home')}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         role="menuitem"
                     >
-                        My Dashboard
+                        Home
                     </Link>
                     <Link
                         href={route('user.request.myrequests')}
@@ -79,7 +79,7 @@ export default function UserDropdown() {
                     </Link>
                     {user.is_partner && (
                     <Link
-                        href={route('opportunity.list')}
+                        href={route('opportunity.me.list')}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         role="menuitem"
                     >

@@ -115,16 +115,6 @@ export default function OpportunitiesList() {
                 </button>
             )}
 
-            {pageActions.canChangeStatus && (
-                <button
-                    onClick={() => handleDelete(rowData.id)}
-                    className="flex items-center text-red-600 hover:text-red-800"
-                >
-                    <i className="pi pi-trash mr-1" aria-hidden="true"/>
-                    Delete
-                </button>
-            )}
-
             <Link
                 href={route('opportunity.show', rowData.id)}
                 className="flex items-center text-green-600 hover:text-green-800"
@@ -151,7 +141,7 @@ export default function OpportunitiesList() {
             <Head title="Welcome"/>
             <div className="overflow-x-auto">
                 <div className='flex justify-between items-center mb-6'>
-                    {auth.user.is_partner && (
+                    {auth.user.is_partner && pageActions.canSubmitNew && (
                         <Link
                             href={route('partner.opportunity.create')}
                             className="px-4 text-xl py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"

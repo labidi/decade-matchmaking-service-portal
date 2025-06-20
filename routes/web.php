@@ -37,7 +37,7 @@ Route::get('user-guide', [UserGuideController::class, 'download'])->name('user.g
 
 Route::middleware(['auth', 'role:user'])->group(function () {
 
-    Route::get('dashboard', IndexController::class)->name('dashboard');
+    Route::get('home', IndexController::class)->name('user.home');
     Route::get('user/request/create', [OcdRequestController::class, 'create'])->name('user.request.create');
     Route::get('user/request/myrequests', [OcdRequestController::class, 'myRequestsList'])->name('user.request.myrequests');
     Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
@@ -58,6 +58,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 Route::middleware(['auth', 'role:partner'])->group(function () {
 
     // Opportunity routes
+    Route::get('opportunity/me/list', [OcdOpportunityController::class, 'mySubmittedList'])->name('opportunity.me.list');
     Route::get('opportunity/create', [OcdOpportunityController::class, 'create'])->name('partner.opportunity.create');
     Route::post('opportunity/store', [OcdOpportunityController::class, 'store'])->name('partner.opportunity.store');
     Route::get('opportunity/list', [OcdOpportunityController::class, 'list'])->name('opportunity.list');

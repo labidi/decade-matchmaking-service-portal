@@ -22,7 +22,7 @@ class OcdOpportunityController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
                 ['name' => 'Create Opportunity', 'url' => route('partner.opportunity.create')],
             ],
@@ -54,7 +54,7 @@ class OcdOpportunityController extends Controller
         return response()->json(['message' => 'Opportunity created successfully', 'opportunity' => $opportunity], 201);
     }
 
-    public function list(Request $httpRequest)
+    public function mySubmittedList(Request $httpRequest)
     {
         // Fetch all opportunities
         $opportunities = Opportunity::where('user_id', $httpRequest->user()->id)->get();
@@ -64,18 +64,48 @@ class OcdOpportunityController extends Controller
             'opportunities' => $opportunities,
             'title' => 'Opportunities',
             'banner' => [
-                'title' => 'List of Opportunities',
-                'description' => 'Manage your opportunities here.',
+                'title' => 'List of My submitted Opportunities',
+                'description' => 'Manage your submitted opportunities here.',
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
             ],
             'pageActions' => [
                 "canAddNew" => true,
-                "canChangeStatus" => $user->is_admin,
-                "canDelete" => true
+                "canChangeStatus" => false,
+                "canDelete" => true,
+                "canSubmitNew" => true,
+                'canApply' => false
+            ],
+        ]);
+    }
+
+    public function list(Request $httpRequest)
+    {
+        // Fetch all opportunities
+        $opportunities = Opportunity::where('status', '=', OpportunityStatus::ACTIVE, false)->get();
+        // Return the opportunities to the view
+        return Inertia::render('Opportunity/List', [
+            'opportunities' => $opportunities,
+            'title' => 'Opportunities',
+            'banner' => [
+                'title' => 'List of Opportunities',
+                'description' => 'Browse and view opportunities submitted by OCD partners here.',
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => route('user.home')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
+            ],
+            'pageActions' => [
+                "canAddNew" => false,
+                "canChangeStatus" => false,
+                "canDelete" => false,
+                "canEdit" => false,
+                "canSubmitNew" => false,
+                'canApply' => true
             ],
         ]);
     }
@@ -95,7 +125,7 @@ class OcdOpportunityController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.hom')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
             ],
             'PageActions' => [
@@ -119,7 +149,7 @@ class OcdOpportunityController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
                 ['name' => 'View Opportunity', 'url' => route('opportunity.show', ['id' => $id])],
             ],

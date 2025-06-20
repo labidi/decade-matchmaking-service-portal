@@ -14,7 +14,7 @@ class IndexController extends Controller
     public function __invoke(Request $HttpRequest): \Inertia\Response
     {
         $user = $HttpRequest->user();
-        return Inertia::render('Dashboard', [
+        return Inertia::render('User/Home', [
             'title' => 'Welcome '.$user->name,
             'banner' => [
                 'title' => 'Welcome back '.$user->name,

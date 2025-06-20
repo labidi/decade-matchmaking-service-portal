@@ -194,7 +194,7 @@ export type OCDOpportunitiesListPageActions = {
     canCreate?: boolean;
     canExpressInterest?: boolean;
     canExportPdf?: boolean;
-
+    canSubmitNew?: boolean;
 }
 
 export interface AttachmentsProps {

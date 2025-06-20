@@ -110,16 +110,13 @@ export default function Show() {
 
                 {/* Actions */}
                 <div className="mt-8 flex space-x-4">
-                    {(opportunity.can_edit &&
-                        <Link
-                            href={`/opportunities/${opportunity.id}/edit`}
-                            className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
-                        >
-                            Edit Opportunity
-                        </Link>
-                    )
-
-                    }
+                    <a
+                        target="_blank"
+                        href={opportunity.url}
+                        className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
+                    >
+                        Apply Now
+                    </a>
                 </div>
             </div>
         </FrontendLayout>

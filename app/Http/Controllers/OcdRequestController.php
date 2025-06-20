@@ -36,7 +36,7 @@ class OcdRequestController extends Controller
             ],
             'requests' => OCDRequest::with('status')->where('user_id', $httpRequest->user()->id)->get(),
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
             ],
             'grid.actions' => [
@@ -73,7 +73,7 @@ class OcdRequestController extends Controller
             ],
             'requests' => $request,
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('partner.request.list')],
             ],
             'grid.actions' => [
@@ -100,7 +100,7 @@ class OcdRequestController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
                 ['name' => 'Create Request', 'url' => route('user.request.create')],
             ],
@@ -200,7 +200,7 @@ class OcdRequestController extends Controller
             'request' => $ocdRequest->toArray(),
             'offer' => $offer,
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
                 [
                     'name' => 'View Request #' . $ocdRequest->id,
@@ -240,7 +240,7 @@ class OcdRequestController extends Controller
             ],
             'request' => $ocdRequest->toArray(),
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('user.request.myrequests')],
                 [
                     'name' => 'Edit Request #' . $ocdRequest->id,

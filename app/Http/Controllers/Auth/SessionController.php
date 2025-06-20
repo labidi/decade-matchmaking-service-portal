@@ -50,7 +50,7 @@ class SessionController extends Controller
                 $credentials['email']
             );
 
-            
+
         } catch (\Exception $e) {
             throw ValidationException::withMessages([
                 "password" => $e->getMessage(),
@@ -70,7 +70,7 @@ class SessionController extends Controller
         Auth::login($user, false);
         $request->session()->put('external_api_token', $token);
         $request->session()->regenerate();
-        return to_route('dashboard')->with([
+        return to_route('user.home')->with([
             'status' => 'You are logged in successfully.',
         ]);
     }
