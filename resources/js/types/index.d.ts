@@ -152,7 +152,7 @@ export type OCDRequestList = OCDRequest[];
 export interface OCDOpportunity {
     id: string;
     title: string;
-    type: string[];
+    type: string;
     closing_date: string;
     coverage_activity: string;
     implementation_location: string;
@@ -206,3 +206,5 @@ export interface OfferProps {
     OcdRequest: OcdRequest;
     OcdRequestOffer: RequestOffer;
 }
+
+export type OpportunityTypeOptions = Record<string, string>;
