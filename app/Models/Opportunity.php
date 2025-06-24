@@ -24,6 +24,30 @@ class Opportunity extends Model
         OpportunityStatus::PENDING_REVIEW->value => 'Pending Review',
     ];
 
+    /**
+     * Available opportunity types
+     */
+    const TYPE_OPTIONS = [
+        'training' => 'Training',
+        'onboarding-expeditions' => 'Onboarding Expeditions, Research & Training',
+        'fellowships' => 'Fellowships',
+        'internships-jobs' => 'Internships/Jobs',
+        'mentorships' => 'Mentorships',
+        'visiting-lecturers' => 'Visiting Lecturers/Scholars',
+        'travel-grants' => 'Travel Grants',
+        'awards' => 'Awards',
+        'research-funding' => 'Research Fundings, Grants & Scholarships',
+        'access-infrastructure' => 'Access to Infrastructure',
+        'ocean-data' => 'Ocean Data, Information and Documentation',
+        'networks-community' => 'Professional Networks & Community Building',
+        'ocean-literacy' => 'Ocean Literacy, Public Information and Communication',
+    ];
+
+    public static function getTypeOptions(): array
+    {
+        return self::TYPE_OPTIONS;
+    }
+
     protected $casts = [
         'status' => OpportunityStatus::class,
     ];

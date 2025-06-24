@@ -1,7 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDOpportunity } from '@/types';
+import { OCDOpportunity, OpportunityTypeOptions } from '@/types';
 import TagsInput from '@/Components/TagsInput';
 import { router } from '@inertiajs/react'
 import { Tag } from 'react-tag-input';
@@ -20,6 +20,7 @@ import { countryOptions, regionOptions, oceanOptions, Option } from '@/data/loca
 
 export default function CreateOpportunity() {
     const OcdOpportunityData = usePage().props.request as OCDOpportunity;
+    const opportunityTypes = usePage().props.opportunityTypes as OpportunityTypeOptions;
 
     const { data, setData, post, processing, errors, reset, setError, clearErrors, setDefaults } = useForm({
         id: OcdOpportunityData?.id,
@@ -130,25 +131,14 @@ export default function CreateOpportunity() {
                         <p className="mt-1 text-base text-gray-500">Specify the type of your Opportunity</p>
                         <select
                             id="type"
-
                             className={getInputClass()}
                             value={data.type}
                             onChange={(e) => setData('type' as keyof typeof data, e.currentTarget.value)}
                         >
                             <option value="">— Select —</option>
-                            <option value="raining">Training</option>
-                            <option value="onboarding-expeditions">Onboarding Expeditions, Research & Training</option>
-                            <option value="fellowships">Fellowships</option>
-                            <option value="internships-jobs">Internships/Jobs</option>
-                            <option value="mentorships">Mentorships</option>
-                            <option value="visiting-lecturers">Visiting Lecturers/Scholars</option>
-                            <option value="travel-grants">Travel Grants</option>
-                            <option value="awards">Awards</option>
-                            <option value="research-funding">Research Fundings, Grants & Scholarships</option>
-                            <option value="access-infrastructure">Access to Infrastructure</option>
-                            <option value="ocean-data">Ocean Data, Information and Documentation</option>
-                            <option value="networks-community">Professional Networks & Community Building</option>
-                            <option value="ocean-literacy">Ocean Literacy, Public Information and Communication</option>
+                            {Object.entries(opportunityTypes).map(([value, label]) => (
+                                <option key={value} value={value}>{label}</option>
+                            ))}
                         </select>
                         {errors.type && (
                             <p className="text-red-600 text-base mt-1">{errors.type}</p>

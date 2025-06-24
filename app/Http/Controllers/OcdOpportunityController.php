@@ -21,6 +21,7 @@ class OcdOpportunityController extends Controller
                 'description' => 'Create a new Opportunity to get started.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'opportunityTypes' => Opportunity::getTypeOptions(),
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
@@ -176,6 +177,7 @@ class OcdOpportunityController extends Controller
                 'description' => 'Edit my Opportunity details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'opportunityTypes' => Opportunity::getTypeOptions(),
             'request' => $opportunity->toArray(),
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],
