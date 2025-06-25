@@ -75,6 +75,9 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 Route::get('users', [UserRoleController::class, 'index'])->name('admin.users.index');
 Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
 Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('admin.request.offer.store');
+Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
+Route::get('notifications/{notification}', [\App\Http\Controllers\Admin\NotificationController::class, 'show'])->name('admin.notifications.show');
+Route::patch('notifications/{notification}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('admin.notifications.read');
 // });
 
 

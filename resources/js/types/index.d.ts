@@ -31,6 +31,8 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
 
+    unread_notifications?: number;
+
     [key: string]: unknown;
 }
 
@@ -206,5 +208,15 @@ export interface OfferProps {
     OcdRequest: OcdRequest;
     OcdRequestOffer: RequestOffer;
 }
+
+export interface Notification {
+    id: number;
+    title: string;
+    description: string;
+    is_read: boolean;
+    created_at: string;
+}
+
+export type NotificationList = Notification[];
 
 export type OpportunityTypeOptions = Record<string, string>;

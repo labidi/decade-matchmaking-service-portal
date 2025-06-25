@@ -3,7 +3,7 @@ import { usePage, Link, useForm } from '@inertiajs/react';
 import { Auth, User } from '@/types';
 
 export default function UserDropdown() {
-    const { auth } = usePage<{ auth: Auth }>().props;
+    const { auth, unread_notifications } = usePage<{ auth: Auth; unread_notifications: number }>().props;
     const user = auth.user;
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -54,6 +54,11 @@ export default function UserDropdown() {
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
+                {user.is_admin && unread_notifications > 0 && (
+                    <span className="ml-2 bg-red-600 text-white rounded-full px-2 text-xs">
+                        {unread_notifications}
+                    </span>
+                )}
             </button>
 
             {/* Dropdown Menu */}
@@ -86,13 +91,24 @@ export default function UserDropdown() {
                         My Opportunties List
                     </Link>
                     )}
-                    <Link
-                        href={route('admin.users.index')}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        role="menuitem"
-                    >
-                        Manage User Roles
-                    </Link>
+                    {user.is_admin && (
+                        <>
+                            <Link
+                                href={route('admin.notifications.index')}
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                role="menuitem"
+                            >
+                                Notifications
+                            </Link>
+                            <Link
+                                href={route('admin.users.index')}
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                role="menuitem"
+                            >
+                                Manage User Roles
+                            </Link>
+                        </>
+                    )}
                     <form method="POST" onSubmit={handleSignOutFormSubmit}>
                         {/* Include CSRF token if needed */}
                         <button
