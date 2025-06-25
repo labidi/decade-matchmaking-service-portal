@@ -53,6 +53,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::delete('user/request/{id}', [OcdRequestController::class, 'destroy'])->name('user.request.destroy');
     Route::get('user/opportunity/list', [UserOpportunityController::class, 'list'])->name('user.opportunity.list');
     Route::get('user/opportunity/show/{id}', [UserOpportunityController::class, 'show'])->name('user.opportunity.show');
+    Route::get('opportunity/list', [OcdOpportunityController::class, 'list'])->name('opportunity.list');
+    Route::get('opportunity/show/{id}', [OcdOpportunityController::class, 'show'])->name('opportunity.show');
 });
 
 Route::middleware(['auth', 'role:partner'])->group(function () {
@@ -61,9 +63,7 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::get('opportunity/me/list', [OcdOpportunityController::class, 'mySubmittedList'])->name('opportunity.me.list');
     Route::get('opportunity/create', [OcdOpportunityController::class, 'create'])->name('partner.opportunity.create');
     Route::post('opportunity/store', [OcdOpportunityController::class, 'store'])->name('partner.opportunity.store');
-    Route::get('opportunity/list', [OcdOpportunityController::class, 'list'])->name('opportunity.list');
     Route::get('opportunity/browse', [OcdOpportunityController::class, 'list'])->name('opportunity.browse');
-    Route::get('opportunity/show/{id}', [OcdOpportunityController::class, 'show'])->name('opportunity.show');
     Route::patch('opportunity/{id}/status', [OcdOpportunityController::class, 'updateStatus'])->name('partner.opportunity.status');
     Route::delete('opportunity/{id}', [OcdOpportunityController::class, 'destroy'])->name('partner.opportunity.destroy');
     Route::get('request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');

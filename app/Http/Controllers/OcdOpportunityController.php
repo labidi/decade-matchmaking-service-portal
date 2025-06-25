@@ -8,6 +8,8 @@ use App\Models\Opportunity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Database\Eloquent\Builder;
+
 
 class OcdOpportunityController extends Controller
 {
@@ -86,7 +88,10 @@ class OcdOpportunityController extends Controller
     public function list(Request $httpRequest)
     {
         // Fetch all opportunities
-        $opportunities = Opportunity::where('status', '=', OpportunityStatus::ACTIVE, false)->get();
+        $opportunities = Opportunity::where(function (Builder $query) {
+            $query->where('user_id', '!=', auth()->id())
+                ->where('status', OpportunityStatus::ACTIVE);
+        })->get();
         // Return the opportunities to the view
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,

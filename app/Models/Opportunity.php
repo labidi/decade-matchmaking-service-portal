@@ -14,10 +14,10 @@ class Opportunity extends Model
     protected $table = 'opportunities';
     protected $primaryKey = 'id';
     public $timestamps = true;
-    protected $appends = ['status_label'];
+    protected $appends = ['status_label','type_label'];
 
 
-    const STATUS_LABELS = [
+    public const STATUS_LABELS = [
         OpportunityStatus::ACTIVE->value => 'Active',
         OpportunityStatus::CLOSED->value => 'Closed',
         OpportunityStatus::REJECTED->value => 'Rejected',
@@ -27,7 +27,7 @@ class Opportunity extends Model
     /**
      * Available opportunity types
      */
-    const TYPE_OPTIONS = [
+    public const TYPE_OPTIONS = [
         'training' => 'Training',
         'onboarding-expeditions' => 'Onboarding Expeditions, Research & Training',
         'fellowships' => 'Fellowships',
@@ -74,6 +74,13 @@ class Opportunity extends Model
     {
         return Attribute::make(
             get: fn() => self::STATUS_LABELS[$this->status->value] ?? '',
+        );
+    }
+
+    protected function typeLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => self::TYPE_OPTIONS[$this->type] ?? '',
         );
     }
 
