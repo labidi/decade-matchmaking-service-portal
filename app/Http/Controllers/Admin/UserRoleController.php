@@ -22,7 +22,7 @@ class UserRoleController extends Controller
             ],
             'breadcrumbs' => [
             ],
-            'users' => User::with('roles')->get()->makeVisible('id'),
+            'users' => User::with('roles')->get()->makeVisible(['id','is_blocked']),
             'roles' => Role::all(),
         ]);
     }
@@ -39,6 +39,17 @@ class UserRoleController extends Controller
         return response()->json([
             'message' => 'Roles updated successfully',
             'roles' => $user->roles->pluck('name'),
+        ]);
+    }
+
+    public function toggleBlock(User $user)
+    {
+        $user->is_blocked = !$user->is_blocked;
+        $user->save();
+
+        return response()->json([
+            'message' => $user->is_blocked ? 'User blocked' : 'User unblocked',
+            'is_blocked' => $user->is_blocked,
         ]);
     }
 }

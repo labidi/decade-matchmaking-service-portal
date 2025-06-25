@@ -9,6 +9,7 @@ export interface User {
     email_verified_at?: string;
     is_partner: boolean;
     is_admin: boolean;
+    is_blocked: boolean;
 }
 
 export interface Role {

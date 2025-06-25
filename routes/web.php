@@ -74,6 +74,7 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 // Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
 Route::get('users', [UserRoleController::class, 'index'])->name('admin.users.index');
 Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
+Route::post('users/{user}/toggle-block', [UserRoleController::class, 'toggleBlock'])->name('admin.users.block.toggle');
 Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('admin.request.offer.store');
 Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
 Route::get('notifications/{notification}', [\App\Http\Controllers\Admin\NotificationController::class, 'show'])->name('admin.notifications.show');
