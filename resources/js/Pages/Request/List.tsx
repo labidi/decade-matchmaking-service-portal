@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Head, Link} from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
 import {OCDRequest, OCDRequestList, OCDRequestGrid} from '@/types';
@@ -10,11 +10,15 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import axios from 'axios';
+import XHRAlertDialog from "@/Components/Dialog/XHRAlertDialog";
 
 export default function RequestsList() {
     const requests = usePage().props.requests as OCDRequestList;
     const grid = usePage().props.grid as OCDRequestGrid;
     const [requestList, setRequestList] = React.useState<OCDRequestList>(requests);
+
+    const [expressInterestDialog, setExpressInterestDialog] = useState(false);
+
     const statuses = [
         'draft',
         'under_review',
@@ -79,24 +83,26 @@ export default function RequestsList() {
                 </Link>
             )}
             {grid.actions.canExpressInterest && (
-                <Link
-                    href={route('user.request.show', rowData.id)}
-                    className="flex items-center text-green-700 hover:text-green-800"
-                >
-                    <i className="pi pi-star-fill mr-1" aria-hidden="true"/>
-                    Express interest
-                </Link>
+                <>
+                    <span
+                       onClick={() => setExpressInterestDialog(true)}
+                       className="flex items-center text-green-700 hover:text-green-800"
+                    >
+                        <i className="pi pi-star-fill mr-1" aria-hidden="true"/>
+                        Express interest
+                    </span>
+                </>
             )}
             {grid.actions.canChangeStatus && (
-            <select
-                className="border rounded px-2 py-1"
-                value={rowData.status.status_code}
-                onChange={e => handleStatusChange(rowData.id, e.currentTarget.value)}
-            >
-                {statuses.map(s => (
-                    <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
-                ))}
-            </select>
+                <select
+                    className="border rounded px-2 py-1"
+                    value={rowData.status.status_code}
+                    onChange={e => handleStatusChange(rowData.id, e.currentTarget.value)}
+                >
+                    {statuses.map(s => (
+                        <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
+                    ))}
+                </select>
             )}
         </div>
     );
@@ -179,6 +185,12 @@ export default function RequestsList() {
                     <Column body={actionsTemplate} header="Actions"/>
                 </DataTable>
             </div>
+            <XHRAlertDialog
+                open={expressInterestDialog}
+                onOpenChange={setExpressInterestDialog}
+                type="info"
+                message="his message confirms your interest in delivering services for this request. The CDF Secretariat will follow up within three business days."
+            />
         </FrontendLayout>
     );
 }
