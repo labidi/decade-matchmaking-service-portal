@@ -8,6 +8,8 @@ use App\Models\Opportunity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Database\Eloquent\Builder;
+
 
 class OcdOpportunityController extends Controller
 {
@@ -21,6 +23,7 @@ class OcdOpportunityController extends Controller
                 'description' => 'Create a new Opportunity to get started.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'opportunityTypes' => Opportunity::getTypeOptions(),
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
@@ -85,7 +88,10 @@ class OcdOpportunityController extends Controller
     public function list(Request $httpRequest)
     {
         // Fetch all opportunities
-        $opportunities = Opportunity::where('status', '=', OpportunityStatus::ACTIVE, false)->get();
+        $opportunities = Opportunity::where(function (Builder $query) {
+            $query->where('user_id', '!=', auth()->id())
+                ->where('status', OpportunityStatus::ACTIVE);
+        })->get();
         // Return the opportunities to the view
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
@@ -176,6 +182,7 @@ class OcdOpportunityController extends Controller
                 'description' => 'Edit my Opportunity details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'opportunityTypes' => Opportunity::getTypeOptions(),
             'request' => $opportunity->toArray(),
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],

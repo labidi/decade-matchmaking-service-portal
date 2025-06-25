@@ -14,15 +14,39 @@ class Opportunity extends Model
     protected $table = 'opportunities';
     protected $primaryKey = 'id';
     public $timestamps = true;
-    protected $appends = ['status_label'];
+    protected $appends = ['status_label','type_label'];
 
 
-    const STATUS_LABELS = [
+    public const STATUS_LABELS = [
         OpportunityStatus::ACTIVE->value => 'Active',
         OpportunityStatus::CLOSED->value => 'Closed',
         OpportunityStatus::REJECTED->value => 'Rejected',
         OpportunityStatus::PENDING_REVIEW->value => 'Pending Review',
     ];
+
+    /**
+     * Available opportunity types
+     */
+    public const TYPE_OPTIONS = [
+        'training' => 'Training',
+        'onboarding-expeditions' => 'Onboarding Expeditions, Research & Training',
+        'fellowships' => 'Fellowships',
+        'internships-jobs' => 'Internships/Jobs',
+        'mentorships' => 'Mentorships',
+        'visiting-lecturers' => 'Visiting Lecturers/Scholars',
+        'travel-grants' => 'Travel Grants',
+        'awards' => 'Awards',
+        'research-funding' => 'Research Fundings, Grants & Scholarships',
+        'access-infrastructure' => 'Access to Infrastructure',
+        'ocean-data' => 'Ocean Data, Information and Documentation',
+        'networks-community' => 'Professional Networks & Community Building',
+        'ocean-literacy' => 'Ocean Literacy, Public Information and Communication',
+    ];
+
+    public static function getTypeOptions(): array
+    {
+        return self::TYPE_OPTIONS;
+    }
 
     protected $casts = [
         'status' => OpportunityStatus::class,
@@ -50,6 +74,13 @@ class Opportunity extends Model
     {
         return Attribute::make(
             get: fn() => self::STATUS_LABELS[$this->status->value] ?? '',
+        );
+    }
+
+    protected function typeLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => self::TYPE_OPTIONS[$this->type] ?? '',
         );
     }
 

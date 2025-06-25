@@ -171,7 +171,7 @@ export default function OpportunitiesList() {
                 >
                     <Column field="id" header="ID" sortable/>
                     <Column body={titleBodyTemplate} header="Title"/>
-                    <Column field="type" header="Type"/>
+                    <Column field="type_label" header="Type"/>
                     <Column field="created_at" body={ApplicationClosingDate} header="Application closing date"
                             sortable/>
                     <Column field="status.status_code" body={statusBodyTemplate} header="Status" sortable/>
