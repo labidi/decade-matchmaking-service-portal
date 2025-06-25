@@ -33,6 +33,27 @@ const AdminMenu: React.FC = () => {
                         {({ open }) => (
                             <>
                                 <Disclosure.Button className="flex w-full items-center justify-between rounded bg-gray-100 px-4 py-2 text-left font-semibold hover:bg-gray-200">
+                                    <span>Notifications</span>
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+                                </Disclosure.Button>
+                                <Disclosure.Panel as="div" className="mt-2 pl-4">
+                                    <ul className="space-y-1">
+                                        <li>
+                                            <Link className="text-firefly-700 hover:underline" href={route('admin.notifications.index')}>
+                                                List Notifications
+                                            </Link>
+                                        </li>
+                                    </ul>
+                                </Disclosure.Panel>
+                            </>
+                        )}
+                    </Disclosure>
+                </li>
+                <li>
+                    <Disclosure>
+                        {({ open }) => (
+                            <>
+                                <Disclosure.Button className="flex w-full items-center justify-between rounded bg-gray-100 px-4 py-2 text-left font-semibold hover:bg-gray-200">
                                     <span>Users</span>
                                     <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
                                 </Disclosure.Button>
