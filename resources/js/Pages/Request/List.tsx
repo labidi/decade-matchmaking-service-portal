@@ -82,6 +82,15 @@ export default function RequestsList() {
                     View
                 </Link>
             )}
+            {grid.actions.canPreview && (
+                <Link
+                    href={route('request.preview', rowData.id)}
+                    className="flex items-center text-green-600 hover:text-green-800"
+                >
+                    <i className="pi pi-eye mr-1" aria-hidden="true"/>
+                    Preview
+                </Link>
+            )}
             {grid.actions.canExpressInterest && (
                 <>
                     <span
@@ -189,7 +198,7 @@ export default function RequestsList() {
                 open={expressInterestDialog}
                 onOpenChange={setExpressInterestDialog}
                 type="info"
-                message="his message confirms your interest in delivering services for this request. The CDF Secretariat will follow up within three business days."
+                message="This message confirms your interest in delivering services for this request. The CDF Secretariat will follow up within three business days."
             />
         </FrontendLayout>
     );

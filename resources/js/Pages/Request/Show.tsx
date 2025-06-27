@@ -38,7 +38,7 @@ export default function ShowRequest() {
 
         {RequestPageDetails.actions.canEdit && (
           <Link
-            href={route('user.request.myrequests')}
+            href={route('request.me.list')}
             className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
           >
             Edit
@@ -47,7 +47,7 @@ export default function ShowRequest() {
 
         {RequestPageDetails.actions.canDelete && (
           <Link
-            href={route('user.request.myrequests')}
+            href={route('request.me.list')}
             className="px-4 py-2 bg-firefly-200 text-gray-800 rounded hover:bg-firefly-300"
           >
             Delete

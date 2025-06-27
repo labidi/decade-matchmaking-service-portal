@@ -31,13 +31,13 @@ class OcdRequestController extends Controller
             'title' => 'My requests',
             'banner' => [
                 'title' => 'List of my requests',
-                'description' => 'Manager your requests here.',
+                'description' => 'Manage your requests here.',
                 'image' => '/assets/img/sidebar.png',
             ],
             'requests' => OCDRequest::with('status')->where('user_id', $httpRequest->user()->id)->get(),
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
+                ['name' => 'Requests', 'url' => route('request.me.list')],
             ],
             'grid.actions' => [
                 'canEdit' => true,
@@ -82,7 +82,8 @@ class OcdRequestController extends Controller
                 'canView' => true,
                 'canCreate' => false,
                 'canExpressInterest' => true,
-                'canChangeStatus' => $user->is_admin
+                'canChangeStatus' => $user->is_admin,
+                'canPreview' => true,
             ],
         ]);
     }
@@ -135,7 +136,7 @@ class OcdRequestController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
+                ['name' => 'Requests', 'url' => route('request.me.list')],
                 ['name' => 'Create Request', 'url' => route('user.request.create')],
             ],
         ]);
@@ -145,9 +146,9 @@ class OcdRequestController extends Controller
     {
         $requestId = $httpRequest->input('id') ?? null;
         $mode = $httpRequest->input('mode', 'submit');
-        if ($mode == 'draft') {
+       /* if ($mode == 'draft') {
             return $this->saveRequestAsDraft($httpRequest, $requestId);
-        }
+        }*/
         return $this->store($httpRequest, $requestId);
     }
 
@@ -235,7 +236,7 @@ class OcdRequestController extends Controller
             'offer' => $offer,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
+                ['name' => 'Requests', 'url' => route('request.me.list')],
                 [
                     'name' => 'View Request #' . $ocdRequest->id,
                     'url' => route('user.request.show', ['id' => $ocdRequest->id])
@@ -251,6 +252,49 @@ class OcdRequestController extends Controller
                 'canExportPdf' => true,
                 'canAcceptOffer' => $offer && $ocdRequest->user->id == $httpRequest->user()->id,
                 'canRequestClarificationForOffer' => $offer && $ocdRequest->user->id == $httpRequest->user()->id
+            ],
+        ]);
+    }
+    /**
+     * Display the specified resource.
+     */
+    public function preview(Request $httpRequest, int $OCDrequestId)
+    {
+        $ocdRequest = OCDRequest::with(['status', 'user', 'offer'])->find($OCDrequestId);
+        if (!$ocdRequest) {
+            return response()->json(['error' => 'Ocd Request not found'], 404);
+        }
+
+        $offer = RequestOffer::with('documents')
+            ->where('request_id', $OCDrequestId)
+            ->where('status', RequestOfferStatus::ACTIVE)
+            ->first();
+
+        return Inertia::render('Request/Preview', [
+            'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
+            'banner' => [
+                'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
+                'description' => 'View my request details here.',
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'request' => $ocdRequest->toArray(),
+            'offer' => $offer,
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => route('user.home')],
+                ['name' => 'Requests', 'url' => route('request.me.list')],
+                [
+                    'name' => 'View Request #' . $ocdRequest->id,
+                    'url' => route('user.request.show', ['id' => $ocdRequest->id])
+                ],
+            ],
+            'requestDetail.actions' => [
+                'canEdit' => false,
+                'canDelete' => false,
+                'canCreate' => false,
+                'canExpressInterest' => false,
+                'canExportPdf' => false,
+                'canAcceptOffer' => false,
+                'canRequestClarificationForOffer' => false
             ],
         ]);
     }
@@ -275,7 +319,7 @@ class OcdRequestController extends Controller
             'request' => $ocdRequest->toArray(),
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Requests', 'url' => route('user.request.myrequests')],
+                ['name' => 'Requests', 'url' => route('request.me.list')],
                 [
                     'name' => 'Edit Request #' . $ocdRequest->id,
                     'url' => route('user.request.edit', ['id' => $ocdRequest->id])

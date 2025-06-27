@@ -43,12 +43,12 @@ export default function Welcome({
                         <Link href="#" onClick={e=>e.preventDefault()} className="p-12 bg-firefly-600 shadow">
                             <h4 className="text-xl font-semibold mb-2 text-white">
                                 Click to view CDF Partners supporting capacity development through the Matchmaking Platform.<br />
-                                <DataTableDialog columns={columnsCDF} data={data} triggerLabel="Show Records" />
+                                <DataTableDialog triggerLabel="Show Records" />
                             </h4>
                         </Link>
                         <a target="_blank" href="https://www.oceancd.org/landingpage" className="p-12 bg-firefly-600 shadow">
                             <h4 className="text-xl font-semibold text-white mb-2">
-                                Search across IOC platforms for available capacity development opportunities in one place.<br />
+                                Search across Ocean CD Hub for available capacity development opportunities in one place.<br />
                             </h4>
                         </a>
                     </div>

@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\IndexController;
 use App\Http\Controllers\OcdRequestController;
 use Inertia\Inertia;
-use App\Http\Controllers\Partner\OpportunityController as PartnerOpportunityController;
 use App\Http\Controllers\User\OpportunityController as UserOpportunityController;
 use App\Http\Controllers\OcdOpportunityController;
 use App\Http\Controllers\UserGuideController;
@@ -39,9 +38,10 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::get('home', IndexController::class)->name('user.home');
     Route::get('user/request/create', [OcdRequestController::class, 'create'])->name('user.request.create');
-    Route::get('user/request/myrequests', [OcdRequestController::class, 'myRequestsList'])->name('user.request.myrequests');
+    Route::get('request/me/list', [OcdRequestController::class, 'myRequestsList'])->name('request.me.list');
     Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
     Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('user.request.show');
+    Route::get('request/preview/{id}', [OcdRequestController::class, 'preview'])->name('request.preview');
 
     Route::get('user/request/pdf/{id}', [OcdRequestController::class, 'exportPdf'])->name('user.request.pdf');
     Route::post('user/request/submit', [OcdRequestController::class, 'submit'])->name('user.request.submit');
@@ -51,7 +51,6 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::delete('user/document/{document}', [\App\Http\Controllers\DocumentController::class, 'destroy'])->name('user.document.destroy');
     Route::get('user/document/{document}/download', [\App\Http\Controllers\DocumentController::class, 'download'])->name('user.document.download');
     Route::delete('user/request/{id}', [OcdRequestController::class, 'destroy'])->name('user.request.destroy');
-    Route::get('user/opportunity/list', [UserOpportunityController::class, 'list'])->name('user.opportunity.list');
     Route::get('user/opportunity/show/{id}', [UserOpportunityController::class, 'show'])->name('user.opportunity.show');
     Route::get('opportunity/list', [OcdOpportunityController::class, 'list'])->name('opportunity.list');
     Route::get('opportunity/show/{id}', [OcdOpportunityController::class, 'show'])->name('opportunity.show');

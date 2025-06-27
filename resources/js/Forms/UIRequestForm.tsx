@@ -1,3 +1,5 @@
+import {countryOptions} from '@/data/locations';
+
 export interface Request {
     id: string;
     is_related_decade_action: 'Yes' | 'No';
@@ -32,7 +34,11 @@ export interface Request {
     expected_outcomes: string;
     success_metrics: string;
     long_term_impact: string;
+    delivery_format: 'Online' | 'On-site Choose countries' | 'Blended  Choose countries';
+    delivery_country: string;
+    target_audience: string;
 }
+
 export interface UIField {
     id: string;
     type: string;
@@ -42,6 +48,7 @@ export interface UIField {
     options?: { value: string; label: string }[];
     required?: boolean;
     show?: (data: Request) => boolean;
+    multiple?: boolean;
 }
 
 export interface UIStep {
@@ -90,8 +97,8 @@ export const UIRequestForm: UIStep[] = [
                 label: 'Is this request related an Ocean Decade Action ?',
                 description: 'Only Ocean Decade Programmes, Projects, and Contributions are considered official Decade Actions. Activities are not considered Decade Actions.',
                 options: [
-                    { value: 'Yes', label: 'Yes' },
-                    { value: 'No', label: 'No' },
+                    {value: 'Yes', label: 'Yes'},
+                    {value: 'No', label: 'No'},
                 ],
             },
             unique_related_decade_action_id: {
@@ -140,8 +147,8 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Is this request linked to a broader initiative ?',
                 options: [
-                    { value: 'yes', label: 'Yes' },
-                    { value: 'no', label: 'No' },
+                    {value: 'yes', label: 'Yes'},
+                    {value: 'no', label: 'No'},
                 ],
                 show: data => data.is_related_decade_action !== 'Yes',
             },
@@ -151,11 +158,11 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Could you specify the current stage of the initiative?',
                 options: [
-                    { value: 'Planning', label: 'Planning' },
-                    { value: 'Approved', label: 'Approved' },
-                    { value: 'Implementation', label: 'In implementation' },
-                    { value: 'Closed', label: 'Closed' },
-                    { value: 'Other', label: 'Other' },
+                    {value: 'Planning', label: 'Planning'},
+                    {value: 'Approved', label: 'Approved'},
+                    {value: 'Implementation', label: 'In implementation'},
+                    {value: 'Closed', label: 'Closed'},
+                    {value: 'Other', label: 'Other'},
                 ],
                 show: data => data.request_link_type === 'yes',
             },
@@ -171,8 +178,8 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Has your Action undergone any significant changes to its activities or framework since its endorsement ?',
                 options: [
-                    { value: 'Yes', label: 'Yes' },
-                    { value: 'No', label: 'No' },
+                    {value: 'Yes', label: 'Yes'},
+                    {value: 'No', label: 'No'},
                 ],
                 show: data => data.is_related_decade_action === 'Yes',
             },
@@ -196,9 +203,9 @@ export const UIRequestForm: UIStep[] = [
                 label: 'Is your request related to a training, a workshop, or both ?',
                 description: 'Please select the option that best describes your request.',
                 options: [
-                    { value: 'Training', label: 'Training' },
-                    { value: 'Workshop', label: 'Workshop' },
-                    { value: 'Both', label: 'Both' },
+                    {value: 'Training', label: 'Training'},
+                    {value: 'Workshop', label: 'Workshop'},
+                    {value: 'Both', label: 'Both'},
                 ],
             },
             delivery_format: {
@@ -206,15 +213,50 @@ export const UIRequestForm: UIStep[] = [
                 type: 'select',
                 required: true,
                 label: 'What is the delivery format of this training/workshop? ',
-                options: []
+                options: [
+                    {value: 'Online', label: 'Online'},
+                    {value: 'On-site', label: 'On-site'},
+                    {value: 'Blended', label: 'Blended'},
+                ]
+            },
+            delivery_country: {
+                id: 'delivery_country',
+                type: 'select',
+                options: countryOptions,
+                required: false,
+                label: 'What is the delivery country? ',
+                show: data => data.delivery_format !== 'Online',
             },
             target_audience: {
-                id: 'delivery_format',
-                type: 'select',
+                id: 'target_audience',
+                type: 'multiselect',
                 required: true,
                 label: 'Who is the target audience (multiple choice allowed)?',
                 options: [
-                ]
+                    {value: 'Academic', label: 'Academic'},
+                    {value: 'Alumni', label: 'Alumni'},
+                    {value: 'Civil Society', label: 'Civil Society'},
+                    {value: 'Small Island Developing States (SIDS)', label: 'Small Island Developing States (SIDS)'},
+                    {value: 'Decision Makers', label: 'Developing Countries'},
+                    {value: 'Early Career Professionals', label: 'Early Career Professionals'},
+                    {value: 'Researchers', label: 'Researchers'},
+                    {value: 'Doctoral or Postdoctoral', label: 'Doctoral or Postdoctoral'},
+                    {value: 'Scientists', label: 'Scientists'},
+                    {value: 'Executives', label: 'Executives'},
+                    {value: 'Technicians', label: 'General Public'},
+                    {value: 'Women', label: 'Women'},
+                    {value: 'Government', label: 'Government'},
+                    {value: 'Youth', label: 'Youth'},
+                    {value: 'Other (Please Specify)', label: 'Other (Please Specify)'},
+                ],
+                multiple: true,
+            },
+            target_audience_other: {
+                id: 'target_audience_other',
+                type: 'text',
+                required: false,
+                show: data => data.target_audience === 'Other (Please Specify)',
+                placeholder: 'Please specify the target audience',
             },
             subthemes: {
                 id: 'subthemes',
@@ -222,7 +264,7 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Which sub-theme(s) of the Capacity Development Facility priorities does your request fall under?',
                 description: 'Please review the umbrella theme carefully before selecting the corresponding sub-themes.',
-                options: subthemeOptions.map(v => ({ value: v, label: v })),
+                options: subthemeOptions.map(v => ({value: v, label: v})),
             },
             subthemes_other: {
                 id: 'subthemes_other',
@@ -236,7 +278,7 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'What type of support related to workshops or training are you seeking?',
                 description: "If you require support outside listed options, specify under 'Other options'.",
-                options: supportOptions.map(v => ({ value: v, label: v })),
+                options: supportOptions.map(v => ({value: v, label: v})),
             },
             support_types_other: {
                 id: 'support_types_other',
@@ -262,8 +304,8 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Do you already have a partner/service provider in mind to execute your request?',
                 options: [
-                    { value: 'Yes', label: 'Yes' },
-                    { value: 'No', label: 'No' },
+                    {value: 'Yes', label: 'Yes'},
+                    {value: 'No', label: 'No'},
                 ],
             },
             partner_name: {
@@ -280,8 +322,8 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Has this partner already been contacted and confirmed?',
                 options: [
-                    { value: 'Yes', label: 'Yes' },
-                    { value: 'No', label: 'No' },
+                    {value: 'Yes', label: 'Yes'},
+                    {value: 'No', label: 'No'},
                 ],
                 show: data => data.has_partner === 'Yes',
             },
@@ -291,8 +333,8 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Do you require financial support from the Capacity Development Facility to address this request?',
                 options: [
-                    { value: 'Yes', label: 'Yes' },
-                    { value: 'No', label: 'No' },
+                    {value: 'Yes', label: 'Yes'},
+                    {value: 'No', label: 'No'},
                 ],
             },
             budget_breakdown: {

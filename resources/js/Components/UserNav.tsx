@@ -76,7 +76,7 @@ export default function UserDropdown() {
                         Home
                     </Link>
                     <Link
-                        href={route('user.request.myrequests')}
+                        href={route('request.me.list')}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         role="menuitem"
                     >
@@ -98,7 +98,7 @@ export default function UserDropdown() {
                                 className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                                 role="menuitem"
                             >
-                                Notifications
+                                Notifications (0)
                             </Link>
                             <Link
                                 href={route('admin.users.index')}
