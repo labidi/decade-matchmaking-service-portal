@@ -5,6 +5,10 @@ import {UIRequestForm, UIField, Request as RequestFields} from '@/Forms/UIReques
 import XHRMessageDialog from '@/Components/Dialog/XHRAlertDialog';
 import axios from 'axios';
 import {OCDRequest} from '@/types';
+import { MultiSelect } from 'primereact/multiselect';
+import 'primereact/resources/themes/saga-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 
 type Mode = 'submit' | 'draft';
 type Id = '';
@@ -180,6 +184,23 @@ export default function RequestForm() {
                                 <option key={opt.value} value={opt.value}>{opt.label}</option>
                             ))}
                         </select>
+                        {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
+                    </div>
+                );
+            case 'multiselect':
+                return (
+                    <div key={name} className="mt-8">
+                        {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
+                        {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
+                        <MultiSelect
+                            id={field.id}
+                            options={field.options ?? []}
+                            value={(form.data as any)[name]}
+                            onChange={(e) => form.setData(name, e.value)}
+                            display="chip"
+                            placeholder="Select"
+                            className={getInputClass(name)}
+                        />
                         {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                     </div>
                 );
