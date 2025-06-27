@@ -10,6 +10,7 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
+
 type Mode = 'submit' | 'draft';
 type Id = '';
 export default function RequestForm() {
@@ -51,6 +52,10 @@ export default function RequestForm() {
         success_metrics: '',
         long_term_impact: '',
         mode: 'submit' as Mode,
+        target_audience:'',
+        target_audience_other: '',
+        delivery_format:'',
+        delivery_country: '',
     });
 
 
@@ -142,6 +147,7 @@ export default function RequestForm() {
             required: field.required,
             className: getInputClass(name),
             value: (form.data as any)[name],
+            placeholder: field.placeholder || '',
             onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
                 form.setData(name, e.currentTarget.value),
         };
@@ -169,7 +175,7 @@ export default function RequestForm() {
                     <div key={name} className="mt-8">
                         {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
                         {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                        <textarea placeholder={field.placeholder} {...common} />
+                        <textarea {...common} />
                         {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                     </div>
                 );
@@ -200,6 +206,7 @@ export default function RequestForm() {
                             display="chip"
                             placeholder="Select"
                             className={getInputClass(name)}
+
                         />
                         {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                     </div>
@@ -283,7 +290,7 @@ export default function RequestForm() {
                 onConfirm={() => {
                     setXhrDialogOpen(false);
                     if (xhrdialogResponseType === 'redirect') {
-                        router.visit(route(`user.request.myrequests`), {method: 'get'});
+                        router.visit(route(`request.me.list`), {method: 'get'});
                     }
                 }}
             />

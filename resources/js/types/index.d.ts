@@ -183,7 +183,8 @@ export type OCDRequestGrid = {
         canExportPdf?: boolean;
         canAcceptOffer?: boolean;
         canRequestClarificationForOffer?: boolean,
-        canChangeStatus?: boolean
+        canChangeStatus?: boolean,
+        canPreview?: boolean
     }
 }
 
@@ -202,6 +203,7 @@ export interface AttachmentsProps {
     OcdRequest: OcdRequest;
     canEdit?: boolean;
     documents?: Document[];
+    fieldsToShow?: string[];
 }
 
 export interface OfferProps {

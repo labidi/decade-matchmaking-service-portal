@@ -25,7 +25,7 @@ class OpportunityController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('user.opportunity.list')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
             ],
             'pageActions' => [
                 "canAddNew" => false,
@@ -52,7 +52,7 @@ class OpportunityController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('user.opportunity.list')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
             ],
         ]);
     }

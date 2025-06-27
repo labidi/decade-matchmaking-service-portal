@@ -35,7 +35,7 @@ export default function Home({
                             </Link>
                         )}
                         {auth.user && (
-                            <Link href={route('user.request.myrequests')} className={LinkRequestCardClassName}>
+                            <Link href={route('request.me.list')} className={LinkRequestCardClassName}>
                                 <div>
                                     <div className="px-6 py-4">
                                         <div className="font-bold text-xl mb-2">List of My Requests</div>

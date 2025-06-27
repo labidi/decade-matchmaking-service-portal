@@ -312,7 +312,7 @@ export default function CreateOpportunity() {
                             disabled={processing}
                             className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
                         >
-                            {processing ? 'Saving Opportunity...' : 'Save Opportunity'}
+                            {processing ? 'Submitting Opportunity...' : 'Submit Opportunity'}
                         </button>
                     </div>
                 </form>
