@@ -31,6 +31,7 @@ class User extends Authenticatable
         'last_name',
         'country',
         'city',
+        'is_blocked',
     ];
 
     protected $appends = ['is_partner','is_admin'];
@@ -67,6 +68,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_blocked' => 'boolean',
         ];
     }
 

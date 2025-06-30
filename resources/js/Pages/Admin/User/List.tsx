@@ -9,6 +9,14 @@ export default function UserRolesList() {
     const users = usePage().props.users as UserWithRoles[];
     const roles = usePage().props.roles as Role[];
 
+    const [blocked, setBlocked] = useState<Record<number, boolean>>(() => {
+        const map: Record<number, boolean> = {};
+        users.forEach((u) => {
+            map[u.id] = u.is_blocked;
+        });
+        return map;
+    });
+
     const [userRoles, setUserRoles] = useState<Record<number, string[]>>(() => {
         const map: Record<number, string[]> = {};
         users.forEach((u) => {
@@ -28,6 +36,14 @@ export default function UserRolesList() {
         });
     };
 
+    const toggleBlock = (userId: number) => {
+        const current = blocked[userId];
+        setBlocked({ ...blocked, [userId]: !current });
+        axios.post(route('admin.users.block.toggle', userId)).catch(() => {
+            setBlocked({ ...blocked, [userId]: current });
+        });
+    };
+
     return (
         <BackendLayout menu={<AdminMenu />}>
             <Head title="Manage User Roles" />
@@ -43,6 +59,7 @@ export default function UserRolesList() {
                                     {role.name}
                                 </th>
                             ))}
+                            <th className="px-4 py-2 text-left text-xl font-medium text-gray-500 uppercase">Blocked</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -60,6 +77,14 @@ export default function UserRolesList() {
                                         />
                                     </td>
                                 ))}
+                                <td className="px-4 py-2 text-center">
+                                    <button
+                                        className="text-blue-600 underline"
+                                        onClick={() => toggleBlock(user.id)}
+                                    >
+                                        {blocked[user.id] ? 'Unblock' : 'Block'}
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
