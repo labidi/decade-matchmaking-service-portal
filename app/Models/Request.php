@@ -68,7 +68,7 @@ class Request extends Model
     public function getTitleAttribute(): string
     {
         if ($this->detail) {
-            return $this->detail->capacity_development_title ?? 'N/A';
+            return $this->detail->capacity_development_title;
         }
 
         return $this->request_data?->capacity_development_title ?? 'N/A';
