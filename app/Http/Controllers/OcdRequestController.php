@@ -135,9 +135,11 @@ class OcdRequestController extends Controller
     {
         $requestId = $request->input('id') ?? null;
         $mode = $request->input('mode', 'submit');
+
         if ($mode == 'draft') {
             return $this->saveRequestAsDraft($request, $requestId);
         }
+
         return $this->store($request, $requestId);
     }
 
@@ -330,6 +332,7 @@ class OcdRequestController extends Controller
 
         return $pdf->download('request_' . $ocdRequest->id . '.pdf');
     }
+
 
     /**
      * Remove the specified resource from storage.

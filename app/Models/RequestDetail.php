@@ -126,4 +126,4 @@ class RequestDetail extends Model
     {
         return $query->where('needs_financial_support', $needsSupport ? 'Yes' : 'No');
     }
-} 
+}
