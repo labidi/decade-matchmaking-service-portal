@@ -5,14 +5,20 @@ namespace App\Http\Controllers;
 use App\Enums\OpportunityStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Opportunity;
+use App\Services\OpportunityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Illuminate\Database\Eloquent\Builder;
-
+use Exception;
 
 class OcdOpportunityController extends Controller
 {
+    protected OpportunityService $opportunityService;
+
+    public function __construct(OpportunityService $opportunityService)
+    {
+        $this->opportunityService = $opportunityService;
+    }
 
     public function create()
     {
@@ -32,37 +38,37 @@ class OcdOpportunityController extends Controller
         ]);
     }
 
-    public function store(Request $httpRequest)
+    public function store(Request $request)
     {
-        $validatedData = $httpRequest->validate([
+        $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|string',
             'closing_date' => 'required|string|max:255',
             'coverage_activity' => 'required',
             'implementation_location' => 'required',
             'target_audience' => 'required',
-            // 'target_audience_other' => 'required',
             'summary' => 'required',
             'url' => 'required',
         ]);
 
         try {
-            $opportunity = new Opportunity($validatedData);
-            $opportunity->user_id = $httpRequest->user()->id;
-            $opportunity->status = OpportunityStatus::PENDING_REVIEW;
-            $opportunity->save();
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Error saving Opportunity' . $e->getMessage()], 500);
+            $opportunity = $this->opportunityService->createOpportunity($validatedData, $request->user());
+
+            return response()->json([
+                'message' => 'Opportunity created successfully',
+                'opportunity' => $opportunity
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Error creating opportunity: ' . $e->getMessage()
+            ], 500);
         }
-        return response()->json(['message' => 'Opportunity created successfully', 'opportunity' => $opportunity], 201);
     }
 
-    public function mySubmittedList(Request $httpRequest)
+    public function mySubmittedList(Request $request)
     {
-        // Fetch all opportunities
-        $opportunities = Opportunity::where('user_id', $httpRequest->user()->id)->get();
-        $user = Auth::user();
-        // Return the opportunities to the view
+        $opportunities = $this->opportunityService->getUserOpportunities($request->user());
+
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
             'title' => 'Opportunities',
@@ -85,14 +91,10 @@ class OcdOpportunityController extends Controller
         ]);
     }
 
-    public function list(Request $httpRequest)
+    public function list(Request $request)
     {
-        // Fetch all opportunities
-        $opportunities = Opportunity::where(function (Builder $query) {
-            $query->where('user_id', '!=', auth()->id())
-                ->where('status', OpportunityStatus::ACTIVE);
-        })->get();
-        // Return the opportunities to the view
+        $opportunities = $this->opportunityService->getPublicOpportunities($request->user());
+
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
             'title' => 'Opportunities',
@@ -112,42 +114,18 @@ class OcdOpportunityController extends Controller
                 "canEdit" => false,
                 "canSubmitNew" => false,
                 'canApply' => true,
-                "canChangeStatus" => false,
-                "canDelete" => false
-            ],
-        ]);
-    }
-
-    public function browse(Request $httpRequest)
-    {
-        // Fetch all opportunities
-        $opportunities = Opportunity::where('user_id', $httpRequest->user()->id)->get();
-
-        // Return the opportunities to the view
-        return Inertia::render('Opportunity/List', [
-            'opportunities' => $opportunities,
-            'title' => 'Opportunities',
-            'banner' => [
-                'title' => 'List of Opportunities',
-                'description' => 'Manage your opportunities here.',
-                'image' => '/assets/img/sidebar.png',
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.hom')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
-            ],
-            'PageActions' => [
-                "canAddNew" => false
             ],
         ]);
     }
 
     public function show(int $id)
     {
-        // Fetch the opportunity by ID
-        $opportunity = Opportunity::findOrFail($id);
+        $opportunity = $this->opportunityService->findOpportunity($id, Auth::user());
 
-        // Return the opportunity to the view
+        if (!$opportunity) {
+            abort(404, 'Opportunity not found');
+        }
+
         return Inertia::render('Opportunity/Show', [
             'opportunity' => $opportunity,
             'title' => 'Opportunity Details',
@@ -164,15 +142,12 @@ class OcdOpportunityController extends Controller
         ]);
     }
 
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(int $id)
     {
-        $opportunity = Opportunity::findOrFail($id);
+        $opportunity = $this->opportunityService->findOpportunity($id, Auth::user());
+
         if (!$opportunity) {
-            return response()->json(['error' => 'Ocd Opportunity not found'], 404);
+            abort(404, 'Opportunity not found');
         }
 
         return Inertia::render('Opportunity/Create', [
@@ -195,46 +170,46 @@ class OcdOpportunityController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $httpRequest, int $opportunityId)
+    public function updateStatus(Request $request, int $opportunityId)
     {
-        $statusCode = (int)$httpRequest->input('status');
-        $opportunity = Opportunity::find($opportunityId);
-        if (!$opportunity) {
-            return response()->json(['error' => 'Opportunity not found'], 404);
-        }
-        if (!in_array($statusCode, array_column(OpportunityStatus::cases(), 'value'))) {
-            return response()->json(['error' => 'Status not found'], 422);
-        }
+        try {
+            $statusCode = (int)$request->input('status');
+            $result = $this->opportunityService->updateOpportunityStatus($opportunityId, $statusCode, $request->user());
 
-        $opportunity->status = $statusCode;
-        $opportunity->save();
-
-        return response()->json([
-            'message' => 'Status updated successfully',
-            'status' => [
-                'status_code' => (string)$statusCode,
-                'status_label' => Opportunity::STATUS_LABELS[$statusCode] ?? ''
-            ]
-        ]);
+            return response()->json([
+                'message' => 'Status updated successfully',
+                'status' => $result['status']
+            ]);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() ?: 500;
+            return response()->json(['error' => $e->getMessage()], $statusCode);
+        }
     }
 
     public function destroy(Request $request, int $id)
     {
-        $opportunity = Opportunity::find($id);
-        if (!$opportunity) {
-            return response()->json(['error' => 'Opportunity not found'], 404);
+        try {
+            $this->opportunityService->deleteOpportunity($id, $request->user());
+
+            return response()->json(['message' => 'Opportunity deleted successfully']);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() ?: 500;
+            return response()->json(['error' => $e->getMessage()], $statusCode);
         }
+    }
 
-        if ($opportunity->user_id !== $request->user()->id) {
-            return response()->json(['error' => 'Forbidden'], 403);
-        }
+    public function search(Request $request)
+    {
+        $filters = $request->only(['type', 'status', 'location', 'public']);
+        $opportunities = $this->opportunityService->searchOpportunities($filters, $request->user());
 
-        if ($opportunity->status !== OpportunityStatus::PENDING_REVIEW) {
-            return response()->json(['error' => 'Only pending review opportunities can be deleted'], 422);
-        }
+        return response()->json(['opportunities' => $opportunities]);
+    }
 
-        $opportunity->delete();
+    public function stats(Request $request)
+    {
+        $stats = $this->opportunityService->getOpportunityStats($request->user());
 
-        return response()->json(['message' => 'Opportunity deleted successfully']);
+        return response()->json(['stats' => $stats]);
     }
 }
