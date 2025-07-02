@@ -5,28 +5,27 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
 use App\Models\Request\RequestStatus;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\Request\RequestOffer;
-use App\Enums\RequestOfferStatus;
-use App\Services\OcdRequestService;
+use App\Services\RequestService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class OcdRequestController extends Controller
 {
-    public function __construct(private OcdRequestService $service)
+    public function __construct(private RequestService $service)
     {
     }
 
-
     /**
-     * Display a listing of the resource.
+     * Display user's requests list
      */
-    public function myRequestsList(Request $httpRequest)
+    public function myRequestsList(Request $request)
     {
+        $requests = $this->service->getUserRequests($request->user());
+
         return Inertia::render('Request/List', [
             'title' => 'My requests',
             'banner' => [
@@ -34,7 +33,7 @@ class OcdRequestController extends Controller
                 'description' => 'Manage your requests here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'requests' => OCDRequest::with('status')->where('user_id', $httpRequest->user()->id)->get(),
+            'requests' => $requests,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('request.me.list')],
@@ -49,21 +48,12 @@ class OcdRequestController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Display public requests list (for partners)
      */
-    public function list(Request $httpRequest)
+    public function list(Request $request)
     {
-        $user = Auth::user();
-        $request = OCDRequest::with('status')->whereHas(
-            'status',
-            function (Builder $query) {
-                $query->where('status_code', 'validated');
-                $query->orWhere('status_code', 'offer_made');
-                $query->orWhere('status_code', 'match_made');
-                $query->orWhere('status_code', 'closed');
-                $query->orWhere('status_code', 'in_implementation');
-            }
-        )->where('user_id', '!=', $user->id)->get();
+        $requests = $this->service->getPublicRequests($request->user());
+
         return Inertia::render('Request/List', [
             'title' => 'View Request for Training workshops',
             'banner' => [
@@ -71,7 +61,7 @@ class OcdRequestController extends Controller
                 'description' => 'View requests for training and workshops.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'requests' => $request,
+            'requests' => $requests,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('partner.request.list')],
@@ -82,22 +72,18 @@ class OcdRequestController extends Controller
                 'canView' => true,
                 'canCreate' => false,
                 'canExpressInterest' => true,
-                'canChangeStatus' => $user->is_admin,
+                'canChangeStatus' => $request->user()->is_admin,
                 'canPreview' => true,
             ],
         ]);
     }
 
-    public function matchedRequest(Request $httpRequest)
+    /**
+     * Display matched requests for user
+     */
+    public function matchedRequest(Request $request)
     {
-        $user = Auth::user();
-        $request = OCDRequest::with('status')->whereHas(
-            'status',
-            function (Builder $query) {
-                $query->orWhere('status_code', 'in_implementation');
-                $query->orWhere('status_code', 'closed');
-            }
-        )->where('user_id', '==', $user->id)->get();
+        $requests = $this->service->getMatchedRequests($request->user());
 
         return Inertia::render('Request/List', [
             'title' => 'View my matched requests',
@@ -106,7 +92,7 @@ class OcdRequestController extends Controller
                 'description' => 'View and browse my matched Request with OCD partners',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'requests' => $request,
+            'requests' => $requests,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('partner.request.list')],
@@ -142,29 +128,37 @@ class OcdRequestController extends Controller
         ]);
     }
 
-    public function submit(\App\Http\Requests\StoreOcdRequest $httpRequest)
+    /**
+     * Submit request (draft or final)
+     */
+    public function submit(\App\Http\Requests\StoreOcdRequest $request)
     {
-        $requestId = $httpRequest->input('id') ?? null;
-        $mode = $httpRequest->input('mode', 'submit');
-       /* if ($mode == 'draft') {
-            return $this->saveRequestAsDraft($httpRequest, $requestId);
-        }*/
-        return $this->store($httpRequest, $requestId);
+        $requestId = $request->input('id') ?? null;
+        $mode = $request->input('mode', 'submit');
+        if ($mode == 'draft') {
+            return $this->saveRequestAsDraft($request, $requestId);
+        }
+        return $this->store($request, $requestId);
     }
 
-    public function saveRequestAsDraft(Request $httpRequest, $requestId = null)
+    /**
+     * Save request as draft
+     */
+    public function saveRequestAsDraft(Request $request, $requestId = null)
     {
         try {
             $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
             if ($requestId && !$ocdRequest) {
-                throw new \Exception('Request not found');
+                throw new Exception('Request not found');
             }
-            $ocdRequest = $this->service->saveDraft($httpRequest->user(), $httpRequest->all(), $ocdRequest);
+
+            $ocdRequest = $this->service->saveDraft($request->user(), $request->all(), $ocdRequest);
+
             return response()->json([
                 'message' => 'Draft saved successfully',
                 'request_data' => $ocdRequest->attributesToArray()
             ], 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -172,63 +166,64 @@ class OcdRequestController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(\App\Http\Requests\StoreOcdRequest $httpRequest, $requestId = null)
+    public function store(\App\Http\Requests\StoreOcdRequest $request, $requestId = null)
     {
-        $validated = $httpRequest->validated();
+        $validated = $request->validated();
+
         try {
             $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
             if ($requestId && !$ocdRequest) {
-                throw new \Exception('Request not found');
+                throw new Exception('Request not found');
             }
-            $ocdRequest = $this->service->storeRequest($httpRequest->user(), $validated, $ocdRequest);
+
+            $ocdRequest = $this->service->storeRequest($request->user(), $validated, $ocdRequest);
+
             return response()->json([
                 'message' => 'Request submitted successfully',
                 'request_data' => $ocdRequest->attributesToArray()
             ], 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    public function updateStatus(Request $httpRequest, int $requestId)
+    /**
+     * Update request status
+     */
+    public function updateStatus(Request $request, int $requestId)
     {
-        $statusCode = $httpRequest->input('status');
-        $ocdRequest = OCDRequest::find($requestId);
-        if (!$ocdRequest) {
-            return response()->json(['error' => 'Request not found'], 404);
-        }
-        $status = RequestStatus::where('status_code', $statusCode)->first();
-        if (!$status) {
-            return response()->json(['error' => 'Status not found'], 422);
-        }
-        $ocdRequest->status()->associate($status);
-        $ocdRequest->save();
+        try {
+            $statusCode = $request->input('status');
+            $result = $this->service->updateRequestStatus($requestId, $statusCode, $request->user());
 
-        return response()->json([
-            'message' => 'Status updated successfully',
-            'status' => $status->only(['status_code', 'status_label'])
-        ]);
+            return response()->json([
+                'message' => 'Status updated successfully',
+                'status' => $result['status']
+            ]);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() ?: 500;
+            return response()->json(['error' => $e->getMessage()], $statusCode);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Request $httpRequest, int $OCDrequestId)
+    public function show(Request $request, int $requestId)
     {
-        $ocdRequest = OCDRequest::with(['status', 'user', 'offer'])->find($OCDrequestId);
+        $ocdRequest = $this->service->findRequest($requestId, $request->user());
+
         if (!$ocdRequest) {
-            return response()->json(['error' => 'Ocd Request not found'], 404);
+            abort(404, 'Request not found');
         }
 
-        $offer = RequestOffer::with('documents')
-            ->where('request_id', $OCDrequestId)
-            ->where('status', RequestOfferStatus::ACTIVE)
-            ->first();
+        $offer = $this->service->getActiveOffer($requestId);
+        $actions = $this->service->getRequestActions($ocdRequest, $request->user());
 
         return Inertia::render('Request/Show', [
-            'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
+            'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
             'banner' => [
-                'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
+                'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
@@ -242,38 +237,27 @@ class OcdRequestController extends Controller
                     'url' => route('user.request.show', ['id' => $ocdRequest->id])
                 ],
             ],
-            'requestDetail.actions' => [
-                'canEdit' => $ocdRequest->user->id === $httpRequest->user(
-                    )->id && $ocdRequest->status->status_code === "draft",
-                'canDelete' => $ocdRequest->user->id === $httpRequest->user(
-                    )->id && $ocdRequest->status->status_code === "draft",
-                'canCreate' => false,
-                'canExpressInterest' => $ocdRequest->user->id !== $httpRequest->user()->id,
-                'canExportPdf' => true,
-                'canAcceptOffer' => $offer && $ocdRequest->user->id == $httpRequest->user()->id,
-                'canRequestClarificationForOffer' => $offer && $ocdRequest->user->id == $httpRequest->user()->id
-            ],
+            'requestDetail.actions' => $actions,
         ]);
     }
+
     /**
-     * Display the specified resource.
+     * Display request preview
      */
-    public function preview(Request $httpRequest, int $OCDrequestId)
+    public function preview(Request $request, int $requestId)
     {
-        $ocdRequest = OCDRequest::with(['status', 'user', 'offer'])->find($OCDrequestId);
+        $ocdRequest = $this->service->findRequest($requestId, $request->user());
+
         if (!$ocdRequest) {
-            return response()->json(['error' => 'Ocd Request not found'], 404);
+            abort(404, 'Request not found');
         }
 
-        $offer = RequestOffer::with('documents')
-            ->where('request_id', $OCDrequestId)
-            ->where('status', RequestOfferStatus::ACTIVE)
-            ->first();
+        $offer = $this->service->getActiveOffer($requestId);
 
         return Inertia::render('Request/Preview', [
-            'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
+            'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
             'banner' => [
-                'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
+                'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
@@ -302,17 +286,18 @@ class OcdRequestController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int $OCDrequestId)
+    public function edit(int $requestId)
     {
-        $ocdRequest = OCDRequest::find($OCDrequestId);
+        $ocdRequest = $this->service->findRequest($requestId, Auth::user());
+
         if (!$ocdRequest) {
-            return response()->json(['error' => 'Ocd Request not found'], 404);
+            abort(404, 'Request not found');
         }
 
         return Inertia::render('Request/Create', [
-            'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
+            'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
             'banner' => [
-                'title' => 'Request : ' . $ocdRequest->request_data?->capacity_development_title ?? 'N/A',
+                'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
                 'description' => 'Edit my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
@@ -328,42 +313,58 @@ class OcdRequestController extends Controller
         ]);
     }
 
-    public function exportPdf(int $OCDrequestId)
+    /**
+     * Export request as PDF
+     */
+    public function exportPdf(int $requestId)
     {
-        $ocdRequest = OCDRequest::with(['status', 'user'])->find($OCDrequestId);
+        $ocdRequest = $this->service->getRequestForExport($requestId, Auth::user());
+
         if (!$ocdRequest) {
-            return redirect()->back()->with('error', 'Ocd Request not found');
+            return redirect()->back()->with('error', 'Request not found or access denied');
         }
 
         $pdf = Pdf::loadView('pdf.ocdrequest', [
             'ocdRequest' => $ocdRequest,
         ]);
+
         return $pdf->download('request_' . $ocdRequest->id . '.pdf');
     }
-
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Request $request)
     {
-        $ocdRequestId = (int)$request->route('id');
-        $ocdRequest = OCDRequest::with('status')->find($ocdRequestId);
+        try {
+            $requestId = (int)$request->route('id');
+            $this->service->deleteRequest($requestId, $request->user());
 
-        if (!$ocdRequest) {
-            return response()->json(['error' => 'Request not found'], 404);
+            return response()->json(['message' => 'Request deleted successfully']);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() ?: 500;
+            return response()->json(['error' => $e->getMessage()], $statusCode);
         }
+    }
 
-        if ($ocdRequest->user_id !== $request->user()->id) {
-            return response()->json(['error' => 'Forbidden'], 403);
-        }
+    /**
+     * Search requests with filters
+     */
+    public function search(Request $request)
+    {
+        $filters = $request->only(['status', 'activity_type', 'subtheme', 'user_requests']);
+        $requests = $this->service->searchRequests($filters, $request->user());
 
-        if ($ocdRequest->status->status_code !== 'draft') {
-            return response()->json(['error' => 'Only draft requests can be deleted'], 422);
-        }
+        return response()->json(['requests' => $requests]);
+    }
 
-        $ocdRequest->delete();
+    /**
+     * Get request statistics
+     */
+    public function stats(Request $request)
+    {
+        $stats = $this->service->getRequestStats($request->user());
 
-        return response()->json(['message' => 'Request deleted successfully']);
+        return response()->json(['stats' => $stats]);
     }
 }
