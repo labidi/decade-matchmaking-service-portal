@@ -14,9 +14,9 @@ class StoreOcdRequest extends FormRequest
 
     public function rules(): array
     {
-        /* if ($this->input('mode') === 'draft') {
-             return [];
-         }*/
+        if ($this->input('mode') === 'draft') {
+            return [];
+        }
         return [
             'is_related_decade_action' => ['required', Rule::in(['Yes', 'No'])],
             'unique_related_decade_action_id' => [

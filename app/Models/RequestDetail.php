@@ -25,6 +25,9 @@ class RequestDetail extends Model
         'related_activity',
         'delivery_format',
         'delivery_country',
+        'subthemes',
+        'support_types',
+        'target_audience',
         'subthemes_other',
         'support_types_other',
         'target_audience_other',
@@ -47,6 +50,9 @@ class RequestDetail extends Model
     ];
 
     protected $casts = [
+        'subthemes' => 'array',
+        'support_types' => 'array',
+        'target_audience' => 'array',
         'additional_data' => 'array',
         'support_months' => 'integer',
         'direct_beneficiaries_number' => 'integer',

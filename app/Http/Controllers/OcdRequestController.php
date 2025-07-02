@@ -8,14 +8,14 @@ use App\Models\Request\RequestStatus;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Services\OcdRequestService;
+use App\Services\RequestService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class OcdRequestController extends Controller
 {
-    public function __construct(private OcdRequestService $service)
+    public function __construct(private RequestService $service)
     {
     }
 
@@ -25,7 +25,7 @@ class OcdRequestController extends Controller
     public function myRequestsList(Request $request)
     {
         $requests = $this->service->getUserRequests($request->user());
-        
+
         return Inertia::render('Request/List', [
             'title' => 'My requests',
             'banner' => [
@@ -53,7 +53,7 @@ class OcdRequestController extends Controller
     public function list(Request $request)
     {
         $requests = $this->service->getPublicRequests($request->user());
-        
+
         return Inertia::render('Request/List', [
             'title' => 'View Request for Training workshops',
             'banner' => [
@@ -135,11 +135,9 @@ class OcdRequestController extends Controller
     {
         $requestId = $request->input('id') ?? null;
         $mode = $request->input('mode', 'submit');
-        
         if ($mode == 'draft') {
             return $this->saveRequestAsDraft($request, $requestId);
         }
-        
         return $this->store($request, $requestId);
     }
 
@@ -153,9 +151,9 @@ class OcdRequestController extends Controller
             if ($requestId && !$ocdRequest) {
                 throw new Exception('Request not found');
             }
-            
+
             $ocdRequest = $this->service->saveDraft($request->user(), $request->all(), $ocdRequest);
-            
+
             return response()->json([
                 'message' => 'Draft saved successfully',
                 'request_data' => $ocdRequest->attributesToArray()
@@ -171,15 +169,15 @@ class OcdRequestController extends Controller
     public function store(\App\Http\Requests\StoreOcdRequest $request, $requestId = null)
     {
         $validated = $request->validated();
-        
+
         try {
             $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
             if ($requestId && !$ocdRequest) {
                 throw new Exception('Request not found');
             }
-            
+
             $ocdRequest = $this->service->storeRequest($request->user(), $validated, $ocdRequest);
-            
+
             return response()->json([
                 'message' => 'Request submitted successfully',
                 'request_data' => $ocdRequest->attributesToArray()
@@ -197,7 +195,7 @@ class OcdRequestController extends Controller
         try {
             $statusCode = $request->input('status');
             $result = $this->service->updateRequestStatus($requestId, $statusCode, $request->user());
-            
+
             return response()->json([
                 'message' => 'Status updated successfully',
                 'status' => $result['status']
@@ -214,7 +212,7 @@ class OcdRequestController extends Controller
     public function show(Request $request, int $requestId)
     {
         $ocdRequest = $this->service->findRequest($requestId, $request->user());
-        
+
         if (!$ocdRequest) {
             abort(404, 'Request not found');
         }
@@ -249,7 +247,7 @@ class OcdRequestController extends Controller
     public function preview(Request $request, int $requestId)
     {
         $ocdRequest = $this->service->findRequest($requestId, $request->user());
-        
+
         if (!$ocdRequest) {
             abort(404, 'Request not found');
         }
@@ -291,7 +289,7 @@ class OcdRequestController extends Controller
     public function edit(int $requestId)
     {
         $ocdRequest = $this->service->findRequest($requestId, Auth::user());
-        
+
         if (!$ocdRequest) {
             abort(404, 'Request not found');
         }
@@ -321,7 +319,7 @@ class OcdRequestController extends Controller
     public function exportPdf(int $requestId)
     {
         $ocdRequest = $this->service->getRequestForExport($requestId, Auth::user());
-        
+
         if (!$ocdRequest) {
             return redirect()->back()->with('error', 'Request not found or access denied');
         }
@@ -329,7 +327,7 @@ class OcdRequestController extends Controller
         $pdf = Pdf::loadView('pdf.ocdrequest', [
             'ocdRequest' => $ocdRequest,
         ]);
-        
+
         return $pdf->download('request_' . $ocdRequest->id . '.pdf');
     }
 
@@ -341,7 +339,7 @@ class OcdRequestController extends Controller
         try {
             $requestId = (int)$request->route('id');
             $this->service->deleteRequest($requestId, $request->user());
-            
+
             return response()->json(['message' => 'Request deleted successfully']);
         } catch (Exception $e) {
             $statusCode = $e->getCode() ?: 500;
@@ -356,7 +354,7 @@ class OcdRequestController extends Controller
     {
         $filters = $request->only(['status', 'activity_type', 'subtheme', 'user_requests']);
         $requests = $this->service->searchRequests($filters, $request->user());
-        
+
         return response()->json(['requests' => $requests]);
     }
 
@@ -366,7 +364,7 @@ class OcdRequestController extends Controller
     public function stats(Request $request)
     {
         $stats = $this->service->getRequestStats($request->user());
-        
+
         return response()->json(['stats' => $stats]);
     }
 }

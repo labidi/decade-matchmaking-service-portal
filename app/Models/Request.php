@@ -80,9 +80,9 @@ class Request extends Model
     public function getTitleAttribute(): string
     {
         if ($this->detail) {
-            return $this->detail->capacity_development_title;
+            return $this->detail->capacity_development_title ?? 'N/A';
         }
-        
+
         return $this->request_data?->capacity_development_title ?? 'N/A';
     }
 
@@ -94,12 +94,12 @@ class Request extends Model
         if ($this->detail) {
             return $this->detail->full_name;
         }
-        
+
         $data = $this->request_data;
         if ($data && isset($data->first_name) && isset($data->last_name)) {
             return trim($data->first_name . ' ' . $data->last_name);
         }
-        
+
         return 'N/A';
     }
 
