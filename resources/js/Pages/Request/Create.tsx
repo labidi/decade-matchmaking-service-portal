@@ -5,10 +5,9 @@ import {UIRequestForm, UIField, Request as RequestFields} from '@/Forms/UIReques
 import XHRMessageDialog from '@/Components/Dialog/XHRAlertDialog';
 import axios from 'axios';
 import {OCDRequest} from '@/types';
-import { MultiSelect } from 'primereact/multiselect';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
+
+import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
+import { ChevronsUpDown } from 'lucide-react'
 
 
 type Mode = 'submit' | 'draft';
@@ -68,6 +67,24 @@ export default function RequestForm() {
     const [xhrdialogOpen, setXhrDialogOpen] = useState(false);
     const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
     const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect'>('info');
+
+    // Query state for each combobox field
+    const [comboboxQueries, setComboboxQueries] = useState<Record<string, string>>({});
+
+    // Helper to get filtered options for a field
+    const getFilteredOptions = (field: UIField, name: string, selectedValues?: string[]) => {
+        const query = comboboxQueries[name] || '';
+        let options = field.options ?? [];
+        // For multiselect, hide already selected options
+        if (selectedValues && Array.isArray(selectedValues)) {
+            options = options.filter(opt => !selectedValues.includes(opt.value));
+        }
+        if (!query) return options;
+        return options.filter(opt =>
+            opt.label.toLowerCase().includes(query.toLowerCase()) ||
+            opt.value.toLowerCase().includes(query.toLowerCase())
+        );
+    };
 
     const getInputClass = (fieldName: keyof typeof form.errors) => {
         return `mt-2 block w-full border rounded ${form.errors[fieldName] ? 'border-red-600' : 'border-gray-300'}`;
@@ -184,30 +201,162 @@ export default function RequestForm() {
                     <div key={name} className="mt-8">
                         {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
                         {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                        <select {...common}>
-                            <option value="">— Select —</option>
-                            {field.options?.map(opt => (
-                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                        </select>
+                        <Combobox value={(form.data as any)[name]} onChange={(value) => {
+                            form.setData(name, value);
+                            setComboboxQueries(q => ({ ...q, [name]: '' })); // reset query on select
+                        }}>
+                            <div className="relative">
+                                <div className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
+                                    <ComboboxInput
+                                        className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                                        displayValue={(value: string) => {
+                                            const option = field.options?.find(opt => opt.value === value);
+                                            return option ? option.label : value;
+                                        }}
+                                        onChange={event => setComboboxQueries(q => ({ ...q, [name]: event.target.value }))}
+                                        placeholder="Select an option..."
+                                    />
+                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronsUpDown
+                                            className="h-5 w-5 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                    </Combobox.Button>
+                                </div>
+                                <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                    {getFilteredOptions(field, name).map((option) => (
+                                        <ComboboxOption
+                                            key={option.value}
+                                            className={({ active }) =>
+                                                `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                                    active ? 'bg-firefly-600 text-white' : 'text-gray-900'
+                                                }`
+                                            }
+                                            value={option.value}
+                                        >
+                                            {({ selected, active }) => (
+                                                <>
+                                                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                        {option.label}
+                                                    </span>
+                                                    {selected ? (
+                                                        <span
+                                                            className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                                                active ? 'text-white' : 'text-firefly-600'
+                                                            }`}
+                                                        >
+                                                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </span>
+                                                    ) : null}
+                                                </>
+                                            )}
+                                        </ComboboxOption>
+                                    ))}
+                                </ComboboxOptions>
+                            </div>
+                        </Combobox>
                         {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                     </div>
                 );
             case 'multiselect':
+                const selectedValues = (form.data as any)[name] || [];
                 return (
                     <div key={name} className="mt-8">
                         {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
                         {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                        <MultiSelect
-                            id={field.id}
-                            options={field.options ?? []}
-                            value={(form.data as any)[name]}
-                            onChange={(e) => form.setData(name, e.value)}
-                            display="chip"
-                            placeholder="Select"
-                            className={getInputClass(name)}
-
-                        />
+                        <Combobox
+                            value={selectedValues}
+                            onChange={(value) => {
+                                const currentValues = selectedValues;
+                                if (currentValues.includes(value)) {
+                                    form.setData(name, currentValues.filter((v: string) => v !== value));
+                                } else {
+                                    form.setData(name, [...currentValues, value]);
+                                }
+                                setComboboxQueries(q => ({ ...q, [name]: '' })); // reset query on select
+                            }}
+                            multiple
+                        >
+                            <div className="relative">
+                                <div className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
+                                    <ComboboxInput
+                                        className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                                        displayValue={() => comboboxQueries[name] || ''}
+                                        onChange={event => setComboboxQueries(q => ({ ...q, [name]: event.target.value }))}
+                                        placeholder="Select options..."
+                                    />
+                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronsUpDown
+                                            className="h-5 w-5 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                    </Combobox.Button>
+                                </div>
+                                <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                    {getFilteredOptions(field, name, selectedValues).map((option) => (
+                                        <ComboboxOption
+                                            key={option.value}
+                                            className={({ active }) =>
+                                                `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                                    active ? 'bg-firefly-600 text-white' : 'text-gray-900'
+                                                }`
+                                            }
+                                            value={option.value}
+                                        >
+                                            {({ selected, active }) => (
+                                                <>
+                                                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                        {option.label}
+                                                    </span>
+                                                    {selected ? (
+                                                        <span
+                                                            className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                                                active ? 'text-white' : 'text-firefly-600'
+                                                            }`}
+                                                        >
+                                                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </span>
+                                                    ) : null}
+                                                </>
+                                            )}
+                                        </ComboboxOption>
+                                    ))}
+                                </ComboboxOptions>
+                            </div>
+                        </Combobox>
+                        {/* Display selected chips */}
+                        {selectedValues && selectedValues.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                {selectedValues.map((value: string) => {
+                                    const option = field.options?.find(opt => opt.value === value);
+                                    console.log(selectedValues);
+                                    return (
+                                        <span
+                                            key={value}
+                                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-firefly-100 text-firefly-800"
+                                        >
+                                            {value}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    form.setData(name, selectedValues.filter((v: string) => v !== value));
+                                                }}
+                                                className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-firefly-400 hover:bg-firefly-200 hover:text-firefly-500"
+                                            >
+                                                <span className="sr-only">Remove</span>
+                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </span>
+                                    );
+                                })}
+                            </div>
+                        )}
                         {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                     </div>
                 );
