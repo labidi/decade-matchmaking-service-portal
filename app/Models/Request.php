@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 
 class Request extends Model
 {
@@ -60,20 +60,7 @@ class Request extends Model
         return $this->hasOne(RequestDetail::class);
     }
 
-    public function subthemes(): BelongsToMany
-    {
-        return $this->belongsToMany(Subtheme::class, 'request_subtheme');
-    }
 
-    public function supportTypes(): BelongsToMany
-    {
-        return $this->belongsToMany(SupportType::class, 'request_support_type');
-    }
-
-    public function targetAudiences(): BelongsToMany
-    {
-        return $this->belongsToMany(TargetAudience::class, 'request_target_audience');
-    }
 
     /**
      * Get request title (from normalized data if available, fallback to JSON)

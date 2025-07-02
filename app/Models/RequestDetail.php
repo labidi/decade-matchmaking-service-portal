@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 
 class RequestDetail extends Model
 {
@@ -64,20 +64,7 @@ class RequestDetail extends Model
         return $this->belongsTo(Request::class);
     }
 
-    public function subthemes(): BelongsToMany
-    {
-        return $this->belongsToMany(Subtheme::class, 'request_subtheme', 'request_id', 'subtheme_id');
-    }
 
-    public function supportTypes(): BelongsToMany
-    {
-        return $this->belongsToMany(SupportType::class, 'request_support_type', 'request_id', 'support_type_id');
-    }
-
-    public function targetAudiences(): BelongsToMany
-    {
-        return $this->belongsToMany(TargetAudience::class, 'request_target_audience', 'request_id', 'target_audience_id');
-    }
 
     /**
      * Get full name of the requester

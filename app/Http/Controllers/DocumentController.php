@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Document;
 use App\Models\Request as OCDRequest;
 use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Enums\DocumentType;
+use App\Services\DocumentService;
+use Exception;
 
 class DocumentController extends Controller
 {
+    public function __construct(private DocumentService $documentService)
+    {
+    }
+
     public function store(HttpRequest $httpRequest, OCDRequest $request)
     {
         $validated = $httpRequest->validate([
@@ -18,31 +23,36 @@ class DocumentController extends Controller
             'file' => ['required', 'file'],
         ]);
 
-        $path = $httpRequest->file('file')->store('documents', 'public');
+        try {
+            $this->documentService->storeDocument(
+                $httpRequest->file('file'),
+                $validated['document_type'],
+                $request,
+                $httpRequest->user()->id
+            );
 
-        Document::create([
-            'name' => $httpRequest->file('file')->getClientOriginalName(),
-            'path' => $path,
-            'file_type' => $httpRequest->file('file')->getClientMimeType(),
-            'document_type' => $validated['document_type'],
-            'parent_id' => $request->id,
-            'parent_type' => OCDRequest::class,
-            'uploader_id' => $httpRequest->user()->id,
-        ]);
-
-        return back();
+            return back()->with('success', 'Document uploaded successfully');
+        } catch (Exception $e) {
+            return back()->with('error', 'Failed to upload document: ' . $e->getMessage());
+        }
     }
 
     public function destroy(Document $document)
     {
-        Storage::disk('public')->delete($document->path);
-        $document->delete();
-
-        return back();
+        try {
+            $this->documentService->deleteDocument($document);
+            return back()->with('success', 'Document deleted successfully');
+        } catch (Exception $e) {
+            return back()->with('error', 'Failed to delete document: ' . $e->getMessage());
+        }
     }
 
     public function download(Document $document)
     {
-        return Storage::disk('public')->download($document->path, $document->name);
+        try {
+            return $this->documentService->getDownloadResponse($document);
+        } catch (Exception $e) {
+            return back()->with('error', 'Failed to download document: ' . $e->getMessage());
+        }
     }
 }

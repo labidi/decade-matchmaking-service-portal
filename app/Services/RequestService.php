@@ -4,9 +4,7 @@ namespace App\Services;
 
 use App\Models\Request as OCDRequest;
 use App\Models\RequestDetail;
-use App\Models\Subtheme;
-use App\Models\SupportType;
-use App\Models\TargetAudience;
+
 use App\Models\Request\RequestStatus;
 use App\Models\Request\RequestOffer;
 use App\Models\User;
