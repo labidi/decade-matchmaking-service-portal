@@ -331,6 +331,7 @@ class OcdRequestController extends Controller
         return $pdf->download('request_' . $ocdRequest->id . '.pdf');
     }
 
+
     /**
      * Remove the specified resource from storage.
      */
