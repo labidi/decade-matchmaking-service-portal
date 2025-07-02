@@ -6,6 +6,7 @@ import XHRMessageDialog from '@/Components/Dialog/XHRAlertDialog';
 import axios from 'axios';
 import {OCDRequest} from '@/types';
 import { MultiSelect } from 'primereact/multiselect';
+import { getFlagEmoji } from '@/data/locations';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -55,7 +56,7 @@ export default function RequestForm() {
         target_audience:'',
         target_audience_other: '',
         delivery_format:'',
-        delivery_country: '',
+        delivery_country: [] as string[],
     });
 
 
@@ -85,10 +86,15 @@ export default function RequestForm() {
     const handleSubmitV2 = (mode: 'submit' | 'draft') => {
         form.clearErrors();
         form.setData('mode', mode);
+        const payload = {
+            ...form.data,
+            delivery_country: (form.data.delivery_country as string[]).join(','),
+            mode,
+        };
         axios
             .post(
                 route(`user.request.submit`),
-                {...form.data, mode},
+                payload,
                 {
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -194,6 +200,13 @@ export default function RequestForm() {
                     </div>
                 );
             case 'multiselect':
+                const isCountry = field.id === 'delivery_country';
+                const template = (option: any) => (
+                    <div className="flex items-center">
+                        {isCountry && <span className="mr-2">{getFlagEmoji(option.value)}</span>}
+                        <span>{option.label}</span>
+                    </div>
+                );
                 return (
                     <div key={name} className="mt-8">
                         {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
@@ -206,7 +219,9 @@ export default function RequestForm() {
                             display="chip"
                             placeholder="Select"
                             className={getInputClass(name)}
-
+                            filter
+                            itemTemplate={template}
+                            selectedItemTemplate={template}
                         />
                         {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                     </div>
@@ -273,7 +288,12 @@ export default function RequestForm() {
             form.setData('id', ocdRequestFormData.id.toString());
             Object.entries(ocdRequestFormData.request_data).forEach(([key, value]) => {
                 if (key in form.data) {
-                    form.setData(key as FormDataKeys, value || '');
+                    if (key === 'delivery_country') {
+                        const arr = typeof value === 'string' && value ? value.split(',') : [];
+                        form.setData(key as FormDataKeys, arr as any);
+                    } else {
+                        form.setData(key as FormDataKeys, value || '');
+                    }
                 }
             });
         }

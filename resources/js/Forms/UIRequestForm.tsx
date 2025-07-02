@@ -221,11 +221,12 @@ export const UIRequestForm: UIStep[] = [
             },
             delivery_country: {
                 id: 'delivery_country',
-                type: 'select',
+                type: 'multiselect',
                 options: countryOptions,
                 required: false,
                 label: 'What is the delivery country? ',
                 show: data => data.delivery_format !== 'Online',
+                multiple: true,
             },
             target_audience: {
                 id: 'target_audience',
