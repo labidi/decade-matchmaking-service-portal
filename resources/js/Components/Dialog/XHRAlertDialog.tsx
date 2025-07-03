@@ -1,7 +1,7 @@
 // resources/js/Components/XHRAlertDialog.tsx
-import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import { Dialog, DialogPanel, DialogTitle, Description } from '@headlessui/react';
 import React from 'react';
-import { CheckIcon, Cross2Icon, InfoCircledIcon } from '@radix-ui/react-icons';
+import { CheckCircle, XCircle, Info, AlertCircle } from 'lucide-react';
 
 type XHRAlertDialogProps = {
   open: boolean;
@@ -19,44 +19,61 @@ export default function XHRAlertDialog({
   onConfirm,
 }: XHRAlertDialogProps) {
   const icon = {
-    success: <CheckIcon className="w-6 h-6 text-green-600" />,
-    redirect: <CheckIcon className="w-6 h-6 text-green-600" />,
-    error:   <Cross2Icon className="w-6 h-6 text-red-600" />,
-    info:    <InfoCircledIcon className="w-6 h-6 text-blue-600" />,
+    success: <CheckCircle className="w-6 h-6 text-green-600" />,
+    redirect: <CheckCircle className="w-6 h-6 text-green-600" />,
+    error: <XCircle className="w-6 h-6 text-red-600" />,
+    info: <Info className="w-6 h-6 text-blue-600" />,
   }[type];
 
+  const title = {
+    success: 'Success',
+    redirect: 'Success',
+    error: 'Error',
+    info: 'Information',
+  }[type];
+
+  const buttonText = type === 'redirect' ? 'Continue' : 'OK';
+
   return (
-    <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
-      <AlertDialog.Portal>
-        <AlertDialog.Overlay className="fixed inset-0 bg-black bg-opacity-30" />
-        <AlertDialog.Content className="fixed top-1/2 left-1/2 w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-lg focus:outline-none">
+    <Dialog  open={open} onClose={() => onOpenChange(false)} className="relative z-50">
+      {/* The backdrop, rendered as a fixed sibling to the panel container */}
+      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+      {/* Full-screen container to center the panel */}
+      <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
+        <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
           <div className="flex items-start space-x-4">
             {icon}
             <div className="flex-1">
-              <AlertDialog.Title className="text-lg font-semibold text-gray-900">
-                {type === 'success' || 'redirect' ? 'Success' : type === 'error' ? 'Error' : 'Information'}
-              </AlertDialog.Title>
-              <AlertDialog.Description className="mt-2 text-sm text-gray-700">
+              <DialogTitle as="h3" className="text-lg font-semibold leading-6 text-gray-900">
+                {title}
+              </DialogTitle>
+              <Description as="p" className="mt-2 text-sm text-gray-700">
                 {message}
-              </AlertDialog.Description>
+              </Description>
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end space-x-2">
-            <AlertDialog.Action asChild>
-              <button
-                className="px-4 py-2 rounded bg-firefly-600 text-white hover:bg-firefly-700"
-                onClick={() => {
-                  onConfirm?.();
-                  onOpenChange(false);
-                }}
-              >
-                OK
-              </button>
-            </AlertDialog.Action>
+          <div className="mt-6 flex justify-end">
+            <button
+              type="button"
+              className={`inline-flex justify-center rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm focus-outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                type === 'error' 
+                  ? 'bg-red-600 hover:bg-red-500 focus-visible:outline-red-600' 
+                  : type === 'info'
+                  ? 'bg-blue-600 hover:bg-blue-500 focus-visible:outline-blue-600'
+                  : 'bg-firefly-600 hover:bg-firefly-500 focus-visible:outline-firefly-600'
+              }`}
+              onClick={() => {
+                onConfirm?.();
+                onOpenChange(false);
+              }}
+            >
+              {buttonText}
+            </button>
           </div>
-        </AlertDialog.Content>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+        </DialogPanel>
+      </div>
+    </Dialog>
   );
 }
