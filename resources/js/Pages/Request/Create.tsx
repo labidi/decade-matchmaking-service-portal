@@ -3,9 +3,8 @@ import {Head, router, useForm, usePage} from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
 import {UIRequestForm, UIField, Request as RequestFields} from '@/Forms/UIRequestForm';
 import XHRMessageDialog from '@/Components/Dialog/XHRAlertDialog';
-import axios from 'axios';
+import { submitRequest } from '@/api/request';
 import {OCDRequest} from '@/types';
-
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
 import { ChevronsUpDown } from 'lucide-react'
 
@@ -76,9 +75,6 @@ export default function RequestForm() {
         const query = comboboxQueries[name] || '';
         let options = field.options ?? [];
         // For multiselect, hide already selected options
-        if (selectedValues && Array.isArray(selectedValues)) {
-            options = options.filter(opt => !selectedValues.includes(opt.value));
-        }
         if (!query) return options;
         return options.filter(opt =>
             opt.label.toLowerCase().includes(query.toLowerCase()) ||
@@ -99,37 +95,27 @@ export default function RequestForm() {
     };
 
 
-    const handleSubmitV2 = (mode: 'submit' | 'draft') => {
+    const handleSubmitV2 = async (mode: 'submit' | 'draft') => {
         form.clearErrors();
         form.setData('mode', mode);
-        axios
-            .post(
-                route(`user.request.submit`),
-                {...form.data, mode},
-                {
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                    },
-                }
-            )
-            .then(function (responseXhr) {
-                form.setData('id', responseXhr.data.request_data.id);
-                form.setData('unique_id', responseXhr.data.request_data.unique_id);
-                setXhrDialogResponseMessage(responseXhr.data.request_data.message);
+        try {
+            const responseXhr = await submitRequest(form.data, mode);
+            form.setData('id', responseXhr.request_data.id);
+            form.setData('unique_id', responseXhr.request_data.unique_id);
+            setXhrDialogResponseMessage(responseXhr.request_data.message);
                 if (mode === 'draft') {
                     setXhrDialogResponseType('success');
                     router.push({
-                        url: route(`user.request.edit`, {id: responseXhr.data.request_data.id}),
+                    url: route(`user.request.edit`, {id: responseXhr.request_data.id}),
                         clearHistory: false,
                         encryptHistory: false,
                         preserveScroll: true,
                         preserveState: true,
-                    })
+                });
                 } else {
                     setXhrDialogResponseType('redirect');
                 }
-            })
-            .catch(function (responseXhr) {
+        } catch (responseXhr: any) {
                 if (responseXhr.response?.status === 422) {
                     form.setError(responseXhr.response.data.errors);
                     const stepsWithError: number[] = [];
@@ -146,12 +132,9 @@ export default function RequestForm() {
                     setXhrDialogResponseType('error');
                     setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
                 }
-            })
-            .finally(() => {
-                // window.history.replaceState(null, "Submit Request", "/request/create/" + form.data.id);
+        } finally {
                 setXhrDialogOpen(true);
-            });
-
+        }
     };
 
     const renderField = (name: FormDataKeys, field: UIField) => {
@@ -261,20 +244,15 @@ export default function RequestForm() {
                     </div>
                 );
             case 'multiselect':
-                const selectedValues = (form.data as any)[name] || [];
+                const selectedValues = ((form.data as any)[name] || []).map((v: any) => String(v));
                 return (
                     <div key={name} className="mt-8">
                         {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
                         {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
                         <Combobox
                             value={selectedValues}
-                            onChange={(value) => {
-                                const currentValues = selectedValues;
-                                if (currentValues.includes(value)) {
-                                    form.setData(name, currentValues.filter((v: string) => v !== value));
-                                } else {
-                                    form.setData(name, [...currentValues, value]);
-                                }
+                            onChange={(values: any[]) => {
+                                form.setData(name, values.map(String));
                                 setComboboxQueries(q => ({ ...q, [name]: '' })); // reset query on select
                             }}
                             multiple
@@ -332,14 +310,13 @@ export default function RequestForm() {
                         {selectedValues && selectedValues.length > 0 && (
                             <div className="mt-2 flex flex-wrap gap-2">
                                 {selectedValues.map((value: string) => {
-                                    const option = field.options?.find(opt => opt.value === value);
-                                    console.log(selectedValues);
+                                    const option = field.options?.find(opt => String(opt.value) === value);
                                     return (
                                         <span
                                             key={value}
                                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-firefly-100 text-firefly-800"
                                         >
-                                            {value}
+                                            {option ? option.label : value}
                                             <button
                                                 type="button"
                                                 onClick={() => {

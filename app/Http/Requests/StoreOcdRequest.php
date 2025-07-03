@@ -43,19 +43,18 @@ class StoreOcdRequest extends FormRequest
             ],
             'project_url' => ['required', 'url'],
             'related_activity' => ['required'],
-            // gooooooooooooooooooood
             'delivery_format' => ['required'],
             'delivery_country' => [
                 Rule::requiredIf(
                     fn() => $this->input("request_link_type") !== 'Online'
                 ),
-                'string'
+                'array'
             ],
             'target_audience' => [
                 Rule::requiredIf(
                     fn() => $this->input("request_link_type") !== 'Online'
                 ),
-                'string'
+                'array'
             ],
             'target_audience_other' => [
                 Rule::requiredIf(

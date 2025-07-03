@@ -57,6 +57,7 @@ class RequestDetail extends Model
         'support_months' => 'integer',
         'direct_beneficiaries_number' => 'integer',
         'completion_date' => 'date',
+        'delivery_country' => 'array',
     ];
 
     public function request(): BelongsTo
