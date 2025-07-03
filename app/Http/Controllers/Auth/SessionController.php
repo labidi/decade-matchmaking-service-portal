@@ -67,7 +67,8 @@ class SessionController extends Controller
                 'city' => $oceanExpertProfile['city'],
             ]
         );
-        Auth::login($user, false);
+        $remember = $request->boolean('remember', false);
+        Auth::login($user, $remember);
         $request->session()->put('external_api_token', $token);
         $request->session()->regenerate();
         return to_route('user.home')->with([

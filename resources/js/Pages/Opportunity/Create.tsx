@@ -1,70 +1,38 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
-import React, { useEffect, useState } from 'react';
+import {Head, useForm, usePage, router} from '@inertiajs/react';
+import React, {useEffect, useState} from 'react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDOpportunity, OpportunityTypeOptions } from '@/types';
+import {UIOpportunityForm, UIField, Opportunity as OpportunityFields} from '@/Forms/UIOpportunityForm';
 import TagsInput from '@/Components/TagsInput';
-import { router } from '@inertiajs/react'
-import { Tag } from 'react-tag-input';
-import axios from 'axios';
 import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
-import { FormEventHandler } from 'react';
-import { MultiSelect } from 'primereact/multiselect';
+import {countryOptions, regionOptions, oceanOptions} from '@/data/locations';
+import {OCDOpportunity} from '@/types';
+import {Combobox, ComboboxInput, ComboboxOption, ComboboxOptions} from '@headlessui/react';
+import {ChevronsUpDown} from 'lucide-react';
 
-
-import { Chips } from 'primereact/chips';
-
-import 'primereact/resources/themes/saga-blue/theme.css'; // ou un autre thème
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-import { countryOptions, regionOptions, oceanOptions, Option } from '@/data/locations';
+type SimpleTag = { id: string; text: string };
 
 export default function CreateOpportunity() {
-    const OcdOpportunityData = usePage().props.request as OCDOpportunity;
-    const opportunityTypes = usePage().props.opportunityTypes as OpportunityTypeOptions;
-
-    const { data, setData, post, processing, errors, reset, setError, clearErrors, setDefaults } = useForm({
-        id: OcdOpportunityData?.id,
-        title: OcdOpportunityData?.title,
-        type: OcdOpportunityData?.type,
-        closing_date: OcdOpportunityData?.closing_date,
-        coverage_activity: OcdOpportunityData?.coverage_activity,
-        implementation_location: OcdOpportunityData?.implementation_location,
-        target_audience: OcdOpportunityData?.target_audience,
-        target_audience_other: OcdOpportunityData?.target_audience_other,
-        summary: OcdOpportunityData?.summary,
-        url: OcdOpportunityData?.url,
-        key_words: OcdOpportunityData?.keywords ? OcdOpportunityData.keywords.split(','):'',
+    const OcdOpportunityData = usePage().props.request as OCDOpportunity || {};
+    const {data, setData, post, processing, errors, setError, clearErrors} = useForm({
+        id: OcdOpportunityData?.id || '',
+        title: OcdOpportunityData?.title || '',
+        type: OcdOpportunityData?.type || '',
+        closing_date: OcdOpportunityData?.closing_date || '',
+        coverage_activity: OcdOpportunityData?.coverage_activity || '',
+        implementation_location: OcdOpportunityData?.implementation_location || '',
+        target_audience: OcdOpportunityData?.target_audience || '',
+        target_audience_other: OcdOpportunityData?.target_audience_other || '',
+        summary: OcdOpportunityData?.summary || '',
+        url: OcdOpportunityData?.url || '',
+        key_words: OcdOpportunityData?.keywords ? OcdOpportunityData.keywords.split(',') : [],
     });
-
-
-    const getInputClass = () => {
-        return "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500";
-    }
-
-
-    const handleSubmit: FormEventHandler = (e) => {
-        e.preventDefault();
-        clearErrors()
-        axios.post(route('partner.opportunity.store'), data)
-            .then(response => {
-                setXhrDialogResponseMessage('Opportunity created successfully!');
-                setXhrDialogResponseType('redirect');
-                setXhrDialogOpen(true);
-            }).catch(responseerror => {
-                console.error(responseerror.response.data.errors);
-                setError(responseerror.response.data.errors);
-            })
-    };
 
     const [xhrdialogOpen, setXhrDialogOpen] = useState(false);
     const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
     const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect'>('info');
-    const [keyWords, setkeyWords] = useState<string[]>([]);
-    const [implementationOptions, setImplementationOptions] = useState<Option[]>([]);
-
-    useEffect(() => {
-        setData('key_words', keyWords);
-    }, [keyWords]);
+    const [implementationOptions, setImplementationOptions] = useState<{ value: string; label: string }[]>([]);
+    // Query state for each combobox field
+    const [comboboxQueries, setComboboxQueries] = useState<Record<string, string>>({});
 
     useEffect(() => {
         switch (data.coverage_activity) {
@@ -77,18 +45,185 @@ export default function CreateOpportunity() {
             case 'Ocean-based':
                 setImplementationOptions(oceanOptions);
                 break;
+            case 'Global':
+                setImplementationOptions([{value: 'Global', label: 'Global'}]);
+                break;
             default:
                 setImplementationOptions([]);
         }
-        setData('implementation_location' as keyof typeof data, '');
+        setData('implementation_location', '');
     }, [data.coverage_activity]);
 
+    const getInputClass = (fieldName: keyof typeof errors) => {
+        return `mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors[fieldName] ? 'border-red-600' : ''}`;
+    };
 
+    // Helper to get filtered options for a field
+    const getFilteredOptions = (field: UIField, name: string) => {
+        const query = comboboxQueries[name] || '';
+        let options = field.options ?? [];
+        if (name === 'implementation_location') {
+            options = implementationOptions;
+        }
+        if (!query) return options;
+        return options.filter(opt =>
+            opt.label.toLowerCase().includes(query.toLowerCase()) ||
+            opt.value.toLowerCase().includes(query.toLowerCase())
+        );
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        clearErrors();
+        post(route('partner.opportunity.store'), {
+            onSuccess: () => {
+                setXhrDialogResponseMessage('Opportunity created successfully!');
+                setXhrDialogResponseType('redirect');
+                setXhrDialogOpen(true);
+            },
+            onError: (err) => {
+                setError(err as any);
+            },
+        });
+    };
+
+    type FormDataKeys = keyof typeof data;
+
+    const renderField = (name: FormDataKeys, field: UIField) => {
+        if (field.show && !field.show(data as OpportunityFields)) {
+            return null;
+        }
+        const error = errors[name];
+        switch (field.type) {
+            case 'text':
+            case 'date':
+                return (
+                    <div key={name} className="mt-4">
+                        {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
+                        {field.description && <p className="mt-1 text-base text-gray-500">{field.description}</p>}
+                        <input
+                            id={field.id}
+                            type={field.type}
+                            className={getInputClass(name)}
+                            value={data[name] as string}
+                            placeholder={field.placeholder}
+                            onChange={e => setData(name, e.currentTarget.value)}
+                        />
+                        {error && <p className="text-red-600 text-base mt-1">{error}</p>}
+                    </div>
+                );
+            case 'textarea':
+                return (
+                    <div key={name} className="mt-4">
+                        {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
+                        <textarea
+                            id={field.id}
+                            className={getInputClass(name)}
+                            value={data[name] as string}
+                            maxLength={field.maxLength}
+                            rows={4}
+                            onChange={e => setData(name, e.currentTarget.value)}
+                        />
+                        {error && <p className="text-red-600 text-base mt-1">{error}</p>}
+                    </div>
+                );
+            case 'select':
+                return (
+                    <div key={name} className="mt-4">
+                        {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
+                        {field.description && <p className="mt-1 text-base text-gray-500">{field.description}</p>}
+                        <Combobox value={data[name] as string} onChange={(value) => {
+                            // @ts-ignore
+                            setData(name, value);
+                            setComboboxQueries(q => ({...q, [name]: ''}));
+                        }}>
+                            <div className="relative">
+                                <div
+                                    className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
+                                    <ComboboxInput
+                                        className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                                        displayValue={(value: string) => {
+                                            const option = getFilteredOptions(field, name).find(opt => opt.value === value);
+                                            return option ? option.label : value;
+                                        }}
+                                        onChange={event => setComboboxQueries(q => ({
+                                            ...q,
+                                            [name]: event.target.value
+                                        }))}
+                                        placeholder="Select an option..."
+                                    />
+                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronsUpDown
+                                            className="h-5 w-5 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                    </Combobox.Button>
+                                </div>
+                                <ComboboxOptions
+                                    className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                    {getFilteredOptions(field, name).map((option) => (
+                                        <ComboboxOption
+                                            key={option.value}
+                                            className={({active}) =>
+                                                `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                                    active ? 'bg-firefly-600 text-white' : 'text-gray-900'
+                                                }`
+                                            }
+                                            value={option.value}
+                                        >
+                                            {({selected, active}) => (
+                                                <>
+                                                    <span
+                                                        className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                        {option.label}
+                                                    </span>
+                                                    {selected ? (
+                                                        <span
+                                                            className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                                                active ? 'text-white' : 'text-firefly-600'
+                                                            }`}
+                                                        >
+                                                            <svg className="h-5 w-5" viewBox="0 0 20 20"
+                                                                 fill="currentColor">
+                                                                <path fillRule="evenodd"
+                                                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                      clipRule="evenodd"/>
+                                                            </svg>
+                                                        </span>
+                                                    ) : null}
+                                                </>
+                                            )}
+                                        </ComboboxOption>
+                                    ))}
+                                </ComboboxOptions>
+                            </div>
+                        </Combobox>
+                        {error && <p className="text-red-600 text-base mt-1">{error}</p>}
+                    </div>
+                );
+            case 'tags':
+                const initialTags: SimpleTag[] = (data[name] as string[] || []).map((kw, i) => ({
+                    id: String(i),
+                    text: kw
+                }));
+                return (
+                    <div key={name} className="mt-4">
+                        {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
+                        {field.description && <p className="mt-1 text-base text-gray-500">{field.description}</p>}
+                        <TagsInput
+                            initialTags={initialTags as any}
+                            onTagsChange={(tags: any) => setData(name, tags.map((t: any) => t.text))}
+                        />
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
 
     return (
-
         <FrontendLayout>
-            <Head title="Create Opportunity" />
+            <Head title="Create Opportunity"/>
             <XHRAlertDialog
                 open={xhrdialogOpen}
                 onOpenChange={setXhrDialogOpen}
@@ -97,215 +232,18 @@ export default function CreateOpportunity() {
                 onConfirm={() => {
                     setXhrDialogOpen(false);
                     if (xhrdialogResponseType === 'redirect') {
-                        router.visit(route(`opportunity.list`), { method: 'get' });
+                        router.visit(route(`opportunity.list`), {method: 'get'});
                     }
                 }}
             />
             <div className="mx-auto p-6 ">
                 <form onSubmit={handleSubmit}>
-                    <input
-                        type="hidden"
-                        value={data.id}
-                        onChange={(e) => setData('id' as keyof typeof data, e.currentTarget.value)}
-                    />
-                    <div>
-                        <label htmlFor="title" className="block font-medium">
-                            Title
-                        </label>
-                        <p className="mt-1 text-base text-gray-500">Specify the Opportunity title</p>
-                        <input
-                            id="title"
-                            type="text"
-                            className={getInputClass()}
-                            value={data.title}
-                            onChange={(e) => setData('title' as keyof typeof data, e.currentTarget.value)}
-                        />
-                        {errors.title && (
-                            <p className="text-red-600 text-base mt-1">{errors.title}</p>
-                        )}
-                    </div>
-                    <div className="mt-4">
-                        <label htmlFor="type" className="block font-medium">
-                            Type of Opportunity
-                        </label>
-                        <p className="mt-1 text-base text-gray-500">Specify the type of your Opportunity</p>
-                        <select
-                            id="type"
-                            className={getInputClass()}
-                            value={data.type}
-                            onChange={(e) => setData('type' as keyof typeof data, e.currentTarget.value)}
-                        >
-                            <option value="">— Select —</option>
-                            {Object.entries(opportunityTypes).map(([value, label]) => (
-                                <option key={value} value={value}>{label}</option>
-                            ))}
-                        </select>
-                        {errors.type && (
-                            <p className="text-red-600 text-base mt-1">{errors.type}</p>
-                        )}
-                    </div>
-                    <div className="mt-4">
-                        <label htmlFor="closing_date" className="block font-medium">
-                            Application closing date (MM/DD/YY)
-                        </label>
-                        <p className="mt-1 text-base text-gray-500">Specify the type of your Opportunity</p>
-
-                        <input
-                            id="closing_date"
-
-                            type="date"
-                            className={getInputClass()}
-                            value={data.closing_date}
-                            onChange={(e) => setData('closing_date' as keyof typeof data, e.currentTarget.value)}
-                        />
-                        {errors.closing_date && (
-                            <p className="text-red-600 text-base mt-1">{errors.closing_date}</p>
-                        )}
-                    </div>
-
-                    <div className="mt-4">
-                        <label htmlFor="coverage_activity" className="block font-medium">
-                            Coverage of CD Activity
-                        </label>
-                        <select
-                            id="coverage_activity"
-
-                            className={getInputClass()}
-                            value={data.coverage_activity}
-                            onChange={(e) => setData('coverage_activity' as keyof typeof data, e.currentTarget.value)}
-                        >
-                            <option value="">— Select —</option>
-                            <option value="country">Country</option>
-                            <option value="Regions">Regions</option>
-                            <option value="Global">Global</option>
-                            <option value="Ocean-based">Ocean Based</option>
-                        </select>
-                        {errors.coverage_activity && (
-                            <p className="text-red-600 text-base mt-1">{errors.coverage_activity}</p>
-                        )}
-                    </div>
-
-                    <div className="mt-4">
-                        <label htmlFor="implementation_location" className="block font-medium">
-                            Implementation Location
-                        </label>
-                        <select
-                            id="implementation_location"
-                            className={getInputClass()}
-                            value={data.implementation_location}
-                            onChange={(e) => setData('implementation_location' as keyof typeof data, e.currentTarget.value)}
-                        >
-                            <option value="">— Select —</option>
-                            {implementationOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                        </select>
-                        {errors.implementation_location && (
-                            <p className="text-red-600 text-base mt-1">{errors.implementation_location}</p>
-                        )}
-                    </div>
-
-                    <div className="mt-4">
-                        <label htmlFor="target_audience" className="block font-medium">
-                            Target Audience
-                        </label>
-                        <select
-                            id="target_audience"
-                            className={getInputClass()}
-                            value={data.target_audience}
-                            onChange={(e) => setData('target_audience' as keyof typeof data, e.currentTarget.value)}
-                        >
-                            <option value="">— Select —</option>
-                            <option value="academic">Academic</option>
-                            <option value="alumni">Alumni</option>
-                            <option value="civil-society">Civil Society</option>
-                            <option value="sids">Small Island Developing States (SIDS)</option>
-                            <option value="decision-makers">Decision Makers</option>
-                            <option value="developing-countries">Developing Countries</option>
-                            <option value="early-career">Early Career Professionals</option>
-                            <option value="researchers">Researchers</option>
-                            <option value="doctoral-postdoctoral">Doctoral or Postdoctoral</option>
-                            <option value="scientists">Scientists</option>
-                            <option value="executives">Executives</option>
-                            <option value="technicians">Technicians</option>
-                            <option value="general-public">General Public</option>
-                            <option value="women">Women</option>
-                            <option value="government">Government</option>
-                            <option value="youth">Youth</option>
-                            <option value="other">Other (Please Specify)</option>
-                        </select>
-                        {errors.target_audience && (
-                            <p className="text-red-600 text-base mt-1">{errors.target_audience}</p>
-                        )}
-                    </div>
-
-                    {data.target_audience === 'other' && (
-                        <div className="mt-4">
-                            <label htmlFor="target_audience_other" className="block font-medium">
-                                Please specify the target audience
-                            </label>
-                            <input
-                                id="target_audience_other"
-                                type="text"
-                                className={getInputClass()}
-                                value={data.target_audience_other}
-                                onChange={(e) => setData('target_audience_other' as keyof typeof data, e.currentTarget.value)}
-                            />
-                            {errors.target_audience_other && (
-                                <p className="text-red-600 text-base mt-1">{errors.target_audience_other}</p>
-                            )}
+                    {UIOpportunityForm.map((step, idx) => (
+                        <div key={step.label}>
+                            <h2 className="text-lg font-bold mt-8 mb-2">{step.label}</h2>
+                            {Object.entries(step.fields).map(([key, field]) => renderField(key as FormDataKeys, field))}
                         </div>
-                    )}
-
-                    <div className="mt-4">
-                        <label htmlFor="summary" className="block font-medium">
-                            Summary of the Opportunity
-                        </label>
-                        <textarea
-                            id="summary"
-                            className={getInputClass()}
-                            value={data.summary}
-                            maxLength={500}
-                            rows={4}
-                            onChange={(e) => setData('summary' as keyof typeof data, e.currentTarget.value)}
-                        />
-                        {errors.summary && (
-                            <p className="text-red-600 text-base mt-1">{errors.summary}</p>
-                        )}
-                    </div>
-
-                    <div className="mt-4">
-                        <label htmlFor="url" className="block font-medium">
-                            Url
-                        </label>
-                        <input
-                            id="url"
-                            type="text"
-                            className={getInputClass()}
-                            value={data.url}
-                            onChange={(e) => setData('url' as keyof typeof data, e.currentTarget.value)}
-                        />
-                        {errors.url && (
-                            <p className="text-red-600 text-base mt-1">{errors.url}</p>
-                        )}
-                    </div>
-
-                    <div className="mt-4">
-                        <label htmlFor="tags" className="block font-medium">
-                            Three key words
-                        </label>
-                        <p className="mt-1 text-base text-gray-500">Add comma (,) to separate key words or press enter</p>
-                        <Chips
-                            value={keyWords}
-                            onChange={(e) => setkeyWords(e.value ?? [])}
-                            separator=","
-                            max={3}
-                            allowDuplicate={false}
-                            className="w-full"
-                            />
-                            <input type="hidden" name="key_words" value={data.key_words} />
-                    </div>
-
+                    ))}
                     <div className="flex justify-end mt-6">
                         <button
                             type="submit"

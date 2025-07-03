@@ -428,8 +428,7 @@ class RequestService
         if ($request->detail) {
             $request->detail()->update($detailData);
         } else {
-            $detail = RequestDetail::create($detailData);
-            $request->update(['detail_id' => $detail->id]);
+            $request->detail()->save(new RequestDetail($detailData));
         }
     }
 
