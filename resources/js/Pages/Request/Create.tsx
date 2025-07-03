@@ -2,11 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {Head, router, useForm, usePage} from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
 import {UIRequestForm, UIField, Request as RequestFields} from '@/Forms/UIRequestForm';
-import XHRMessageDialog from '@/Components/Dialog/XHRAlertDialog';
-import { submitRequest } from '@/api/request';
+import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
+import {submitRequest} from '@/api/request';
 import {OCDRequest} from '@/types';
-import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
-import { ChevronsUpDown } from 'lucide-react'
+import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react'
+import {ChevronsUpDown} from 'lucide-react'
 
 
 type Mode = 'submit' | 'draft';
@@ -50,9 +50,9 @@ export default function RequestForm() {
         success_metrics: '',
         long_term_impact: '',
         mode: 'submit' as Mode,
-        target_audience:'',
+        target_audience: '',
         target_audience_other: '',
-        delivery_format:'',
+        delivery_format: '',
         delivery_country: '',
     });
 
@@ -103,37 +103,37 @@ export default function RequestForm() {
             form.setData('id', responseXhr.request_data.id);
             form.setData('unique_id', responseXhr.request_data.unique_id);
             setXhrDialogResponseMessage(responseXhr.request_data.message);
-                if (mode === 'draft') {
-                    setXhrDialogResponseType('success');
-                    router.push({
+            if (mode === 'draft') {
+                setXhrDialogResponseType('success');
+                router.push({
                     url: route(`user.request.edit`, {id: responseXhr.request_data.id}),
-                        clearHistory: false,
-                        encryptHistory: false,
-                        preserveScroll: true,
-                        preserveState: true,
+                    clearHistory: false,
+                    encryptHistory: false,
+                    preserveScroll: true,
+                    preserveState: true,
                 });
-                } else {
-                    setXhrDialogResponseType('redirect');
-                }
+            } else {
+                setXhrDialogResponseType('redirect');
+            }
         } catch (responseXhr: any) {
-                if (responseXhr.response?.status === 422) {
-                    form.setError(responseXhr.response.data.errors);
-                    const stepsWithError: number[] = [];
-                    Object.keys(responseXhr.response.data.errors).forEach(field => {
-                        const idx = UIRequestForm.findIndex(step => step.fields[field]);
-                        if (idx !== -1 && !stepsWithError.includes(idx + 1)) {
-                            stepsWithError.push(idx + 1);
-                        }
-                    });
-                    setErrorSteps(stepsWithError);
-                    setXhrDialogResponseType('error');
-                    setXhrDialogResponseMessage('Please correct the highlighted errors.');
-                } else {
-                    setXhrDialogResponseType('error');
-                    setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
-                }
+            if (responseXhr.response?.status === 422) {
+                form.setError(responseXhr.response.data.errors);
+                const stepsWithError: number[] = [];
+                Object.keys(responseXhr.response.data.errors).forEach(field => {
+                    const idx = UIRequestForm.findIndex(step => step.fields[field]);
+                    if (idx !== -1 && !stepsWithError.includes(idx + 1)) {
+                        stepsWithError.push(idx + 1);
+                    }
+                });
+                setErrorSteps(stepsWithError);
+                setXhrDialogResponseType('error');
+                setXhrDialogResponseMessage('Please correct the highlighted errors.');
+            } else {
+                setXhrDialogResponseType('error');
+                setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
+            }
         } finally {
-                setXhrDialogOpen(true);
+            setXhrDialogOpen(true);
         }
     };
 
@@ -184,42 +184,48 @@ export default function RequestForm() {
                     <div key={name} className="mt-8">
                         {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
                         {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                        <Combobox value={(form.data as any)[name]} onChange={(value) => {
+                        <Combobox immediate value={(form.data as any)[name]} onChange={(value) => {
                             form.setData(name, value);
-                            setComboboxQueries(q => ({ ...q, [name]: '' })); // reset query on select
+                            setComboboxQueries(q => ({...q, [name]: ''})); // reset query on select
                         }}>
                             <div className="relative">
-                                <div className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
+                                <div
+                                    className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
                                     <ComboboxInput
                                         className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
                                         displayValue={(value: string) => {
                                             const option = field.options?.find(opt => opt.value === value);
                                             return option ? option.label : value;
                                         }}
-                                        onChange={event => setComboboxQueries(q => ({ ...q, [name]: event.target.value }))}
+                                        onChange={event => setComboboxQueries(q => ({
+                                            ...q,
+                                            [name]: event.target.value
+                                        }))}
                                         placeholder="Select an option..."
                                     />
-                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-2">
                                         <ChevronsUpDown
                                             className="h-5 w-5 text-gray-400"
                                             aria-hidden="true"
                                         />
-                                    </Combobox.Button>
+                                    </ComboboxButton>
                                 </div>
-                                <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                <ComboboxOptions
+                                    className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                     {getFilteredOptions(field, name).map((option) => (
                                         <ComboboxOption
                                             key={option.value}
-                                            className={({ active }) =>
+                                            className={({active}) =>
                                                 `relative cursor-default select-none py-2 pl-10 pr-4 ${
                                                     active ? 'bg-firefly-600 text-white' : 'text-gray-900'
                                                 }`
                                             }
                                             value={option.value}
                                         >
-                                            {({ selected, active }) => (
+                                            {({selected, active}) => (
                                                 <>
-                                                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                    <span
+                                                        className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
                                                         {option.label}
                                                     </span>
                                                     {selected ? (
@@ -228,8 +234,11 @@ export default function RequestForm() {
                                                                 active ? 'text-white' : 'text-firefly-600'
                                                             }`}
                                                         >
-                                                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                            <svg className="h-5 w-5" viewBox="0 0 20 20"
+                                                                 fill="currentColor">
+                                                                <path fillRule="evenodd"
+                                                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                      clipRule="evenodd"/>
                                                             </svg>
                                                         </span>
                                                     ) : null}
@@ -251,41 +260,48 @@ export default function RequestForm() {
                         {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
                         <Combobox
                             value={selectedValues}
+                            immediate
                             onChange={(values: any[]) => {
                                 form.setData(name, values.map(String));
-                                setComboboxQueries(q => ({ ...q, [name]: '' })); // reset query on select
+                                setComboboxQueries(q => ({...q, [name]: ''})); // reset query on select
                             }}
                             multiple
                         >
                             <div className="relative">
-                                <div className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
+                                <div
+                                    className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
                                     <ComboboxInput
                                         className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
                                         displayValue={() => comboboxQueries[name] || ''}
-                                        onChange={event => setComboboxQueries(q => ({ ...q, [name]: event.target.value }))}
+                                        onChange={event => setComboboxQueries(q => ({
+                                            ...q,
+                                            [name]: event.target.value
+                                        }))}
                                         placeholder="Select options..."
                                     />
-                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-2">
                                         <ChevronsUpDown
                                             className="h-5 w-5 text-gray-400"
                                             aria-hidden="true"
                                         />
-                                    </Combobox.Button>
+                                    </ComboboxButton>
                                 </div>
-                                <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                <ComboboxOptions
+                                    className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                     {getFilteredOptions(field, name, selectedValues).map((option) => (
                                         <ComboboxOption
                                             key={option.value}
-                                            className={({ active }) =>
+                                            className={({active}) =>
                                                 `relative cursor-default select-none py-2 pl-10 pr-4 ${
                                                     active ? 'bg-firefly-600 text-white' : 'text-gray-900'
                                                 }`
                                             }
                                             value={option.value}
                                         >
-                                            {({ selected, active }) => (
+                                            {({selected, active}) => (
                                                 <>
-                                                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                    <span
+                                                        className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
                                                         {option.label}
                                                     </span>
                                                     {selected ? (
@@ -294,8 +310,11 @@ export default function RequestForm() {
                                                                 active ? 'text-white' : 'text-firefly-600'
                                                             }`}
                                                         >
-                                                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                            <svg className="h-5 w-5" viewBox="0 0 20 20"
+                                                                 fill="currentColor">
+                                                                <path fillRule="evenodd"
+                                                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                      clipRule="evenodd"/>
                                                             </svg>
                                                         </span>
                                                     ) : null}
@@ -326,7 +345,9 @@ export default function RequestForm() {
                                             >
                                                 <span className="sr-only">Remove</span>
                                                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                    <path fillRule="evenodd"
+                                                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                          clipRule="evenodd"/>
                                                 </svg>
                                             </button>
                                         </span>
@@ -408,7 +429,7 @@ export default function RequestForm() {
     return (
         <FrontendLayout>
             <Head title="Submit Request"/>
-            <XHRMessageDialog
+            <XHRAlertDialog
                 open={xhrdialogOpen}
                 onOpenChange={setXhrDialogOpen}
                 message={xhrdialogResponseMessage}

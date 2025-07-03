@@ -6,7 +6,7 @@ import TagsInput from '@/Components/TagsInput';
 import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
 import {countryOptions, regionOptions, oceanOptions} from '@/data/locations';
 import {OCDOpportunity} from '@/types';
-import {Combobox, ComboboxInput, ComboboxOption, ComboboxOptions} from '@headlessui/react';
+import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react';
 import {ChevronsUpDown} from 'lucide-react';
 
 type SimpleTag = { id: string; text: string };
@@ -132,7 +132,7 @@ export default function CreateOpportunity() {
                     <div key={name} className="mt-4">
                         {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
                         {field.description && <p className="mt-1 text-base text-gray-500">{field.description}</p>}
-                        <Combobox value={data[name] as string} onChange={(value) => {
+                        <Combobox immediate value={data[name] as string} onChange={(value) => {
                             // @ts-ignore
                             setData(name, value);
                             setComboboxQueries(q => ({...q, [name]: ''}));
@@ -152,12 +152,12 @@ export default function CreateOpportunity() {
                                         }))}
                                         placeholder="Select an option..."
                                     />
-                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-2">
                                         <ChevronsUpDown
                                             className="h-5 w-5 text-gray-400"
                                             aria-hidden="true"
                                         />
-                                    </Combobox.Button>
+                                    </ComboboxButton>
                                 </div>
                                 <ComboboxOptions
                                     className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
