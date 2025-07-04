@@ -1,8 +1,8 @@
 import { usePage } from '@inertiajs/react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import LoginDialog from '@/Components/Dialog/SignInDialog';
+import ApplicationLogo from '@/Components/Common/ApplicationLogo';
+import LoginDialog from '@/Components/Dialogs/SignInDialog';
 import type { Auth } from '@/types';
-import UserNav from '@/Components/UserNav';
+import UserNav from '@/Components/Layout/UserNav';
 
 export default function Header() {
   const { auth } = usePage<{ auth: Auth }>().props;

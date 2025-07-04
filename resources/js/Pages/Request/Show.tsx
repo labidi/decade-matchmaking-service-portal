@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { Head, usePage, Link } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import { OCDRequest, OCDRequestGrid, RequestOffer } from '@/types';
 import OfferSection from '@/Pages/Request/Components/OfferSection';
+import React, { useState } from 'react';
 import RequestDetailsSection from '@/Pages/Request/Components/RequestDetailsSection';
-import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
-
+import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
+import { Head, usePage, Link } from '@inertiajs/react';
+import { OCDRequest, OCDRequestGrid, RequestOffer } from '@/types';
 
 export default function ShowRequest() {
   const OcdRequest = usePage().props.request as OCDRequest;

@@ -10,7 +10,7 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import axios from 'axios';
-import XHRAlertDialog from "@/Components/Dialog/XHRAlertDialog";
+import XHRAlertDialog from "@/Components/Dialogs/XHRAlertDialog";
 
 export default function RequestsList() {
     const requests = usePage().props.requests as OCDRequestList;

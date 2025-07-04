@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {Head, router, useForm, usePage} from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import {UIRequestForm, UIField, Request as RequestFields} from '@/Forms/UIRequestForm';
-import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
-import {submitRequest} from '@/api/request';
-import {OCDRequest} from '@/types';
-import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react'
+import React, {useEffect, useState} from 'react';
+import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
 import {ChevronsUpDown} from 'lucide-react'
+import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react'
+import {Head, router, useForm, usePage} from '@inertiajs/react';
+import {OCDRequest} from '@/types';
+import {UIRequestForm, UIField, Request as RequestFields} from '@/Forms/UIRequestForm';
+import {submitRequest} from '@/Services/Api/request';
 
 
 type Mode = 'submit' | 'draft';
@@ -385,6 +385,11 @@ export default function RequestForm() {
                 return (
                     <fieldset key={name} className="mt-8">
                         <legend className="block font-medium mb-2">{field.label}</legend>
+                        {(field.image) && (
+                            <div className="w-full">
+                                <img src={field.image} alt="Logo" className="object-cover"/>
+                            </div>
+                        )}
                         {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
                             {field.options?.map(opt => (

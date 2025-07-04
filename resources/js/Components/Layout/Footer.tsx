@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from '@inertiajs/react';
-import ApplicationLogo from './ApplicationLogo';
-import FlanderLogo from './FlanderLogo';
+import ApplicationLogo from '@/Components/Common/ApplicationLogo';
+import FlanderLogo from '@/Components/Common/FlanderLogo';
 import {Instagram, Facebook, Linkedin} from 'lucide-react';
 
 const Header: React.FC = () => {
