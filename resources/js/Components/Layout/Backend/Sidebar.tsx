@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 import { Disclosure } from '@headlessui/react';
 import { ChevronDown } from 'lucide-react';
 
-const AdminMenu: React.FC = () => {
+const Sidebar: React.FC = () => {
     return (
         <nav>
             <ul className="space-y-2">
@@ -18,7 +18,7 @@ const AdminMenu: React.FC = () => {
                                 <Disclosure.Panel as="div" className="mt-2 pl-4">
                                     <ul className="space-y-1">
                                         <li>
-                                            <Link className="text-firefly-700 hover:underline" href={route('admin.users.index')}>
+                                            <Link className="text-firefly-700 hover:underline" href="#">
                                                 Portal configurations
                                             </Link>
                                         </li>
@@ -39,29 +39,8 @@ const AdminMenu: React.FC = () => {
                                 <Disclosure.Panel as="div" className="mt-2 pl-4">
                                     <ul className="space-y-1">
                                         <li>
-                                            <Link className="text-firefly-700 hover:underline" href={route('admin.notifications.index')}>
+                                            <Link className="text-firefly-700 hover:underline" href="#">
                                                 List Notifications
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </Disclosure.Panel>
-                            </>
-                        )}
-                    </Disclosure>
-                </li>
-                <li>
-                    <Disclosure>
-                        {({ open }) => (
-                            <>
-                                <Disclosure.Button className="flex w-full items-center justify-between rounded bg-gray-100 px-4 py-2 text-left font-semibold hover:bg-gray-200">
-                                    <span>Users</span>
-                                    <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
-                                </Disclosure.Button>
-                                <Disclosure.Panel as="div" className="mt-2 pl-4">
-                                    <ul className="space-y-1">
-                                        <li>
-                                            <Link className="text-firefly-700 hover:underline" href={route('admin.users.index')}>
-                                                Manage Users
                                             </Link>
                                         </li>
                                     </ul>
@@ -81,8 +60,29 @@ const AdminMenu: React.FC = () => {
                                 <Disclosure.Panel as="div" className="mt-2 pl-4">
                                     <ul className="space-y-1">
                                         <li>
-                                            <Link className="text-firefly-700 hover:underline" href={route('admin.users.index')}>
+                                            <Link className="text-firefly-700 hover:underline" href={route('admin.request.list')}>
                                                 Manage Requests
+                                            </Link>
+                                        </li>
+                                    </ul>
+                                </Disclosure.Panel>
+                            </>
+                        )}
+                    </Disclosure>
+                </li>
+                <li>
+                    <Disclosure>
+                        {({ open }) => (
+                            <>
+                                <Disclosure.Button className="flex w-full items-center justify-between rounded bg-gray-100 px-4 py-2 text-left font-semibold hover:bg-gray-200">
+                                    <span>Users</span>
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+                                </Disclosure.Button>
+                                <Disclosure.Panel as="div" className="mt-2 pl-4">
+                                    <ul className="space-y-1">
+                                        <li>
+                                            <Link className="text-firefly-700 hover:underline" href="#">
+                                                Manage Users
                                             </Link>
                                         </li>
                                     </ul>
@@ -117,4 +117,4 @@ const AdminMenu: React.FC = () => {
     );
 };
 
-export default AdminMenu;
+export default Sidebar;

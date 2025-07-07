@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {Head, router, useForm, usePage} from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import {UIRequestForm, UIField, Request as RequestFields} from '@/Forms/UIRequestForm';
-import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
-import {submitRequest} from '@/api/request';
-import {OCDRequest} from '@/types';
-import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react'
+import React, {useEffect, useState} from 'react';
+import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
 import {ChevronsUpDown} from 'lucide-react'
+import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react'
+import {Head, router, useForm, usePage} from '@inertiajs/react';
+import {OCDRequest} from '@/types';
+import {UIRequestForm, UIField, Request as RequestFields} from '@/Forms/UIRequestForm';
+import {submitRequest} from '@/Services/Api/request';
 
 
 type Mode = 'submit' | 'draft';
@@ -14,7 +14,6 @@ type Id = '';
 export default function RequestForm() {
 
     const ocdRequestFormData = usePage().props.request as OCDRequest;
-    console.log(ocdRequestFormData);
     const form = useForm({
         id: '',
         is_partner: '',
@@ -65,7 +64,8 @@ export default function RequestForm() {
 
     const [xhrdialogOpen, setXhrDialogOpen] = useState(false);
     const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
-    const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect'>('info');
+    const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect' | 'loading'>('info');
+    const [isLoading, setIsLoading] = useState(false);
 
     // Query state for each combobox field
     const [comboboxQueries, setComboboxQueries] = useState<Record<string, string>>({});
@@ -94,10 +94,14 @@ export default function RequestForm() {
         setStep(prev => Math.max(prev - 1, 1));
     };
 
-
     const handleSubmitV2 = async (mode: 'submit' | 'draft') => {
         form.clearErrors();
         form.setData('mode', mode);
+        setIsLoading(true);
+        setXhrDialogResponseType('loading');
+        setXhrDialogResponseMessage(mode === 'draft' ? 'Saving draft...' : 'Submitting request...');
+        setXhrDialogOpen(true);
+
         try {
             const responseXhr = await submitRequest(form.data, mode);
             form.setData('id', responseXhr.request_data.id);
@@ -133,7 +137,7 @@ export default function RequestForm() {
                 setXhrDialogResponseMessage(responseXhr.response?.data?.error || 'Something went wrong');
             }
         } finally {
-            setXhrDialogOpen(true);
+            setIsLoading(false);
         }
     };
 
@@ -385,6 +389,11 @@ export default function RequestForm() {
                 return (
                     <fieldset key={name} className="mt-8">
                         <legend className="block font-medium mb-2">{field.label}</legend>
+                        {(field.image) && (
+                            <div className="w-full">
+                                <img src={field.image} alt="Logo" className="object-cover"/>
+                            </div>
+                        )}
                         {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
                             {field.options?.map(opt => (
@@ -480,17 +489,17 @@ export default function RequestForm() {
                         onClick={() => {
                             handleSubmitV2('draft');
                         }}
-                        disabled={form.processing}
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+                        disabled={isLoading}
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {form.processing ? 'Saving...' : 'Save Draft'}
+                        {isLoading ? 'Saving...' : 'Save Draft'}
                     </button>
                     {step < 5 ? (
                         <button
                             type="button"
                             onClick={handleNext}
-                            className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
-                            disabled={form.processing}
+                            className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isLoading}
                         >
                             Next
                         </button>
@@ -500,10 +509,10 @@ export default function RequestForm() {
                             onClick={() => {
                                 handleSubmitV2('submit');
                             }}
-                            disabled={form.processing}
-                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                            disabled={isLoading}
+                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {form.processing ? 'Submitting...' : 'Submit'}
+                            {isLoading ? 'Submitting...' : 'Submit'}
                         </button>
                     )}
                 </div>

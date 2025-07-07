@@ -4,7 +4,7 @@ import FrontendLayout from '@/Layouts/FrontendLayout';
 import {OCDRequest, OCDRequestGrid, RequestOffer} from '@/types';
 import OfferSection from '@/Pages/Request/Components/OfferSection';
 import RequestDetailsSection from '@/Pages/Request/Components/RequestDetailsSection';
-import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
+import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
 
 
 export default function ShowRequest() {

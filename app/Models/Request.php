@@ -49,7 +49,7 @@ class Request extends Model
         return $this->belongsTo(RequestStatus::class);
     }
 
-    public function offer(): HasMany
+    public function offers(): HasMany
     {
         return $this->hasMany(RequestOffer::class);
     }

@@ -1,10 +1,10 @@
 import React from 'react';
-import Header from '@/Components/Header';
-import Footer from '@/Components/Footer';
-import Banner from '@/Components/Banner';
-import Userguide from '@/Components/UserGuide';
+import Header from '@/Components/Layout/Header';
+import Footer from '@/Components/Layout/Footer';
+import Banner from '@/Components/Common/Banner';
+import UserGuide from '@/Components/Common/UserGuide';
 import { usePage } from '@inertiajs/react';
-import Breadcrumb from '@/Components/Breadcrumb';
+import Breadcrumb from '@/Components/Common/Breadcrumb';
 
 interface FrontendLayoutProps {
   children: React.ReactNode;
@@ -16,7 +16,7 @@ const FrontendLayout: React.FC<FrontendLayoutProps> = ({ children }) => {
     <div className="min-h-screen flex flex-col bg-white text-gray-900">
       <Header />
       <Banner />
-      <Userguide />
+      <UserGuide />
       <Breadcrumb />
       <main className="flex-grow container mx-auto py-8">
         <div className="container shadow rounded bg-white p-6">

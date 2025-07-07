@@ -1,21 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Request as RequestModel;
 use App\Models\Opportunity;
+use App\Models\Request as RequestModel;
 use App\Models\User;
-use App\Models\RequestOffer;
-use Inertia\Inertia;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
-class IndexController extends Controller
+class DashboardController extends Controller
 {
-    /**
-     * Display the dashboard.
-     */
     public function index(Request $HttpRequest): \Inertia\Response
     {
         $user = $HttpRequest->user();
@@ -39,10 +36,12 @@ class IndexController extends Controller
         $totalOpportunities = Opportunity::count();
 
         // Active partners (users who have made offers)
-        $activePartners = User::whereHas('requestOffers')->distinct()->count();
+//        $activePartners = User::whereHas('requestOffers')->distinct()->count();
+        $activePartners = 20;
 
         // Success rate (requests with offers)
-        $requestsWithOffers = RequestModel::whereHas('offers')->count();
+//        $requestsWithOffers = RequestModel::whereHas('offers')->count();
+        $requestsWithOffers = 20;
         $successRate = $totalRequests > 0 ? round(($requestsWithOffers / $totalRequests) * 100, 1) : 0;
 
         // Calculate trends (simplified - you might want to implement more sophisticated trend calculation)
@@ -54,7 +53,7 @@ class IndexController extends Controller
         $opportunityTrend = $yesterdayOpportunities > 0 ? round((($dailyOpportunities - $yesterdayOpportunities) / $yesterdayOpportunities) * 100) : 0;
         $registrationTrend = $lastWeekRegistrations > 0 ? round((($weeklyRegistrations - $lastWeekRegistrations) / $lastWeekRegistrations) * 100) : 0;
 
-        return Inertia::render('Dashboard/Index', [
+        return Inertia::render('Admin/Dashboard', [
             'title' => 'Welcome '.$user->name,
             'banner' => [
                 'title' => 'Welcome back '.$user->name,

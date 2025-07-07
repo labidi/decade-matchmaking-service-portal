@@ -49,6 +49,7 @@ export interface UIField {
     required?: boolean;
     show?: (data: Request) => boolean;
     multiple?: boolean;
+    image?: string;
 }
 
 export interface UIStep {
@@ -263,6 +264,7 @@ export const UIRequestForm: UIStep[] = [
                 type: 'checkbox-group',
                 required: true,
                 label: 'Which sub-theme(s) of the Capacity Development Facility priorities does your request fall under?',
+                image : '/assets/img/cdf_subthemes.svg',
                 description: 'Please review the umbrella theme carefully before selecting the corresponding sub-themes.',
                 options: subthemeOptions.map(v => ({value: v, label: v})),
             },

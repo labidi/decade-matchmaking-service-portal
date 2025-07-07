@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog } from "radix-ui";
-import SignInForm from '../SignInForm';
+import SignInForm from '@/Components/Forms/SignInForm';
 
 export default function SignInDialog() {
   return (

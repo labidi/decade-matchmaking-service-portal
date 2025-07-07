@@ -1,7 +1,7 @@
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import DataTableDialog from '@/Components/Dialog/DataTableDialog';
+import DataTableDialog from '@/Components/Dialogs/DataTableDialog';
 
 const columnsCDF = [
     { key: 'id', label: 'Org name' },

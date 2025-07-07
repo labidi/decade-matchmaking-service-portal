@@ -100,7 +100,7 @@ class OcdOpportunityController extends Controller
             'title' => 'Opportunities',
             'banner' => [
                 'title' => 'List of Opportunities',
-                'description' => 'Browse and view opportunities submitted by OCD partners here.',
+                'description' => 'Browse and view opportunities submitted by CDF partners here.',
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [

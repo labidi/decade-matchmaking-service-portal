@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import AdminMenu from '@/Components/AdminMenu';
+import Sidebar from '@/Components/Layout/Backend/Sidebar';
 import axios from 'axios';
 import { NotificationList } from '@/types';
 
@@ -16,7 +16,7 @@ export default function NotificationListPage() {
     };
 
     return (
-        <BackendLayout menu={<AdminMenu />}>
+        <BackendLayout>
             <Head title="Notifications" />
             <div className="space-y-4">
                 {items.map(n => (

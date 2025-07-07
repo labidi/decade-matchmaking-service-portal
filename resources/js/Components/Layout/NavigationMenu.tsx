@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { usePage, Link, useForm } from '@inertiajs/react';
 import { Auth, User } from '@/types';
 
-export default function UserDropdown() {
+export default function NavigationMenu() {
     const { auth, unread_notifications } = usePage<{ auth: Auth; unread_notifications: number }>().props;
     const user = auth.user;
     const [open, setOpen] = useState(false);
@@ -101,11 +101,11 @@ export default function UserDropdown() {
                                 Notifications (0)
                             </Link>
                             <Link
-                                href={route('admin.users.index')}
+                                href={route('admin.dashboard.index')}
                                 className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                                 role="menuitem"
                             >
-                                Manage User Roles
+                                Dashboard
                             </Link>
                         </>
                     )}

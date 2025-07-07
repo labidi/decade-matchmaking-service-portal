@@ -110,20 +110,31 @@ class RequestService
             });
     }
 
+    public function getAllRequests(): Collection
+    {
+        $requests = OCDRequest::with(['status', 'detail','user','offers'])
+            ->get();
+        return $requests->map(function ($request) {
+            return $this->enhanceRequestData($request);
+        });
+    }
+
     /**
      * Get public requests (for partners)
      */
-    public function getPublicRequests(User $user): Collection
+    public function getPublicRequests(?User $user = null): Collection
     {
         $publicStatuses = ['validated', 'offer_made', 'match_made', 'closed', 'in_implementation'];
 
-        return OCDRequest::with(['status', 'detail'])
+        $requests = OCDRequest::with(['status', 'detail'])
             ->whereHas('status', function (Builder $query) use ($publicStatuses) {
                 $query->whereIn('status_code', $publicStatuses);
             })
-            ->where('user_id', '!=', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get()
+            ->orderBy('created_at', 'desc');
+        if ($user) {
+            $requests->where('user_id', '!=', $user->id);
+        }
+        return $requests->get()
             ->map(function ($request) {
                 return $this->enhanceRequestData($request);
             });
@@ -151,7 +162,7 @@ class RequestService
     public function findRequest(int $id, ?User $user = null): ?OCDRequest
     {
         $request = OCDRequest::with(
-            ['status', 'user', 'offer', 'detail']
+            ['status', 'user', 'offers', 'detail']
         )
             ->find($id);
 
@@ -440,7 +451,6 @@ class RequestService
     {
         $request->setAttribute('title', $this->getRequestTitle($request));
         $request->setAttribute('requester_name', $this->getRequesterName($request));
-
         return $request;
     }
 

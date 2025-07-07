@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\IndexController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OcdRequestController;
 use Inertia\Inertia;
 use App\Http\Controllers\User\OpportunityController as UserOpportunityController;
@@ -9,6 +9,10 @@ use App\Http\Controllers\OcdOpportunityController;
 use App\Http\Controllers\UserGuideController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\RequestOfferController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Dashboard\IndexController;
+
+use App\Http\Controllers\Admin\OcdRequestController as AdminOcdRequestController;
 
 Route::get('/', function () {
     return Inertia::render('Index', [
@@ -36,7 +40,7 @@ Route::get('user-guide', [UserGuideController::class, 'download'])->name('user.g
 
 Route::middleware(['auth', 'role:user'])->group(function () {
 
-    Route::get('home', IndexController::class)->name('user.home');
+    Route::get('home', [HomeController::class,'index'])->name('user.home');
     Route::get('user/request/create', [OcdRequestController::class, 'create'])->name('user.request.create');
     Route::get('request/me/list', [OcdRequestController::class, 'myRequestsList'])->name('request.me.list');
     Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
@@ -67,17 +71,21 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::delete('opportunity/{id}', [OcdOpportunityController::class, 'destroy'])->name('partner.opportunity.destroy');
     Route::get('request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
     Route::get('opportunity/edit/{id}', [OcdOpportunityController::class, 'edit'])->name('opportunity.edit');
-    Route::get('request/me/matchedrequests', [OcdRequestController::class, 'matchedRequest'])->name('request.me.matchedrequests');
+    Route::get('request/me/matched-requests', [OcdRequestController::class, 'matchedRequest'])->name('request.me.matched-requests');
 });
 
-// Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
-Route::get('users', [UserRoleController::class, 'index'])->name('admin.users.index');
+ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
+     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
+     Route::get('request/list', [AdminOcdRequestController::class, 'list'])->name('admin.request.list');
+     Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('admin.request.offer.store');
+ });
+
+
 Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
-Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('admin.request.offer.store');
+
 Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
 Route::get('notifications/{notification}', [\App\Http\Controllers\Admin\NotificationController::class, 'show'])->name('admin.notifications.show');
 Route::patch('notifications/{notification}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('admin.notifications.read');
-// });
 
 
 
