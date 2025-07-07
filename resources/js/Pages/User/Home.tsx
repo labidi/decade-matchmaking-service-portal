@@ -56,7 +56,7 @@ export default function Home({
                             </Link>
                         )}
                         {auth.user && auth.user.is_partner && (
-                            <Link href={route('request.me.matchedrequests')} className={LinkRequestCardClassName}>
+                            <Link href={route('request.me.matched-requests')} className={LinkRequestCardClassName}>
                                 <div className="px-6 py-4">
                                     <div className="font-bold text-xl mb-2">My matched requests</div>
                                     <p className="text-base">

@@ -1,91 +1,12 @@
 // resources/js/Components/DataTableDialog.tsx
 import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import DataTable, {TableColumn} from 'react-data-table-component';
 
 interface DataRow {
     title: string;
     director: string;
     year: string;
 }
-
-const columns: TableColumn<DataRow>[] = [
-    {
-        name: 'Title',
-        selector: row => row.title,
-        sortable: true,
-    },
-    {
-        name: 'Director',
-        selector: row => row.director,
-        sortable: true,
-    },
-    {
-        name: 'Year',
-        selector: row => row.year,
-        sortable: true,
-    },
-];
-
-const data = [
-    {
-        id: 1,
-        title: 'Beetlejuice',
-        year: '1988',
-        director: 'Tim Burton',
-    },
-    {
-        id: 2,
-        title: 'Ghostbusters',
-        year: '1984',
-        director: 'Ivan Reitman',
-    },
-    {
-        id: 1,
-        title: 'Beetlejuice',
-        year: '1988',
-        director: 'Tim Burton',
-    },
-    {
-        id: 2,
-        title: 'Ghostbusters',
-        year: '1984',
-        director: 'Ivan Reitman',
-    },{
-        id: 1,
-        title: 'Beetlejuice',
-        year: '1988',
-        director: 'Tim Burton',
-    },
-    {
-        id: 2,
-        title: 'Ghostbusters',
-        year: '1984',
-        director: 'Ivan Reitman',
-    },{
-        id: 1,
-        title: 'Beetlejuice',
-        year: '1988',
-        director: 'Tim Burton',
-    },
-    {
-        id: 2,
-        title: 'Ghostbusters',
-        year: '1984',
-        director: 'Ivan Reitman',
-    },{
-        id: 1,
-        title: 'Beetlejuice',
-        year: '1988',
-        director: 'Tim Burton',
-    },
-    {
-        id: 2,
-        title: 'Ghostbusters',
-        year: '1984',
-        director: 'Ivan Reitman',
-    },
-]
 
 interface DataTableDialogProps {
     triggerLabel?: string;
@@ -115,12 +36,7 @@ export default function DataTableDialog<TRow extends Record<string, any>>({
                     </Dialog.Description>
 
                     <div className="overflow-x-auto">
-                        <DataTable columns={columns} data={data} pagination paginationComponentOptions={{
-                            rowsPerPageText: 'Rows per page',
-                            rangeSeparatorText: 'of',
-                            selectAllRowsItem: true,
-                            selectAllRowsItemText: 'All',
-                        }}/>
+
                     </div>
 
                     <div className="mt-6 flex justify-end">

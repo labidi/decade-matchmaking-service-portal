@@ -13,3 +13,24 @@ export async function submitRequest(data: any, mode: 'submit' | 'draft') {
     );
     return response.data;
 }
+
+// Create a wrapper function that returns a promise with loading state
+export function createSubmitRequestWithLoading() {
+    let loading = false;
+    
+    const submit = async (data: any, mode: 'submit' | 'draft') => {
+        loading = true;
+        try {
+            const result = await submitRequest(data, mode);
+            return { data: result, loading: false };
+        } catch (error) {
+            loading = false;
+            throw error;
+        }
+    };
+    
+    return {
+        submit,
+        get loading() { return loading; }
+    };
+}

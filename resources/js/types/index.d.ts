@@ -146,6 +146,8 @@ export interface OCDRequest {
     matched_partner_id: string | null;
     status_id: string;
     user_id: string;
+    user?: User;
+    offers?: RequestOfferList
 };
 
 export type OCDRequestList = OCDRequest[];
@@ -169,6 +171,7 @@ export interface OCDOpportunity {
     status_label: string;
     can_edit: boolean;
     keywords: string
+    user?: User;
 }
 
 export type OCDOpportunitiesList = OCDOpportunity[];
