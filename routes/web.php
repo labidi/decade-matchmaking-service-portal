@@ -50,7 +50,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('user/request/pdf/{id}', [OcdRequestController::class, 'exportPdf'])->name('user.request.pdf');
     Route::post('user/request/submit', [OcdRequestController::class, 'submit'])->name('user.request.submit');
 
-    Route::patch('user/request/{id}/status', [OcdRequestController::class, 'updateStatus'])->name('user.request.status');
+    Route::patch('request/{id}/update-status', [OcdRequestController::class, 'updateStatus'])->name('request.update.status');
     Route::post('user/request/{request}/document', [\App\Http\Controllers\DocumentController::class, 'store'])->name('user.request.document.store');
     Route::delete('user/document/{document}', [\App\Http\Controllers\DocumentController::class, 'destroy'])->name('user.document.destroy');
     Route::get('user/document/{document}/download', [\App\Http\Controllers\DocumentController::class, 'download'])->name('user.document.download');

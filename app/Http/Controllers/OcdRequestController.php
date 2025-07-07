@@ -198,7 +198,7 @@ class OcdRequestController extends Controller
 
             return response()->json([
                 'message' => 'Status updated successfully',
-                'status' => $result['status']
+                'status' => $result['request']->status
             ]);
         } catch (Exception $e) {
             $statusCode = $e->getCode() ?: 500;

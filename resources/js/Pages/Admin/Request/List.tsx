@@ -45,7 +45,7 @@ export default function List() {
     ];
 
     const handleStatusChange = (id: string, status: string) => {
-        axios.patch(route('user.request.status', id), {status})
+        axios.patch(route('request.update.status', id), {status})
             .then(res => {
                 setRequestList(prev => prev.map(req =>
                     req.id === id
