@@ -20,6 +20,7 @@ export { default as OffersDialog } from './Dialogs/OffersDialog';
 
 // Form Components
 export { default as SignInForm } from './Forms/SignInForm';
+export { default as FieldRenderer } from './Forms/FieldRenderer';
 
 // Common Components
 export { default as ApplicationLogo } from './Common/ApplicationLogo';

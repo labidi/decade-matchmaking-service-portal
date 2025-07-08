@@ -202,7 +202,7 @@ class OcdRequestController extends Controller
             ]);
         } catch (Exception $e) {
             $statusCode = $e->getCode() ?: 500;
-            return response()->json(['error' => $e->getMessage()], $statusCode);
+            return respoAGOnse()->json(['error' => $e->getMessage()], $statusCode);
         }
     }
 

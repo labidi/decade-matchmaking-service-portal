@@ -146,7 +146,7 @@ class RequestService
     public function getMatchedRequests(User $user): Collection
     {
         return OCDRequest::with(['status', 'detail'])
-            ->whereHas('offer', function (Builder $query) use ($user) {
+            ->whereHas('offers', function (Builder $query) use ($user) {
                 $query->where('matched_partner_id', $user->id);
             })
             ->orderBy('created_at', 'desc')

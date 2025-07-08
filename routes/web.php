@@ -46,6 +46,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
     Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('user.request.show');
     Route::get('request/preview/{id}', [OcdRequestController::class, 'preview'])->name('request.preview');
+    Route::get('request/me/matched-requests', [OcdRequestController::class, 'matchedRequest'])->name('request.me.matched-requests');
 
     Route::get('user/request/pdf/{id}', [OcdRequestController::class, 'exportPdf'])->name('user.request.pdf');
     Route::post('user/request/submit', [OcdRequestController::class, 'submit'])->name('user.request.submit');
@@ -71,13 +72,11 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::delete('opportunity/{id}', [OcdOpportunityController::class, 'destroy'])->name('partner.opportunity.destroy');
     Route::get('request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
     Route::get('opportunity/edit/{id}', [OcdOpportunityController::class, 'edit'])->name('opportunity.edit');
-    Route::get('request/me/matched-requests', [OcdRequestController::class, 'matchedRequest'])->name('request.me.matched-requests');
 });
 
  Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
      Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
      Route::get('request/list', [AdminOcdRequestController::class, 'list'])->name('admin.request.list');
-     Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('admin.request.offer.store');
  });
 
 
@@ -86,6 +85,9 @@ Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('
 Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
 Route::get('notifications/{notification}', [\App\Http\Controllers\Admin\NotificationController::class, 'show'])->name('admin.notifications.show');
 Route::patch('notifications/{notification}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('admin.notifications.read');
+
+Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('request.offer.store');
+Route::get('request/{request}/offers', [RequestOfferController::class, 'list'])->name('request.offer.list');
 
 
 

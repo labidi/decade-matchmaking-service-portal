@@ -1,4 +1,5 @@
 import {countryOptions} from '@/data/locations';
+import {UIField} from '@/types';
 
 export interface Request {
     id: string;
@@ -37,19 +38,6 @@ export interface Request {
     delivery_format: 'Online' | 'On-site Choose countries' | 'Blended  Choose countries';
     delivery_country: string;
     target_audience: string;
-}
-
-export interface UIField {
-    id: string;
-    type: string;
-    label?: string;
-    description?: string;
-    placeholder?: string;
-    options?: { value: string; label: string }[];
-    required?: boolean;
-    show?: (data: Request) => boolean;
-    multiple?: boolean;
-    image?: string;
 }
 
 export interface UIStep {

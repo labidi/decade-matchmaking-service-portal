@@ -54,10 +54,15 @@ export default function NavigationMenu() {
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
-                {user.is_admin && unread_notifications > 0 && (
-                    <span className="ml-2 bg-red-600 text-white rounded-full px-2 text-xs">
+                {user.is_admin  && (
+                    <Link
+                        href={route('admin.notifications.index')}
+                    >
+                        <span className="ml-2 bg-red-600 text-white rounded-full px-2 text-xs">
                         {unread_notifications}
                     </span>
+                    </Link>
+
                 )}
             </button>
 
@@ -75,6 +80,17 @@ export default function NavigationMenu() {
                     >
                         Home
                     </Link>
+                    {user.is_admin && (
+
+                            <Link
+                                href={route('admin.dashboard.index')}
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                role="menuitem"
+                            >
+                                Dashboard
+                            </Link>
+
+                    )}
                     <Link
                         href={route('request.me.list')}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -90,24 +106,6 @@ export default function NavigationMenu() {
                     >
                         My Opportunties List
                     </Link>
-                    )}
-                    {user.is_admin && (
-                        <>
-                            <Link
-                                href={route('admin.notifications.index')}
-                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                role="menuitem"
-                            >
-                                Notifications (0)
-                            </Link>
-                            <Link
-                                href={route('admin.dashboard.index')}
-                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                role="menuitem"
-                            >
-                                Dashboard
-                            </Link>
-                        </>
                     )}
                     <form method="POST" onSubmit={handleSignOutFormSubmit}>
                         {/* Include CSRF token if needed */}
