@@ -1,3 +1,19 @@
+import {Request} from "@/Forms/UIRequestForm";
+
+export interface UIField {
+    id: string;
+    type: string;
+    label?: string;
+    description?: string;
+    placeholder?: string;
+    options?: { value: string; label: string }[];
+    required?: boolean;
+    show?: (data: Request) => boolean;
+    multiple?: boolean;
+    image?: string;
+    accept?: string;
+}
+
 export interface User {
     id: number;
     name: string;
@@ -225,3 +241,4 @@ export interface Notification {
 export type NotificationList = Notification[];
 
 export type OpportunityTypeOptions = Record<string, string>;
+

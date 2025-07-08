@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { Dialog } from 'primereact/dialog';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { FileUpload } from 'primereact/fileupload';
-import { Tag } from 'primereact/tag';
-import { useForm } from '@inertiajs/react';
+import React, {useState} from 'react';
+import {Dialog} from 'primereact/dialog';
+import {DataTable} from 'primereact/datatable';
+import {Column} from 'primereact/column';
+import {Button} from 'primereact/button';
+import {Tag} from 'primereact/tag';
+import {useForm} from '@inertiajs/react';
 import axios from 'axios';
+import FieldRenderer from '@/Components/Forms/FieldRenderer';
+import {UIOfferForm, Offer} from '@/Forms/UIOfferForm';
 
 interface RequestOffer {
     id: string;
@@ -26,13 +25,13 @@ interface OffersDialogProps {
     requestTitle: string;
 }
 
-export default function OffersDialog({ visible, onHide, requestId, requestTitle }: OffersDialogProps) {
+export default function OffersDialog({visible, onHide, requestId, requestTitle}: OffersDialogProps) {
     const [offers, setOffers] = useState<RequestOffer[]>([]);
     const [showNewOfferForm, setShowNewOfferForm] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const {data, setData, post, processing, errors, reset} = useForm({
         description: '',
         partner_id: '',
         document: null as File | null,
@@ -48,39 +47,24 @@ export default function OffersDialog({ visible, onHide, requestId, requestTitle 
     const loadOffers = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(route('admin.request.offers', requestId));
-            setOffers(response.data.offers || []);
-        } catch (error) {
-            console.error('Error loading offers:', error);
+            const response = await axios.get(route('request.offer.list', requestId));
+            if (response.data.success) {
+                setOffers(response.data.data.offers || []);
+            } else {
+                console.error('Error loading offers:', response.data.message);
+            }
+        } catch (error: any) {
+            console.error('Error loading offers:', error.response?.data?.message || error.message);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSubmitOffer = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const formData = new FormData();
-        formData.append('description', data.description);
-        formData.append('partner_id', data.partner_id);
-        if (selectedFile) {
-            formData.append('document', selectedFile);
-        }
-
-        try {
-            await axios.post(route('admin.request.offer.store', requestId), formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            reset();
-            setSelectedFile(null);
-            setShowNewOfferForm(false);
-            loadOffers();
-        } catch (error) {
-            console.error('Error submitting offer:', error);
-        }
-    };
+    const form = useForm<Offer>({
+        description: '',
+        partner_id: '',
+        file: null,
+    });
 
     const descriptionBodyTemplate = (rowData: RequestOffer) => (
         <div className="max-w-xs">
@@ -157,12 +141,14 @@ export default function OffersDialog({ visible, onHide, requestId, requestTitle 
         </div>
     );
 
+
+
     return (
         <Dialog
             header={`Offers for Request: ${requestTitle}`}
             visible={visible}
             onHide={onHide}
-            style={{ width: '80vw', maxWidth: '1200px' }}
+            style={{width: '80vw', maxWidth: '1200px'}}
             footer={footer}
             maximizable
         >
@@ -218,80 +204,46 @@ export default function OffersDialog({ visible, onHide, requestId, requestTitle 
                     header="Submit New Offer"
                     visible={showNewOfferForm}
                     onHide={() => setShowNewOfferForm(false)}
-                    style={{ width: '50vw' }}
+                    style={{width: '50vw'}}
                     modal
                 >
-                    <form onSubmit={handleSubmitOffer} className="space-y-4">
-                        <div>
-                            <label htmlFor="partner_id" className="block text-sm font-medium text-gray-700 mb-1">
-                                Partner ID *
-                            </label>
-                            <InputText
-                                id="partner_id"
-                                value={data.partner_id}
-                                onChange={(e) => setData('partner_id', e.target.value)}
-                                className={`w-full ${errors.partner_id ? 'p-invalid' : ''}`}
-                                placeholder="Enter partner ID"
+                    <form className="mx-auto bg-white"
+                          onSubmit={e => {
+                              e.preventDefault();
+                              form.post(route('request.offer.store', {request: requestId}), {
+                                  forceFormData: true,
+                                  onSuccess: (response: any) => {
+                                      form.reset();
+                                      setShowNewOfferForm(false);
+                                      loadOffers();
+                                      console.log('Offer submitted successfully:', response?.data?.message);
+                                  },
+                                  onError: (errors) => {
+                                      console.error('Form submission errors:', errors);
+                                  },
+                              });
+                          }}
+                    >
+                        {Object.entries(UIOfferForm[0].fields).map(([key, field]) => (
+                            <FieldRenderer
+                                key={key}
+                                name={key}
+                                field={field}
+                                value={(form.data as any)[key]}
+                                error={(form.errors as any)[key]}
+                                onChange={(name, value) => (form.setData as any)(name, value)}
+                                formData={form.data}
                             />
-                            {errors.partner_id && (
-                                <small className="p-error">{errors.partner_id}</small>
-                            )}
-                        </div>
+                        ))}
 
-                        <div>
-                            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                                Description *
-                            </label>
-                            <InputTextarea
-                                id="description"
-                                value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
-                                className={`w-full ${errors.description ? 'p-invalid' : ''}`}
-                                rows={4}
-                                placeholder="Enter offer description"
-                            />
-                            {errors.description && (
-                                <small className="p-error">{errors.description}</small>
-                            )}
-                        </div>
-
-                        <div>
-                            <label htmlFor="document" className="block text-sm font-medium text-gray-700 mb-1">
-                                Offer Document (PDF)
-                            </label>
-                            <FileUpload
-                                mode="basic"
-                                accept=".pdf"
-                                maxFileSize={10000000}
-                                chooseLabel="Choose PDF"
-                                onSelect={(e) => setSelectedFile(e.files[0])}
-                                customUpload
-                                uploadHandler={() => {}}
-                                auto
-                                className="w-full"
-                            />
-                            {selectedFile && (
-                                <div className="mt-2 text-sm text-gray-600">
-                                    Selected: {selectedFile.name}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="flex justify-end space-x-2 pt-4">
-                            <Button
-                                type="button"
-                                label="Cancel"
-                                icon="pi pi-times"
-                                onClick={() => setShowNewOfferForm(false)}
-                                className="p-button-text"
-                            />
-                            <Button
+                        <div className="flex flex-col space-y-2 mt-6">
+                            <button
                                 type="submit"
-                                label="Submit Offer"
-                                icon="pi pi-check"
-                                loading={processing}
-                                disabled={!data.partner_id || !data.description}
-                            />
+                                className="px-4 py-1 bg-firefly-600 text-white rounded disabled:opacity-50"
+                                disabled={form.processing || !form.data.file || !form.data.partner_id}
+                            >
+                                Submit Offer
+                            </button>
                         </div>
                     </form>
                 </Dialog>

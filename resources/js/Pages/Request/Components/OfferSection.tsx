@@ -8,7 +8,6 @@ export default function OfferSection({OcdRequest, OcdRequestOffer}: OfferProps) 
         partner_id: '',
         file: null,
     });
-    console.log(OcdRequest);
     const getInputClass = () => {
         return "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500";
     }
@@ -22,7 +21,7 @@ export default function OfferSection({OcdRequest, OcdRequestOffer}: OfferProps) 
                 </div>
             </div>
             <div className="grid grid-cols-1">
-                {!OcdRequestOffer && OcdRequest.status.status_code == "validated" && (
+                { OcdRequest.status.status_code == "validated" && (
                     <div>
                         <form className="mx-auto bg-white"
                               onSubmit={e => {

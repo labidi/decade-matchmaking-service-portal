@@ -1,20 +1,17 @@
 import React, {useState} from 'react';
-import {Head, Link} from '@inertiajs/react';
+import {Head, Link , usePage} from '@inertiajs/react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import {OCDRequest, OCDRequestList, OCDRequestGrid} from '@/types';
-import {usePage} from '@inertiajs/react';
+import {OCDRequest, OCDRequestList} from '@/types';
 import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column';
 import {Tag} from 'primereact/tag';
-import {FilterMatchMode, FilterOperator} from 'primereact/api';
-import {InputText} from 'primereact/inputtext';
+import {FilterMatchMode} from 'primereact/api';
 import {Button} from 'primereact/button';
 import {Dropdown} from 'primereact/dropdown';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import axios from 'axios';
-import XHRAlertDialog from "@/Components/Dialogs/XHRAlertDialog";
 import OffersDialog from "@/Components/Dialogs/OffersDialog";
 import { useOffersDialog } from "@/hooks/useOffersDialog";
 
