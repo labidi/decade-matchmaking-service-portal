@@ -183,7 +183,7 @@ export interface OCDOpportunity {
     created_at: string;
     updated_at: string;
     user_id: string;
-    status: string;
+    status: number;
     status_label: string;
     can_edit: boolean;
     keywords: string

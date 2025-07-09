@@ -18,7 +18,7 @@ class RequestOffer extends Model
 
     const STATUS_LABELS = [
         RequestOfferStatus::ACTIVE->value => 'Active',
-        RequestOfferStatus::REJECTED->value => 'Rejected',
+        RequestOfferStatus::INACTIVE->value => 'Inactive',
     ];
 
     protected $casts = [

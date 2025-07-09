@@ -10,6 +10,7 @@ import {Column} from 'primereact/column';
 import {DataTable} from 'primereact/datatable';
 import {Head, Link, usePage} from '@inertiajs/react';
 import {Tag} from 'primereact/tag';
+import {countryOptions, regionOptions, oceanOptions} from '@/data/locations';
 
 
 export default function OpportunitiesList() {
@@ -48,6 +49,39 @@ export default function OpportunitiesList() {
     };
     const titleBodyTemplate = (rowData: OCDOpportunity) => rowData.title ?? 'N/A';
     const ApplicationClosingDate = (rowData: OCDOpportunity) => new Date(rowData.closing_date).toLocaleDateString();
+    
+    const ImplementationLocationTemplate = (rowData: OCDOpportunity) => {
+        const implementationLocation = rowData.implementation_location;
+        const coverageActivity = rowData.coverage_activity;
+        
+        if (!implementationLocation) {
+            return 'N/A';
+        }
+        
+        // Define the options based on coverage activity (same logic as Create form)
+        let options: { value: string; label: string }[] = [];
+        
+        switch (coverageActivity) {
+            case 'country':
+                options = countryOptions;
+                break;
+            case 'Regions':
+                options = regionOptions;
+                break;
+            case 'Ocean-based':
+                options = oceanOptions;
+                break;
+            case 'Global':
+                options = [{value: 'Global', label: 'Global'}];
+                break;
+            default:
+                return implementationLocation; // Return as-is if no matching coverage activity
+        }
+        
+        // Find the matching option and return the label
+        const option = options.find(opt => opt.value === implementationLocation);
+        return option ? option.label : implementationLocation;
+    };
     const statusBodyTemplate = (rowData: OCDOpportunity) => {
         const code = rowData.status
         const label = rowData.status_label
@@ -55,26 +89,26 @@ export default function OpportunitiesList() {
         let iconClass = '';
         let tagSeverity: 'success' | 'info' | 'warning' | 'danger' | undefined = undefined;
         let iconColor = '';
-
+        console.log(code);
         switch (code) {
-            case '1':
+            case 1:
                 iconClass = 'pi pi-file-edit';
-                tagSeverity = 'info';
+                tagSeverity = 'success';
                 iconColor = 'mr-1';
                 break;
-            case '2':
+            case 2:
                 iconClass = 'pi pi-clock';
                 tagSeverity = 'info';
                 iconColor = 'mr-1';
                 break;
-            case '3':
+            case 3:
                 iconClass = 'pi pi-check-circle';
                 tagSeverity = 'danger';
                 iconColor = 'mr-1';
                 break;
-            case '4':
+            case 4:
                 iconClass = 'pi pi-times-circle';
-                tagSeverity = 'danger';
+                tagSeverity = 'info';
                 iconColor = 'mr-1';
                 break;
             default:
@@ -176,7 +210,7 @@ export default function OpportunitiesList() {
                             sortable/>
                     <Column field="status.status_code" body={statusBodyTemplate} header="Status" sortable/>
                     <Column field="coverage_activity" header="Coverage of CD Activity" sortable/>
-                    <Column field="implementation_location" header="Implementation location" sortable/>
+                    <Column body={ImplementationLocationTemplate} header="Implementation location" sortable/>
                     <Column body={actionsTemplate} header="Actions"/>
                 </DataTable>
             </div>
