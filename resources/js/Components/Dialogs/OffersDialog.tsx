@@ -15,7 +15,8 @@ interface RequestOffer {
     partner_id: string;
     document_url?: string;
     created_at: string;
-    status: string;
+    status: number;
+    status_label: string;
 }
 
 interface OffersDialogProps {
@@ -83,15 +84,11 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
         let icon = 'pi pi-info-circle';
 
         switch (rowData.status) {
-            case 'pending':
-                severity = 'warning';
-                icon = 'pi pi-clock';
-                break;
-            case 'accepted':
+            case 1:
                 severity = 'success';
                 icon = 'pi pi-check-circle';
                 break;
-            case 'rejected':
+            case 2:
                 severity = 'danger';
                 icon = 'pi pi-times-circle';
                 break;
@@ -102,9 +99,8 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
 
         return (
             <Tag
-                value={rowData.status}
+                value={rowData.status_label}
                 severity={severity}
-                icon={<i className={icon}/>}
                 className="capitalize"
             />
         );
@@ -185,7 +181,7 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
                             style={{width: '150px'}}
                         />
                         <Column
-                            field="status"
+                            field="status_label"
                             header="Status"
                             body={statusBodyTemplate}
                             sortable
