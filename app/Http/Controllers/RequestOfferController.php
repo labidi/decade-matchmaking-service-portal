@@ -8,27 +8,22 @@ use App\Models\Document;
 use Illuminate\Http\Request as HttpRequest;
 use App\Enums\RequestOfferStatus;
 use App\Enums\DocumentType;
+use App\Http\Requests\StoreRequestOffer;
+use App\Http\Requests\UpdateRequestOfferStatus;
+use Illuminate\Http\JsonResponse;
 
 class RequestOfferController extends Controller
 {
-    public function store(HttpRequest $httpRequest, OCDRequest $request)
+    /**
+     * Store a newly created offer in storage.
+     *
+     * @param StoreRequestOffer $offerRequest
+     * @param OCDRequest $request
+     * @return JsonResponse
+     */
+    public function store(StoreRequestOffer $offerRequest, OCDRequest $request): JsonResponse
     {
         try {
-            $validated = $httpRequest->validate([
-                'description' => 'required|string|max:1000',
-                'partner_id' => 'required|string|max:255',
-                'file' => 'required|file|mimes:pdf|max:10240', // 10MB max
-            ]);
-
-            // Check if user is authenticated
-            if (!$httpRequest->user()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Authentication required',
-                    'error' => 'User not authenticated'
-                ], 401);
-            }
-
             // Check if request exists and is accessible
             if (!$request) {
                 return response()->json([
@@ -38,13 +33,16 @@ class RequestOfferController extends Controller
                 ], 404);
             }
 
+            // Get validated data from Form Request
+            $validated = $offerRequest->validated();
+
             // Create the offer
             $offer = new RequestOffer();
             $offer->description = $validated['description'];
             $offer->matched_partner_id = $validated['partner_id'];
             $offer->request_id = $request->id;
-            $offer->status = RequestOfferStatus::ACTIVE;
-            
+            $offer->status = RequestOfferStatus::INACTIVE;
+
             if (!$offer->save()) {
                 return response()->json([
                     'success' => false,
@@ -55,8 +53,9 @@ class RequestOfferController extends Controller
 
             // Handle file upload
             try {
-                $path = $httpRequest->file('file')->store('documents', 'public');
-                
+                $uploadedFile = $offerRequest->file('document');
+                $path = $uploadedFile->store('documents', 'public');
+
                 if (!$path) {
                     // If file upload failed, delete the offer and return error
                     $offer->delete();
@@ -69,13 +68,13 @@ class RequestOfferController extends Controller
 
                 // Create document record
                 $document = Document::create([
-                    'name' => $httpRequest->file('file')->getClientOriginalName(),
+                    'name' => $uploadedFile->getClientOriginalName(),
                     'path' => $path,
-                    'file_type' => $httpRequest->file('file')->getClientMimeType(),
+                    'file_type' => $uploadedFile->getClientMimeType(),
                     'document_type' => DocumentType::OFFER_DOCUMENT,
                     'parent_id' => $offer->id,
                     'parent_type' => RequestOffer::class,
-                    'uploader_id' => $httpRequest->user()->id,
+                    'uploader_id' => $offerRequest->user()->id,
                 ]);
 
                 if (!$document) {
@@ -110,17 +109,10 @@ class RequestOfferController extends Controller
                 ]
             ], 201);
 
-        } catch (\Illuminate\Validation\ValidationException $validationException) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validationException->errors()
-            ], 422);
-
         } catch (\Exception $exception) {
             \Log::error('RequestOffer store error: ' . $exception->getMessage(), [
                 'request_id' => $request->id ?? null,
-                'user_id' => $httpRequest->user()->id ?? null,
+                'user_id' => $offerRequest->user()->id ?? null,
                 'exception' => $exception
             ]);
 
@@ -131,7 +123,15 @@ class RequestOfferController extends Controller
             ], 500);
         }
     }
-    public function list(HttpRequest $httpRequest, OCDRequest $request)
+
+    /**
+     * Display a listing of offers for a specific request.
+     *
+     * @param HttpRequest $httpRequest
+     * @param OCDRequest $request
+     * @return JsonResponse
+     */
+    public function list(HttpRequest $httpRequest, OCDRequest $request): JsonResponse
     {
         try {
             // Check if request exists
@@ -143,8 +143,13 @@ class RequestOfferController extends Controller
                 ], 404);
             }
 
-            // Get offers for the request
-            $requestOffers = $request->offers()->with('documents')->get();
+            // Get offers for the request with eager loading
+            $requestOffers = $request->offers()
+                ->with(['documents' => function ($query) {
+                    $query->select('id', 'name', 'path', 'parent_id', 'parent_type');
+                }])
+                ->orderBy('created_at', 'desc')
+                ->get();
 
             return response()->json([
                 'success' => true,
@@ -169,22 +174,17 @@ class RequestOfferController extends Controller
         }
     }
 
-    public function updateStatus(HttpRequest $httpRequest, OCDRequest $request, RequestOffer $offer)
+    /**
+     * Update the status of a specific offer.
+     *
+     * @param UpdateRequestOfferStatus $statusRequest
+     * @param OCDRequest $request
+     * @param RequestOffer $offer
+     * @return JsonResponse
+     */
+    public function updateStatus(UpdateRequestOfferStatus $statusRequest, OCDRequest $request, RequestOffer $offer): JsonResponse
     {
         try {
-            $validated = $httpRequest->validate([
-                'status' => 'required|in:' . implode(',', RequestOfferStatus::values()),
-            ]);
-
-            // Check if user is authenticated and has permission
-            if (!$httpRequest->user()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Authentication required',
-                    'error' => 'User not authenticated'
-                ], 401);
-            }
-
             // Check if offer belongs to the request
             if ($offer->request_id !== $request->id) {
                 return response()->json([
@@ -194,8 +194,11 @@ class RequestOfferController extends Controller
                 ], 400);
             }
 
+            // Get validated data from Form Request
+            $validated = $statusRequest->validated();
+
             $offer->status = $validated['status'];
-            
+
             if (!$offer->save()) {
                 return response()->json([
                     'success' => false,
@@ -210,22 +213,16 @@ class RequestOfferController extends Controller
                 'data' => [
                     'offer_id' => $offer->id,
                     'status' => $offer->status,
+                    'status_label' => $offer->status_label,
                     'updated_at' => $offer->updated_at
                 ]
             ], 200);
-
-        } catch (\Illuminate\Validation\ValidationException $validationException) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validationException->errors()
-            ], 422);
 
         } catch (\Exception $exception) {
             \Log::error('RequestOffer updateStatus error: ' . $exception->getMessage(), [
                 'request_id' => $request->id ?? null,
                 'offer_id' => $offer->id ?? null,
-                'user_id' => $httpRequest->user()->id ?? null,
+                'user_id' => $statusRequest->user()->id ?? null,
                 'exception' => $exception
             ]);
 
