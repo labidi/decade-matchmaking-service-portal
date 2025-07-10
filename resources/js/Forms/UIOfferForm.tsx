@@ -3,7 +3,7 @@ import {UIField} from '@/types';
 export interface Offer {
     description: string;
     partner_id: string;
-    file: File | null;
+    document: File | null;
     [key: string]: any;
 }
 
@@ -32,8 +32,8 @@ export const UIOfferForm: UIStep[] = [
                 description: 'Add Offer Description',
                 placeholder: 'Offer Description',
             },
-            file: {
-                id: 'file',
+            document: {
+                id: 'document',
                 type: 'file',
                 required: true,
                 label: 'Offer Document',

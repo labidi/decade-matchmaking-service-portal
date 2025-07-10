@@ -4,10 +4,8 @@ import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column';
 import {Button} from 'primereact/button';
 import {Tag} from 'primereact/tag';
-import {useForm} from '@inertiajs/react';
 import axios from 'axios';
-import FieldRenderer from '@/Components/Forms/FieldRenderer';
-import {UIOfferForm, Offer} from '@/Forms/UIOfferForm';
+import NewOfferDialog from '@/Components/Dialogs/NewOfferDialog';
 
 interface RequestOffer {
     id: string;
@@ -30,13 +28,6 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
     const [offers, setOffers] = useState<RequestOffer[]>([]);
     const [showNewOfferForm, setShowNewOfferForm] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-    const {data, setData, post, processing, errors, reset} = useForm({
-        description: '',
-        partner_id: '',
-        document: null as File | null,
-    });
 
     // Load offers when dialog opens
     React.useEffect(() => {
@@ -60,12 +51,6 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
             setLoading(false);
         }
     };
-
-    const form = useForm<Offer>({
-        description: '',
-        partner_id: '',
-        file: null,
-    });
 
     const descriptionBodyTemplate = (rowData: RequestOffer) => (
         <div className="max-w-xs">
@@ -137,113 +122,72 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
         </div>
     );
 
-
-
     return (
-        <Dialog
-            header={`Offers for Request: ${requestTitle}`}
-            visible={visible}
-            onHide={onHide}
-            style={{width: '80vw', maxWidth: '1200px'}}
-            footer={footer}
-            maximizable
-        >
-            <div className="space-y-6">
-                {/* Offers DataTable */}
-                <div className="bg-white rounded-lg border">
-                    <DataTable
-                        value={offers}
-                        loading={loading}
-                        paginator
-                        rows={5}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        showGridlines
-                        emptyMessage="No offers found for this request."
-                        className="p-datatable-sm"
-                    >
-                        <Column
-                            field="partner_id"
-                            header="Partner ID"
-                            sortable
-                            style={{width: '120px'}}
-                        />
-                        <Column
-                            field="description"
-                            header="Description"
-                            body={descriptionBodyTemplate}
-                            style={{minWidth: '200px'}}
-                        />
-                        <Column
-                            field="created_at"
-                            header="Submitted Date"
-                            body={dateBodyTemplate}
-                            sortable
-                            style={{width: '150px'}}
-                        />
-                        <Column
-                            field="status_label"
-                            header="Status"
-                            body={statusBodyTemplate}
-                            sortable
-                            style={{width: '120px'}}
-                        />
-                        <Column
-                            header="Actions"
-                            body={actionsBodyTemplate}
-                            style={{width: '100px'}}
-                        />
-                    </DataTable>
-                </div>
-
-                {/* New Offer Form Dialog */}
-                <Dialog
-                    header="Submit New Offer"
-                    visible={showNewOfferForm}
-                    onHide={() => setShowNewOfferForm(false)}
-                    style={{width: '50vw'}}
-                    modal
-                >
-                    <form className="mx-auto bg-white"
-                          onSubmit={e => {
-                              e.preventDefault();
-                              form.post(route('request.offer.store', {request: requestId}), {
-                                  forceFormData: true,
-                                  onSuccess: (response: any) => {
-                                      form.reset();
-                                      setShowNewOfferForm(false);
-                                      loadOffers();
-                                      console.log('Offer submitted successfully:', response?.data?.message);
-                                  },
-                                  onError: (errors) => {
-                                      console.error('Form submission errors:', errors);
-                                  },
-                              });
-                          }}
-                    >
-                        {Object.entries(UIOfferForm[0].fields).map(([key, field]) => (
-                            <FieldRenderer
-                                key={key}
-                                name={key}
-                                field={field}
-                                value={(form.data as any)[key]}
-                                error={(form.errors as any)[key]}
-                                onChange={(name, value) => (form.setData as any)(name, value)}
-                                formData={form.data}
+        <>
+            <Dialog
+                header={`Offers for Request: ${requestTitle}`}
+                visible={visible}
+                onHide={onHide}
+                style={{width: '80vw', maxWidth: '1200px'}}
+                footer={footer}
+                maximizable
+            >
+                <div className="space-y-6">
+                    {/* Offers DataTable */}
+                    <div className="bg-white rounded-lg border">
+                        <DataTable
+                            value={offers}
+                            loading={loading}
+                            paginator
+                            rows={5}
+                            rowsPerPageOptions={[5, 10, 25]}
+                            showGridlines
+                            emptyMessage="No offers found for this request."
+                            className="p-datatable-sm"
+                        >
+                            <Column
+                                field="partner_id"
+                                header="Partner ID"
+                                sortable
+                                style={{width: '120px'}}
                             />
-                        ))}
+                            <Column
+                                field="description"
+                                header="Description"
+                                body={descriptionBodyTemplate}
+                                style={{minWidth: '200px'}}
+                            />
+                            <Column
+                                field="created_at"
+                                header="Submitted Date"
+                                body={dateBodyTemplate}
+                                sortable
+                                style={{width: '150px'}}
+                            />
+                            <Column
+                                field="status_label"
+                                header="Status"
+                                body={statusBodyTemplate}
+                                sortable
+                                style={{width: '120px'}}
+                            />
+                            <Column
+                                header="Actions"
+                                body={actionsBodyTemplate}
+                                style={{width: '100px'}}
+                            />
+                        </DataTable>
+                    </div>
+                </div>
+            </Dialog>
 
-                        <div className="flex flex-col space-y-2 mt-6">
-                            <button
-                                type="submit"
-                                className="px-4 py-1 bg-firefly-600 text-white rounded disabled:opacity-50"
-                                disabled={form.processing || !form.data.file || !form.data.partner_id}
-                            >
-                                Submit Offer
-                            </button>
-                        </div>
-                    </form>
-                </Dialog>
-            </div>
-        </Dialog>
+            {/* New Offer Dialog */}
+            <NewOfferDialog
+                visible={showNewOfferForm}
+                onHide={() => setShowNewOfferForm(false)}
+                requestId={requestId}
+                onSuccess={loadOffers}
+            />
+        </>
     );
 }
