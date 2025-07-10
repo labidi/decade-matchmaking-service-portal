@@ -94,7 +94,7 @@ Route::patch('request/{request}/offer/{offer}/status', [RequestOfferController::
 // Location data routes
 Route::get('api/location-data', [LocationDataController::class, 'index'])->name('api.location-data');
 Route::get('api/location-data/implementation/{coverageActivity}', [LocationDataController::class, 'getImplementationLocationOptions'])->name('api.location-data.implementation');
-
+Route::get('api/partners', [RequestOfferController::class, 'partnersList'])->name('api.partners.list');
 
 
 require __DIR__ . '/auth.php';

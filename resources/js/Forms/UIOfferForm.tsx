@@ -18,11 +18,12 @@ export const UIOfferForm: UIStep[] = [
         fields: {
             partner_id: {
                 id: 'partner_id',
-                type: 'text',
+                type: 'select',
                 required: true,
-                label: 'Partner ID',
-                description: 'Enter Unique ID (for partner)',
-                placeholder: 'Partner ID',
+                label: 'Partner',
+                description: 'Select a partner from the list',
+                placeholder: 'Select a partner',
+                options: [], // Will be filled dynamically in FieldRenderer
             },
             description: {
                 id: 'description',

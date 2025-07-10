@@ -11,6 +11,7 @@ use App\Enums\DocumentType;
 use App\Http\Requests\StoreRequestOffer;
 use App\Http\Requests\UpdateRequestOfferStatus;
 use Illuminate\Http\JsonResponse;
+use App\Models\User;
 
 class RequestOfferController extends Controller
 {
@@ -253,5 +254,17 @@ class RequestOfferController extends Controller
                 'error' => config('app.debug') ? $exception->getMessage() : 'Internal server error'
             ], 500);
         }
+    }
+
+    /**
+     * Return all users with the 'partner' role as JSON
+     */
+    public function partnersList(): JsonResponse
+    {
+        $partners = User::role('partner')->select('id', 'name', 'email', 'first_name', 'last_name')->get();
+        return response()->json([
+            'success' => true,
+            'data' => $partners
+        ]);
     }
 }
