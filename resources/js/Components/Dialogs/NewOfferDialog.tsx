@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Dialog} from 'primereact/dialog';
 import axios from 'axios';
 import FieldRenderer from '@/Components/Forms/FieldRenderer';
@@ -27,6 +27,41 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
     });
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
+    // Partner users state
+    const [partners, setPartners] = useState<{id: string, name: string, email: string, first_name?: string, last_name?: string}[]>([]);
+    const [partnersLoading, setPartnersLoading] = useState(false);
+    const [partnersError, setPartnersError] = useState<string | null>(null);
+
+    useEffect(() => {
+        setPartnersLoading(true);
+        axios.get(route('api.partners.list'))
+            .then(res => {
+                if (res.data.success) {
+                    setPartners(res.data.data);
+                } else {
+                    setPartnersError('Failed to load partners');
+                }
+            })
+            .catch(() => setPartnersError('Failed to load partners'))
+            .finally(() => setPartnersLoading(false));
+    }, []);
+
+    // Prepare offer form fields with partner options injected
+    const offerFormFields = React.useMemo(() => {
+        const step = {...UIOfferForm[0]};
+        step.fields = {...step.fields};
+        if (step.fields.partner_id) {
+            step.fields.partner_id = {
+                ...step.fields.partner_id,
+                options: partners.map(partner => ({
+                    value: partner.id,
+                    label: `${partner.name || ((partner.first_name || '') + ' ' + (partner.last_name || ''))} (${partner.email})`,
+                })),
+            };
+        }
+        return step.fields;
+    }, [partners]);
+
     const handleFieldChange = (name: string, value: any) => {
         setFormData(prev => ({
             ...prev,
@@ -43,24 +78,6 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
 
     const handleSubmitNewOffer = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Validate required fields
-        const errors: Record<string, string> = {};
-        if (!formData.description.trim()) {
-            errors.description = 'Description is required';
-        }
-        if (!formData.partner_id.trim()) {
-            errors.partner_id = 'Partner ID is required';
-        }
-        if (!formData.document) {
-            errors.document = 'Document file is required';
-        }
-
-        if (Object.keys(errors).length > 0) {
-            setFormErrors(errors);
-            return;
-        }
-
         setIsSubmitting(true);
         setXhrDialogResponseType('loading');
         setXhrDialogResponseMessage('Submitting offer...');
@@ -125,7 +142,7 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
                 modal
             >
                 <form className="mx-auto bg-white" onSubmit={handleSubmitNewOffer}>
-                    {Object.entries(UIOfferForm[0].fields).map(([key, field]) => (
+                    {Object.entries(offerFormFields).map(([key, field]) => (
                         <FieldRenderer
                             key={key}
                             name={key}
@@ -136,6 +153,7 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
                             formData={formData}
                         />
                     ))}
+                    {partnersError && <div className="text-red-600 text-xs mt-1">{partnersError}</div>}
 
                     <div className="flex flex-col space-y-2 mt-6">
                         <button
