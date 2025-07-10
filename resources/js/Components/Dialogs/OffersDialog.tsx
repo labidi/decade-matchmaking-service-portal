@@ -4,6 +4,8 @@ import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column';
 import {Button} from 'primereact/button';
 import {Tag} from 'primereact/tag';
+import {InputSwitch} from 'primereact/inputswitch';
+import {Toast} from 'primereact/toast';
 import axios from 'axios';
 import NewOfferDialog from '@/Components/Dialogs/NewOfferDialog';
 
@@ -28,6 +30,8 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
     const [offers, setOffers] = useState<RequestOffer[]>([]);
     const [showNewOfferForm, setShowNewOfferForm] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+    const [toast, setToast] = useState<Toast | null>(null);
 
     // Load offers when dialog opens
     React.useEffect(() => {
@@ -52,6 +56,66 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
         }
     };
 
+    const handleStatusChange = async (offerId: string, newStatus: boolean) => {
+        // Prevent multiple simultaneous updates
+        if (updatingStatus) {
+            return;
+        }
+
+        setUpdatingStatus(offerId);
+        
+        try {
+            const statusValue = newStatus ? 1 : 2; // 1 = Active, 2 = Inactive
+            
+            const response = await axios.patch(
+                route('request.offer.update-status', { 
+                    request: requestId, 
+                    offer: offerId 
+                }), 
+                { status: statusValue }
+            );
+
+            if (response.data.success) {
+                // Update the offer status in the local state
+                setOffers(prevOffers => 
+                    prevOffers.map(offer => 
+                        offer.id === offerId 
+                            ? { 
+                                ...offer, 
+                                status: statusValue,
+                                status_label: statusValue === 1 ? 'Active' : 'Inactive'
+                              }
+                            : offer
+                    )
+                );
+
+                toast?.show({
+                    severity: 'success',
+                    summary: 'Status Updated',
+                    detail: 'Offer status updated successfully',
+                    life: 3000
+                });
+            } else {
+                toast?.show({
+                    severity: 'error',
+                    summary: 'Update Failed',
+                    detail: response.data.message || 'Failed to update status',
+                    life: 3000
+                });
+            }
+        } catch (error: any) {
+            console.error('Error updating offer status:', error);
+            toast?.show({
+                severity: 'error',
+                summary: 'Update Failed',
+                detail: error.response?.data?.message || 'Failed to update offer status',
+                life: 3000
+            });
+        } finally {
+            setUpdatingStatus(null);
+        }
+    };
+
     const descriptionBodyTemplate = (rowData: RequestOffer) => (
         <div className="max-w-xs">
             <p className="text-sm text-gray-900 line-clamp-2">{rowData.description}</p>
@@ -65,29 +129,46 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
     );
 
     const statusBodyTemplate = (rowData: RequestOffer) => {
-        let severity: 'success' | 'info' | 'warning' | 'danger' | undefined = undefined;
-        let icon = 'pi pi-info-circle';
+        const isActive = rowData.status === 1;
+        const isUpdating = updatingStatus === rowData.id;
 
-        switch (rowData.status) {
-            case 1:
-                severity = 'success';
-                icon = 'pi pi-check-circle';
-                break;
-            case 2:
-                severity = 'danger';
-                icon = 'pi pi-times-circle';
-                break;
-            default:
-                severity = 'info';
-                icon = 'pi pi-info-circle';
-        }
+        const handleSwitchChange = (e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (!isUpdating) {
+                handleStatusChange(rowData.id, !isActive);
+            }
+        };
 
         return (
-            <Tag
-                value={rowData.status_label}
-                severity={severity}
-                className="capitalize"
-            />
+            <div className="flex items-center space-x-2 p-2">
+                <div 
+                    className="cursor-pointer"
+                    onClick={handleSwitchChange}
+                    onMouseDown={(e) => e.preventDefault()}
+                >
+                    <InputSwitch
+                        checked={isActive}
+                        onChange={(e) => {
+                            e.preventDefault();
+                            if (!isUpdating) {
+                                handleStatusChange(rowData.id, e.value);
+                            }
+                        }}
+                        disabled={isUpdating}
+                        className={`${isUpdating ? 'opacity-50' : ''} cursor-pointer`}
+                        pt={{
+                            root: { className: 'cursor-pointer' },
+                            slider: { className: 'cursor-pointer' },
+                            input: { className: 'cursor-pointer' }
+                        }}
+                    />
+                </div>
+                <span className="text-sm text-gray-600 select-none">
+                    {isUpdating ? 'Updating...' : (isActive ? 'Active' : 'Inactive')}
+                </span>
+            </div>
         );
     };
 
@@ -169,7 +250,7 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
                                 header="Status"
                                 body={statusBodyTemplate}
                                 sortable
-                                style={{width: '120px'}}
+                                style={{width: '150px'}}
                             />
                             <Column
                                 header="Actions"
@@ -188,6 +269,9 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
                 requestId={requestId}
                 onSuccess={loadOffers}
             />
+
+            {/* Toast for notifications */}
+            <Toast ref={setToast} />
         </>
     );
 }

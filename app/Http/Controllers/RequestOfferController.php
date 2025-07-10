@@ -33,6 +33,19 @@ class RequestOfferController extends Controller
                 ], 404);
             }
 
+            // Check if there's already an active offer for this request
+            $existingActiveOffer = $request->offers()
+                ->where('status', RequestOfferStatus::ACTIVE)
+                ->first();
+
+            if ($existingActiveOffer) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot create offer',
+                    'error' => 'This request already has an active offer. Only one active offer is allowed per request.'
+                ], 422);
+            }
+
             // Get validated data from Form Request
             $validated = $offerRequest->validated();
 
@@ -196,6 +209,14 @@ class RequestOfferController extends Controller
 
             // Get validated data from Form Request
             $validated = $statusRequest->validated();
+
+            // If we're activating an offer, deactivate all other active offers for this request
+            if ($validated['status'] === RequestOfferStatus::ACTIVE) {
+                $request->offers()
+                    ->where('id', '!=', $offer->id)
+                    ->where('status', RequestOfferStatus::ACTIVE)
+                    ->update(['status' => RequestOfferStatus::INACTIVE]);
+            }
 
             $offer->status = $validated['status'];
 
