@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('request_offers', function (Blueprint $table) {
             // Add a unique constraint for active offers per request
             // This ensures only one active offer per request at the database level
-            $table->unique(['request_id', 'status'], 'unique_active_offer_per_request')
-                ->where('status', 1); // 1 = ACTIVE status
+//            $table->unique(['request_id', 'status'], 'unique_active_offer_per_request')
+//                ->where('status', 1); // 1 = ACTIVE status
         });
     }
 
@@ -24,8 +24,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('request_offers', function (Blueprint $table) {
-            $table->dropUnique('unique_active_offer_per_request');
-        });
+//        Schema::table('request_offers', function (Blueprint $table) {
+//            $table->dropUnique('unique_active_offer_per_request');
+//        });
     }
 };
