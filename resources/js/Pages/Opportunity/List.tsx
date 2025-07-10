@@ -10,14 +10,20 @@ import {Column} from 'primereact/column';
 import {DataTable} from 'primereact/datatable';
 import {Head, Link, usePage} from '@inertiajs/react';
 import {Tag} from 'primereact/tag';
-import {countryOptions, regionOptions, oceanOptions} from '@/data/locations';
 
 
 export default function OpportunitiesList() {
-    const opportunitiesList = usePage().props.opportunities as OCDOpportunitiesList;
-    const pageActions = usePage().props.pageActions as OCDOpportunitiesListPageActions;
+    const page = usePage();
+    const opportunitiesList = page.props.opportunities as OCDOpportunitiesList;
+    const pageActions = page.props.pageActions as OCDOpportunitiesListPageActions;
+    const locationData = (page.props.locationData as any) || {
+        countries: [],
+        regions: [],
+        oceans: [],
+        targetAudiences: []
+    };
 
-    const {auth} = usePage<{ auth: Auth }>().props;
+    const {auth} = page.props;
     const [opportunityList, setOpportunityList] = React.useState<OCDOpportunitiesList>(opportunitiesList);
 
     const statuses = [
@@ -63,13 +69,13 @@ export default function OpportunitiesList() {
         
         switch (coverageActivity) {
             case 'country':
-                options = countryOptions;
+                options = locationData.countries;
                 break;
             case 'Regions':
-                options = regionOptions;
+                options = locationData.regions;
                 break;
             case 'Ocean-based':
-                options = oceanOptions;
+                options = locationData.oceans;
                 break;
             case 'Global':
                 options = [{value: 'Global', label: 'Global'}];

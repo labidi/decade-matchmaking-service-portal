@@ -22,9 +22,9 @@ export default function Show() {
                             <dt className="text-2xl text-firefly-800">Status</dt>
                             <dd className="mt-1">
                                 <span
-                                    className={`inline-block px-2 py-1 text-sm font-medium rounded-full ${opportunity.status === 'Open'
+                                    className={`inline-block px-2 py-1 text-sm font-medium rounded-full ${opportunity.status === 1
                                         ? 'bg-green-100 text-green-800'
-                                        : opportunity.status === 'Closed'
+                                        : opportunity.status === 2
                                             ? 'bg-red-100 text-red-800'
                                             : 'bg-gray-100 text-gray-800'
                                         }`}

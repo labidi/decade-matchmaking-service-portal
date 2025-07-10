@@ -1,5 +1,3 @@
-import { countryOptions, regionOptions, oceanOptions } from '@/data/locations';
-
 export interface Opportunity {
     id: string;
     title: string;
@@ -32,22 +30,7 @@ export interface UIStep {
     fields: Record<string, UIField>;
 }
 
-export const opportunityTypeOptions = [
-    { value: 'training', label: 'Training' },
-    { value: 'onboarding-expeditions', label: 'Onboarding Expeditions, Research & Training' },
-    { value: 'fellowships', label: 'Fellowships' },
-    { value: 'internships-jobs', label: 'Internships/Jobs' },
-    { value: 'mentorships', label: 'Mentorships' },
-    { value: 'visiting-lecturers', label: 'Visiting Lecturers/Scholars' },
-    { value: 'travel-grants', label: 'Travel Grants' },
-    { value: 'awards', label: 'Awards' },
-    { value: 'research-funding', label: 'Research Fundings, Grants & Scholarships' },
-    { value: 'access-infrastructure', label: 'Access to Infrastructure' },
-    { value: 'ocean-data', label: 'Ocean Data, Information and Documentation' },
-    { value: 'networks-community', label: 'Professional Networks & Community Building' },
-    { value: 'ocean-literacy', label: 'Ocean Literacy, Public Information and Communication' },
-];
-
+// opportunityTypeOptions should be provided by the parent component from backend
 export const coverageActivityOptions = [
     { value: 'country', label: 'Country' },
     { value: 'Regions', label: 'Regions' },
@@ -55,25 +38,8 @@ export const coverageActivityOptions = [
     { value: 'Ocean-based', label: 'Ocean Based' },
 ];
 
-export const targetAudienceOptions = [
-    { value: 'academic', label: 'Academic' },
-    { value: 'alumni', label: 'Alumni' },
-    { value: 'civil-society', label: 'Civil Society' },
-    { value: 'sids', label: 'Small Island Developing States (SIDS)' },
-    { value: 'decision-makers', label: 'Decision Makers' },
-    { value: 'developing-countries', label: 'Developing Countries' },
-    { value: 'early-career', label: 'Early Career Professionals' },
-    { value: 'researchers', label: 'Researchers' },
-    { value: 'doctoral-postdoctoral', label: 'Doctoral or Postdoctoral' },
-    { value: 'scientists', label: 'Scientists' },
-    { value: 'executives', label: 'Executives' },
-    { value: 'technicians', label: 'Technicians' },
-    { value: 'general-public', label: 'General Public' },
-    { value: 'women', label: 'Women' },
-    { value: 'government', label: 'Government' },
-    { value: 'youth', label: 'Youth' },
-    { value: 'other', label: 'Other (Please Specify)' },
-];
+// Target audience options will be provided by the backend
+export const targetAudienceOptions: { value: string; label: string }[] = [];
 
 export const UIOpportunityForm: UIStep[] = [
     {
@@ -91,7 +57,7 @@ export const UIOpportunityForm: UIStep[] = [
                 type: 'select',
                 required: true,
                 label: 'Type of Opportunity',
-                options: opportunityTypeOptions,
+                // options should be provided by the parent component from backend
             },
             closing_date: {
                 id: 'closing_date',
