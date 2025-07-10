@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\OpportunityStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Data\CountryOptions;
+use App\Models\Data\OceanOptions;
+use App\Models\Data\OpportunityTypeOptions;
+use App\Models\Data\RegionOptions;
+use App\Models\Data\TargetAudienceOptions;
 use App\Models\Opportunity;
 use App\Services\OpportunityService;
 use Illuminate\Http\Request;
@@ -29,7 +34,13 @@ class OcdOpportunityController extends Controller
                 'description' => 'Create a new Opportunity to get started.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'opportunityTypes' => Opportunity::getTypeOptions(),
+            'form' => [
+                'countries' => CountryOptions::getOptions(),
+                'regions' => RegionOptions::getOptions(),
+                'oceans' => OceanOptions::getOptions(),
+                'targetAudiences' => TargetAudienceOptions::getOptions(),
+                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
+            ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
@@ -77,6 +88,13 @@ class OcdOpportunityController extends Controller
                 'description' => 'Manage your submitted opportunities here.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'locationData' => [
+                'countries' => CountryOptions::getOptions(),
+                'regions' => RegionOptions::getOptions(),
+                'oceans' => OceanOptions::getOptions(),
+                'targetAudiences' => TargetAudienceOptions::getOptions(),
+                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
+            ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
@@ -102,6 +120,13 @@ class OcdOpportunityController extends Controller
                 'title' => 'List of Opportunities',
                 'description' => 'Browse and view opportunities submitted by CDF partners here.',
                 'image' => '/assets/img/sidebar.png',
+            ],
+            'locationData' => [
+                'countries' => CountryOptions::getOptions(),
+                'regions' => RegionOptions::getOptions(),
+                'oceans' => OceanOptions::getOptions(),
+                'targetAudiences' => TargetAudienceOptions::getOptions(),
+                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
@@ -158,6 +183,13 @@ class OcdOpportunityController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'opportunityTypes' => Opportunity::getTypeOptions(),
+            'form' => [
+                'countries' => CountryOptions::getOptions(),
+                'regions' => RegionOptions::getOptions(),
+                'oceans' => OceanOptions::getOptions(),
+                'targetAudiences' => TargetAudienceOptions::getOptions(),
+                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
+            ],
             'request' => $opportunity->toArray(),
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('dashboard')],

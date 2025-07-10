@@ -4,7 +4,6 @@ import FrontendLayout from '@/Layouts/FrontendLayout';
 import {UIOpportunityForm, UIField, Opportunity as OpportunityFields} from '@/Forms/UIOpportunityForm';
 import TagsInput from '@/Components/ui/TagsInput';
 import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
-import {countryOptions, regionOptions, oceanOptions} from '@/data/locations';
 import {OCDOpportunity} from '@/types';
 import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react';
 import {ChevronsUpDown} from 'lucide-react';
@@ -12,7 +11,15 @@ import {ChevronsUpDown} from 'lucide-react';
 type SimpleTag = { id: string; text: string };
 
 export default function CreateOpportunity() {
-    const OcdOpportunityData = usePage().props.request as OCDOpportunity || {};
+    const page = usePage();
+    const OcdOpportunityData = page.props.request as OCDOpportunity || {};
+    const formOptions = (page.props.form as any) || {
+        countries: [],
+        regions: [],
+        oceans: [],
+        targetAudiences: [],
+        opportunityTypes: []
+    };
     const {data, setData, post, processing, errors, setError, clearErrors} = useForm({
         id: OcdOpportunityData?.id || '',
         title: OcdOpportunityData?.title || '',
@@ -33,17 +40,16 @@ export default function CreateOpportunity() {
     const [implementationOptions, setImplementationOptions] = useState<{ value: string; label: string }[]>([]);
     // Query state for each combobox field
     const [comboboxQueries, setComboboxQueries] = useState<Record<string, string>>({});
-
     useEffect(() => {
         switch (data.coverage_activity) {
             case 'country':
-                setImplementationOptions(countryOptions);
+                setImplementationOptions(formOptions.countries);
                 break;
             case 'Regions':
-                setImplementationOptions(regionOptions);
+                setImplementationOptions(formOptions.regions);
                 break;
             case 'Ocean-based':
-                setImplementationOptions(oceanOptions);
+                setImplementationOptions(formOptions.oceans);
                 break;
             case 'Global':
                 setImplementationOptions([{value: 'Global', label: 'Global'}]);
@@ -52,7 +58,7 @@ export default function CreateOpportunity() {
                 setImplementationOptions([]);
         }
         setData('implementation_location', '');
-    }, [data.coverage_activity]);
+    }, [data.coverage_activity, formOptions]);
 
     const getInputClass = (fieldName: keyof typeof errors) => {
         return `mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors[fieldName] ? 'border-red-600' : ''}`;
@@ -64,6 +70,10 @@ export default function CreateOpportunity() {
         let options = field.options ?? [];
         if (name === 'implementation_location') {
             options = implementationOptions;
+        } else if (name === 'type') {
+            options = formOptions.opportunityTypes || [];
+        } else if (name === 'target_audience') {
+            options = formOptions.targetAudiences || [];
         }
         if (!query) return options;
         return options.filter(opt =>
@@ -207,14 +217,20 @@ export default function CreateOpportunity() {
                     text: kw
                 }));
                 return (
-                    <div key={name} className="mt-4">
-                        {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
-                        {field.description && <p className="mt-1 text-base text-gray-500">{field.description}</p>}
-                        <TagsInput
-                            initialTags={initialTags as any}
-                            onTagsChange={(tags: any) => setData(name, tags.map((t: any) => t.text))}
-                        />
-                    </div>
+                    <>
+                        <div className="mt-4">
+
+                        </div>
+                        <div key={name} className="mt-4">
+                            {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
+                            {field.description && <p className="mt-1 text-base text-gray-500">{field.description}</p>}
+                            <TagsInput
+                                initialTags={initialTags as any}
+                                onTagsChange={(tags: any) => setData(name, tags.map((t: any) => t.text))}
+                            />
+                        </div>
+                    </>
+
                 );
             default:
                 return null;

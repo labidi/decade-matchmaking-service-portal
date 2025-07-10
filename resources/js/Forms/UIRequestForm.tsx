@@ -1,4 +1,3 @@
-import {countryOptions} from '@/data/locations';
 import {UIField} from '@/types';
 
 export interface Request {
@@ -211,7 +210,7 @@ export const UIRequestForm: UIStep[] = [
             delivery_country: {
                 id: 'delivery_country',
                 type: 'multiselect',
-                options: countryOptions,
+                // options should be provided by the parent component from backend location data
                 required: false,
                 label: 'What is the delivery country? ',
                 show: data => data.delivery_format !== 'Online',

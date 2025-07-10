@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Dashboard\IndexController;
 
 use App\Http\Controllers\Admin\OcdRequestController as AdminOcdRequestController;
+use App\Http\Controllers\LocationDataController;
 
 Route::get('/', function () {
     return Inertia::render('Index', [
@@ -88,6 +89,10 @@ Route::patch('notifications/{notification}/read', [\App\Http\Controllers\Admin\N
 
 Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('request.offer.store');
 Route::get('request/{request}/offers', [RequestOfferController::class, 'list'])->name('request.offer.list');
+
+// Location data routes
+Route::get('api/location-data', [LocationDataController::class, 'index'])->name('api.location-data');
+Route::get('api/location-data/implementation/{coverageActivity}', [LocationDataController::class, 'getImplementationLocationOptions'])->name('api.location-data.implementation');
 
 
 

@@ -5,8 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
+use App\Models\LocationData;
+use App\Models\Data\TargetAudienceOptions;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Enums\OpportunityStatus;
+use App\Models\Data\OpportunityTypeOptions;
 
 
 class Opportunity extends Model
@@ -14,7 +17,7 @@ class Opportunity extends Model
     protected $table = 'opportunities';
     protected $primaryKey = 'id';
     public $timestamps = true;
-    protected $appends = ['status_label','type_label'];
+    protected $appends = ['status_label','type_label','implementation_location_label','target_audience_label'];
 
 
     public const STATUS_LABELS = [
@@ -24,28 +27,9 @@ class Opportunity extends Model
         OpportunityStatus::PENDING_REVIEW->value => 'Pending Review',
     ];
 
-    /**
-     * Available opportunity types
-     */
-    public const TYPE_OPTIONS = [
-        'training' => 'Training',
-        'onboarding-expeditions' => 'Onboarding Expeditions, Research & Training',
-        'fellowships' => 'Fellowships',
-        'internships-jobs' => 'Internships/Jobs',
-        'mentorships' => 'Mentorships',
-        'visiting-lecturers' => 'Visiting Lecturers/Scholars',
-        'travel-grants' => 'Travel Grants',
-        'awards' => 'Awards',
-        'research-funding' => 'Research Fundings, Grants & Scholarships',
-        'access-infrastructure' => 'Access to Infrastructure',
-        'ocean-data' => 'Ocean Data, Information and Documentation',
-        'networks-community' => 'Professional Networks & Community Building',
-        'ocean-literacy' => 'Ocean Literacy, Public Information and Communication',
-    ];
-
     public static function getTypeOptions(): array
     {
-        return self::TYPE_OPTIONS;
+        return OpportunityTypeOptions::getOptions();
     }
 
     protected $casts = [
@@ -80,8 +64,42 @@ class Opportunity extends Model
     protected function typeLabel(): Attribute
     {
         return Attribute::make(
-            get: fn() => self::TYPE_OPTIONS[$this->type] ?? '',
+            get: fn() => OpportunityTypeOptions::getLabel($this->type),
         );
     }
 
+    /**
+     * Get the formatted implementation location label
+     */
+    protected function implementationLocationLabel(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if (!$this->implementation_location || !$this->coverage_activity) {
+                    return '';
+                }
+
+                return LocationData::getImplementationLocationLabel(
+                    $this->implementation_location,
+                    $this->coverage_activity
+                );
+            }
+        );
+    }
+
+    /**
+     * Get the formatted target audience label
+     */
+    protected function targetAudienceLabel(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if (!$this->target_audience) {
+                    return '';
+                }
+
+                return TargetAudienceOptions::getLabel($this->target_audience);
+            }
+        );
+    }
 }
