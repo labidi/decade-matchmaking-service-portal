@@ -13,6 +13,7 @@ interface RequestOffer {
     id: string;
     description: string;
     partner_id: string;
+    matched_partner_id?: string;
     document_url?: string;
     created_at: string;
     status: number;
@@ -24,14 +25,16 @@ interface OffersDialogProps {
     onHide: () => void;
     requestId: string;
     requestTitle: string;
+    partners: { value: string, label: string }[];
 }
 
-export default function OffersDialog({visible, onHide, requestId, requestTitle}: OffersDialogProps) {
+export default function OffersDialog({visible, onHide, requestId, requestTitle, partners}: OffersDialogProps) {
     const [offers, setOffers] = useState<RequestOffer[]>([]);
     const [showNewOfferForm, setShowNewOfferForm] = useState(false);
     const [loading, setLoading] = useState(false);
     const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
     const [toast, setToast] = useState<Toast | null>(null);
+    // Remove partners fetching logic and state
 
     // Load offers when dialog opens
     React.useEffect(() => {
@@ -39,6 +42,8 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
             loadOffers();
         }
     }, [visible, requestId]);
+
+    // Remove partners fetching logic and state
 
     const loadOffers = async () => {
         setLoading(true);
@@ -186,6 +191,18 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
         </div>
     );
 
+    // Template to display matched partner name from partners prop
+    const matchedPartnerBodyTemplate = (rowData: RequestOffer) => {
+        console.log(partners);
+        const partner = partners.find(p => p.value === rowData.partner_id || p.value === rowData.matched_partner_id);
+        console.log(partner);
+        return (
+            <span>
+                {partner ? partner.label : rowData.matched_partner_id?.toString() || rowData.partner_id || 'N/A'}
+            </span>
+        );
+    };
+
     const footer = (
         <div className="flex justify-between items-center">
             <Button
@@ -227,10 +244,11 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
                             className="p-datatable-sm"
                         >
                             <Column
-                                field="partner_id"
-                                header="Partner ID"
+                                field="matched_partner_id"
+                                header="Matched Partner"
                                 sortable
                                 style={{width: '120px'}}
+                                body={matchedPartnerBodyTemplate}
                             />
                             <Column
                                 field="description"
@@ -268,6 +286,7 @@ export default function OffersDialog({visible, onHide, requestId, requestTitle}:
                 onHide={() => setShowNewOfferForm(false)}
                 requestId={requestId}
                 onSuccess={loadOffers}
+                partners={partners}
             />
 
             {/* Toast for notifications */}

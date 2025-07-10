@@ -4,47 +4,39 @@ import axios from 'axios';
 import FieldRenderer from '@/Components/Forms/FieldRenderer';
 import {UIOfferForm, Offer} from '@/Forms/UIOfferForm';
 import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
+import { useForm } from '@inertiajs/react';
 
 interface NewOfferDialogProps {
     visible: boolean;
     onHide: () => void;
     requestId: string;
     onSuccess: () => void;
+    partners: { value: string, label: string }[];
+    partnersError?: string | null;
+    partnersLoading?: boolean;
 }
 
-export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: NewOfferDialogProps) {
+export default function NewOfferDialog({visible, onHide, requestId, onSuccess, partners, partnersError, partnersLoading}: NewOfferDialogProps) {
     // XHR Dialog states
     const [xhrDialogOpen, setXhrDialogOpen] = useState(false);
     const [xhrDialogResponseMessage, setXhrDialogResponseMessage] = useState('');
     const [xhrDialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect' | 'loading'>('info');
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Form data state
-    const [formData, setFormData] = useState<Offer>({
+    // Inertia useForm for form state and errors
+    const {
+        data,
+        setData,
+        post,
+        processing,
+        errors: inertiaErrors,
+        reset,
+        setError,
+    } = useForm<Record<string, any>>({
         description: '',
         partner_id: '',
         document: null,
     });
-    const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-    // Partner users state
-    const [partners, setPartners] = useState<{id: string, name: string, email: string, first_name?: string, last_name?: string}[]>([]);
-    const [partnersLoading, setPartnersLoading] = useState(false);
-    const [partnersError, setPartnersError] = useState<string | null>(null);
-
-    useEffect(() => {
-        setPartnersLoading(true);
-        axios.get(route('api.partners.list'))
-            .then(res => {
-                if (res.data.success) {
-                    setPartners(res.data.data);
-                } else {
-                    setPartnersError('Failed to load partners');
-                }
-            })
-            .catch(() => setPartnersError('Failed to load partners'))
-            .finally(() => setPartnersLoading(false));
-    }, []);
+    const errors: Record<string, string> = inertiaErrors as Record<string, string>;
 
     // Prepare offer form fields with partner options injected
     const offerFormFields = React.useMemo(() => {
@@ -53,9 +45,9 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
         if (step.fields.partner_id) {
             step.fields.partner_id = {
                 ...step.fields.partner_id,
-                options: partners.map(partner => ({
-                    value: partner.id,
-                    label: `${partner.name || ((partner.first_name || '') + ' ' + (partner.last_name || ''))} (${partner.email})`,
+                options: partners.map(option => ({
+                    value: option.value,
+                    label: option.label,
                 })),
             };
         }
@@ -63,36 +55,24 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
     }, [partners]);
 
     const handleFieldChange = (name: string, value: any) => {
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-        // Clear error when user starts typing
-        if (formErrors[name]) {
-            setFormErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
-        }
+        setData(name, value);
     };
 
     const handleSubmitNewOffer = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSubmitting(true);
         setXhrDialogResponseType('loading');
         setXhrDialogResponseMessage('Submitting offer...');
         setXhrDialogOpen(true);
 
-        try {
-            // Create FormData for file upload
-            const submitData = new FormData();
-            submitData.append('description', formData.description);
-            submitData.append('partner_id', formData.partner_id);
-            if (formData.document) {
-                submitData.append('document', formData.document);
-            }
+        const submitData = new FormData();
+        submitData.append('description', data.description);
+        submitData.append('partner_id', data.partner_id);
+        if (data.document) {
+            submitData.append('document', data.document);
+        }
 
-            const response = await axios.post(route('request.offer.store', { request: requestId }), submitData, {
+        try {
+            const response = await axios.post(route('request.offer.store', {request: requestId}), submitData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -101,17 +81,8 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
             if (response.data.success) {
                 setXhrDialogResponseType('success');
                 setXhrDialogResponseMessage(response.data.message || 'Offer submitted successfully!');
-                
-                // Reset form
-                setFormData({
-                    description: '',
-                    partner_id: '',
-                    document: null,
-                });
-                setFormErrors({});
+                reset();
                 onHide();
-                
-                // Call success callback
                 onSuccess();
             } else {
                 setXhrDialogResponseType('error');
@@ -121,14 +92,14 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
             setXhrDialogResponseType('error');
             if (error.response?.status === 422) {
                 // Validation errors
-                const validationErrors = error.response.data.errors;
-                setFormErrors(validationErrors);
+                const validationErrors = error.response.data.errors || {};
+                Object.entries(validationErrors).forEach(([field, message]) => {
+                    setError(field, Array.isArray(message) ? message[0] : message);
+                });
                 setXhrDialogResponseMessage('Please correct the highlighted errors.');
             } else {
                 setXhrDialogResponseMessage(error.response?.data?.message || 'Something went wrong');
             }
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -142,15 +113,15 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
                 modal
             >
                 <form className="mx-auto bg-white" onSubmit={handleSubmitNewOffer}>
-                    {Object.entries(offerFormFields).map(([key, field]) => (
+                    {Object.entries(offerFormFields).map(([key, field]: [string, any]) => (
                         <FieldRenderer
                             key={key}
                             name={key}
                             field={field}
-                            value={formData[key as keyof Offer]}
-                            error={formErrors[key]}
+                            value={data[key]}
+                            error={errors[key]}
                             onChange={handleFieldChange}
-                            formData={formData}
+                            formData={data}
                         />
                     ))}
                     {partnersError && <div className="text-red-600 text-xs mt-1">{partnersError}</div>}
@@ -159,9 +130,9 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
                         <button
                             type="submit"
                             className="px-4 py-1 bg-firefly-600 text-white rounded disabled:opacity-50"
-                            disabled={isSubmitting || !formData.document || !formData.partner_id}
+                            disabled={processing || !data.document || !data.partner_id}
                         >
-                            {isSubmitting ? 'Submitting...' : 'Submit Offer'}
+                            {processing ? 'Submitting...' : 'Submit Offer'}
                         </button>
                     </div>
                 </form>
@@ -183,4 +154,4 @@ export default function NewOfferDialog({visible, onHide, requestId, onSuccess}: 
             />
         </>
     );
-} 
+}

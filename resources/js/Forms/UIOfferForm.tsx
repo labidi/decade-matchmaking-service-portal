@@ -18,7 +18,7 @@ export const UIOfferForm: UIStep[] = [
         fields: {
             partner_id: {
                 id: 'partner_id',
-                type: 'select',
+                type: 'raw_select',
                 required: true,
                 label: 'Partner',
                 description: 'Select a partner from the list',

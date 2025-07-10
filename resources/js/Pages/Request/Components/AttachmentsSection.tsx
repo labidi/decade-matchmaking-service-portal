@@ -83,9 +83,11 @@ export default function AttachmentsSection({OcdRequest, canEdit = false, documen
                                 <td className="p-2 space-x-2">
                                     <a href={route('user.document.download', doc.id)}
                                        className="text-blue-600 underline">Download</a>
+                                    {doc.uploader_id === auth.user.id && canEdit && (
                                     <button type="button" onClick={() => handleDelete(doc.id)}
                                             className="text-red-600 underline">Delete
                                     </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

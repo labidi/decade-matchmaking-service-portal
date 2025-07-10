@@ -164,6 +164,7 @@ export interface OCDRequest {
     user_id: string;
     user?: User;
     offers?: RequestOfferList
+    active_offer?: RequestOffer;
 };
 
 export type OCDRequestList = OCDRequest[];
@@ -227,7 +228,6 @@ export interface AttachmentsProps {
 
 export interface OfferProps {
     OcdRequest: OcdRequest;
-    OcdRequestOffer: RequestOffer;
 }
 
 export interface Notification {

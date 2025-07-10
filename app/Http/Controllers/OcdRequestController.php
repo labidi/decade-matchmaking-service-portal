@@ -228,7 +228,6 @@ class OcdRequestController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'request' => $ocdRequest->toArray(),
-            'offer' => $offer,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('request.me.list')],

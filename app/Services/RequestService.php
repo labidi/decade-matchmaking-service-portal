@@ -112,7 +112,7 @@ class RequestService
 
     public function getAllRequests(): Collection
     {
-        $requests = OCDRequest::with(['status', 'detail','user','offers'])
+        $requests = OCDRequest::with(['status', 'detail', 'user', 'offers'])
             ->get();
         return $requests->map(function ($request) {
             return $this->enhanceRequestData($request);
@@ -162,7 +162,7 @@ class RequestService
     public function findRequest(int $id, ?User $user = null): ?OCDRequest
     {
         $request = OCDRequest::with(
-            ['status', 'user', 'offers', 'detail']
+            ['status', 'user', 'detail', 'activeOffer.documents']
         )
             ->find($id);
 
@@ -349,21 +349,21 @@ class RequestService
     {
         $actions = [];
 
-        if ($request->user_id === $user->id) {
-            $actions[] = 'edit';
-            $actions[] = 'delete';
+        if ($request->user_id === $user->id && $request->status->status_code === 'draft') {
+            $actions['canEdit'] = true;
+            $actions['canDelete'] = true;
         }
 
-        if ($user->is_admin) {
-            $actions[] = 'change_status';
+        if ($request->status->status_code === 'offer_made' && $request->user_id === $user->id && $request->activeOffer) {
+            $actions['canAcceptOffer'] = true;
+            $actions['canRequestClarificationForOffer'] = true;
         }
-
-        if ($request->status->status_code === 'validated') {
+        if ($request->status->status_code === 'validated' && $request->user_id !== $user->id) {
             $actions[] = 'express_interest';
         }
 
-        $actions[] = 'view';
-        $actions[] = 'export';
+        $actions['view'] = true;
+        $actions['export'] = true;
 
         return $actions;
     }

@@ -194,7 +194,20 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                     {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                 </div>
             );
-
+        case 'raw_select':
+            return (
+                <div key={name} className="mt-8">
+                    {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
+                    {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
+                    <select key={name} {...common}>
+                        <option value="" >Select an option...</option>
+                        {field.options?.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                    </select>
+                    {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
+                </div>
+            );
         case 'multiselect':
             const selectedValues = (value || []).map((v: any) => String(v));
             return (
