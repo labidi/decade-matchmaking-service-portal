@@ -262,9 +262,16 @@ class RequestOfferController extends Controller
     public function partnersList(): JsonResponse
     {
         $partners = User::role('partner')->select('id', 'name', 'email', 'first_name', 'last_name')->get();
+        $optionsValues = [] ;
+        foreach ($partners as $partner) {
+            $optionsValues[] = [
+                'value' => $partner->id,
+                'label' => $partner->name.' ('.$partner->email.')',
+            ];
+        }
         return response()->json([
             'success' => true,
-            'data' => $partners
+            'data' => $optionsValues
         ]);
     }
 }

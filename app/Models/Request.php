@@ -26,6 +26,7 @@ class Request extends Model
 
     protected $hidden = ['updated_at'];
 
+
     protected function requestData(): Attribute
     {
 
@@ -60,6 +61,22 @@ class Request extends Model
         return $this->hasOne(RequestDetail::class);
     }
 
+    /**
+     * Relationship: Get the active offer for this request
+     */
+    public function activeOffer()
+    {
+        return $this->hasOne(RequestOffer::class)
+            ->where('status', \App\Enums\RequestOfferStatus::ACTIVE);
+    }
+
+    /**
+     * Accessor: Get the active offer as an attribute
+     */
+    public function getActiveOfferAttribute()
+    {
+        return $this->activeOffer()->first();
+    }
 
 
     /**

@@ -2,7 +2,7 @@ import {useForm} from '@inertiajs/react';
 import {OfferProps} from '@/types';
 import AttachmentsSection from '@/Pages/Request/Components/AttachmentsSection';
 
-export default function OfferSection({OcdRequest, OcdRequestOffer}: OfferProps) {
+export default function OfferSection({OcdRequest}: OfferProps) {
     const form = useForm<{ description: string; partner_id: string; file: File | null }>({
         description: '',
         partner_id: '',
@@ -96,12 +96,12 @@ export default function OfferSection({OcdRequest, OcdRequestOffer}: OfferProps) 
                         </form>
                     </div>
                 )}
-                {OcdRequestOffer && ['in_implementation','validated','offer_made'].includes(OcdRequest.status.status_code) && (
+                {OcdRequest.active_offer && ['in_implementation','validated','offer_made'].includes(OcdRequest.status.status_code) && (
                     <>
                         <div className='my-5'>
-                            <p>{OcdRequestOffer.description}</p>
+                            <p>{OcdRequest.active_offer.description}</p>
                         </div>
-                        <AttachmentsSection OcdRequest={OcdRequest} documents={OcdRequestOffer.documents}/>
+                        <AttachmentsSection OcdRequest={OcdRequest} documents={OcdRequest.active_offer.documents}/>
                     </>
                 )}
             </div>

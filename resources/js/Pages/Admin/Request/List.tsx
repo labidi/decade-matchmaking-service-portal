@@ -17,6 +17,7 @@ import { useOffersDialog } from "@/hooks/useOffersDialog";
 
 export default function List() {
     const requests = usePage().props.requests as OCDRequestList;
+    const partners = usePage().props.partners as { value: string, label: string }[];
     console.log('Requests:', requests);
     const [requestList, setRequestList] = React.useState<OCDRequestList>(requests);
     const [filters, setFilters] = useState({
@@ -60,6 +61,11 @@ export default function List() {
             .then(() => {
                 setRequestList(prev => prev.filter(req => req.id !== id));
             });
+    };
+
+    // Export CSV handler
+    const handleExportCSV = () => {
+        window.location.href = route('admin.request.export.csv');
     };
 
     const titleBodyTemplate = (rowData: OCDRequest) => (
@@ -185,9 +191,17 @@ export default function List() {
         <BackendLayout>
             <Head title="Admin Requests List"/>
             <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-4 border-b border-gray-200">
-                    <h2 className="text-xl font-semibold text-gray-900">Requests Management</h2>
-                    <p className="text-sm text-gray-600 mt-1">Manage and monitor all requests in the system</p>
+                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900">Requests Management</h2>
+                        <p className="text-sm text-gray-600 mt-1">Manage and monitor all requests in the system</p>
+                    </div>
+                    <button
+                        className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700 transition"
+                        onClick={handleExportCSV}
+                    >
+                        Export CSV
+                    </button>
                 </div>
                 <div className="p-6">
                     <DataTable
@@ -262,6 +276,7 @@ export default function List() {
                     onHide={closeOffersDialog}
                     requestId={selectedRequest.id}
                     requestTitle={selectedRequest.request_data.capacity_development_title || 'Untitled Request'}
+                    partners={partners}
                 />
             )}
         </BackendLayout>

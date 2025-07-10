@@ -78,6 +78,7 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
  Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
      Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
      Route::get('request/list', [AdminOcdRequestController::class, 'list'])->name('admin.request.list');
+     Route::get('request/export/csv', [AdminOcdRequestController::class, 'exportCsv'])->name('admin.request.export.csv');
  });
 
 
