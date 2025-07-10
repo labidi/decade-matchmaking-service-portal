@@ -89,7 +89,7 @@ class OcdRequestController extends Controller
             'title' => 'View my matched requests',
             'banner' => [
                 'title' => 'View my matched requests',
-                'description' => 'View and browse my matched Request with OCD partners',
+                'description' => 'View and browse my matched Request with CDF partners',
                 'image' => '/assets/img/sidebar.png',
             ],
             'requests' => $requests,

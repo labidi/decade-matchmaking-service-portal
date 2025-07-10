@@ -89,6 +89,7 @@ Route::patch('notifications/{notification}/read', [\App\Http\Controllers\Admin\N
 
 Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('request.offer.store');
 Route::get('request/{request}/offers', [RequestOfferController::class, 'list'])->name('request.offer.list');
+Route::patch('request/{request}/offer/{offer}/status', [RequestOfferController::class, 'updateStatus'])->name('request.offer.update-status');
 
 // Location data routes
 Route::get('api/location-data', [LocationDataController::class, 'index'])->name('api.location-data');

@@ -32,10 +32,6 @@ class StoreRequestOffer extends FormRequest
             ],
             'partner_id' => [
                 'required',
-                'string',
-                'min:3',
-                'max:255',
-                'regex:/^[a-zA-Z0-9\-\_\.]+$/', // Alphanumeric, hyphens, underscores, dots
             ],
             'document' => [
                 'required',
@@ -118,4 +114,4 @@ class StoreRequestOffer extends FormRequest
             ], 403)
         );
     }
-} 
+}
