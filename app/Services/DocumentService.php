@@ -15,7 +15,7 @@ class DocumentService
     /**
      * Store a document for a request
      */
-    public function storeDocument(UploadedFile $file, DocumentType $documentType, OCDRequest $request, int $uploaderId): Document
+    public function storeDocument(UploadedFile $file, string $documentType, OCDRequest $request, int $uploaderId): Document
     {
         try {
             $path = $file->store('documents', 'public');
@@ -57,7 +57,7 @@ class DocumentService
         try {
             // Delete file from storage
             Storage::disk('public')->delete($document->path);
-            
+
             // Delete database record
             $deleted = $document->delete();
 
@@ -156,4 +156,4 @@ class DocumentService
             })
         ];
     }
-} 
+}
