@@ -13,18 +13,11 @@ interface DashboardProps extends PageProps
       totalUsers: number;
       totalRequests: number;
       totalOpportunities: number;
-      activePartners: number;
-      successRate: number;
       trends: {
         requests: number;
         opportunities: number;
         registrations: number;
       };
-    };
-    banner: {
-      title: string;
-      description: string;
-      image: string;
     };
   }
 
