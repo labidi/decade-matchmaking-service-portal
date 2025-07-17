@@ -21,7 +21,6 @@ class DashboardController extends Controller
         $today = Carbon::today();
         $yesterday = Carbon::yesterday();
         $weekAgo = Carbon::now()->subWeek();
-        $monthAgo = Carbon::now()->subMonth();
 
         // Daily statistics
         $dailyRequests = RequestModel::whereDate('created_at', $today)->count();
@@ -35,15 +34,6 @@ class DashboardController extends Controller
         $totalRequests = RequestModel::count();
         $totalOpportunities = Opportunity::count();
 
-        // Active partners (users who have made offers)
-//        $activePartners = User::whereHas('requestOffers')->distinct()->count();
-        $activePartners = 20;
-
-        // Success rate (requests with offers)
-//        $requestsWithOffers = RequestModel::whereHas('offers')->count();
-        $requestsWithOffers = 20;
-        $successRate = $totalRequests > 0 ? round(($requestsWithOffers / $totalRequests) * 100, 1) : 0;
-
         // Calculate trends (simplified - you might want to implement more sophisticated trend calculation)
         $yesterdayRequests = RequestModel::whereDate('created_at', $yesterday)->count();
         $yesterdayOpportunities = Opportunity::whereDate('created_at', $yesterday)->count();
@@ -55,11 +45,6 @@ class DashboardController extends Controller
 
         return Inertia::render('Admin/Dashboard', [
             'title' => 'Welcome '.$user->name,
-            'banner' => [
-                'title' => 'Welcome back '.$user->name,
-                'description' => 'Whether you\'re seeking training or offering expertise, this platform makes the connection. It\'s where organizations find support—and partners find purpose. By matching demand with opportunity, it brings the right people and resources together. A transparent marketplace driving collaboration, innovation, and impact.',
-                'image' => '/assets/img/sidebar.png',
-            ],
             'stats' => [
                 'dailyRequests' => $dailyRequests,
                 'dailyOpportunities' => $dailyOpportunities,
@@ -67,8 +52,6 @@ class DashboardController extends Controller
                 'totalUsers' => $totalUsers,
                 'totalRequests' => $totalRequests,
                 'totalOpportunities' => $totalOpportunities,
-                'activePartners' => $activePartners,
-                'successRate' => $successRate,
                 'trends' => [
                     'requests' => $requestTrend,
                     'opportunities' => $opportunityTrend,

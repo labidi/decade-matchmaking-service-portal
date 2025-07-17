@@ -81,7 +81,7 @@ const Sidebar: React.FC = () => {
                                 <Disclosure.Panel as="div" className="mt-2 pl-4">
                                     <ul className="space-y-1">
                                         <li>
-                                            <Link className="text-firefly-700 hover:underline" href="#">
+                                            <Link className="text-firefly-700 hover:underline" href={route('admin.users.roles.list')}>
                                                 Manage Users
                                             </Link>
                                         </li>

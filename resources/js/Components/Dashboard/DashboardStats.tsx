@@ -19,8 +19,6 @@ interface DashboardStatsProps {
     totalUsers: number;
     totalRequests: number;
     totalOpportunities: number;
-    activePartners: number;
-    successRate: number;
     trends: {
       requests: number;
       opportunities: number;
