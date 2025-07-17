@@ -1,4 +1,4 @@
-import { usePage, Link } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { UserGuideFile } from '@/types';
 
 export default function UserGuide() {
