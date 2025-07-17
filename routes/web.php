@@ -79,10 +79,12 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
      Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
      Route::get('request/list', [AdminOcdRequestController::class, 'list'])->name('admin.request.list');
      Route::get('request/export/csv', [AdminOcdRequestController::class, 'exportCsv'])->name('admin.request.export.csv');
+     Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
+     Route::get('user/list', [UserRoleController::class, 'index'])->name('admin.users.roles.list');
  });
 
 
-Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
+
 
 Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
 Route::get('notifications/{notification}', [\App\Http\Controllers\Admin\NotificationController::class, 'show'])->name('admin.notifications.show');
