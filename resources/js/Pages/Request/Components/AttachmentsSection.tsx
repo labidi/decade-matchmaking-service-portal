@@ -39,12 +39,10 @@ export default function AttachmentsSection({OcdRequest, canEdit = false, documen
                         <div className="flex space-x-4 items-end">
                             <select
                                 className="border rounded px-2 py-1"
-                                value={form.data.document_type}
                                 onChange={e => form.setData('document_type', e.currentTarget.value)}
                             >
                                 <option value="financial_breakdown_report">Financial Breakdown Report</option>
                                 <option value="lesson_learned_report">Lesson Learned Report</option>
-                                <option value="offer_document">Offer Document</option>
                             </select>
                             <input
                                 type="file"

@@ -49,12 +49,9 @@ class OpportunityService
      */
     public function getPublicOpportunities(User $user): Collection
     {
-        return Opportunity::where(function (Builder $query) use ($user) {
-            $query->where('user_id', '!=', $user->id)
-                ->where('status', OpportunityStatus::ACTIVE);
-        })
-        ->orderBy('created_at', 'desc')
-        ->get();
+        return Opportunity::where('status', '=', OpportunityStatus::ACTIVE, false)
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 
     /**
@@ -63,7 +60,7 @@ class OpportunityService
     public function findOpportunity(int $id, ?User $user = null): ?Opportunity
     {
         $opportunity = Opportunity::find($id);
-        
+
         if (!$opportunity) {
             return null;
         }
@@ -85,7 +82,7 @@ class OpportunityService
     public function updateOpportunityStatus(int $opportunityId, int $statusCode, User $user): array
     {
         $opportunity = $this->findOpportunity($opportunityId, $user);
-        
+
         if (!$opportunity) {
             throw new Exception('Opportunity not found', 404);
         }
@@ -126,7 +123,7 @@ class OpportunityService
     public function deleteOpportunity(int $opportunityId, User $user): bool
     {
         $opportunity = $this->findOpportunity($opportunityId, $user);
-        
+
         if (!$opportunity) {
             throw new Exception('Opportunity not found', 404);
         }
@@ -160,7 +157,7 @@ class OpportunityService
     public function getOpportunityStats(User $user): array
     {
         $userOpportunities = $this->getUserOpportunities($user);
-        
+
         return [
             'total' => $userOpportunities->count(),
             'active' => $userOpportunities->where('status', OpportunityStatus::ACTIVE)->count(),
@@ -192,9 +189,9 @@ class OpportunityService
         // Exclude user's own opportunities for public search
         if (isset($filters['public']) && $filters['public']) {
             $query->where('user_id', '!=', $user->id)
-                  ->where('status', OpportunityStatus::ACTIVE);
+                ->where('status', OpportunityStatus::ACTIVE);
         }
 
         return $query->orderBy('created_at', 'desc')->get();
     }
-} 
+}
