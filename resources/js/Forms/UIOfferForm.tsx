@@ -4,6 +4,7 @@ export interface Offer {
     description: string;
     partner_id: string;
     document: File | null;
+
     [key: string]: any;
 }
 
