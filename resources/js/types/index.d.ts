@@ -242,3 +242,12 @@ export type NotificationList = Notification[];
 
 export type OpportunityTypeOptions = Record<string, string>;
 
+export interface Settings {
+    site_name: string;
+    site_description: string;
+    site_logo: string;
+    site_favicon: string;
+    contact_email: string;
+    homepage_youtube_video:string;
+}
+
