@@ -1,119 +1,86 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Sidebar as PrimeSidebar } from 'primereact/sidebar';
+import { PanelMenu } from 'primereact/panelmenu';
 import { Link } from '@inertiajs/react';
-import { Disclosure } from '@headlessui/react';
-import { ChevronDown } from 'lucide-react';
+
+// PrimeReact CSS should be imported globally, but if not, import here:
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 
 const Sidebar: React.FC = () => {
+    const [visible, setVisible] = useState(true);
+
+    const items = [
+        {
+            label: 'Portal',
+            icon: 'pi pi-cog',
+            items: [
+                {
+                    label: 'Portal configurations',
+                    icon: 'pi pi-sliders-h',
+                    template: (item: any, options: any) => (
+                        <Link className="text-firefly-700 hover:underline" href={route('admin.portal.settings')}>{item.label}</Link>
+                    )
+                }
+            ]
+        },
+        {
+            label: 'Notifications',
+            icon: 'pi pi-bell',
+            items: [
+                {
+                    label: 'List Notifications',
+                    icon: 'pi pi-list',
+                    template: (item: any, options: any) => (
+                        <Link className="text-firefly-700 hover:underline" href="#">{item.label}</Link>
+                    )
+                }
+            ]
+        },
+        {
+            label: 'Requests',
+            icon: 'pi pi-inbox',
+            items: [
+                {
+                    label: 'Manage Requests',
+                    icon: 'pi pi-cog',
+                    template: (item: any, options: any) => (
+                        <Link className="text-firefly-700 hover:underline" href={route('admin.request.list')}>{item.label}</Link>
+                    )
+                }
+            ]
+        },
+        {
+            label: 'Users',
+            icon: 'pi pi-users',
+            items: [
+                {
+                    label: 'Manage Users',
+                    icon: 'pi pi-user-edit',
+                    template: (item: any, options: any) => (
+                        <Link className="text-firefly-700 hover:underline" href={route('admin.users.roles.list')}>{item.label}</Link>
+                    )
+                }
+            ]
+        },
+        {
+            label: 'Opportunities',
+            icon: 'pi pi-briefcase',
+            items: [
+                {
+                    label: 'Dashboard',
+                    icon: 'pi pi-th-large',
+                    template: (item: any, options: any) => (
+                        <Link className="text-firefly-700 hover:underline" href="#">{item.label}</Link>
+                    )
+                }
+            ]
+        }
+    ];
+
     return (
-        <nav>
-            <ul className="space-y-2">
-                <li>
-                    <Disclosure>
-                        {({ open }) => (
-                            <>
-                                <Disclosure.Button className="flex w-full items-center justify-between rounded bg-gray-100 px-4 py-2 text-left font-semibold hover:bg-gray-200">
-                                    <span>Portal</span>
-                                    <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
-                                </Disclosure.Button>
-                                <Disclosure.Panel as="div" className="mt-2 pl-4">
-                                    <ul className="space-y-1">
-                                        <li>
-                                            <Link className="text-firefly-700 hover:underline" href="#">
-                                                Portal configurations
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </Disclosure.Panel>
-                            </>
-                        )}
-                    </Disclosure>
-                </li>
-                <li>
-                    <Disclosure>
-                        {({ open }) => (
-                            <>
-                                <Disclosure.Button className="flex w-full items-center justify-between rounded bg-gray-100 px-4 py-2 text-left font-semibold hover:bg-gray-200">
-                                    <span>Notifications</span>
-                                    <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
-                                </Disclosure.Button>
-                                <Disclosure.Panel as="div" className="mt-2 pl-4">
-                                    <ul className="space-y-1">
-                                        <li>
-                                            <Link className="text-firefly-700 hover:underline" href="#">
-                                                List Notifications
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </Disclosure.Panel>
-                            </>
-                        )}
-                    </Disclosure>
-                </li>
-                <li>
-                    <Disclosure>
-                        {({ open }) => (
-                            <>
-                                <Disclosure.Button className="flex w-full items-center justify-between rounded bg-gray-100 px-4 py-2 text-left font-semibold hover:bg-gray-200">
-                                    <span>Requests</span>
-                                    <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
-                                </Disclosure.Button>
-                                <Disclosure.Panel as="div" className="mt-2 pl-4">
-                                    <ul className="space-y-1">
-                                        <li>
-                                            <Link className="text-firefly-700 hover:underline" href={route('admin.request.list')}>
-                                                Manage Requests
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </Disclosure.Panel>
-                            </>
-                        )}
-                    </Disclosure>
-                </li>
-                <li>
-                    <Disclosure>
-                        {({ open }) => (
-                            <>
-                                <Disclosure.Button className="flex w-full items-center justify-between rounded bg-gray-100 px-4 py-2 text-left font-semibold hover:bg-gray-200">
-                                    <span>Users</span>
-                                    <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
-                                </Disclosure.Button>
-                                <Disclosure.Panel as="div" className="mt-2 pl-4">
-                                    <ul className="space-y-1">
-                                        <li>
-                                            <Link className="text-firefly-700 hover:underline" href={route('admin.users.roles.list')}>
-                                                Manage Users
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </Disclosure.Panel>
-                            </>
-                        )}
-                    </Disclosure>
-                </li>
-                <li>
-                    <Disclosure>
-                        {({ open }) => (
-                            <>
-                                <Disclosure.Button className="flex w-full items-center justify-between rounded bg-gray-100 px-4 py-2 text-left font-semibold hover:bg-gray-200">
-                                    <span>Opportunities</span>
-                                    <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
-                                </Disclosure.Button>
-                                <Disclosure.Panel as="div" className="mt-2 pl-4">
-                                    <ul className="space-y-1">
-                                        <li>
-                                            <Link className="text-firefly-700 hover:underline" href={'#'}>
-                                                Dashboard
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </Disclosure.Panel>
-                            </>
-                        )}
-                    </Disclosure>
-                </li>
-            </ul>
-        </nav>
+        <PanelMenu model={items} className="w-full md:w-20rem" />
     );
 };
 

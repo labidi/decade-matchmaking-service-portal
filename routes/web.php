@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\RequestOfferController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Dashboard\IndexController;
+use App\Http\Controllers\Admin\SettingsController;
 
 use App\Http\Controllers\Admin\OcdRequestController as AdminOcdRequestController;
 use App\Http\Controllers\LocationDataController;
@@ -69,7 +70,6 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:partner'])->group(function () {
-    // Opportunity routes
     Route::get('opportunity/me/list', [OcdOpportunityController::class, 'mySubmittedList'])->name(
         'opportunity.me.list'
     );
@@ -88,6 +88,7 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
+    Route::get('settings', [SettingsController::class, 'index'])->name('admin.portal.settings');
     Route::get('request/list', [AdminOcdRequestController::class, 'list'])->name('admin.request.list');
     Route::get('request/export/csv', [AdminOcdRequestController::class, 'exportCsv'])->name('admin.request.export.csv');
     Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
