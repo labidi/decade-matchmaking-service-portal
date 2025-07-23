@@ -40,17 +40,17 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('user.home');
-    Route::get('user/request/create', [OcdRequestController::class, 'create'])->name('user.request.create');
+    Route::get('user/request/create', [OcdRequestController::class, 'create'])->name('request.create');
     Route::get('request/me/list', [OcdRequestController::class, 'myRequestsList'])->name('request.me.list');
-    Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
-    Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('user.request.show');
+    Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('request.edit');
+    Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('request.show');
     Route::get('request/preview/{id}', [OcdRequestController::class, 'preview'])->name('request.preview');
     Route::get('request/me/matched-requests', [OcdRequestController::class, 'matchedRequest'])->name(
         'request.me.matched-requests'
     );
 
-    Route::get('user/request/pdf/{id}', [OcdRequestController::class, 'exportPdf'])->name('user.request.pdf');
-    Route::post('user/request/submit', [OcdRequestController::class, 'submit'])->name('user.request.submit');
+    Route::get('user/request/pdf/{id}', [OcdRequestController::class, 'exportPdf'])->name('request.pdf');
+    Route::post('user/request/submit', [OcdRequestController::class, 'submit'])->name('request.submit');
 
     Route::patch('request/{id}/update-status', [OcdRequestController::class, 'updateStatus'])->name(
         'request.update.status'

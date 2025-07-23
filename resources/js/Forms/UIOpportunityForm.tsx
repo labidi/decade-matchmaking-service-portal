@@ -32,10 +32,10 @@ export interface UIStep {
 
 // opportunityTypeOptions should be provided by the parent component from backend
 export const coverageActivityOptions = [
-    { value: 'country', label: 'Country' },
-    { value: 'Regions', label: 'Regions' },
-    { value: 'Global', label: 'Global' },
-    { value: 'Ocean-based', label: 'Ocean Based' },
+    {value: 'country', label: 'Country'},
+    {value: 'Regions', label: 'Regions'},
+    {value: 'Global', label: 'Global'},
+    {value: 'Ocean-based', label: 'Ocean Based'},
 ];
 
 // Target audience options will be provided by the backend
@@ -104,6 +104,7 @@ export const UIOpportunityForm: UIStep[] = [
                 required: true,
                 label: 'Summary of the Opportunity',
                 maxLength: 500,
+                placeholder: 'Summary of the Opportunity (please include any prerequisites so that interested applicants are aware).'
             },
             url: {
                 id: 'url',

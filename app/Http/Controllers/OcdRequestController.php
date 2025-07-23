@@ -3,8 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Data\CountryOptions;
+use App\Models\Data\SubThemeOptions;
+use App\Models\Data\SupportTypeOptions;
+use App\Models\Data\RelatedActivityOptions;
+use App\Models\Data\DeliveryFormatOptions;
+use App\Models\Data\TargetAudienceOptions;
 use App\Models\Request as OCDRequest;
-use App\Models\Request\RequestStatus;
+use App\Models\Request\Status;
+use App\Models\RequestEnhancer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -12,6 +19,7 @@ use App\Services\RequestService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Exception;
+use App\Http\Resources\OcdRequestResource;
 
 class OcdRequestController extends Controller
 {
@@ -120,10 +128,18 @@ class OcdRequestController extends Controller
                 'description' => 'Create a new request to get started.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'formOptions' => [
+                'subthemes' => SubThemeOptions::getOptions(),
+                'supportTypes' => SupportTypeOptions::getOptions(),
+                'relatedActivities' => RelatedActivityOptions::getOptions(),
+                'deliveryFormats' => DeliveryFormatOptions::getOptions(),
+                'targetAudiences' => TargetAudienceOptions::getOptions(),
+                'deliveryCountries' => CountryOptions::getOptions()
+            ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('request.me.list')],
-                ['name' => 'Create Request', 'url' => route('user.request.create')],
+                ['name' => 'Create Request', 'url' => route('request.create')],
             ],
         ]);
     }
@@ -146,21 +162,12 @@ class OcdRequestController extends Controller
      */
     public function saveRequestAsDraft(Request $request, $requestId = null)
     {
-        try {
-            $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
-            if ($requestId && !$ocdRequest) {
-                throw new Exception('Request not found');
-            }
-
-            $ocdRequest = $this->service->saveDraft($request->user(), $request->all(), $ocdRequest);
-
-            return response()->json([
-                'message' => 'Draft saved successfully',
-                'request_data' => $ocdRequest->attributesToArray()
-            ], 201);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+        $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
+        if ($requestId && !$ocdRequest) {
+            throw new Exception('Request not found');
         }
+        $ocdRequest = $this->service->saveDraft($request->user(), $request->all(), $ocdRequest);
+        return to_route('request.edit', ['id' => $ocdRequest->id]);
     }
 
     /**
@@ -175,13 +182,8 @@ class OcdRequestController extends Controller
             if ($requestId && !$ocdRequest) {
                 throw new Exception('Request not found');
             }
-
             $ocdRequest = $this->service->storeRequest($request->user(), $validated, $ocdRequest);
-
-            return response()->json([
-                'message' => 'Request submitted successfully',
-                'request_data' => $ocdRequest->attributesToArray()
-            ], 201);
+            return to_route('request.list');
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -211,15 +213,13 @@ class OcdRequestController extends Controller
      */
     public function show(Request $request, int $requestId)
     {
-        $ocdRequest = $this->service->findRequest($requestId, $request->user());
+        $ocdRequest = $this->service->findRequest($requestId, $request->user(), true);
 
         if (!$ocdRequest) {
             abort(404, 'Request not found');
         }
 
-        $offer = $this->service->getActiveOffer($requestId);
         $actions = $this->service->getRequestActions($ocdRequest, $request->user());
-
         return Inertia::render('Request/Show', [
             'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
             'banner' => [
@@ -227,13 +227,13 @@ class OcdRequestController extends Controller
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'request' => $ocdRequest->toArray(),
+            'request' => RequestEnhancer::enhanceRequest($ocdRequest),
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('request.me.list')],
                 [
                     'name' => 'View Request #' . $ocdRequest->id,
-                    'url' => route('user.request.show', ['id' => $ocdRequest->id])
+                    'url' => route('request.show', ['id' => $ocdRequest->id])
                 ],
             ],
             'requestDetail.actions' => $actions,
@@ -260,14 +260,14 @@ class OcdRequestController extends Controller
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'request' => $ocdRequest->toArray(),
+            'request' => new OcdRequestResource($ocdRequest),
             'offer' => $offer,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('request.me.list')],
                 [
                     'name' => 'View Request #' . $ocdRequest->id,
-                    'url' => route('user.request.show', ['id' => $ocdRequest->id])
+                    'url' => route('request.show', ['id' => $ocdRequest->id])
                 ],
             ],
             'requestDetail.actions' => [
@@ -301,12 +301,20 @@ class OcdRequestController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'request' => $ocdRequest->toArray(),
+            'formOptions' => [
+                'subthemes' => SubThemeOptions::getOptions(),
+                'supportTypes' => SupportTypeOptions::getOptions(),
+                'relatedActivities' => RelatedActivityOptions::getOptions(),
+                'deliveryFormats' => DeliveryFormatOptions::getOptions(),
+                'targetAudiences' => TargetAudienceOptions::getOptions(),
+                'deliveryCountries' => CountryOptions::getOptions()
+            ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('request.me.list')],
                 [
                     'name' => 'Edit Request #' . $ocdRequest->id,
-                    'url' => route('user.request.edit', ['id' => $ocdRequest->id])
+                    'url' => route('request.edit', ['id' => $ocdRequest->id])
                 ],
             ],
         ]);

@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Request;
 
+use App\Models\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-class RequestDetail extends Model
+class Detail extends Model
 {
+    protected $table = 'request_details';
     protected $fillable = [
         'request_id',
         'capacity_development_title',
@@ -24,7 +26,7 @@ class RequestDetail extends Model
         'project_url',
         'related_activity',
         'delivery_format',
-        'delivery_country',
+        'delivery_countries',
         'subthemes',
         'support_types',
         'target_audience',
@@ -57,7 +59,7 @@ class RequestDetail extends Model
         'support_months' => 'integer',
         'direct_beneficiaries_number' => 'integer',
         'completion_date' => 'date',
-        'delivery_country' => 'array',
+        'delivery_countries' => 'array',
     ];
 
     public function request(): BelongsTo
@@ -97,14 +99,6 @@ class RequestDetail extends Model
     public function scopeByDeliveryFormat($query, string $deliveryFormat)
     {
         return $query->where('delivery_format', $deliveryFormat);
-    }
-
-    /**
-     * Scope for filtering by country
-     */
-    public function scopeByCountry($query, string $country)
-    {
-        return $query->where('delivery_country', $country);
     }
 
     /**

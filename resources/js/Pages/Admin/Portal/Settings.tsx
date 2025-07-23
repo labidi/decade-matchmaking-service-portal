@@ -4,15 +4,12 @@ import BackendLayout from '@/Layouts/BackendLayout';
 import {UISettingsForm} from "@/Forms";
 import FieldRenderer from '@/Components/Forms/FieldRenderer';
 import {Settings} from "@/types";
-import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
-
+import { useDialog } from '@/Components/Dialogs';
 
 export default function SettingsForm() {
     const page = usePage();
     const SettingsData = page.props.request as Settings || {};
-    const [xhrdialogOpen, setXhrDialogOpen] = useState(false);
-    const [xhrdialogResponseMessage, setXhrDialogResponseMessage] = useState('');
-    const [xhrdialogResponseType, setXhrDialogResponseType] = useState<'success' | 'error' | 'info' | 'redirect'>('info');
+    const { showDialog } = useDialog();
 
     const {data, setData, post, processing, errors, setError, clearErrors} = useForm({
         site_name: SettingsData.site_name || '',
@@ -26,14 +23,14 @@ export default function SettingsForm() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         clearErrors();
+        showDialog('Saving Settings', 'loading');
         post(route('partner.opportunity.store'), {
             onSuccess: () => {
-                setXhrDialogResponseMessage('Opportunity created successfully!');
-                setXhrDialogResponseType('redirect');
-                setXhrDialogOpen(true);
+                showDialog('Settings saved successfully!', 'success');
             },
             onError: (err) => {
                 setError(err as any);
+                showDialog('Failed to save settings.', 'error');
             },
         });
     };

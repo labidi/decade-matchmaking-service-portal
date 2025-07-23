@@ -3,12 +3,15 @@
 namespace App\Models\Request;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Document;
+use App\Models\Request;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Enums\RequestOfferStatus;
 
-class RequestOffer extends Model
+class Offer extends Model
 {
     protected $table = 'request_offers';
     protected $primaryKey = 'id';
@@ -27,9 +30,21 @@ class RequestOffer extends Model
 
 
     protected $fillable = [
+        'request_id',
+        'matched_partner_id',
         'description',
         'status',
     ];
+
+    public function request(): BelongsTo
+    {
+        return $this->belongsTo(Request::class);
+    }
+
+    public function matchedPartner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'matched_partner_id');
+    }
 
     public function documents(): MorphMany
     {
@@ -39,7 +54,7 @@ class RequestOffer extends Model
     protected function statusLabel(): Attribute
     {
         return Attribute::make(
-            get: fn() => RequestOffer::STATUS_LABELS[$this->status->value] ?? '',
+            get: fn() => Offer::STATUS_LABELS[$this->status->value] ?? '',
         );
     }
 }

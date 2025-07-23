@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Request as OCDRequest;
-use App\Models\Request\RequestOffer;
+use App\Models\Request\Offer;
 use App\Models\Document;
 use Illuminate\Http\Request as HttpRequest;
 use App\Enums\RequestOfferStatus;
@@ -51,7 +51,7 @@ class RequestOfferController extends Controller
             $validated = $offerRequest->validated();
 
             // Create the offer
-            $offer = new RequestOffer();
+            $offer = new Offer();
             $offer->description = $validated['description'];
             $offer->matched_partner_id = $validated['partner_id'];
             $offer->request_id = $request->id;
@@ -87,7 +87,7 @@ class RequestOfferController extends Controller
                     'file_type' => $uploadedFile->getClientMimeType(),
                     'document_type' => DocumentType::OFFER_DOCUMENT,
                     'parent_id' => $offer->id,
-                    'parent_type' => RequestOffer::class,
+                    'parent_type' => Offer::class,
                     'uploader_id' => $offerRequest->user()->id,
                 ]);
 
@@ -193,10 +193,10 @@ class RequestOfferController extends Controller
      *
      * @param UpdateRequestOfferStatus $statusRequest
      * @param OCDRequest $request
-     * @param RequestOffer $offer
+     * @param Offer $offer
      * @return JsonResponse
      */
-    public function updateStatus(UpdateRequestOfferStatus $statusRequest, OCDRequest $request, RequestOffer $offer): JsonResponse
+    public function updateStatus(UpdateRequestOfferStatus $statusRequest, OCDRequest $request, Offer $offer): JsonResponse
     {
         try {
             // Check if offer belongs to the request

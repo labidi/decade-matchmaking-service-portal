@@ -57,7 +57,7 @@ export default function RequestsList() {
         <div className="flex space-x-4 items-center">
             {grid.actions.canEdit && rowData.status.status_code === 'draft' && (
                 <Link
-                    href={route('user.request.edit', rowData.id)}
+                    href={route('request.edit', rowData.id)}
                     className="flex items-center text-blue-600 hover:text-blue-800"
                 >
                     <i className="pi pi-pencil mr-1" aria-hidden="true"/>
@@ -75,7 +75,7 @@ export default function RequestsList() {
             )}
             {grid.actions.canView && (
                 <Link
-                    href={route('user.request.show', rowData.id)}
+                    href={route('request.show', rowData.id)}
                     className="flex items-center text-green-600 hover:text-green-800"
                 >
                     <i className="pi pi-eye mr-1" aria-hidden="true"/>
@@ -170,7 +170,7 @@ export default function RequestsList() {
                 {grid.actions.canCreate && (
                     <div className='flex justify-between items-center mb-6'>
                         <Link
-                            href={route('user.request.create')}
+                            href={route('request.create')}
                             className="px-4 py-2 text-xl bg-firefly-600 text-white rounded hover:bg-firefly-700"
                         >
                             Create new request

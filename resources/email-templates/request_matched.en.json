@@ -1,0 +1,20 @@
+{
+    "name": "Request Matched with Partner",
+    "description": "Email sent when a request is matched with a partner",
+    "subject": "Partnership Confirmed - {request_title}",
+    "body": "Hello {recipient_name},\n\nExcellent news! A capacity development request has been successfully matched with a partner.\n\nRequest Details:\n• Title: {request_title}\n• Request ID: {request_id}\n• Requester: {requester_name}\n• Partner: {partner_name}\n• Partnership Date: {match_date}\n\nNext Steps:\n1. Review the partnership details in your dashboard\n2. Connect with your counterpart to discuss project scope\n3. Finalize timeline and deliverables\n4. Begin collaboration\n\nView Partnership: {app_url}/requests/{request_id}\n\nWe're excited to see this collaboration contribute to ocean science capacity building!\n\nBest regards,\n{app_name} Team",
+    "variables": [
+        "recipient_name",
+        "request_title",
+        "request_id",
+        "requester_name", 
+        "partner_name",
+        "match_date",
+        "app_name",
+        "app_url"
+    ],
+    "recipient_types": [
+        "requester",
+        "partner"
+    ]
+}

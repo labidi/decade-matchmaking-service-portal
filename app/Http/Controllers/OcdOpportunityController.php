@@ -159,6 +159,13 @@ class OcdOpportunityController extends Controller
                 'description' => 'View the details of the selected opportunity.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'locationData' => [
+                'countries' => CountryOptions::getOptions(),
+                'regions' => RegionOptions::getOptions(),
+                'oceans' => OceanOptions::getOptions(),
+                'targetAudiences' => TargetAudienceOptions::getOptions(),
+                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
+            ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],

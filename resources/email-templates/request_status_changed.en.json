@@ -1,0 +1,22 @@
+{
+    "name": "Request Status Changed",
+    "description": "Email sent when a request status is updated",
+    "subject": "Request Status Update - {request_title}",
+    "body": "Hello {recipient_name},\n\nThe status of your capacity development request has been updated.\n\nRequest Details:\n• Title: {request_title}\n• Request ID: {request_id}\n• Requester: {requester_name}\n• Previous Status: {previous_status}\n• Current Status: {current_status}\n• Updated: {update_date}\n\nPlease log in to your dashboard to view the full details and any additional information.\n\nView Request: {app_url}/requests/{request_id}\n\nIf you have any questions about this status change, please contact our support team.\n\nBest regards,\n{app_name} Team",
+    "variables": [
+        "recipient_name",
+        "request_title",
+        "request_id", 
+        "requester_name",
+        "previous_status",
+        "current_status",
+        "update_date",
+        "app_name",
+        "app_url"
+    ],
+    "recipient_types": [
+        "requester",
+        "partner",
+        "admin"
+    ]
+}

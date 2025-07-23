@@ -1,4 +1,4 @@
-import {Request} from "@/Forms/UIRequestForm";
+import {RequestForm} from "@/Forms/UIRequestForm";
 
 export interface UIField {
     id: string;
@@ -8,7 +8,7 @@ export interface UIField {
     placeholder?: string;
     options?: { value: string; label: string }[];
     required?: boolean;
-    show?: (data: Request) => boolean;
+    show?: (data: RequestForm) => boolean;
     multiple?: boolean;
     image?: string;
     accept?: string;
@@ -122,7 +122,7 @@ export interface OCDRequest {
         created_at: string;
         updated_at: string;
     }
-    request_data: {
+    detail: {
         id: string;
         is_related_decade_action: 'Yes' | 'No';
         unique_related_decade_action_id: string;
@@ -219,15 +219,8 @@ export type OCDOpportunitiesListPageActions = {
     canSubmitNew?: boolean;
 }
 
-export interface AttachmentsProps {
-    OcdRequest: OcdRequest;
-    canEdit?: boolean;
-    documents?: Document[];
-    fieldsToShow?: string[];
-}
-
 export interface OfferProps {
-    OcdRequest: OcdRequest;
+    OcdRequest: OCDRequest;
 }
 
 export interface Notification {

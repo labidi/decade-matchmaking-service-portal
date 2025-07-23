@@ -43,13 +43,13 @@ export default function RequestsList() {
                                 <td className="px-4 py-2 whitespace-nowrap flex space-x-2">
 
                                     <Link
-                                        href={route('user.request.show', req.id)}
+                                        href={route('request.show', req.id)}
                                         className="px-2 py-1 text-base font-medium text-green-600 hover:text-green-800"
                                     >
                                         View
                                     </Link>
                                     <Link
-                                        href={route('user.request.show', req.id)}
+                                        href={route('request.show', req.id)}
                                         className="px-2 py-1 text-base font-medium text-green-600 hover:text-green-800"
                                     >
                                         Express interrest

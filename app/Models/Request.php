@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Request\RequestOffer;
-use App\Models\Request\RequestStatus;
-use App\Models\User;
+use App\Models\Request\Offer;
+use App\Models\Request\Detail;
+use App\Models\Request\Status;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,39 +26,30 @@ class Request extends Model
 
     protected $hidden = ['updated_at'];
 
-
-    protected function requestData(): Attribute
-    {
-
-        return Attribute::make(
-            get: fn(?string $value) => json_decode($value),
-        );
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function MatchedPartner(): BelongsTo
+    public function matchedPartner(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function status(): belongsTo
+    public function status(): BelongsTo
     {
-        return $this->belongsTo(RequestStatus::class);
+        return $this->belongsTo(Status::class);
     }
 
     public function offers(): HasMany
     {
-        return $this->hasMany(RequestOffer::class);
+        return $this->hasMany(Offer::class);
     }
 
     // New normalized relationships
     public function detail(): HasOne
     {
-        return $this->hasOne(RequestDetail::class);
+        return $this->hasOne(Detail::class);
     }
 
     /**
@@ -66,7 +57,7 @@ class Request extends Model
      */
     public function activeOffer()
     {
-        return $this->hasOne(RequestOffer::class)
+        return $this->hasOne(Offer::class)
             ->where('status', \App\Enums\RequestOfferStatus::ACTIVE);
     }
 

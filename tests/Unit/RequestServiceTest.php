@@ -6,7 +6,7 @@ use Tests\TestCase;
 use App\Services\RequestService;
 use App\Models\Request as OCDRequest;
 use App\Models\User;
-use App\Models\Request\RequestStatus;
+use App\Models\Request\Status;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Schema;
@@ -17,26 +17,26 @@ class RequestServiceTest extends TestCase
 
     protected RequestService $service;
     protected User $user;
-    protected RequestStatus $draftStatus;
-    protected RequestStatus $validatedStatus;
+    protected Status $draftStatus;
+    protected Status $validatedStatus;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->service = new RequestService();
-        
+
         // Create test user
         $this->user = User::factory()->create();
-        
+
         // Create statuses
-        $this->draftStatus = RequestStatus::create([
+        $this->draftStatus = Status::create([
             'status_code' => 'draft',
             'status_label' => 'Draft',
             'description' => 'Request is in draft status'
         ]);
-        
-        $this->validatedStatus = RequestStatus::create([
+
+        $this->validatedStatus = Status::create([
             'status_code' => 'validated',
             'status_label' => 'Validated',
             'description' => 'Request has been validated'
@@ -47,14 +47,14 @@ class RequestServiceTest extends TestCase
     public function it_stores_request_successfully()
     {
         $data = $this->getSampleRequestData();
-        
+
         $request = $this->service->storeRequest($this->user, $data);
-        
+
         $this->assertInstanceOf(OCDRequest::class, $request);
         $this->assertEquals($this->user->id, $request->user_id);
         $this->assertEquals($this->validatedStatus->id, $request->status_id);
         $this->assertNotNull($request->request_data);
-        
+
         // Check if normalized data was created (if tables exist)
         if (Schema::hasTable('request_details')) {
             $this->assertNotNull($request->detail);
@@ -68,9 +68,9 @@ class RequestServiceTest extends TestCase
     public function it_saves_draft_successfully()
     {
         $data = $this->getSampleRequestData();
-        
+
         $request = $this->service->saveDraft($this->user, $data);
-        
+
         $this->assertInstanceOf(OCDRequest::class, $request);
         $this->assertEquals($this->user->id, $request->user_id);
         $this->assertEquals($this->draftStatus->id, $request->status_id);
@@ -85,10 +85,10 @@ class RequestServiceTest extends TestCase
         ]);
 
         $requests = $this->service->getUserRequests($this->user);
-        
+
         $this->assertInstanceOf(Collection::class, $requests);
         $this->assertCount(3, $requests);
-        
+
         foreach ($requests as $request) {
             $this->assertEquals($this->user->id, $request->user_id);
         }
@@ -98,7 +98,7 @@ class RequestServiceTest extends TestCase
     public function it_gets_public_requests()
     {
         $otherUser = User::factory()->create();
-        
+
         OCDRequest::factory()->count(2)->create([
             'user_id' => $otherUser->id,
             'status_id' => $this->validatedStatus->id,
@@ -110,10 +110,10 @@ class RequestServiceTest extends TestCase
         ]);
 
         $requests = $this->service->getPublicRequests($this->user);
-        
+
         $this->assertInstanceOf(Collection::class, $requests);
         $this->assertCount(2, $requests);
-        
+
         foreach ($requests as $request) {
             $this->assertNotEquals($this->user->id, $request->user_id);
         }
@@ -128,7 +128,7 @@ class RequestServiceTest extends TestCase
         ]);
 
         $found = $this->service->findRequest($request->id, $this->user);
-        
+
         $this->assertInstanceOf(OCDRequest::class, $found);
         $this->assertEquals($request->id, $found->id);
     }
@@ -143,7 +143,7 @@ class RequestServiceTest extends TestCase
         ]);
 
         $found = $this->service->findRequest($request->id, $this->user);
-        
+
         $this->assertNull($found);
     }
 
@@ -156,10 +156,10 @@ class RequestServiceTest extends TestCase
         ]);
 
         $result = $this->service->updateRequestStatus($request->id, 'validated', $this->user);
-        
+
         $this->assertTrue($result['success']);
         $this->assertEquals('Request status updated successfully', $result['message']);
-        
+
         $request->refresh();
         $this->assertEquals($this->validatedStatus->id, $request->status_id);
     }
@@ -175,7 +175,7 @@ class RequestServiceTest extends TestCase
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Unauthorized to update this request');
-        
+
         $this->service->updateRequestStatus($request->id, 'validated', $this->user);
     }
 
@@ -188,7 +188,7 @@ class RequestServiceTest extends TestCase
         ]);
 
         $result = $this->service->deleteRequest($request->id, $this->user);
-        
+
         $this->assertTrue($result);
         $this->assertDatabaseMissing('requests', ['id' => $request->id]);
     }
@@ -204,7 +204,7 @@ class RequestServiceTest extends TestCase
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Unauthorized to delete this request');
-        
+
         $this->service->deleteRequest($request->id, $this->user);
     }
 
@@ -222,7 +222,7 @@ class RequestServiceTest extends TestCase
         ]);
 
         $stats = $this->service->getRequestStats($this->user);
-        
+
         $this->assertIsArray($stats);
         $this->assertEquals(5, $stats['total']);
         $this->assertEquals(2, $stats['draft']);
@@ -239,7 +239,7 @@ class RequestServiceTest extends TestCase
         ]);
 
         $title = $this->service->getRequestTitle($request);
-        
+
         $this->assertEquals('Ocean Conservation Workshop', $title);
     }
 
@@ -253,7 +253,7 @@ class RequestServiceTest extends TestCase
         ]);
 
         $name = $this->service->getRequesterName($request);
-        
+
         $this->assertEquals('John Doe', $name);
     }
 
@@ -261,17 +261,17 @@ class RequestServiceTest extends TestCase
     public function it_saves_json_arrays_in_request_details()
     {
         $data = $this->getSampleRequestData();
-        
+
         $request = $this->service->storeRequest($this->user, $data);
-        
+
         if (Schema::hasTable('request_details')) {
             $this->assertNotNull($request->detail);
-            
+
             // Check JSON arrays are saved correctly
             $this->assertIsArray($request->detail->subthemes);
             $this->assertIsArray($request->detail->support_types);
             $this->assertIsArray($request->detail->target_audience);
-            
+
             // Check specific values
             $this->assertContains('ocean_health', $request->detail->subthemes);
             $this->assertContains('sustainable_fisheries', $request->detail->subthemes);
@@ -303,4 +303,4 @@ class RequestServiceTest extends TestCase
             'completion_date' => '2024-12-31',
         ];
     }
-} 
+}

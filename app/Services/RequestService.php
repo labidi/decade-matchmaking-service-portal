@@ -3,17 +3,16 @@
 namespace App\Services;
 
 use App\Models\Request as OCDRequest;
-use App\Models\RequestDetail;
-
-use App\Models\Request\RequestStatus;
-use App\Models\Request\RequestOffer;
+use App\Models\Request\Offer;
+use App\Models\Request\Detail;
+use App\Models\Request\Status;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
-use Exception;
 
 class RequestService
 {
@@ -335,9 +334,9 @@ class RequestService
     /**
      * Get active offer for a request
      */
-    public function getActiveOffer(int $requestId): ?RequestOffer
+    public function getActiveOffer(int $requestId): ?Offer
     {
-        return RequestOffer::where('request_id', $requestId)
+        return Offer::where('request_id', $requestId)
             ->where('status', 'active')
             ->first();
     }
@@ -427,7 +426,7 @@ class RequestService
             'expected_outcomes' => $data['expected_outcomes'] ?? null,
             'unique_related_decade_action_id' => $data['unique_related_decade_action_id'] ?? null,
             'project_url' => $data['project_url'] ?? null,
-            'delivery_country' => $data['delivery_country'] ?? null,
+            'delivery_countries' => $data['delivery_countries'] ?? null,
             'budget_breakdown' => $data['budget_breakdown'] ?? null,
             'completion_date' => $data['completion_date'] ?? null,
             // Save arrays as JSON in separate fields
@@ -439,7 +438,7 @@ class RequestService
         if ($request->detail) {
             $request->detail()->update($detailData);
         } else {
-            $request->detail()->save(new RequestDetail($detailData));
+            $request->detail()->save(new Detail($detailData));
         }
     }
 
@@ -459,7 +458,7 @@ class RequestService
      */
     private function getStatusId(string $statusCode): ?int
     {
-        $status = RequestStatus::where('status_code', $statusCode)->first();
+        $status = Status::where('status_code', $statusCode)->first();
         return $status ? $status->id : null;
     }
 
@@ -481,7 +480,7 @@ class RequestService
      */
     private function getRequestsByActivity(): array
     {
-        return RequestDetail::select('related_activity', DB::raw('count(*) as count'))
+        return Detail::select('related_activity', DB::raw('count(*) as count'))
             ->whereNotNull('related_activity')
             ->groupBy('related_activity')
             ->get()
@@ -495,7 +494,7 @@ class RequestService
     private function getPopularSubthemes(): array
     {
         // Use JSON fields for better performance
-        $subthemes = RequestDetail::select('subthemes')
+        $subthemes = Detail::select('subthemes')
             ->whereNotNull('subthemes')
             ->where('subthemes', '!=', '[]')
             ->get()
@@ -514,7 +513,7 @@ class RequestService
     private function getSupportTypeDistribution(): array
     {
         // Use JSON fields for better performance
-        $supportTypes = RequestDetail::select('support_types')
+        $supportTypes = Detail::select('support_types')
             ->whereNotNull('support_types')
             ->where('support_types', '!=', '[]')
             ->get()

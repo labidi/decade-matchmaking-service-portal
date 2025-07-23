@@ -1,0 +1,20 @@
+{
+    "name": "New Request Submitted",
+    "description": "Email sent when a new capacity development request is submitted",
+    "subject": "New Request Submitted - {request_title}",
+    "body": "Hello {recipient_name},\n\nA new capacity development request has been submitted to the Ocean Decade Portal.\n\nRequest Details:\n• Title: {request_title}\n• Request ID: {request_id}\n• Submitted by: {requester_name}\n• Submission Date: {submission_date}\n\nPlease log in to your dashboard to review this request and take appropriate action.\n\nView Request: {app_url}/requests/{request_id}\n\nBest regards,\n{app_name} Team",
+    "variables": [
+        "recipient_name",
+        "request_title", 
+        "request_id",
+        "requester_name",
+        "submission_date",
+        "app_name",
+        "app_url"
+    ],
+    "recipient_types": [
+        "requester",
+        "admin", 
+        "potential_partner"
+    ]
+}

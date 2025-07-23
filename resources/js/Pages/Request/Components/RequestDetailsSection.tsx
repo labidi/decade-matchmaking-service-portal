@@ -1,7 +1,20 @@
-import {AttachmentsProps} from '@/types';
 import {UIRequestForm} from '@/Forms/UIRequestForm';
+import {Document, OCDRequest} from "@/types";
 
-export default function RequestDetailsSection({OcdRequest, canEdit = false, documents = [],fieldsToShow = []}: AttachmentsProps) {
+
+export interface RequestDetailsSectionProps {
+    OcdRequest: OCDRequest;
+    canEdit?: boolean;
+    documents?: Document[];
+    fieldsToShow?: string[];
+}
+
+export default function RequestDetailsSection({
+                                                  OcdRequest,
+                                                  canEdit = false,
+                                                  documents = [],
+                                                  fieldsToShow = []
+                                              }: Readonly<RequestDetailsSectionProps>) {
     return (
         <section id="request_details" className='my-8'>
             <div className="grid grid-cols-1">
@@ -17,15 +30,14 @@ export default function RequestDetailsSection({OcdRequest, canEdit = false, docu
                         <div className="grid divide-y divide-neutral-200 mx-auto">
                             {UIRequestForm.map(step => {
                                 const visibleFields = Object.entries(step.fields).filter(([key, field]) => {
-                                    if (fieldsToShow.length > 0 && !fieldsToShow.includes(key)) return false;
+
+                                     if (fieldsToShow.length > 0 && !fieldsToShow.includes(key)) return false;
                                     if (!field.label || field.type === 'hidden') return false;
-                                    if (field.show && !field.show(OcdRequest.request_data)) return false;
+                                    if (field.show && !field.show(OcdRequest)) return false;
                                     const value = (OcdRequest.request_data as any)[key];
                                     return !(value === undefined || value === '');
                                 });
-
                                 if (visibleFields.length === 0) return null;
-
                                 return (
                                     <div className="py-5" key={step.label}>
                                         <details className="group">
@@ -51,10 +63,12 @@ export default function RequestDetailsSection({OcdRequest, canEdit = false, docu
                                             <ul className=" group-open:animate-fadeIn list-none">
                                                 {visibleFields.map(([key, field]) => {
                                                     const value = (OcdRequest.request_data as any)[key];
+                                                    console.log(OcdRequest)
                                                     const formatted = Array.isArray(value) ? value.join(', ') : value;
                                                     return (
                                                         <li key={key} className='py-2 text-xl'>
-                                                            <span className="text-firefly-600">{field.label}: </span> <br/>
+                                                            <span className="text-firefly-600">{field.label}: </span>
+                                                            <br/>
                                                             {formatted ?? 'N/A'}
                                                         </li>
                                                     );

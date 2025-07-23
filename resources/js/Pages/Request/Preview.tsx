@@ -20,8 +20,9 @@ export default function ShowRequest() {
         'related_activity',
         'support_types',
         'delivery_format',
+        'delivery_countries',
         'target_audience',
-        'gap_description',
+        'gap_description'
     ];
     return (
         <FrontendLayout>
