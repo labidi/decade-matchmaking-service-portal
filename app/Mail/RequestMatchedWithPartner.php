@@ -4,8 +4,6 @@ namespace App\Mail;
 
 use App\Models\Request;
 use App\Models\User;
-use App\Models\RequestEnhancer;
-use App\Services\EmailTemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -36,14 +34,10 @@ class RequestMatchedWithPartner extends Mailable implements ShouldQueue
      */
     public function envelope(): Envelope
     {
-        $templateService = app(EmailTemplateService::class);
-        $rendered = $templateService->renderTemplate(
-            EmailTemplateService::TYPE_REQUEST_MATCHED,
-            $this->getTemplateData()
-        );
+        $subject = "Partnership Confirmed - {$this->request->capacity_development_title}";
 
         return new Envelope(
-            subject: $rendered['subject'],
+            subject: $subject,
         );
     }
 
@@ -58,25 +52,8 @@ class RequestMatchedWithPartner extends Mailable implements ShouldQueue
                 'request' => $this->request,
                 'partner' => $this->partner,
                 'recipient' => $this->recipient,
-                'enhancedData' => RequestEnhancer::enhanceRequest($this->request)
             ]
         );
-    }
-
-    /**
-     * Get template data for variable replacement
-     */
-    private function getTemplateData(): array
-    {
-        return [
-            'recipient_name' => $this->recipient['name'],
-            'request_title' => $this->request->title,
-            'request_id' => $this->request->id,
-            'partner_name' => $this->partner->name,
-            'requester_name' => $this->request->requester_name,
-            'app_name' => config('app.name'),
-            'app_url' => config('app.url')
-        ];
     }
 
     /**

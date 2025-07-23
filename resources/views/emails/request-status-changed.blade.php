@@ -30,15 +30,15 @@
         </span>
     </div>
     
-    @if($enhancedData['request_data']['related_activity_label'])
+    @if($request->related_activity)
     <div class="detail-item">
-        <span class="detail-label">Activity Type:</span> {{ $enhancedData['request_data']['related_activity_label'] }}
+        <span class="detail-label">Activity Type:</span> {{ $request->related_activity }}
     </div>
     @endif
     
-    @if($enhancedData['request_data']['delivery_format_label'])
+    @if($request->delivery_format)
     <div class="detail-item">
-        <span class="detail-label">Delivery Format:</span> {{ $enhancedData['request_data']['delivery_format_label'] }}
+        <span class="detail-label">Delivery Format:</span> {{ $request->delivery_format }}
     </div>
     @endif
 </div>

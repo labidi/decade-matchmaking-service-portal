@@ -3,8 +3,6 @@
 namespace App\Mail;
 
 use App\Models\Request;
-use App\Models\RequestEnhancer;
-use App\Services\EmailTemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -35,14 +33,10 @@ class RequestStatusChanged extends Mailable implements ShouldQueue
      */
     public function envelope(): Envelope
     {
-        $templateService = app(EmailTemplateService::class);
-        $rendered = $templateService->renderTemplate(
-            EmailTemplateService::TYPE_REQUEST_STATUS_CHANGED,
-            $this->getTemplateData()
-        );
+        $subject = "Request Status Update - {$this->request->capacity_development_title}";
 
         return new Envelope(
-            subject: $rendered['subject'],
+            subject: $subject,
         );
     }
 
@@ -57,26 +51,8 @@ class RequestStatusChanged extends Mailable implements ShouldQueue
                 'request' => $this->request,
                 'recipient' => $this->recipient,
                 'previousStatus' => $this->previousStatus,
-                'enhancedData' => RequestEnhancer::enhanceRequest($this->request)
             ]
         );
-    }
-
-    /**
-     * Get template data for variable replacement
-     */
-    private function getTemplateData(): array
-    {
-        return [
-            'recipient_name' => $this->recipient['name'],
-            'request_title' => $this->request->title,
-            'request_id' => $this->request->id,
-            'current_status' => $this->request->status->status_label ?? 'Unknown',
-            'previous_status' => $this->previousStatus ?? 'Unknown',
-            'requester_name' => $this->request->requester_name,
-            'app_name' => config('app.name'),
-            'app_url' => config('app.url')
-        ];
     }
 
     /**

@@ -183,7 +183,7 @@ class OcdRequestController extends Controller
                 throw new Exception('Request not found');
             }
             $ocdRequest = $this->service->storeRequest($request->user(), $validated, $ocdRequest);
-            return to_route('request.list');
+            return to_route('request.me.list');
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }

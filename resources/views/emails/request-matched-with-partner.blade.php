@@ -35,46 +35,46 @@
         <span class="detail-label">Match Date:</span> {{ now()->format('F j, Y \a\t g:i A') }}
     </div>
     
-    @if($enhancedData['request_data']['related_activity_label'])
+    @if($request->related_activity)
     <div class="detail-item">
-        <span class="detail-label">Activity Type:</span> {{ $enhancedData['request_data']['related_activity_label'] }}
+        <span class="detail-label">Activity Type:</span> {{ $request->related_activity }}
     </div>
     @endif
     
-    @if($enhancedData['request_data']['delivery_format_label'])
+    @if($request->delivery_format)
     <div class="detail-item">
-        <span class="detail-label">Delivery Format:</span> {{ $enhancedData['request_data']['delivery_format_label'] }}
+        <span class="detail-label">Delivery Format:</span> {{ $request->delivery_format }}
     </div>
     @endif
     
-    @if($enhancedData['request_data']['completion_date'])
+    @if($request->completion_date)
     <div class="detail-item">
-        <span class="detail-label">Expected Completion:</span> {{ \Carbon\Carbon::parse($enhancedData['request_data']['completion_date'])->format('F j, Y') }}
+        <span class="detail-label">Expected Completion:</span> {{ \Carbon\Carbon::parse($request->completion_date)->format('F j, Y') }}
     </div>
     @endif
     
-    @if(!empty($enhancedData['request_data']['subthemes_labels']))
+    @if($request->subthemes && is_array($request->subthemes))
     <div class="detail-item">
         <span class="detail-label">Sub-themes:</span>
         <ul>
-            @foreach($enhancedData['request_data']['subthemes_labels'] as $subtheme)
+            @foreach($request->subthemes as $subtheme)
                 <li>{{ $subtheme }}</li>
             @endforeach
         </ul>
     </div>
     @endif
     
-    @if($enhancedData['request_data']['gap_description'])
+    @if($request->gap_description)
     <div class="detail-item">
         <span class="detail-label">Gap Description:</span>
-        <p>{{ Str::limit($enhancedData['request_data']['gap_description'], 200) }}</p>
+        <p>{{ Str::limit($request->gap_description, 200) }}</p>
     </div>
     @endif
     
-    @if($enhancedData['request_data']['expected_outcomes'])
+    @if($request->expected_outcomes)
     <div class="detail-item">
         <span class="detail-label">Expected Outcomes:</span>
-        <p>{{ Str::limit($enhancedData['request_data']['expected_outcomes'], 200) }}</p>
+        <p>{{ Str::limit($request->expected_outcomes, 200) }}</p>
     </div>
     @endif
 </div>
