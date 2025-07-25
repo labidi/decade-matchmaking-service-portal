@@ -18,6 +18,8 @@ export default function RequestsList() {
     const [requestList, setRequestList] = React.useState<OCDRequestList>(requests);
 
     const [expressInterestDialog, setExpressInterestDialog] = useState(false);
+    const [currentRequestId, setCurrentRequestId] = useState<string | null>(null);
+    const [isSubmittingInterest, setIsSubmittingInterest] = useState(false);
 
     const statuses = [
         'draft',
@@ -50,7 +52,35 @@ export default function RequestsList() {
                 setRequestList(prev => prev.filter(req => req.id !== id));
             });
     };
-    const titleBodyTemplate = (rowData: OCDRequest) => rowData.request_data.capacity_development_title ?? 'N/A';
+
+    const handleExpressInterest = (requestId: string) => {
+        setCurrentRequestId(requestId);
+        setExpressInterestDialog(true);
+    };
+
+    const confirmExpressInterest = () => {
+        if (!currentRequestId) return;
+
+        setIsSubmittingInterest(true);
+        axios.post(route('request.express.interest', currentRequestId))
+            .then(response => {
+                if (response.data.success) {
+                    alert('Your interest has been expressed successfully! The CDF Secretariat will follow up within three business days.');
+                } else {
+                    alert('Failed to express interest. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error expressing interest:', error);
+                alert('Failed to express interest. Please try again.');
+            })
+            .finally(() => {
+                setIsSubmittingInterest(false);
+                setCurrentRequestId(null);
+                setExpressInterestDialog(false);
+            });
+    };
+    const titleBodyTemplate = (rowData: OCDRequest) => rowData.detail.capacity_development_title ?? 'N/A';
     const submissionDateTemplate = (rowData: OCDRequest) => new Date(rowData.created_at).toLocaleDateString();
 
     const actionsTemplate = (rowData: OCDRequest) => (
@@ -92,15 +122,14 @@ export default function RequestsList() {
                 </Link>
             )}
             {grid.actions.canExpressInterest && (
-                <>
-                    <span
-                       onClick={() => setExpressInterestDialog(true)}
-                       className="flex items-center text-green-700 hover:text-green-800"
-                    >
-                        <i className="pi pi-star-fill mr-1" aria-hidden="true"/>
-                        Express interest
-                    </span>
-                </>
+                <button
+                   onClick={() => handleExpressInterest(rowData.id)}
+                   className="flex items-center text-green-700 hover:text-green-800 cursor-pointer"
+                   disabled={isSubmittingInterest}
+                >
+                    <i className="pi pi-star-fill mr-1" aria-hidden="true"/>
+                    Express interest
+                </button>
             )}
             {grid.actions.canChangeStatus && (
                 <select
@@ -199,6 +228,7 @@ export default function RequestsList() {
                 onOpenChange={setExpressInterestDialog}
                 type="info"
                 message="This message confirms your interest in delivering services for this request. The CDF Secretariat will follow up within three business days."
+                onConfirm={confirmExpressInterest}
             />
         </FrontendLayout>
     );

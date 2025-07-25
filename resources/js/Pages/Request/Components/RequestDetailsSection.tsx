@@ -34,7 +34,7 @@ export default function RequestDetailsSection({
                                      if (fieldsToShow.length > 0 && !fieldsToShow.includes(key)) return false;
                                     if (!field.label || field.type === 'hidden') return false;
                                     if (field.show && !field.show(OcdRequest)) return false;
-                                    const value = (OcdRequest.request_data as any)[key];
+                                    const value = (OcdRequest.detail as any)[key];
                                     return !(value === undefined || value === '');
                                 });
                                 if (visibleFields.length === 0) return null;
@@ -62,7 +62,7 @@ export default function RequestDetailsSection({
                                             </summary>
                                             <ul className=" group-open:animate-fadeIn list-none">
                                                 {visibleFields.map(([key, field]) => {
-                                                    const value = (OcdRequest.request_data as any)[key];
+                                                    const value = (OcdRequest.detail as any)[key];
                                                     console.log(OcdRequest)
                                                     const formatted = Array.isArray(value) ? value.join(', ') : value;
                                                     return (

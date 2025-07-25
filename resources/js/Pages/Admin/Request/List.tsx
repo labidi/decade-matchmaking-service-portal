@@ -1,284 +1,68 @@
 import React, {useState} from 'react';
-import {Head, Link , usePage} from '@inertiajs/react';
-import BackendLayout from '@/Layouts/BackendLayout';
-import {OCDRequest, OCDRequestList} from '@/types';
-import {DataTable} from 'primereact/datatable';
-import {Column} from 'primereact/column';
-import {Tag} from 'primereact/tag';
-import {FilterMatchMode} from 'primereact/api';
-import {Button} from 'primereact/button';
-import {Dropdown} from 'primereact/dropdown';
-import 'primereact/resources/themes/lara-light-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-import axios from 'axios';
-import OffersDialog from "@/Components/Dialogs/OffersDialog";
-import { useOffersDialog } from "@/hooks/useOffersDialog";
+import {Head} from '@inertiajs/react';
+import {OCDRequest, OCDRequestList, PaginationLinkProps} from '@/types';
 
-export default function List() {
-    const requests = usePage().props.requests as OCDRequestList;
-    const partners = usePage().props.partners as { value: string, label: string }[];
-    console.log('Requests:', requests);
-    const [requestList, setRequestList] = React.useState<OCDRequestList>(requests);
-    const [filters, setFilters] = useState({
-        global: {value: null, matchMode: FilterMatchMode.CONTAINS},
-        'request_data.capacity_development_title': {value: null, matchMode: FilterMatchMode.CONTAINS},
-        'status.status_code': {value: null, matchMode: FilterMatchMode.EQUALS},
-        'user.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
-    } as any);
+import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {Navbar} from '@/components/ui/navbar'
+import {Sidebar} from '@/components/ui/sidebar'
+import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
+import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 
-    const [expressInterestDialog, setExpressInterestDialog] = useState(false);
-    const { offersDialogVisible, selectedRequest, openOffersDialog, closeOffersDialog } = useOffersDialog();
+interface RequestsPagination {
+    current_page: number;
+    data: OCDRequestList,
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: PaginationLinkProps[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+}
 
-    const statuses = [
-        {label: 'All Statuses', value: null},
-        {label: 'Draft', value: 'draft'},
-        {label: 'Under Review', value: 'under_review'},
-        {label: 'Validated', value: 'validated'},
-        {label: 'Offer Made', value: 'offer_made'},
-        {label: 'In Implementation', value: 'in_implementation'},
-        {label: 'Rejected', value: 'rejected'},
-        {label: 'Unmatched', value: 'unmatched'},
-        {label: 'Closed', value: 'closed'},
-    ];
-
-    const handleStatusChange = (id: string, status: string) => {
-        axios.patch(route('request.update.status', id), {status})
-            .then(res => {
-                setRequestList(prev => prev.map(req =>
-                    req.id === id
-                        ? {...req, status: {...req.status, ...res.data.status}}
-                        : req
-                ));
-            });
+interface RequestsListPageProps {
+    requests: RequestsPagination;
+    currentSort: {
+        field: string;
+        order: string;
     };
+    currentSearch?: Record<string, string>;
+}
 
-    const handleDelete = (id: string) => {
-        if (!confirm('Are you sure you want to delete this request?')) {
-            return;
-        }
-        axios.delete(route('user.request.destroy', id))
-            .then(() => {
-                setRequestList(prev => prev.filter(req => req.id !== id));
-            });
-    };
-
-    // Export CSV handler
-    const handleExportCSV = () => {
-        window.location.href = route('admin.request.export.csv');
-    };
-
-    const titleBodyTemplate = (rowData: OCDRequest) => (
-        <div className="font-medium text-gray-900">
-            {rowData.request_data.capacity_development_title ?? 'N/A'}
-        </div>
-    );
-
-    const submitterBodyTemplate = (rowData: OCDRequest) => (
-        <div className="text-gray-700">
-            {rowData.user?.name ?? 'N/A'}
-        </div>
-    );
-
-    const submissionDateTemplate = (rowData: OCDRequest) => (
-        <div className="text-gray-600">
-            {new Date(rowData.created_at).toLocaleDateString()}
-        </div>
-    );
-
-    const statusBodyTemplate = (rowData: OCDRequest) => {
-        const code = rowData.status.status_code;
-        const label = rowData.status.status_label;
-
-        let severity: 'success' | 'info' | 'warning' | 'danger' | undefined = undefined;
-        let icon = 'pi pi-info-circle';
-
-        switch (code) {
-            case 'draft':
-                severity = 'warning';
-                icon = 'pi pi-file-edit';
-                break;
-            case 'under_review':
-                severity = 'info';
-                icon = 'pi pi-clock';
-                break;
-            case 'validated':
-                severity = 'success';
-                icon = 'pi pi-check-circle';
-                break;
-            case 'offer_made':
-                severity = 'info';
-                icon = 'pi pi-briefcase';
-                break;
-            case 'in_implementation':
-                severity = 'success';
-                icon = 'pi pi-rocket';
-                break;
-            case 'rejected':
-            case 'unmatched':
-                severity = 'danger';
-                icon = 'pi pi-times-circle';
-                break;
-            case 'closed':
-                severity = undefined;
-                icon = 'pi pi-lock';
-                break;
-        }
-
-        return (
-            <Tag
-                value={label}
-                severity={severity}
-                icon={<i className={icon}/>}
-                className="cursor-default"
-            />
-        );
-    };
-
-    const actionsBodyTemplate = (rowData: OCDRequest) => (
-        <div className="flex space-x-2">
-            <Link
-                href={'#'}
-                className="p-button p-button-sm p-button-outlined p-button-primary"
-            >
-                <i className="pi pi-eye mr-1"></i>
-                View
-            </Link>
-            <Button
-                icon="pi pi-briefcase"
-                size="small"
-                outlined
-                onClick={() => openOffersDialog(rowData)}
-                tooltip="View Offers"
-            />
-            <Button
-                icon="pi pi-trash"
-                severity="danger"
-                size="small"
-                outlined
-                onClick={() => handleDelete(rowData.id)}
-                tooltip="Delete Request"
-            />
-            <select
-                className="border rounded px-2 py-1"
-                value={rowData.status.status_code}
-                onChange={e => handleStatusChange(rowData.id, e.currentTarget.value)}
-            >
-                {statuses.map(s => (
-                    <option key={s.label} value={s.value || ''}>{s.label.replace(/_/g, ' ')}</option>
-                ))}
-            </select>
-        </div>
-    );
-
-    const statusFilterTemplate = () => {
-        return (
-            <Dropdown
-                value={filters['status.status_code'].value}
-                options={statuses}
-                onChange={(e) => setFilters({
-                    ...filters,
-                    'status.status_code': {value: e.value, matchMode: FilterMatchMode.EQUALS}
-                })}
-                placeholder="Select Status"
-                className="p-inputtext-sm"
-                showClear
-            />
-        );
-    };
-
+export default function RequestListPage({requests, currentSort, currentSearch = {}}: Readonly<RequestsListPageProps>) {
     return (
-        <BackendLayout>
-            <Head title="Admin Requests List"/>
-            <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                    <div>
-                        <h2 className="text-xl font-semibold text-gray-900">Requests Management</h2>
-                        <p className="text-sm text-gray-600 mt-1">Manage and monitor all requests in the system</p>
-                    </div>
-                    <button
-                        className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700 transition"
-                        onClick={handleExportCSV}
-                    >
-                        Export CSV
-                    </button>
-                </div>
-                <div className="p-6">
-                    <DataTable
-                        value={requestList}
-                        filters={filters}
-                        globalFilterFields={['id', 'request_data.capacity_development_title', 'user.name', 'status.status_code']}
-                        paginator
-                        rows={10}
-                        rowsPerPageOptions={[10, 25, 50, 100]}
-                        showGridlines
-                        emptyMessage="No requests found."
-                        className="p-datatable-sm"
-                        filterDisplay="menu"
-                        scrollable
-                        stripedRows
-                    >
-                        <Column
-                            field="id"
-                            header="ID"
-                            sortable
-                            style={{width: '80px'}}
-                            className="text-center"
-                        />
-                        <Column
-                            field="request_data.capacity_development_title"
-                            header="Title"
-                            body={titleBodyTemplate}
-                            sortable
-                            filter
-                            filterPlaceholder="Search by title..."
-                            style={{minWidth: '200px'}}
-                        />
-                        <Column
-                            field="user.name"
-                            header="Submitted By"
-                            body={submitterBodyTemplate}
-                            sortable
-                            filter
-                            filterPlaceholder="Search by submitter..."
-                            style={{minWidth: '150px'}}
-                        />
-                        <Column
-                            field="created_at"
-                            header="Submission Date"
-                            body={submissionDateTemplate}
-                            sortable
-                            style={{width: '150px'}}
-                        />
-                        <Column
-                            field="status.status_code"
-                            header="Status"
-                            body={statusBodyTemplate}
-                            sortable
-                            filter
-                            filterElement={statusFilterTemplate}
-                            style={{width: '180px'}}
-                        />
-                        <Column
-                            header="Actions"
-                            body={actionsBodyTemplate}
-                            style={{width: '150px'}}
-                            className="text-center"
-                        />
-                    </DataTable>
-                </div>
+        <SidebarLayout
+            sidebar={<Sidebar><SidebarContent/></Sidebar>}
+            navbar={<Navbar></Navbar>}
+        >
+            <Head title="Requests List"/>
+            <div className="mx-auto">
+                <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+                    Requests List
+                </h2>
+                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
             </div>
-
-            {/* Offers Dialog */}
-            {selectedRequest && (
-                <OffersDialog
-                    visible={offersDialogVisible}
-                    onHide={closeOffersDialog}
-                    requestId={selectedRequest.id}
-                    requestTitle={selectedRequest.request_data.capacity_development_title || 'Untitled Request'}
-                    partners={partners}
+            <div className="py-8">
+                <RequestsDataTable
+                    requests={requests.data}
+                    currentSort={currentSort}
+                    currentSearch={currentSearch}
+                    pagination={{
+                        current_page: requests.current_page,
+                        last_page: requests.last_page,
+                        links: requests.links,
+                        prev_page_url: requests.prev_page_url,
+                        next_page_url: requests.next_page_url,
+                        from: requests.from,
+                        to: requests.to,
+                        total: requests.total
+                    }}
                 />
-            )}
-        </BackendLayout>
+            </div>
+        </SidebarLayout>
     );
 }

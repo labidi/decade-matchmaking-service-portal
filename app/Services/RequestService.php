@@ -109,11 +109,10 @@ class RequestService
             });
     }
 
-    public function getAllRequests(): Collection
+    public function getAllRequests(bool $raw = false): Collection
     {
-        $requests = OCDRequest::with(['status', 'detail', 'user', 'offers'])
-            ->get();
-        return $requests->map(function ($request) {
+        $requests = OCDRequest::with(['status', 'detail', 'user', 'offers']);
+        return $raw ? $requests : $requests->map(function ($request) {
             return $this->enhanceRequestData($request);
         });
     }

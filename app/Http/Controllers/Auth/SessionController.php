@@ -53,7 +53,7 @@ class SessionController extends Controller
 
         } catch (\Exception $e) {
             throw ValidationException::withMessages([
-                "password" => $e->getMessage(),
+                "error" => $e->getMessage(),
             ]);
         }
         $user = User::updateOrCreate(

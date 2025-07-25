@@ -11,13 +11,23 @@ use Inertia\Response;
 
 class NotificationController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $notifications = Auth::user()->notifications()->latest()->get();
+        $sortField = $request->get('sort', 'created_at');
+        $sortOrder = $request->get('order', 'desc');
+        // Validate sort order
+        $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? strtolower($sortOrder) : 'desc';
+
+        $notifications = Auth::user()->notifications()
+            ->orderBy($sortField, $sortOrder)->paginate(10)->appends($request->only(['sort', 'order']));
 
         return Inertia::render('Admin/Notification/List', [
             'title' => 'Notifications',
             'notifications' => $notifications,
+            'currentSort' => [
+                'field' => $sortField,
+                'order' => $sortOrder,
+            ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Notifications'],
@@ -45,7 +55,7 @@ class NotificationController extends Controller
         $this->authorizeNotification($notification);
         $notification->update(['is_read' => true]);
 
-        return redirect()->back();
+        return to_route('admin.notifications.index')->with('success', 'Notification marked as read.');
     }
 
     private function authorizeNotification(Notification $notification): void

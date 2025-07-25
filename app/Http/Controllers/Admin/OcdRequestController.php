@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Request as OCDRequest;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,22 +19,62 @@ class OcdRequestController extends Controller
 
     public function list(Request $httpRequest)
     {
-        $requests = $this->service->getAllRequests();
-        $partners = User::role('partner')->select('id', 'name', 'email', 'first_name', 'last_name')->get()->map(function ($partner) {
-            return [
-                'id' => $partner->id,
-                'name' => $partner->name,
-                'email' => $partner->email,
-                'first_name' => $partner->first_name,
-                'last_name' => $partner->last_name,
-                'value' => $partner->id,
-                'label' => ($partner->name ?: trim(($partner->first_name ?? '') . ' ' . ($partner->last_name ?? ''))) . ' (' . $partner->email . ')',
-            ];
-        })->values();
+        $sortField = $httpRequest->get('sort', 'created_at');
+        $sortOrder = $httpRequest->get('order', 'desc');
+        $searchUser = $httpRequest->get('user');
+        $searchTitle = $httpRequest->get('title');
+
+        // Validate sort field to prevent SQL injection
+        $allowedSortFields = ['id', 'created_at', 'status_id', 'user_id'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'created_at';
+        }
+
+        // Validate sort order
+        $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? strtolower($sortOrder) : 'desc';
+
+        $query = OCDRequest::with(['status', 'detail', 'user', 'offers']);
+
+        // Apply search filters
+        if ($searchUser) {
+            $query->whereHas('user', function ($q) use ($searchUser) {
+                $q->where('name', 'like', '%' . $searchUser . '%');
+            });
+        }
+
+        if ($searchTitle) {
+            $query->whereHas('detail', function ($q) use ($searchTitle) {
+                $q->where('capacity_development_title', 'like', '%' . $searchTitle . '%');
+            });
+        }
+
+        // Apply sorting with special handling for user relationship
+        if ($sortField === 'user_id') {
+            $query->join('users', 'requests.user_id', '=', 'users.id')
+                  ->orderBy('users.name', $sortOrder)
+                  ->select('requests.*');
+        } else {
+            $query->orderBy($sortField, $sortOrder);
+        }
+
+        // If not sorting by created_at, add it as a secondary sort for consistency
+        if ($sortField !== 'created_at') {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $requests = $query->paginate(10)->appends($httpRequest->only(['sort', 'order', 'user', 'title']));
+
         return Inertia::render('Admin/Request/List', [
             'title' => 'My requests',
             'requests' => $requests,
-            'partners' => $partners,
+            'currentSort' => [
+                'field' => $sortField,
+                'order' => $sortOrder,
+            ],
+            'currentSearch' => [
+                'user' => $searchUser ?? '',
+                'title' => $searchTitle ?? '',
+            ],
         ]);
     }
 

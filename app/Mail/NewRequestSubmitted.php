@@ -10,9 +10,9 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NewRequestSubmitted extends Mailable
+class NewRequestSubmitted extends Mailableimplements implements ShouldQueue
 {
-    use SerializesModels;
+    use Queueable, SerializesModels;
 
     public Request $request;
     public array $recipient;

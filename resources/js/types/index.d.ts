@@ -110,18 +110,18 @@ export interface RequestOffer {
 }
 
 export type RequestOfferList = RequestOffer[];
-
+export interface OCDRequestStatus {
+    id: string;
+    status_label: string;
+    status_code: string;
+    created_at: string;
+    updated_at: string;
+}
 export interface OCDRequest {
     id: string;
     type: string;
     submissionDate: string;
-    status: {
-        id: string;
-        status_label: string;
-        status_code: string;
-        created_at: string;
-        updated_at: string;
-    }
+    status: OCDRequestStatus,
     detail: {
         id: string;
         is_related_decade_action: 'Yes' | 'No';
@@ -162,7 +162,7 @@ export interface OCDRequest {
     matched_partner_id: string | null;
     status_id: string;
     user_id: string;
-    user?: User;
+    user: User;
     offers?: RequestOfferList
     active_offer?: RequestOffer;
 };
@@ -174,6 +174,7 @@ export interface OCDOpportunity {
     id: string;
     title: string;
     type: string;
+    type_label: string;
     closing_date: string;
     coverage_activity: string;
     implementation_location: string;
@@ -244,3 +245,9 @@ export interface Settings {
     homepage_youtube_video:string;
 }
 
+
+export interface PaginationLinkProps {
+    active: boolean;
+    label: string;
+    url: string;
+}

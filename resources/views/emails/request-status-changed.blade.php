@@ -1,41 +1,41 @@
 @extends('emails.layout')
 
 @section('content')
-<h2>Hello {{ $recipient['name'] }},</h2>
+<h2>Dear {{ $recipient['name'] }},</h2>
 
-<p>The status of a capacity development request has been updated.</p>
+<p>The status of your request, [Title], has been changed to: [Status].</p>
 
 <div class="request-details">
     <h3>{{ $request->title }}</h3>
-    
+
     <div class="detail-item">
         <span class="detail-label">Request ID:</span> {{ $request->id }}
     </div>
-    
+
     <div class="detail-item">
         <span class="detail-label">Requester:</span> {{ $request->requester_name }}
     </div>
-    
+
     @if($previousStatus)
     <div class="detail-item">
-        <span class="detail-label">Previous Status:</span> 
+        <span class="detail-label">Previous Status:</span>
         <span class="status-badge">{{ $previousStatus }}</span>
     </div>
     @endif
-    
+
     <div class="detail-item">
-        <span class="detail-label">Current Status:</span> 
+        <span class="detail-label">Current Status:</span>
         <span class="status-badge status-{{ strtolower($request->status->status_code ?? '') }}">
             {{ $request->status->status_label ?? 'Unknown' }}
         </span>
     </div>
-    
+
     @if($request->related_activity)
     <div class="detail-item">
         <span class="detail-label">Activity Type:</span> {{ $request->related_activity }}
     </div>
     @endif
-    
+
     @if($request->delivery_format)
     <div class="detail-item">
         <span class="detail-label">Delivery Format:</span> {{ $request->delivery_format }}

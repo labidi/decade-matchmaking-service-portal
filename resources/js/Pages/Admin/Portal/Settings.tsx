@@ -1,10 +1,15 @@
 import React, {useState} from 'react';
 import {Head, useForm, usePage} from '@inertiajs/react';
-import BackendLayout from '@/Layouts/BackendLayout';
 import {UISettingsForm} from "@/Forms";
 import FieldRenderer from '@/Components/Forms/FieldRenderer';
 import {Settings} from "@/types";
 import { useDialog } from '@/Components/Dialogs';
+
+
+import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {Navbar} from '@/components/ui/navbar'
+import {Sidebar} from '@/components/ui/sidebar'
+import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
 
 export default function SettingsForm() {
     const page = usePage();
@@ -40,7 +45,10 @@ export default function SettingsForm() {
     };
 
     return (
-        <BackendLayout>
+        <SidebarLayout
+            sidebar={<Sidebar><SidebarContent/></Sidebar>}
+            navbar={<Navbar></Navbar>}
+        >
             <Head title="Admin Requests List"/>
             <div className="bg-white rounded-lg shadow">
                 <div className="mx-auto p-6 ">
@@ -72,6 +80,6 @@ export default function SettingsForm() {
                     </form>
                 </div>
             </div>
-        </BackendLayout>
+        </SidebarLayout>
     )
 }

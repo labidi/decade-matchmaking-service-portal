@@ -22,10 +22,9 @@ class RequestObserver
         Notification::create([
             'user_id' => 3,
             'title' => 'New Request Submitted',
-            'description' => 'A new request has been submitted: ' . ($request->capacity_development_title ?? $request->id),
+            'description' => 'A new request has been submitted: ' . ($request->capacity_development_title ?? $request->id).' By ' . ($request->user->name ?? 'Unknown User'),
             'is_read' => false,
         ]);
-        
         // Send email notifications
         try {
             $this->sendNewRequestEmails($request);
@@ -46,11 +45,11 @@ class RequestObserver
         if ($request->isDirty('status_id')) {
             $originalStatusId = $request->getOriginal('status_id');
             $previousStatus = null;
-            
+
             if ($originalStatusId) {
                 $previousStatus = \App\Models\Request\Status::find($originalStatusId)?->status_label;
             }
-            
+
             try {
                 $this->sendStatusChangeEmails($request, $previousStatus);
             } catch (\Exception $e) {
@@ -60,7 +59,7 @@ class RequestObserver
                 ]);
             }
         }
-        
+
         // Check if matched partner has been assigned
         if ($request->isDirty('matched_partner_id') && $request->matched_partner_id) {
             try {
@@ -84,7 +83,7 @@ class RequestObserver
     private function sendNewRequestEmails(Request $request): void
     {
         $recipients = [];
-        
+
         // Notify the request creator (confirmation)
         if ($request->user) {
             $recipients[] = [
@@ -93,23 +92,13 @@ class RequestObserver
                 'type' => 'requester'
             ];
         }
-        
-        // Notify admins about new requests
-        $admins = User::where('is_admin', true)->get();
-        foreach ($admins as $admin) {
-            $recipients[] = [
-                'email' => $admin->email,
-                'name' => $admin->name,
-                'type' => 'admin'
-            ];
-        }
-        
+
         // Send emails
         foreach ($recipients as $recipient) {
             Mail::to($recipient['email'])
                 ->send(new NewRequestSubmitted($request, $recipient));
         }
-        
+
         Log::info('New request submission emails sent', [
             'request_id' => $request->id,
             'recipient_count' => count($recipients)
@@ -122,7 +111,7 @@ class RequestObserver
     private function sendStatusChangeEmails(Request $request, ?string $previousStatus): void
     {
         $recipients = [];
-        
+
         // Always notify the request creator
         if ($request->user) {
             $recipients[] = [
@@ -131,7 +120,7 @@ class RequestObserver
                 'type' => 'requester'
             ];
         }
-        
+
         // Notify matched partner if exists
         if ($request->matchedPartner) {
             $recipients[] = [
@@ -140,7 +129,7 @@ class RequestObserver
                 'type' => 'partner'
             ];
         }
-        
+
         // Notify admins for certain status changes
         if ($this->shouldNotifyAdmins($request)) {
             $admins = User::where('is_admin', true)->get();
@@ -152,13 +141,13 @@ class RequestObserver
                 ];
             }
         }
-        
+
         // Send emails
         foreach ($recipients as $recipient) {
             Mail::to($recipient['email'])
                 ->send(new RequestStatusChanged($request, $recipient, $previousStatus));
         }
-        
+
         Log::info('Request status change emails sent', [
             'request_id' => $request->id,
             'new_status' => $request->status->status_label,
@@ -173,7 +162,7 @@ class RequestObserver
     private function sendPartnerMatchingEmails(Request $request, User $partner): void
     {
         $recipients = [];
-        
+
         // Notify the request creator
         if ($request->user) {
             $recipients[] = [
@@ -182,20 +171,20 @@ class RequestObserver
                 'type' => 'requester'
             ];
         }
-        
+
         // Notify the matched partner
         $recipients[] = [
             'email' => $partner->email,
             'name' => $partner->name,
             'type' => 'partner'
         ];
-        
+
         // Send emails
         foreach ($recipients as $recipient) {
             Mail::to($recipient['email'])
                 ->send(new RequestMatchedWithPartner($request, $partner, $recipient));
         }
-        
+
         Log::info('Request matching emails sent', [
             'request_id' => $request->id,
             'partner_id' => $partner->id,
@@ -215,7 +204,7 @@ class RequestObserver
             'rejected',
             'completed'
         ];
-        
+
         return in_array($request->status->status_code ?? '', $notifyAdminStatuses);
     }
 
