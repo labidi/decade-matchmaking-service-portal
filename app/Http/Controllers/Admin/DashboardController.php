@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Opportunity;
 use App\Models\Request as RequestModel;
 use App\Models\User;
+use App\Traits\HasBreadcrumbs;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,6 +14,7 @@ use Spatie\Permission\Models\Role;
 
 class DashboardController extends Controller
 {
+    use HasBreadcrumbs;
     public function index(Request $HttpRequest): \Inertia\Response
     {
         $user = $HttpRequest->user();
@@ -57,7 +59,10 @@ class DashboardController extends Controller
                     'opportunities' => $opportunityTrend,
                     'registrations' => $registrationTrend,
                 ]
-            ]
+            ],
+            'breadcrumbs' => [
+                ['name' => 'Dashboard'],
+            ],
         ]);
     }
 }

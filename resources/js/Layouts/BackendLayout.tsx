@@ -1,9 +1,10 @@
 import React from 'react';
 
+import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
 import {Navbar} from '@/components/ui/navbar'
 import {Sidebar} from '@/components/ui/sidebar'
-import {SidebarLayout} from '@/components/ui/sidebar-layout'
-import {SidebarWrapper} from '@/components/admin/sidebar-content'
+import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
+
 import Footer from '@/Components/Layout/Footer'
 
 interface BackendLayoutProps {
@@ -13,7 +14,7 @@ interface BackendLayoutProps {
 const BackendLayout: React.FC<BackendLayoutProps> = ({children}) => {
     return (
         <SidebarLayout
-            sidebar={<Sidebar><SidebarWrapper/></Sidebar>}
+            sidebar={<Sidebar><SidebarContent/></Sidebar>}
             navbar={<Navbar>{/* Your navbar content */}</Navbar>}
         >
             <main className="container py-2">

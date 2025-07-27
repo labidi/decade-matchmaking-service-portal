@@ -35,9 +35,28 @@ class OcdRequestController extends Controller
     /**
      * Display user's requests list
      */
-    public function myRequestsList(Request $request)
+    public function myRequestsList(Request $httpRequest)
     {
-        $requests = $this->service->getUserRequests($request->user());
+        $sortField = $httpRequest->get('sort', 'created_at');
+        $sortOrder = $httpRequest->get('order', 'desc');
+        $searchUser = $httpRequest->get('user');
+        $searchTitle = $httpRequest->get('title');
+
+        $searchFilters = array_filter([
+            'user' => $searchUser,
+            'title' => $searchTitle,
+        ]);
+
+        $sortFilters = [
+            'field' => $sortField,
+            'order' => $sortOrder,
+            'per_page' => 10,
+        ];
+
+        $requests = $this->service->getPaginatedRequests($searchFilters, $sortFilters);
+
+        // Append query parameters to pagination links
+        $requests->appends($httpRequest->only(['sort', 'order', 'user', 'title']));
 
         return Inertia::render('Request/List', [
             'title' => 'My requests',
@@ -47,16 +66,19 @@ class OcdRequestController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'requests' => $requests,
+            'currentSort' => [
+                'field' => $sortField,
+                'order' => $sortOrder,
+            ],
+            'currentSearch' => [
+                'user' => $searchUser ?? '',
+                'title' => $searchTitle ?? '',
+            ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Requests', 'url' => route('request.me.list')],
             ],
-            'grid.actions' => [
-                'canEdit' => true,
-                'canDelete' => true,
-                'canView' => true,
-                'canCreate' => true,
-            ],
+
         ]);
     }
 

@@ -7,12 +7,14 @@ use App\Models\Request as RequestModel;
 use App\Models\Opportunity;
 use App\Models\User;
 use App\Models\RequestOffer;
+use App\Traits\HasBreadcrumbs;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class IndexController extends Controller
 {
+    use HasBreadcrumbs;
     /**
      * Display the dashboard.
      */
@@ -75,7 +77,10 @@ class IndexController extends Controller
                     'opportunities' => $opportunityTrend,
                     'registrations' => $registrationTrend,
                 ]
-            ]
+            ],
+            'breadcrumbs' => [
+                ['name' => 'Dashboard'],
+            ],
         ]);
     }
 }

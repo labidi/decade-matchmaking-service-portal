@@ -118,7 +118,7 @@ export interface OCDRequestStatus {
     updated_at: string;
 }
 export interface OCDRequest {
-    id: string;
+    id: number;
     type: string;
     submissionDate: string;
     status: OCDRequestStatus,
@@ -157,6 +157,7 @@ export interface OCDRequest {
         expected_outcomes: string;
         success_metrics: string;
         long_term_impact: string;
+        delivery_countries:string[];
     }
     created_at: string;
     matched_partner_id: string | null;

@@ -4,30 +4,38 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Opportunity;
+use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class OpportunityController extends Controller
 {
-    public function list(Request $request): Response
+    use HasBreadcrumbs;
+    public function list(Request $httpRequest): Response
     {
-        $sortField = $request->get('sort', 'created_at');
-        $sortOrder = $request->get('order', 'desc');
-
-        // Validate sort field to prevent SQL injection
-        $allowedSortFields = ['title', 'type', 'closing_date', 'status', 'created_at'];
-        if (!in_array($sortField, $allowedSortFields)) {
-            $sortField = 'created_at';
-        }
+        $sortField = $httpRequest->get('sort', 'created_at');
+        $sortOrder = $httpRequest->get('order', 'desc');
+        $searchUser = $httpRequest->get('user');
+        $searchTitle = $httpRequest->get('title');
 
         // Validate sort order
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? strtolower($sortOrder) : 'desc';
 
-        $opportunities = Opportunity::with(['user'])
-            ->orderBy($sortField, $sortOrder)
-            ->paginate(10)
-            ->appends($request->only(['sort', 'order']));
+        $opportunitiesQuery = Opportunity::with(['user'])  ;
+
+        // Apply search filters
+        if ($searchUser) {
+            $opportunitiesQuery->whereHas('user', function ($q) use ($searchUser) {
+                $q->where('name', 'like', '%' . $searchUser . '%');
+            });
+        }
+        if ($searchTitle) {
+            $opportunitiesQuery->where('title', 'like', '%' . $searchTitle . '%');
+        }
+        $opportunities = $opportunitiesQuery->orderBy($sortField, $sortOrder)
+            ->paginate(5)
+            ->appends($httpRequest->only(['sort', 'order']));
 
         return Inertia::render('Admin/Opportunity/List', [
             'title' => 'Opportunities',
@@ -36,6 +44,11 @@ class OpportunityController extends Controller
                 'field' => $sortField,
                 'order' => $sortOrder,
             ],
+            'currentSearch' => [
+                'user' => $searchUser ?? '',
+                'title' => $searchTitle ?? '',
+            ],
+            'breadcrumbs' => $this->buildOpportunityBreadcrumbs('list', null, true),
         ]);
     }
 }

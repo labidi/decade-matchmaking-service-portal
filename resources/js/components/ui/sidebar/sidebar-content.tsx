@@ -16,7 +16,8 @@ import {
     RocketLaunchIcon,
     BellAlertIcon,
     ArrowLeftStartOnRectangleIcon,
-    PresentationChartBarIcon
+    PresentationChartBarIcon,
+    UserIcon
 } from '@heroicons/react/16/solid'
 
 
@@ -46,6 +47,10 @@ export function SidebarContent() {
                     <SidebarItem href={route('admin.opportunity.list')}>
                         <RocketLaunchIcon/>
                         <SidebarLabel>Opportunities</SidebarLabel>
+                    </SidebarItem>
+                    <SidebarItem href={route('admin.users.roles.list')}>
+                        <UserIcon/>
+                        <SidebarLabel>Users</SidebarLabel>
                     </SidebarItem>
                     <SidebarItem href={route('admin.portal.settings')}>
                         <Cog6ToothIcon/>

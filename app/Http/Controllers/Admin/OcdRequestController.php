@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
 use App\Services\RequestService;
+use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\ExportService;
@@ -13,59 +14,41 @@ use App\Models\User;
 
 class OcdRequestController extends Controller
 {
+    use HasBreadcrumbs;
+
     public function __construct(private RequestService $service)
     {
     }
 
     public function list(Request $httpRequest)
     {
+        // Extract and validate parameters
         $sortField = $httpRequest->get('sort', 'created_at');
         $sortOrder = $httpRequest->get('order', 'desc');
         $searchUser = $httpRequest->get('user');
         $searchTitle = $httpRequest->get('title');
 
-        // Validate sort field to prevent SQL injection
-        $allowedSortFields = ['id', 'created_at', 'status_id', 'user_id'];
-        if (!in_array($sortField, $allowedSortFields)) {
-            $sortField = 'created_at';
-        }
 
-        // Validate sort order
-        $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? strtolower($sortOrder) : 'desc';
+        // Prepare filters for service
+        $searchFilters = array_filter([
+            'user' => $searchUser,
+            'title' => $searchTitle,
+        ]);
 
-        $query = OCDRequest::with(['status', 'detail', 'user', 'offers']);
+        $sortFilters = [
+            'field' => $sortField,
+            'order' => $sortOrder,
+            'per_page' => 10,
+        ];
 
-        // Apply search filters
-        if ($searchUser) {
-            $query->whereHas('user', function ($q) use ($searchUser) {
-                $q->where('name', 'like', '%' . $searchUser . '%');
-            });
-        }
+        // Get paginated requests from service
+        $requests = $this->service->getPaginatedRequests($searchFilters, $sortFilters);
 
-        if ($searchTitle) {
-            $query->whereHas('detail', function ($q) use ($searchTitle) {
-                $q->where('capacity_development_title', 'like', '%' . $searchTitle . '%');
-            });
-        }
-
-        // Apply sorting with special handling for user relationship
-        if ($sortField === 'user_id') {
-            $query->join('users', 'requests.user_id', '=', 'users.id')
-                  ->orderBy('users.name', $sortOrder)
-                  ->select('requests.*');
-        } else {
-            $query->orderBy($sortField, $sortOrder);
-        }
-
-        // If not sorting by created_at, add it as a secondary sort for consistency
-        if ($sortField !== 'created_at') {
-            $query->orderBy('created_at', 'desc');
-        }
-
-        $requests = $query->paginate(10)->appends($httpRequest->only(['sort', 'order', 'user', 'title']));
+        // Append query parameters to pagination links
+        $requests->appends($httpRequest->only(['sort', 'order', 'user', 'title']));
 
         return Inertia::render('Admin/Request/List', [
-            'title' => 'My requests',
+            'title' => 'Requests',
             'requests' => $requests,
             'currentSort' => [
                 'field' => $sortField,
@@ -75,6 +58,19 @@ class OcdRequestController extends Controller
                 'user' => $searchUser ?? '',
                 'title' => $searchTitle ?? '',
             ],
+            'breadcrumbs' => $this->buildRequestBreadcrumbs('list', null, true),
+        ]);
+    }
+
+    public function show($requestId)
+    {
+        $request = OCDRequest::with(['status', 'detail', 'user', 'offers'])
+            ->findOrFail($requestId);
+
+        return Inertia::render('Admin/Request/Show', [
+            'title' => 'Request Details',
+            'request' => $request,
+            'breadcrumbs' => $this->buildRequestBreadcrumbs('show', $requestId, true),
         ]);
     }
 

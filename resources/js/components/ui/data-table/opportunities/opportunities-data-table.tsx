@@ -55,13 +55,7 @@ const statusBadgeRenderer = (status: number, statusLabel: string) => {
     );
 };
 
-export function OpportunitiesDataTable({
-                                           opportunities,
-                                           currentSort,
-                                           currentSearch = {},
-                                           pagination
-                                       }: Readonly<OpportunitiesDataTableProps>) {
-
+export function OpportunitiesDataTable({opportunities, currentSort, currentSearch = {}, pagination}: Readonly<OpportunitiesDataTableProps>) {
     const handleSort = (field: SortField) => {
         const newOrder = currentSort.field === field && currentSort.order === 'asc' ? 'desc' : 'asc';
         router.get(route('admin.opportunity.list'), {
@@ -94,7 +88,6 @@ export function OpportunitiesDataTable({
             placeholder: 'Search by Opportunity title...'
         }
     ];
-
     return (
         <>
             <TableSearch

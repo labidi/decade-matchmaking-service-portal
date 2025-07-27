@@ -59,14 +59,21 @@ export function PaginationList({ className, ...props }: React.ComponentPropsWith
 }
 
 export function PaginationPage({
-  href,
-  className,
-  current = false,
-  children,
-}: React.PropsWithChildren<{ href: string; className?: string; current?: boolean }>) {
+                                   href,
+                                   className,
+                                   current = false,
+                                   children,
+                                   only = []
+                               }: React.PropsWithChildren<{
+    href: string,
+    className?: string,
+    current?: boolean,
+    only?: string[]
+}>) {
   return (
     <Button
       href={href}
+      only={only}
       plain
       aria-label={`Page ${children}`}
       aria-current={current ? 'page' : undefined}

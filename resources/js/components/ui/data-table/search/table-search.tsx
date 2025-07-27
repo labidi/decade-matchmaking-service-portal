@@ -25,6 +25,8 @@ export function TableSearch({
     preserveSort = true,
     className = ""
 }: Readonly<TableSearchProps>) {
+
+    console.log('TableSearch rendered with currentSearch:', currentSearch);
     const [searchValues, setSearchValues] = useState<Record<string, string>>(currentSearch);
     const [isSearching, setIsSearching] = useState(false);
 

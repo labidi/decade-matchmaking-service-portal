@@ -52,7 +52,7 @@ export default function RequestsList() {
                                         href={route('request.show', req.id)}
                                         className="px-2 py-1 text-base font-medium text-green-600 hover:text-green-800"
                                     >
-                                        Express interrest
+                                        Express interest
                                     </Link>
                                 </td>
                             </tr>

@@ -199,10 +199,10 @@ class OcdOpportunityController extends Controller
             ],
             'request' => $opportunity->toArray(),
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
                 [
-                    'name' => 'Edit Request #' . $opportunity->id,
+                    'name' => 'Edit Opportunity #' . $opportunity->id,
                     'url' => route('opportunity.edit', ['id' => $opportunity->id])
                 ],
             ],

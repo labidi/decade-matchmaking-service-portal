@@ -1,12 +1,13 @@
 import React from 'react';
 import {ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/16/solid';
-import {OCDRequestList, PaginationLinkProps, OCDRequestStatus} from "@/types";
+import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus} from "@/types";
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {Badge} from '@/components/ui/badge'
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
 import {formatDate} from '@/utils/date-formatter';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
+import {RequestsActionColumn} from '@/components/ui/data-table/requests/requests-action-column';
 
 // Types and Interfaces
 interface PaginationData {
@@ -22,6 +23,22 @@ interface PaginationData {
 
 type SortField = 'id' | 'created_at' | 'status_id' | 'user_id';
 
+interface DataTableSearchFields {
+    key: string;
+    label: string;
+    placeholder: string;
+}
+
+interface TableColumn {
+    key: string;
+    label: string;
+    sortable?: boolean;
+    sortField?: SortField;
+    render: (request: OCDRequest) => React.ReactNode;
+    className?: string;
+    headerClassName?: string;
+}
+
 interface RequestsDataTableProps {
     requests: OCDRequestList;
     currentSort: {
@@ -30,6 +47,16 @@ interface RequestsDataTableProps {
     };
     currentSearch?: Record<string, string>;
     pagination?: PaginationData;
+    searchFields?: DataTableSearchFields[];
+    columns?: TableColumn[];
+    routeName?: string;
+    actions?: {
+        onViewDetails?: (request: OCDRequest) => void;
+        onUpdateStatus?: (request: OCDRequest) => void;
+        onSeeActiveOffer?: (request: OCDRequest) => void;
+    };
+    showSearch?: boolean;
+    showActions?: boolean;
 }
 
 // Utility Functions
@@ -65,26 +92,22 @@ const statusBadgeRenderer = (status: OCDRequestStatus) => {
     );
 };
 
-// Search Configuration
-const searchFields = [
-    {
-        key: 'user',
-        label: 'Submitted By',
-        placeholder: 'Search by user name...'
-    },
-    {
-        key: 'title',
-        label: 'Title',
-        placeholder: 'Search by request title...'
-    }
-];
+export function RequestsDataTable({
+                                      requests,
+                                      currentSort,
+                                      currentSearch = {},
+                                      pagination,
+                                      searchFields = [],
+                                      columns,
+                                      routeName = 'admin.request.list',
+                                      actions,
+                                      showSearch = true,
+                                      showActions = true
+                                  }: Readonly<RequestsDataTableProps>) {
 
-export function RequestsDataTable({requests, currentSort, currentSearch = {}, pagination}: Readonly<RequestsDataTableProps>) {
-    
-    // Event Handlers
     const handleSort = (field: SortField) => {
         const newOrder = currentSort.field === field && currentSort.order === 'asc' ? 'desc' : 'asc';
-        router.get(route('admin.request.list'), {
+        router.get(route(routeName), {
             sort: field,
             order: newOrder
         }, {
@@ -92,6 +115,53 @@ export function RequestsDataTable({requests, currentSort, currentSearch = {}, pa
             preserveScroll: true
         });
     };
+
+    // Default columns for admin interface
+    const defaultColumns: TableColumn[] = [
+        {
+            key: 'id',
+            label: 'ID',
+            sortable: true,
+            sortField: 'id',
+            render: (request) => (
+                <span className="font-medium">{request.id}</span>
+            )
+        },
+        {
+            key: 'title',
+            label: 'Title',
+            render: (request) => (
+                <span>{request.detail.capacity_development_title || 'No Title'}</span>
+            )
+        },
+        {
+            key: 'user',
+            label: 'Submitted By',
+            sortable: true,
+            sortField: 'user_id',
+            render: (request) => (
+                <span>{request.user.name}</span>
+            )
+        },
+        {
+            key: 'created_at',
+            label: 'Submitted At',
+            sortable: true,
+            sortField: 'created_at',
+            render: (request) => (
+                <span className="text-zinc-500">{formatDate(request.created_at)}</span>
+            )
+        },
+        {
+            key: 'status',
+            label: 'Status',
+            sortable: true,
+            sortField: 'status_id',
+            render: (request) => statusBadgeRenderer(request.status)
+        }
+    ];
+
+    const activeColumns = columns || defaultColumns;
 
     // Helper Functions
     const getSortIcon = (field: SortField) => {
@@ -102,97 +172,75 @@ export function RequestsDataTable({requests, currentSort, currentSearch = {}, pa
             ? <ChevronUpIcon className="size-4"/>
             : <ChevronDownIcon className="size-4"/>;
     };
+    const totalColumns = activeColumns.length + (showActions ? 1 : 0);
 
     return (
         <>
-            <TableSearch
-                searchFields={searchFields}
-                routeName="admin.request.list"
-                currentSearch={currentSearch}
-                preserveSort={true}
-            />
-            
+            {showSearch && (
+                <TableSearch
+                    searchFields={searchFields}
+                    routeName={routeName}
+                    currentSearch={currentSearch}
+                    preserveSort={true}
+                />
+            )}
+
             <Table>
-                <TableHead>
+                <TableHead className="text-lg">
                     <TableRow>
-                        <TableHeader>
-                            <button
-                                onClick={() => handleSort('id')}
-                                className="flex items-center gap-1 font-semibold hover:text-gray-600 dark:hover:text-gray-300"
-                            >
-                                ID
-                                {getSortIcon('id')}
-                            </button>
-                        </TableHeader>
-                        <TableHeader>
-                            Title
-                        </TableHeader>
-                        <TableHeader>
-                            <button
-                                onClick={() => handleSort('user_id')}
-                                className="flex items-center gap-1 font-semibold hover:text-gray-600 dark:hover:text-gray-300"
-                            >
-                                Submitted By
-                                {getSortIcon('user_id')}
-                            </button>
-                        </TableHeader>
-                        <TableHeader>
-                            <button
-                                onClick={() => handleSort('created_at')}
-                                className="flex items-center gap-1 font-semibold hover:text-gray-600 dark:hover:text-gray-300"
-                            >
-                                Submitted At
-                                {getSortIcon('created_at')}
-                            </button>
-                        </TableHeader>
-                        <TableHeader>
-                            <button
-                                onClick={() => handleSort('status_id')}
-                                className="flex items-center gap-1 font-semibold hover:text-gray-600 dark:hover:text-gray-300"
-                            >
-                                Status
-                                {getSortIcon('status_id')}
-                            </button>
-                        </TableHeader>
-                        <TableHeader className="text-right">
-                            Actions
-                        </TableHeader>
+                        {activeColumns.map((column) => (
+                            <TableHeader key={column.key} className={column.headerClassName}>
+                                {column.sortable && column.sortField ? (
+                                    <button
+                                        onClick={() => handleSort(column.sortField!)}
+                                        className="flex items-center gap-1 font-semibold hover:text-gray-600 dark:hover:text-gray-300"
+                                    >
+                                        {column.label}
+                                        {getSortIcon(column.sortField)}
+                                    </button>
+                                ) : (
+                                    column.label
+                                )}
+                            </TableHeader>
+                        ))}
+                        {showActions && (
+                            <TableHeader className="text-right">
+                                
+                            </TableHeader>
+                        )}
                     </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody className="text-lg">
                     {requests.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={6} className="text-center text-zinc-500 py-8">
+                            <TableCell colSpan={totalColumns} className="text-center text-zinc-500 py-8">
                                 No requests found.
                             </TableCell>
                         </TableRow>
                     ) : (
                         requests.map((request) => (
                             <TableRow key={request.id}>
-                                <TableCell className="font-medium">
-                                    {request.id}
-                                </TableCell>
-                                <TableCell>
-                                    {request.detail.capacity_development_title || 'No Title'}
-                                </TableCell>
-                                <TableCell>
-                                    {request.user.name}
-                                </TableCell>
-                                <TableCell className="text-zinc-500">
-                                    {formatDate(request.created_at)}
-                                </TableCell>
-                                <TableCell>
-                                    {statusBadgeRenderer(request.status)}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    {/* Actions can be added here */}
-                                </TableCell>
+                                {activeColumns.map((column) => (
+                                    <TableCell key={column.key} className={column.className}>
+                                        {column.render(request)}
+                                    </TableCell>
+                                ))}
+                                {showActions && (
+                                    <TableCell className="text-right">
+                                        <RequestsActionColumn
+                                            row={request}
+                                            onViewDetails={() => actions?.onViewDetails?.(request) || router.get(route('admin.request.details', request.id), {}, {preserveState: true})}
+                                            onUpdateStatus={() => actions?.onUpdateStatus?.(request) || router.get(route('admin.request.update-status', request.id), {}, {preserveState: true})}
+                                            onSeeActiveOffer={() => actions?.onSeeActiveOffer?.(request) || router.get(route('admin.request.update-status', request.id), {}, {preserveState: true})}
+                                        />
+                                    </TableCell>
+                                )}
                             </TableRow>
                         ))
                     )}
                 </TableBody>
             </Table>
-            
+
             {/* Pagination */}
             {pagination && (
                 <TablePaginationNav

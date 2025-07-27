@@ -8,6 +8,7 @@ use App\Models\Request\Detail;
 use App\Models\Request\Status;
 use App\Models\User;
 use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -289,6 +290,50 @@ class RequestService
             ->map(function ($request) {
                 return $this->enhanceRequestData($request);
             });
+    }
+
+    /**
+     * Get paginated requests with search and sorting
+     */
+    public function getPaginatedRequests(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    {
+        $query = OCDRequest::with(['status', 'detail', 'user', 'offers']);
+
+        // Apply search filters
+        if (!empty($searchFilters['user'])) {
+            $query->whereHas('user', function ($q) use ($searchFilters) {
+                $q->where('name', 'like', '%' . $searchFilters['user'] . '%');
+            });
+        }
+
+        if (!empty($searchFilters['title'])) {
+            $query->whereHas('detail', function ($q) use ($searchFilters) {
+                $q->where('capacity_development_title', 'like', '%' . $searchFilters['title'] . '%');
+            });
+        }
+
+        // Apply sorting with special handling for user relationship
+        if (!empty($sortFilters['field']) && !empty($sortFilters['order'])) {
+            if ($sortFilters['field'] === 'user_id') {
+                $query->join('users', 'requests.user_id', '=', 'users.id')
+                      ->orderBy('users.name', $sortFilters['order'])
+                      ->select('requests.*');
+            } else {
+                $query->orderBy($sortFilters['field'], $sortFilters['order']);
+            }
+
+            // If not sorting by created_at, add it as a secondary sort for consistency
+            if ($sortFilters['field'] !== 'created_at') {
+                $query->orderBy('created_at', 'desc');
+            }
+        } else {
+            // Default sorting
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $perPage = $sortFilters['per_page'] ?? 10;
+
+        return $query->paginate($perPage);
     }
 
     /**

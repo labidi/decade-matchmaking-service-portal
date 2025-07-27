@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\OceanExpertAuthService;
+use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -16,6 +17,8 @@ use Inertia\Response;
 
 class SessionController extends Controller
 {
+    use HasBreadcrumbs;
+
     public function __construct(
         protected OceanExpertAuthService $oceanExpertAuthService,
         protected OceanExpertSearchService $oceanExpertSearchService,
@@ -26,11 +29,13 @@ class SessionController extends Controller
         return Inertia::render('Auth/SignIn', [
             'status' => $request->session()->get('status'),
             'banner' => [
-                'title' => 'Sign in to Oceean decade portal',
+                'title' => 'Sign in to Ocean Decade Portal',
                 'description' => 'Use your OceanExpert credentials to sign in, Or use your Google account or LinkedIn account.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'status'=>$request->session()->get('status')
+            'breadcrumbs' => [
+                ['name' => 'Sign In'],
+            ],
         ]);
     }
 
