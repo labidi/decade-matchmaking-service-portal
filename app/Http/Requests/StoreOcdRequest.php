@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Data\SubThemeOptions;
+use App\Models\Data\SupportTypeOptions;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -44,7 +46,7 @@ class StoreOcdRequest extends FormRequest
             'project_url' => ['required', 'url'],
             'related_activity' => ['required'],
             'delivery_format' => ['required'],
-            'delivery_country' => [
+            'delivery_countries' => [
                 Rule::requiredIf(
                     fn() => $this->input("request_link_type") !== 'Online'
                 ),
@@ -62,22 +64,38 @@ class StoreOcdRequest extends FormRequest
                 ),
             ],
             'subthemes' => ['required', 'array'],
-//            'subthemes.*' => ['string'],
-//            'support_types' => ['required', 'array'],
-//            'support_types.*' => ['string'],
-//            'gap_description' => ['required', 'string'],
-//            'has_partner' => ['required', Rule::in(['Yes', 'No'])],
-//            'needs_financial_support' => ['required', Rule::in(['Yes', 'No'])],
-//            'budget_breakdown' => ['required_if:needs_financial_support,Yes', 'string'],
-//            'support_months' => ['required_if:needs_financial_support,Yes', 'integer'],
-//            'completion_date' => ['required_if:needs_financial_support,Yes', 'date'],
-//            'risks' => ['required', 'string'],
-//            'personnel_expertise' => ['required', 'string'],
-//            'direct_beneficiaries' => ['required', 'string'],
-//            'direct_beneficiaries_number' => ['required', 'numeric'],
-//            'expected_outcomes' => ['required', 'string'],
-//            'success_metrics' => ['required', 'string'],
-//            'long_term_impact' => ['required', 'string'],
+            'subthemes.*' => [
+                Rule::in(
+                    array_column(
+                        SubThemeOptions::getOptions(),
+                        'value'
+                    )
+                )
+            ],
+            'support_types' => ['required', 'array'],
+            'support_types.*' => [
+                Rule::in(
+                    array_column(
+                        SupportTypeOptions::getOptions(),
+                        'value'
+                    )
+                )
+            ],
+            'gap_description' => ['required', 'string'],
+            'has_partner' => ['required', Rule::in(['Yes', 'No'])],
+            'partner_name' => [Rule::requiredIf(fn() => $this->input("has_partner") === 'Yes')],
+            'partner_confirmed' => [Rule::requiredIf(fn() => $this->input("has_partner") === 'Yes')],
+            'needs_financial_support' => ['required', Rule::in(['Yes', 'No'])],
+            'budget_breakdown' => [Rule::requiredIf(fn() => $this->input("needs_financial_support") === 'Yes')],
+            'support_months' => ['required', 'string'],
+            'completion_date' => ['required', 'string'],
+            'risks' => ['required', 'string'],
+            'personnel_expertise' => ['required', 'string'],
+            'direct_beneficiaries' => ['required', 'string'],
+            'direct_beneficiaries_number' => ['required', 'numeric'],
+            'expected_outcomes' => ['required', 'string'],
+            'success_metrics' => ['required', 'string'],
+            'long_term_impact' => ['required', 'string'],
         ];
     }
 }

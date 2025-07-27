@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\Request as OCDRequest;
-use App\Models\Request\RequestStatus;
-use App\Models\Request\RequestOffer;
+use App\Models\Request\Status;
+use App\Models\Request\Offer;
 use App\Models\User;
 use App\Services\OcdRequestService;
 use App\Enums\RequestOfferStatus;
@@ -26,15 +26,15 @@ class OcdRequestServiceTest extends TestCase
         $this->service = new OcdRequestService();
         $this->user = User::factory()->create();
         $this->otherUser = User::factory()->create();
-        
+
         // Create status records
-        RequestStatus::create(['status_code' => 'draft', 'status_label' => 'Draft']);
-        RequestStatus::create(['status_code' => 'under_review', 'status_label' => 'Under Review']);
-        RequestStatus::create(['status_code' => 'validated', 'status_label' => 'Validated']);
-        RequestStatus::create(['status_code' => 'offer_made', 'status_label' => 'Offer Made']);
-        RequestStatus::create(['status_code' => 'match_made', 'status_label' => 'Match Made']);
-        RequestStatus::create(['status_code' => 'in_implementation', 'status_label' => 'In Implementation']);
-        RequestStatus::create(['status_code' => 'closed', 'status_label' => 'Closed']);
+        Status::create(['status_code' => 'draft', 'status_label' => 'Draft']);
+        Status::create(['status_code' => 'under_review', 'status_label' => 'Under Review']);
+        Status::create(['status_code' => 'validated', 'status_label' => 'Validated']);
+        Status::create(['status_code' => 'offer_made', 'status_label' => 'Offer Made']);
+        Status::create(['status_code' => 'match_made', 'status_label' => 'Match Made']);
+        Status::create(['status_code' => 'in_implementation', 'status_label' => 'In Implementation']);
+        Status::create(['status_code' => 'closed', 'status_label' => 'Closed']);
     }
 
     public function test_can_save_draft()
@@ -75,7 +75,7 @@ class OcdRequestServiceTest extends TestCase
     {
         // Create requests for the user
         OCDRequest::factory()->count(3)->create(['user_id' => $this->user->id]);
-        
+
         // Create requests for another user
         OCDRequest::factory()->count(2)->create(['user_id' => $this->otherUser->id]);
 
@@ -90,13 +90,13 @@ class OcdRequestServiceTest extends TestCase
         // Create public requests from other users
         OCDRequest::factory()->count(3)->create([
             'user_id' => $this->otherUser->id,
-            'status_id' => RequestStatus::where('status_code', 'validated')->first()->id
+            'status_id' => Status::where('status_code', 'validated')->first()->id
         ]);
-        
+
         // Create user's own requests
         OCDRequest::factory()->count(2)->create([
             'user_id' => $this->user->id,
-            'status_id' => RequestStatus::where('status_code', 'validated')->first()->id
+            'status_id' => Status::where('status_code', 'validated')->first()->id
         ]);
 
         $requests = $this->service->getPublicRequests($this->user);
@@ -110,12 +110,12 @@ class OcdRequestServiceTest extends TestCase
         // Create matched requests for the user
         OCDRequest::factory()->count(2)->create([
             'user_id' => $this->user->id,
-            'status_id' => RequestStatus::where('status_code', 'in_implementation')->first()->id
+            'status_id' => Status::where('status_code', 'in_implementation')->first()->id
         ]);
-        
+
         OCDRequest::factory()->count(1)->create([
             'user_id' => $this->user->id,
-            'status_id' => RequestStatus::where('status_code', 'closed')->first()->id
+            'status_id' => Status::where('status_code', 'closed')->first()->id
         ]);
 
         $requests = $this->service->getMatchedRequests($this->user);
@@ -127,16 +127,16 @@ class OcdRequestServiceTest extends TestCase
     public function test_can_find_request_with_authorization()
     {
         $request = OCDRequest::factory()->create(['user_id' => $this->user->id]);
-        
+
         $found = $this->service->findRequest($request->id, $this->user);
-        
+
         $this->assertEquals($request->id, $found->id);
     }
 
     public function test_cannot_find_nonexistent_request()
     {
         $found = $this->service->findRequest(999, $this->user);
-        
+
         $this->assertNull($found);
     }
 
@@ -144,7 +144,7 @@ class OcdRequestServiceTest extends TestCase
     {
         $request = OCDRequest::factory()->create([
             'user_id' => $this->user->id,
-            'status_id' => RequestStatus::where('status_code', 'draft')->first()->id
+            'status_id' => Status::where('status_code', 'draft')->first()->id
         ]);
 
         $result = $this->service->updateRequestStatus($request->id, 'validated', $this->user);
@@ -167,7 +167,7 @@ class OcdRequestServiceTest extends TestCase
     {
         $request = OCDRequest::factory()->create([
             'user_id' => $this->user->id,
-            'status_id' => RequestStatus::where('status_code', 'draft')->first()->id
+            'status_id' => Status::where('status_code', 'draft')->first()->id
         ]);
 
         $deleted = $this->service->deleteRequest($request->id, $this->user);
@@ -180,7 +180,7 @@ class OcdRequestServiceTest extends TestCase
     {
         $request = OCDRequest::factory()->create([
             'user_id' => $this->user->id,
-            'status_id' => RequestStatus::where('status_code', 'validated')->first()->id
+            'status_id' => Status::where('status_code', 'validated')->first()->id
         ]);
 
         $this->expectException(Exception::class);
@@ -192,7 +192,7 @@ class OcdRequestServiceTest extends TestCase
     public function test_can_get_active_offer()
     {
         $request = OCDRequest::factory()->create();
-        $offer = RequestOffer::factory()->create([
+        $offer = Offer::factory()->create([
             'request_id' => $request->id,
             'status' => RequestOfferStatus::ACTIVE
         ]);
@@ -216,12 +216,12 @@ class OcdRequestServiceTest extends TestCase
         // Create requests with different statuses
         OCDRequest::factory()->count(2)->create([
             'user_id' => $this->user->id,
-            'status_id' => RequestStatus::where('status_code', 'draft')->first()->id
+            'status_id' => Status::where('status_code', 'draft')->first()->id
         ]);
-        
+
         OCDRequest::factory()->count(1)->create([
             'user_id' => $this->user->id,
-            'status_id' => RequestStatus::where('status_code', 'validated')->first()->id
+            'status_id' => Status::where('status_code', 'validated')->first()->id
         ]);
 
         $stats = $this->service->getRequestStats($this->user);
@@ -252,7 +252,7 @@ class OcdRequestServiceTest extends TestCase
     {
         $request = OCDRequest::factory()->create([
             'user_id' => $this->user->id,
-            'status_id' => RequestStatus::where('status_code', 'draft')->first()->id
+            'status_id' => Status::where('status_code', 'draft')->first()->id
         ]);
 
         $actions = $this->service->getRequestActions($request, $this->user);
@@ -301,4 +301,4 @@ class OcdRequestServiceTest extends TestCase
 
         $this->assertNull($exportRequest);
     }
-} 
+}

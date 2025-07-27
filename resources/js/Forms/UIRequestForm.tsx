@@ -35,7 +35,7 @@ export interface Request {
     success_metrics: string;
     long_term_impact: string;
     delivery_format: 'Online' | 'On-site Choose countries' | 'Blended  Choose countries';
-    delivery_country: string;
+    delivery_countries: string[];
     target_audience: string;
 }
 
@@ -43,36 +43,6 @@ export interface UIStep {
     label: string;
     fields: Record<string, UIField>;
 }
-
-export const subthemeOptions = [
-    'Mapping & modeling ocean-climate interactions',
-    'Marine CO2 removal',
-    'Ocean acidification',
-    'Impact of oceans on human health',
-    'Measuring cumulative impacts and multiple stressors',
-    'Low-cost technology & infrastructure solutions for data gathering and management',
-    'Data management (FAIR and CARE principles)',
-    'Mapping and modelling biodiversity',
-    'Ecosystem Approach to Fisheries',
-    'Implementing the BBNJ Agreement',
-    'eDNA techniques',
-    'Science communication for policy development',
-    'Working with & influencing policymakers',
-    'Sustainable Ocean Planning',
-    'Stakeholder engagement via transdisciplinary approaches',
-    'Engaging Local & Indigenous Knowledge holders',
-    'Managing, leading, & financing ocean projects',
-    'Other',
-];
-
-export const supportOptions = [
-    'Funding to organize a workshop ou formation',
-    'Technical support for planning and delivering a workshop ou training',
-    'Facilitation or coordination support',
-    'Participation in an existing training or capacity-building event',
-    'Access to training materials or curriculum',
-    'Other',
-];
 
 export const UIRequestForm: UIStep[] = [
     {
@@ -190,25 +160,17 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Is your request related to a training, a workshop, or both ?',
                 description: 'Please select the option that best describes your request.',
-                options: [
-                    {value: 'Training', label: 'Training'},
-                    {value: 'Workshop', label: 'Workshop'},
-                    {value: 'Both', label: 'Both'},
-                ],
+                // Options should be provided from RelatedActivityOptions::getOptions()
             },
             delivery_format: {
                 id: 'delivery_format',
                 type: 'select',
                 required: true,
                 label: 'What is the delivery format of this training/workshop? ',
-                options: [
-                    {value: 'Online', label: 'Online'},
-                    {value: 'On-site', label: 'On-site'},
-                    {value: 'Blended', label: 'Blended'},
-                ]
+                // Options should be provided from DeliveryFormatOptions::getOptions()
             },
-            delivery_country: {
-                id: 'delivery_country',
+            delivery_countries: {
+                id: 'delivery_countries',
                 type: 'multiselect',
                 // options should be provided by the parent component from backend location data
                 required: false,
@@ -220,23 +182,7 @@ export const UIRequestForm: UIStep[] = [
                 type: 'multiselect',
                 required: true,
                 label: 'Who is the target audience (multiple choice allowed)?',
-                options: [
-                    {value: 'Academic', label: 'Academic'},
-                    {value: 'Alumni', label: 'Alumni'},
-                    {value: 'Civil Society', label: 'Civil Society'},
-                    {value: 'Small Island Developing States (SIDS)', label: 'Small Island Developing States (SIDS)'},
-                    {value: 'Decision Makers', label: 'Developing Countries'},
-                    {value: 'Early Career Professionals', label: 'Early Career Professionals'},
-                    {value: 'Researchers', label: 'Researchers'},
-                    {value: 'Doctoral or Postdoctoral', label: 'Doctoral or Postdoctoral'},
-                    {value: 'Scientists', label: 'Scientists'},
-                    {value: 'Executives', label: 'Executives'},
-                    {value: 'Technicians', label: 'General Public'},
-                    {value: 'Women', label: 'Women'},
-                    {value: 'Government', label: 'Government'},
-                    {value: 'Youth', label: 'Youth'},
-                    {value: 'Other (Please Specify)', label: 'Other (Please Specify)'},
-                ],
+                // Options should be provided from TargetAudienceOptions::getOptions()
                 multiple: true,
             },
             target_audience_other: {
@@ -253,7 +199,7 @@ export const UIRequestForm: UIStep[] = [
                 label: 'Which sub-theme(s) of the Capacity Development Facility priorities does your request fall under?',
                 image : '/assets/img/cdf_subthemes.svg',
                 description: 'Please review the umbrella theme carefully before selecting the corresponding sub-themes.',
-                options: subthemeOptions.map(v => ({value: v, label: v})),
+                // Options should be provided from SubThemeOptions::getOptions()
             },
             subthemes_other: {
                 id: 'subthemes_other',
@@ -267,7 +213,7 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'What type of support related to workshops or training are you seeking?',
                 description: "If you require support outside listed options, specify under 'Other options'.",
-                options: supportOptions.map(v => ({value: v, label: v})),
+                // Options should be provided from SupportTypeOptions::getOptions()
             },
             support_types_other: {
                 id: 'support_types_other',
@@ -346,15 +292,13 @@ export const UIRequestForm: UIStep[] = [
                 type: 'number',
                 required: true,
                 label: 'How many months from the submission date do you need this support?',
-                description: 'For example, if you need support within six months, simply reply “6.”',
-                show: data => data.needs_financial_support === 'Yes',
+                description: 'For example, if you need support within six months, simply reply "6."'
             },
             completion_date: {
                 id: 'completion_date',
                 type: 'date',
                 required: true,
-                label: 'By when do you anticipate completing this activity?',
-                show: data => data.needs_financial_support === 'Yes',
+                label: 'By when do you anticipate completing this activity?'
             },
         },
     },

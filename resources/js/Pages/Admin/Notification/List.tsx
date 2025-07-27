@@ -1,41 +1,68 @@
-import React from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
-import BackendLayout from '@/Layouts/BackendLayout';
-import Sidebar from '@/Components/Layout/Backend/Sidebar';
-import axios from 'axios';
-import { NotificationList } from '@/types';
+import {Head} from '@inertiajs/react';
 
-export default function NotificationListPage() {
-    const notifications = usePage().props.notifications as NotificationList;
-    const [items, setItems] = React.useState(notifications);
+import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {Navbar} from '@/components/ui/navbar'
+import {Sidebar} from '@/components/ui/sidebar'
+import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
 
-    const markAsRead = (id: number) => {
-        axios.patch(route('admin.notifications.read', id)).then(() => {
-            setItems(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
-        });
+import {NotificationList, PaginationLinkProps} from '@/types';
+import {NotificationsDataTable} from '@/components/ui/data-table/notifications/notifications-data-table';
+import React from "react";
+
+interface NotificationPagination {
+    current_page: number;
+    data: NotificationList,
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: PaginationLinkProps[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+}
+
+interface NotificationListPageProps {
+    notifications: NotificationPagination;
+    currentSort: {
+        field: string;
+        order: string;
     };
+}
+
+export default function NotificationListPage({notifications, currentSort}: Readonly<NotificationListPageProps>) {
 
     return (
-        <BackendLayout>
-            <Head title="Notifications" />
-            <div className="space-y-4">
-                {items.map(n => (
-                    <div key={n.id} className="border p-4 rounded bg-white flex justify-between items-start">
-                        <div>
-                            <Link href={route('admin.notifications.show', n.id)} className="font-semibold text-lg text-firefly-700 hover:underline">
-                                {n.title}
-                            </Link>
-                            <p className="text-sm text-gray-600">{new Date(n.created_at).toLocaleString()}</p>
-                        </div>
-                        {!n.is_read && (
-                            <button onClick={() => markAsRead(n.id)} className="text-sm text-blue-600 hover:underline">
-                                Mark as read
-                            </button>
-                        )}
-                    </div>
-                ))}
-                {items.length === 0 && <p>No notifications found.</p>}
+        <SidebarLayout
+            sidebar={<Sidebar><SidebarContent/></Sidebar>}
+            navbar={<Navbar></Navbar>}
+        >
+            <Head title="Notifications"/>
+            <div className="mx-auto">
+                <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+                    Notifications List
+                </h2>
+                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
             </div>
-        </BackendLayout>
+            <div className="py-8">
+                <NotificationsDataTable
+                    notifications={notifications.data}
+                    currentSort={currentSort}
+                    pagination={{
+                        current_page: notifications.current_page,
+                        last_page: notifications.last_page,
+                        links: notifications.links,
+                        prev_page_url: notifications.prev_page_url,
+                        next_page_url: notifications.next_page_url,
+                        from: notifications.from,
+                        to: notifications.to,
+                        total: notifications.total
+                    }}
+                />
+            </div>
+        </SidebarLayout>
     );
 }

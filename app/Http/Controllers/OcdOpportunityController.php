@@ -159,6 +159,13 @@ class OcdOpportunityController extends Controller
                 'description' => 'View the details of the selected opportunity.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'locationData' => [
+                'countries' => CountryOptions::getOptions(),
+                'regions' => RegionOptions::getOptions(),
+                'oceans' => OceanOptions::getOptions(),
+                'targetAudiences' => TargetAudienceOptions::getOptions(),
+                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
+            ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
@@ -192,10 +199,10 @@ class OcdOpportunityController extends Controller
             ],
             'request' => $opportunity->toArray(),
             'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'Opportunities', 'url' => route('opportunity.list')],
                 [
-                    'name' => 'Edit Request #' . $opportunity->id,
+                    'name' => 'Edit Opportunity #' . $opportunity->id,
                     'url' => route('opportunity.edit', ['id' => $opportunity->id])
                 ],
             ],

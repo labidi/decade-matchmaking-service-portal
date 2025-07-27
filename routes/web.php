@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OcdRequestController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Dashboard\IndexController;
 use App\Http\Controllers\Admin\SettingsController;
 
 use App\Http\Controllers\Admin\OcdRequestController as AdminOcdRequestController;
+use App\Http\Controllers\Admin\OpportunityController as AdminOpportunityController;
 use App\Http\Controllers\LocationDataController;
 
 Route::get('/', function () {
@@ -40,17 +42,20 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('user.home');
-    Route::get('user/request/create', [OcdRequestController::class, 'create'])->name('user.request.create');
+    Route::get('user/request/create', [OcdRequestController::class, 'create'])->name('request.create');
     Route::get('request/me/list', [OcdRequestController::class, 'myRequestsList'])->name('request.me.list');
-    Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('user.request.edit');
-    Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('user.request.show');
+    Route::get('user/request/edit/{id}', [OcdRequestController::class, 'edit'])->name('request.edit');
+    Route::get('user/request/show/{id}', [OcdRequestController::class, 'show'])->name('request.show');
     Route::get('request/preview/{id}', [OcdRequestController::class, 'preview'])->name('request.preview');
     Route::get('request/me/matched-requests', [OcdRequestController::class, 'matchedRequest'])->name(
         'request.me.matched-requests'
     );
 
-    Route::get('user/request/pdf/{id}', [OcdRequestController::class, 'exportPdf'])->name('user.request.pdf');
-    Route::post('user/request/submit', [OcdRequestController::class, 'submit'])->name('user.request.submit');
+    Route::get('user/request/pdf/{id}', [OcdRequestController::class, 'exportPdf'])->name('request.pdf');
+    Route::post('user/request/submit', [OcdRequestController::class, 'submit'])->name('request.submit');
+    Route::post('request/{id}/express-interest', [OcdRequestController::class, 'expressInterest'])->name(
+        'request.express.interest'
+    );
 
     Route::patch('request/{id}/update-status', [OcdRequestController::class, 'updateStatus'])->name(
         'request.update.status'
@@ -90,21 +95,20 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
     Route::get('settings', [SettingsController::class, 'index'])->name('admin.portal.settings');
     Route::get('request/list', [AdminOcdRequestController::class, 'list'])->name('admin.request.list');
+    Route::get('request/show/{request}', [AdminOcdRequestController::class, 'show'])->name('admin.request.show');
+    Route::get('opportunity/list', [AdminOpportunityController::class, 'list'])->name('admin.opportunity.list');
     Route::get('request/export/csv', [AdminOcdRequestController::class, 'exportCsv'])->name('admin.request.export.csv');
     Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
     Route::get('user/list', [UserRoleController::class, 'index'])->name('admin.users.roles.list');
+    Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
+    Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name(
+        'admin.notifications.show'
+    );
+    Route::get('notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name(
+        'admin.notifications.read'
+    );
 });
 
-Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name(
-    'admin.notifications.index'
-);
-Route::get('notifications/{notification}', [\App\Http\Controllers\Admin\NotificationController::class, 'show'])->name(
-    'admin.notifications.show'
-);
-Route::patch(
-    'notifications/{notification}/read',
-    [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead']
-)->name('admin.notifications.read');
 
 Route::post('request/{request}/offer', [RequestOfferController::class, 'store'])->name('request.offer.store');
 Route::get('request/{request}/offers', [RequestOfferController::class, 'list'])->name('request.offer.list');
@@ -112,7 +116,7 @@ Route::patch('request/{request}/offer/{offer}/status', [RequestOfferController::
     'request.offer.update-status'
 );
 
-Route::prefix('guide')->group(function (){
+Route::prefix('guide')->group(function () {
     Route::get('platform-guide.pdf', [UserGuideController::class, 'download'])->name('user.guide');
 });
 

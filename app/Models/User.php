@@ -33,19 +33,19 @@ class User extends Authenticatable
         'city',
     ];
 
-    protected $appends = ['is_partner','is_admin'];
+    protected $appends = ['is_partner', 'is_admin'];
 
 
     public function getIsAdminAttribute()
     {
-        return $this->hasRole('administrator');  
+        return $this->hasRole('administrator');
     }
 
     public function getIsPartnerAttribute()
     {
-        return $this->hasRole('partner');  
+        return $this->hasRole('partner');
     }
-    
+
     /**
      * The attributes that should be hidden for serialization.
      *

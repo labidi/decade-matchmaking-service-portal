@@ -9,7 +9,7 @@ export const UISettingsForm: UIStep[] = [
             site_name: {
                 id: 'site_name',
                 type: 'text',
-                required: true,
+                required: false,
                 label: 'Site Name',
                 placeholder: 'Enter the site name',
             },
@@ -34,6 +34,35 @@ export const UISettingsForm: UIStep[] = [
                 required: false,
                 label: 'Homepage YouTube Video',
                 placeholder: 'Enter the YouTube video URL for the homepage',
+            }
+        }
+    },
+    {
+        label: 'Guides',
+        fields:{
+            portal_guide: {
+                id: 'portal_guide',
+                type: 'file',
+                required: false,
+                label: 'Portal Guide',
+                description: 'Upload a PDF guide for the portal (PDF)',
+                accept: 'application/pdf',
+            },
+            user_guide: {
+                id: 'user_guide',
+                type: 'file',
+                required: false,
+                label: 'User Guide',
+                description: 'Upload a PDF User guide (PDF)',
+                accept: 'application/pdf',
+            },
+            partner_guide: {
+                id: 'partner_guide',
+                type: 'file',
+                required: true,
+                label: 'Partner Guide',
+                description: 'Upload a PDF User guide (PDF)',
+                accept: 'application/pdf',
             }
         }
     }

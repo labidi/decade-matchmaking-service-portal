@@ -6,6 +6,47 @@ import { OCDOpportunity } from '@/types';
 
 export default function Show() {
     const opportunity = usePage().props.opportunity as OCDOpportunity;
+
+    const locationData = (usePage().props.locationData as any) || {
+        countries: [],
+        regions: [],
+        oceans: [],
+        targetAudiences: []
+    };
+
+    const ImplementationLocationTemplate = (rowData: OCDOpportunity) => {
+        const implementationLocation = rowData.implementation_location;
+        const coverageActivity = rowData.coverage_activity;
+
+        if (!implementationLocation) {
+            return 'N/A';
+        }
+
+        // Define the options based on coverage activity (same logic as Create form)
+        let options: { value: string; label: string }[] = [];
+
+        switch (coverageActivity) {
+            case 'country':
+                options = locationData.countries;
+                break;
+            case 'Regions':
+                options = locationData.regions;
+                break;
+            case 'Ocean-based':
+                options = locationData.oceans;
+                break;
+            case 'Global':
+                options = [{value: 'Global', label: 'Global'}];
+                break;
+            default:
+                return implementationLocation; // Return as-is if no matching coverage activity
+        }
+
+        // Find the matching option and return the label
+        const option = options.find(opt => opt.value === implementationLocation);
+        return option ? option.label : implementationLocation;
+    };
+
     return (
         <FrontendLayout>
             <Head title={`Opportunity: ${opportunity.title}`} />
@@ -47,7 +88,7 @@ export default function Show() {
                         </div>
                         <div>
                             <dt className="text-2xl text-firefly-800">Implementation Location</dt>
-                            <dd className="text-2xl mt-1 text-gray-900">{opportunity.implementation_location}</dd>
+                            <dd className="text-2xl mt-1 text-gray-900">{ImplementationLocationTemplate(opportunity)}</dd>
                         </div>
                         <div>
                             <dt className="text-2xl text-firefly-800">Target Audience</dt>

@@ -1,7 +1,9 @@
-// resources/js/Components/Breadcrumb.tsx
-import React from 'react';
-import { Link } from '@inertiajs/react';
+import React from 'react'
 import { usePage } from '@inertiajs/react'
+import clsx from 'clsx'
+import { ChevronRightIcon } from '@heroicons/react/16/solid'
+import { Link } from '@/components/ui/link'
+import { Text } from '@/components/ui/text'
 
 export interface BreadcrumbItem {
   name: string;
@@ -9,39 +11,58 @@ export interface BreadcrumbItem {
 }
 
 interface BreadcrumbProps {
+  className?: string;
   items?: BreadcrumbItem[];
 }
-export default function Breadcrumb(){
-  const defaultItems = usePage().props.breadcrumbs as BreadcrumbItem[] ||  [];
-  if (defaultItems.length === 0) return null;
+
+export function Breadcrumb({ className, items }: BreadcrumbProps) {
+  const defaultItems = (usePage().props.breadcrumbs as BreadcrumbItem[]) || []
+  const breadcrumbItems = items || defaultItems
+  
+  if (breadcrumbItems.length === 0) return null
+
   return (
-    <div className='flex-grow container mx-auto py-4'>
-      <nav aria-label="Breadcrumb">
-      <ol className="flex items-center space-x-2 text-gray-600 text-base">
-        {defaultItems.map((item, idx) => (
-          <li key={idx} className="flex items-center">
+    <nav 
+      aria-label="Breadcrumb" 
+      className={clsx(className, 'flex-grow container mx-auto py-4')}
+    >
+      <ol className="flex items-center gap-2">
+        {breadcrumbItems.map((item, idx) => (
+          <li key={`breadcrumb-${idx}`} className="flex items-center gap-2">
             {idx > 0 && (
-              <span className="mx-2" aria-hidden="true">
-                &gt;
-              </span>
+              <ChevronRightIcon 
+                data-slot="icon"
+                className="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500"
+                aria-hidden="true"
+              />
             )}
             {item.url ? (
               <Link
                 href={item.url}
-                className="hover:underline"
+                className={clsx(
+                  'text-sm/6 font-medium text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white',
+                  'transition-colors duration-200'
+                )}
               >
                 {item.name}
               </Link>
             ) : (
-              <span className="font-semibold text-gray-800">
+              <Text 
+                className={clsx(
+                  'text-sm/6 font-semibold text-zinc-950 dark:text-white',
+                  'truncate'
+                )}
+                aria-current="page"
+              >
                 {item.name}
-              </span>
+              </Text>
             )}
           </li>
         ))}
       </ol>
     </nav>
-    </div>
+  )
+}
 
-  );
-};
+// Default export for backward compatibility
+export default Breadcrumb

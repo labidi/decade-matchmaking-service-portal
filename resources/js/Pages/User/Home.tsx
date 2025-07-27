@@ -57,7 +57,7 @@ export default function Home({}: PageProps<{ laravelVersion: string; phpVersion:
                     <div className="grid md:grid-cols-3 gap-8">
                         {auth.user && (
                             <CardLink
-                                link={route('user.request.create')}
+                                link={route('request.create')}
                                 className={LinkRequestCardClassName}
                                 title="Submit new Request"
                                 text="Use this feature to submit a new capacity development request for training and workshops "

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -11,6 +12,7 @@ use Spatie\Permission\Models\Role;
 
 class UserRoleController extends Controller
 {
+    use HasBreadcrumbs;
     public function index(): Response
     {
         return Inertia::render('Admin/User/List', [
@@ -20,8 +22,7 @@ class UserRoleController extends Controller
                 'description' => 'Manager your requests here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'breadcrumbs' => [
-            ],
+            'breadcrumbs' => $this->buildAdminSectionBreadcrumbs('users'),
             'users' => User::with('roles')->get()->makeVisible('id'),
             'roles' => Role::all(),
         ]);
