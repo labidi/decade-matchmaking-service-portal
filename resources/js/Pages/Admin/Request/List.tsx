@@ -1,14 +1,9 @@
 import React from 'react';
 import {Head, router} from '@inertiajs/react';
 import {OCDRequest, OCDRequestList, PaginationLinkProps} from '@/types';
-
-import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
-import {Sidebar} from '@/components/ui/sidebar'
-import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
-
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 import {adminColumns} from "@/components/ui/data-table/requests/column-configs";
-import { HomeIcon } from '@heroicons/react/20/solid'
 
 
 interface RequestsPagination {
@@ -36,25 +31,36 @@ interface RequestsListPageProps {
     currentSearch?: Record<string, string>;
 }
 
-const actions = [
-    {
-        key: 'view-details',
-        label: 'View Details',
-        onClick: (request: OCDRequest) => router.visit(route('admin.request.show', {id: request.id}))
-    },
-    {
-        key: 'see-active-offer',
-        label: 'See Active Offer',
-        onClick: (request: OCDRequest) => router.visit(route('admin.request.show', {id: request.id})),
-        divider: true
+const getActionsForRequest = (request: OCDRequest) => {
+    const actions = [];
+
+    // View Details - available if user can view
+    if (request.can_view) {
+        actions.push({
+            key: 'view-details',
+            label: 'View Details',
+            onClick: () => router.visit(route('admin.request.show', {id: request.id}))
+        });
     }
-];
+
+    // See Active Offer - available if request has active offer and user can view
+    if (request.can_manage_offers) {
+        actions.push({
+            key: 'see-active-offer',
+            label: 'Manage request offers',
+            onClick: () => router.visit(route('Requests.show', {id: request.id})),
+            divider: actions.length > 0
+        });
+    }
+
+    return actions;
+};
 
 
 export default function RequestListPage({requests, currentSort, currentSearch = {}}: Readonly<RequestsListPageProps>) {
     const pages = [
-        { name: 'Projects', href: '#', current: false },
-        { name: 'Project Nero', href: '#', current: true },
+        {name: 'Projects', href: '#', current: false},
+        {name: 'Project Nero', href: '#', current: true},
     ]
     return (
         <SidebarLayout>
@@ -72,7 +78,7 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     currentSearch={currentSearch}
                     columns={adminColumns}
                     routeName="admin.request.list"
-                    actions={actions}
+                    getActionsForRequest={getActionsForRequest}
                     pagination={{
                         current_page: requests.current_page,
                         last_page: requests.last_page,

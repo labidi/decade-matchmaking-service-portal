@@ -3,7 +3,7 @@ import { Head , usePage} from '@inertiajs/react';
 import DashboardStats from '@/Components/Dashboard/DashboardStats';
 import { PageProps } from '@/types';
 
-import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 
 interface DashboardProps extends PageProps
 {

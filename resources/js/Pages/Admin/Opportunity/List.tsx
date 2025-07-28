@@ -2,7 +2,7 @@ import React from 'react';
 import {Head} from '@inertiajs/react';
 import {OCDOpportunitiesList, PaginationLinkProps} from '@/types';
 
-import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {OpportunitiesDataTable} from "@/components/ui/data-table/opportunities/opportunities-data-table";
 
 interface OpportunitiesPagination {

@@ -40,7 +40,7 @@ You'll need to update import statements in your files:
 ```typescript
 // OLD IMPORTS
 import XHRAlertDialog from '@/Components/Dialog/XHRAlertDialog';
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import { UIRequestForm } from '@/Forms/UIRequestForm';
 
 // NEW IMPORTS

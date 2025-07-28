@@ -44,6 +44,10 @@ export function SidebarContent() {
                         <DocumentDuplicateIcon/>
                         <SidebarLabel>Requests</SidebarLabel>
                     </SidebarItem>
+                    <SidebarItem href={route('admin.offers.list')}>
+                        <DocumentDuplicateIcon/>
+                        <SidebarLabel>Offers</SidebarLabel>
+                    </SidebarItem>
                     <SidebarItem href={route('admin.opportunity.list')}>
                         <RocketLaunchIcon/>
                         <SidebarLabel>Opportunities</SidebarLabel>

@@ -2,7 +2,7 @@
 import 'primeicons/primeicons.css';
 import 'primereact/resources/primereact.min.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import React from 'react';
 import axios from 'axios';
 import {Auth, OCDOpportunity, OCDOpportunitiesList, OCDOpportunitiesListPageActions} from '@/types';
@@ -55,18 +55,18 @@ export default function OpportunitiesList() {
     };
     const titleBodyTemplate = (rowData: OCDOpportunity) => rowData.title ?? 'N/A';
     const ApplicationClosingDate = (rowData: OCDOpportunity) => new Date(rowData.closing_date).toLocaleDateString();
-    
+
     const ImplementationLocationTemplate = (rowData: OCDOpportunity) => {
         const implementationLocation = rowData.implementation_location;
         const coverageActivity = rowData.coverage_activity;
-        
+
         if (!implementationLocation) {
             return 'N/A';
         }
-        
+
         // Define the options based on coverage activity (same logic as Create form)
         let options: { value: string; label: string }[] = [];
-        
+
         switch (coverageActivity) {
             case 'country':
                 options = locationData.countries;
@@ -83,7 +83,7 @@ export default function OpportunitiesList() {
             default:
                 return implementationLocation; // Return as-is if no matching coverage activity
         }
-        
+
         // Find the matching option and return the label
         const option = options.find(opt => opt.value === implementationLocation);
         return option ? option.label : implementationLocation;

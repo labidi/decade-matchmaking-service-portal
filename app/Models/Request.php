@@ -110,7 +110,7 @@ class Request extends Model
     /**
      * Permission attributes to be appended to model
      */
-    protected $appends = ['can_edit', 'can_view', 'can_add_offer'];
+    protected $appends = ['can_edit', 'can_view', 'can_manage_offers'];
 
     /**
      * Check if current user can edit this request
@@ -118,13 +118,11 @@ class Request extends Model
     public function getCanEditAttribute(): bool
     {
         $user = auth()->user();
-        
         if (!$user) {
             return false;
         }
-
         // Only the request owner can edit
-        return $user->id === $this->user_id;
+        return $user->id === $this->user_id && $this->status->status_code === Status::DRAFT_STATUS_CODE;
     }
 
     /**
@@ -133,29 +131,29 @@ class Request extends Model
     public function getCanViewAttribute(): bool
     {
         $user = auth()->user();
-        
+
         if (!$user) {
             return false;
         }
 
         // Request owner, matched partner, or admin can view
-        return $user->id === $this->user_id 
+        return $user->id === $this->user_id
             || $user->id === $this->matched_partner_id
-            || $user->administrator;
+            || $user->hasRole('administrator');
     }
 
     /**
      * Check if current user can add offer to this request
      */
-    public function getCanAddOfferAttribute(): bool
+    public function getCanManageOffersAttribute(): bool
     {
         $user = auth()->user();
         
         if (!$user) {
             return false;
         }
-
-        // Only admins or partners can add offers, and not to their own requests
-        return ($user->administrator || $user->partner) && $user->id !== $this->user_id;
+        
+        // Only admins can manage offers
+        return $user->hasRole('administrator');
     }
 }

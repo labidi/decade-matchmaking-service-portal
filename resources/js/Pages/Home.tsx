@@ -1,6 +1,6 @@
 import {PageProps} from '@/types';
 import {Head} from '@inertiajs/react';
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {Auth, User} from '@/types';
 import {usePage} from '@inertiajs/react';
 import CardLink from '@/Components/Home/CardLink';

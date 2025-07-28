@@ -3,7 +3,6 @@ import {Document, OCDRequest} from "@/types";
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/react'
 import {ChevronDownIcon} from '@heroicons/react/20/solid'
 
-
 export interface RequestDetailsSectionProps {
     request: OCDRequest;
     canEdit?: boolean;
@@ -12,11 +11,11 @@ export interface RequestDetailsSectionProps {
 }
 
 export default function RequestDetails({
-                                                  request,
-                                                  canEdit = false,
-                                                  documents = [],
-                                                  fieldsToShow = []
-                                              }: Readonly<RequestDetailsSectionProps>) {
+                                           request,
+                                           canEdit = false,
+                                           documents = [],
+                                           fieldsToShow = []
+                                       }: Readonly<RequestDetailsSectionProps>) {
     return (
         <section id="request_details" className='my-8'>
             <div className="grid grid-cols-3 gap-4">

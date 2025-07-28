@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\NotificationsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OcdRequestController;
@@ -14,8 +14,9 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Dashboard\IndexController;
 use App\Http\Controllers\Admin\SettingsController;
 
-use App\Http\Controllers\Admin\OcdRequestController as AdminOcdRequestController;
-use App\Http\Controllers\Admin\OpportunityController as AdminOpportunityController;
+use App\Http\Controllers\Admin\RequestsController as AdminOcdRequestController;
+use App\Http\Controllers\Admin\OpportunitiesController as AdminOpportunityController;
+use App\Http\Controllers\Admin\OffersController as AdminOffersController;
 use App\Http\Controllers\LocationDataController;
 
 Route::get('/', function () {
@@ -96,15 +97,27 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('settings', [SettingsController::class, 'index'])->name('admin.portal.settings');
     Route::get('request/list', [AdminOcdRequestController::class, 'list'])->name('admin.request.list');
     Route::get('request/show/{request}', [AdminOcdRequestController::class, 'show'])->name('admin.request.show');
+    Route::get('request/offers/{request}', [AdminOcdRequestController::class, 'show'])->name('admin.request.offers.list');
+
     Route::get('opportunity/list', [AdminOpportunityController::class, 'list'])->name('admin.opportunity.list');
     Route::get('request/export/csv', [AdminOcdRequestController::class, 'exportCsv'])->name('admin.request.export.csv');
+
+    // Offer Management Routes
+    Route::get('offers', [AdminOffersController::class, 'list'])->name('admin.offers.list');
+    Route::get('offers/create', [AdminOffersController::class, 'create'])->name('admin.offers.create');
+    Route::post('offers', [AdminOffersController::class, 'store'])->name('admin.offers.store');
+    Route::get('offers/{id}', [AdminOffersController::class, 'show'])->name('admin.offers.show');
+    Route::get('offers/{id}/edit', [AdminOffersController::class, 'edit'])->name('admin.offers.edit');
+    Route::put('offers/{id}', [AdminOffersController::class, 'update'])->name('admin.offers.update');
+    Route::delete('offers/{id}', [AdminOffersController::class, 'destroy'])->name('admin.offers.destroy');
+
     Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
     Route::get('user/list', [UserRoleController::class, 'index'])->name('admin.users.roles.list');
-    Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
-    Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name(
+    Route::get('notifications', [NotificationsController::class, 'index'])->name('admin.notifications.index');
+    Route::get('notifications/{notification}', [NotificationsController::class, 'show'])->name(
         'admin.notifications.show'
     );
-    Route::get('notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name(
+    Route::get('notifications/{notification}/read', [NotificationsController::class, 'markAsRead'])->name(
         'admin.notifications.read'
     );
 });

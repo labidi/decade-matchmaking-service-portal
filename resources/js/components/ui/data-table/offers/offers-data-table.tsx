@@ -1,13 +1,13 @@
 import React from 'react';
 import {ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/16/solid';
-import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus} from "@/types";
+import {RequestOffer, RequestOfferList, PaginationLinkProps} from "@/types";
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {Badge} from '@/components/ui/badge'
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
 import {formatDate} from '@/utils/date-formatter';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
-import {RequestsActionColumn, RequestAction} from '@/components/ui/data-table/requests/requests-action-column';
+import {OffersActionColumn, OfferAction} from '@/components/ui/data-table/offers/offers-action-column';
 
 // Types and Interfaces
 interface PaginationData {
@@ -21,7 +21,7 @@ interface PaginationData {
     total: number;
 }
 
-type SortField = 'id' | 'created_at' | 'status_id' | 'user_id';
+type SortField = 'id' | 'created_at' | 'status' | 'matched_partner_id' | 'request_id';
 
 interface DataTableSearchFields {
     key: string;
@@ -34,13 +34,13 @@ interface TableColumn {
     label: string;
     sortable?: boolean;
     sortField?: SortField;
-    render: (request: OCDRequest) => React.ReactNode;
+    render: (offer: RequestOffer) => React.ReactNode;
     className?: string;
     headerClassName?: string;
 }
 
-interface RequestsDataTableProps {
-    requests: OCDRequestList;
+interface OffersDataTableProps {
+    offers: RequestOfferList;
     currentSort: {
         field: string;
         order: string;
@@ -50,57 +50,43 @@ interface RequestsDataTableProps {
     searchFields?: DataTableSearchFields[];
     columns?: TableColumn[];
     routeName?: string;
-    actions?: RequestAction[];
-    getActionsForRequest: (request: OCDRequest) => RequestAction[];
+    getActionsForOffer: (offer: RequestOffer) => OfferAction[];
     showSearch?: boolean;
     showActions?: boolean;
 }
 
 // Utility Functions
-const statusBadgeRenderer = (status: OCDRequestStatus) => {
+const statusBadgeRenderer = (statusLabel: string) => {
     let color: "teal" | "cyan" | "amber" | "green" | "blue" | "red" | "orange" | "yellow" | "lime" | "emerald" | "sky" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
-    switch (status.status_code) {
-        case 'draft':
-            color = 'zinc';
-            break;
-        case 'under_review':
-            color = 'amber';
-            break;
-        case 'validated':
+    
+    switch (statusLabel.toLowerCase()) {
+        case 'active':
             color = 'green';
             break;
-        case 'offer_made':
-            color = 'blue';
-            break;
-        case 'in_implementation':
-            color = 'blue';
-            break;
-        case 'rejected':
-        case 'unmatched':
+        case 'inactive':
             color = 'red';
             break;
-        case 'closed':
-            color = "teal";
-            break;
+        default:
+            color = 'zinc';
     }
 
     return (
-        <Badge color={color}>{status.status_label}</Badge>
+        <Badge color={color}>{statusLabel}</Badge>
     );
 };
 
-export function RequestsDataTable({
-                                      requests,
-                                      currentSort,
-                                      currentSearch = {},
-                                      pagination,
-                                      searchFields = [],
-                                      columns,
-                                      routeName = 'admin.request.list',
-                                      getActionsForRequest,
-                                      showSearch = true,
-                                      showActions = true
-                                  }: Readonly<RequestsDataTableProps>) {
+export function OffersDataTable({
+                                    offers,
+                                    currentSort,
+                                    currentSearch = {},
+                                    pagination,
+                                    searchFields = [],
+                                    columns,
+                                    routeName = 'admin.offers.list',
+                                    getActionsForOffer,
+                                    showSearch = true,
+                                    showActions = true
+                                }: Readonly<OffersDataTableProps>) {
 
     const handleSort = (field: SortField) => {
         const newOrder = currentSort.field === field && currentSort.order === 'asc' ? 'desc' : 'asc';
@@ -120,41 +106,66 @@ export function RequestsDataTable({
             label: 'ID',
             sortable: true,
             sortField: 'id',
-            render: (request) => (
-                <span className="font-medium">{request.id}</span>
+            render: (offer) => (
+                <span className="font-medium">{offer.id}</span>
             )
         },
         {
-            key: 'title',
-            label: 'Title',
-            render: (request) => (
-                <span>{request.detail.capacity_development_title || 'No Title'}</span>
-            )
-        },
-        {
-            key: 'user',
-            label: 'Submitted By',
+            key: 'request',
+            label: 'Request',
             sortable: true,
-            sortField: 'user_id',
-            render: (request) => (
-                <span>{request.user.name}</span>
+            sortField: 'request_id',
+            render: (offer) => (
+                <div className="max-w-xs">
+                    <span className="text-sm font-medium line-clamp-2">
+                        {offer.request?.detail?.capacity_development_title || 'No Title'}
+                    </span>
+                    <span className="text-xs text-zinc-500 block">
+                        ID: {offer.request_id}
+                    </span>
+                </div>
             )
         },
         {
-            key: 'created_at',
-            label: 'Submitted At',
+            key: 'partner',
+            label: 'Partner',
             sortable: true,
-            sortField: 'created_at',
-            render: (request) => (
-                <span className="text-zinc-500">{formatDate(request.created_at)}</span>
+            sortField: 'matched_partner_id',
+            render: (offer) => (
+                <div>
+                    <span className="font-medium">{offer.matched_partner?.name || 'Unknown'}</span>
+                    <span className="text-xs text-zinc-500 block">
+                        {offer.matched_partner?.email}
+                    </span>
+                </div>
+            )
+        },
+        {
+            key: 'description',
+            label: 'Description',
+            render: (offer) => (
+                <div className="max-w-sm">
+                    <span className="text-sm line-clamp-3">
+                        {offer.description}
+                    </span>
+                </div>
             )
         },
         {
             key: 'status',
             label: 'Status',
             sortable: true,
-            sortField: 'status_id',
-            render: (request) => statusBadgeRenderer(request.status)
+            sortField: 'status',
+            render: (offer) => statusBadgeRenderer(offer.status_label)
+        },
+        {
+            key: 'created_at',
+            label: 'Created At',
+            sortable: true,
+            sortField: 'created_at',
+            render: (offer) => (
+                <span className="text-zinc-500">{formatDate(offer.created_at)}</span>
+            )
         }
     ];
 
@@ -202,30 +213,31 @@ export function RequestsDataTable({
                         ))}
                         {showActions && (
                             <TableHeader className="text-right">
+                                Actions
                             </TableHeader>
                         )}
                     </TableRow>
                 </TableHead>
                 <TableBody className="text-lg">
-                    {requests.length === 0 ? (
+                    {offers.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={totalColumns} className="text-center text-zinc-500 py-8">
-                                No requests found.
+                                No offers found.
                             </TableCell>
                         </TableRow>
                     ) : (
-                        requests.map((request) => (
-                            <TableRow key={request.id}>
+                        offers.map((offer) => (
+                            <TableRow key={offer.id}>
                                 {activeColumns.map((column) => (
                                     <TableCell key={column.key} className={column.className}>
-                                        {column.render(request)}
+                                        {column.render(offer)}
                                     </TableCell>
                                 ))}
                                 {showActions && (
                                     <TableCell className="text-right">
-                                        <RequestsActionColumn
-                                            row={request}
-                                            actions={getActionsForRequest(request)}
+                                        <OffersActionColumn
+                                            row={offer}
+                                            actions={getActionsForOffer(offer)}
                                         />
                                     </TableCell>
                                 )}

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Head, router} from '@inertiajs/react';
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {OCDRequestList, PaginationLinkProps, OCDRequest} from '@/types';
 import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 import {userColumns} from "@/components/ui/data-table/requests/column-configs";
@@ -68,16 +68,6 @@ export default function RequestsList({
                 key: 'edit',
                 label: 'Edit',
                 onClick: () => router.visit(route('request.edit', {id: request.id}))
-            });
-        }
-
-        // Add Offer - available if user can add offer
-        if (request.can_add_offer) {
-            actions.push({
-                key: 'add-offer',
-                label: 'Add Offer',
-                onClick: () => router.visit(route('request.offer.create', {id: request.id})),
-                divider: actions.length > 0
             });
         }
 

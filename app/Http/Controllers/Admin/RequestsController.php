@@ -12,11 +12,11 @@ use App\Services\ExportService;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Models\User;
 
-class OcdRequestController extends Controller
+class RequestsController extends Controller
 {
     use HasBreadcrumbs;
 
-    public function __construct(private RequestService $service)
+    public function __construct(private readonly RequestService $service)
     {
     }
 

@@ -72,7 +72,6 @@ export function TablePaginationNav({
                                         key={link.url}
                                         href={link.url}
                                         current={isActive}
-                                        only={['requests']}
                                     >
                                         {link.label}
                                     </PaginationPage>

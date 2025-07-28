@@ -1,4 +1,4 @@
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import React from 'react';
 import RequestDetails from '@/components/ui/request/show/request-details';
 import {Head} from '@inertiajs/react';

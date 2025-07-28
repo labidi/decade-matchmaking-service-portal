@@ -6,7 +6,7 @@ import {Settings} from "@/types";
 import { useDialog } from '@/Components/Dialogs';
 
 
-import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 
 export default function SettingsForm() {
     const page = usePage();

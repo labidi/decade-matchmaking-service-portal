@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class OpportunityController extends Controller
+class OpportunitiesController extends Controller
 {
     use HasBreadcrumbs;
     public function list(Request $httpRequest): Response

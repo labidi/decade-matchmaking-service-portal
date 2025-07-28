@@ -1,6 +1,6 @@
 import {Head} from '@inertiajs/react';
 
-import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 
 import {NotificationList, PaginationLinkProps} from '@/types';
 import {NotificationsDataTable} from '@/components/ui/data-table/notifications/notifications-data-table';

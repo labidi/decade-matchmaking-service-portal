@@ -104,9 +104,15 @@ export interface RequestOffer {
     matched_partner_id: number;
     request_id: number;
     status: number;
+    status_label: string;
     created_at: string;
     updated_at: string;
+    can_edit: boolean;
+    can_view: boolean;
+    can_delete: boolean;
     documents?: Document[];
+    request?: OCDRequest;
+    matched_partner?: User;
 }
 
 export type RequestOfferList = RequestOffer[];
@@ -124,7 +130,7 @@ export interface OCDRequest {
     status: OCDRequestStatus,
     can_edit: boolean;
     can_view: boolean;
-    can_add_offer: boolean;
+    can_manage_offers: boolean;
     detail: {
         id: string;
         is_related_decade_action: 'Yes' | 'No';

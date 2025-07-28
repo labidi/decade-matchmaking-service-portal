@@ -4,7 +4,7 @@ namespace App\Traits;
 
 /**
  * Trait HasBreadcrumbs
- * 
+ *
  * Provides standardized breadcrumb generation for controllers
  * Ensures consistent navigation breadcrumbs across the application
  */
@@ -12,7 +12,7 @@ trait HasBreadcrumbs
 {
     /**
      * Generate home breadcrumb (first level)
-     * 
+     *
      * @return array
      */
     protected function getHomeBreadcrumb(): array
@@ -22,7 +22,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate admin dashboard breadcrumb (first level for admin pages)
-     * 
+     *
      * @return array
      */
     protected function getAdminDashboardBreadcrumb(): array
@@ -32,7 +32,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate requests section breadcrumb
-     * 
+     *
      * @param bool $isAdmin Whether this is for admin context
      * @return array
      */
@@ -44,7 +44,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate opportunities section breadcrumb
-     * 
+     *
      * @param bool $isAdmin Whether this is for admin context
      * @return array
      */
@@ -56,7 +56,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate notifications section breadcrumb
-     * 
+     *
      * @return array
      */
     protected function getNotificationsSectionBreadcrumb(): array
@@ -66,7 +66,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate users section breadcrumb
-     * 
+     *
      * @return array
      */
     protected function getUsersSectionBreadcrumb(): array
@@ -76,7 +76,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate settings section breadcrumb
-     * 
+     *
      * @return array
      */
     protected function getSettingsSectionBreadcrumb(): array
@@ -86,7 +86,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate a specific request breadcrumb
-     * 
+     *
      * @param int $requestId
      * @param string $action (view, edit, preview)
      * @param bool $isAdmin
@@ -101,16 +101,49 @@ trait HasBreadcrumbs
         ];
 
         $actionData = $actions[$action] ?? $actions['view'];
-        
+
         // Map admin routes to actual route names
         $adminRouteMapping = [
             'admin.request.show' => 'admin.request.show',
             'admin.request.edit' => 'admin.request.edit', // May not exist
             'admin.request.preview' => 'admin.request.preview', // May not exist
         ];
-        
+
         $route = $isAdmin ? ($adminRouteMapping["admin.{$actionData['route']}"] ?? $actionData['route']) : $actionData['route'];
-        
+
+        return [
+            'name' => $actionData['name'],
+            'url' => $isAdmin && $action === 'show' ? route($route, ['request' => $requestId]) : route($route, ['id' => $requestId])
+        ];
+    }
+
+    /**
+     * Generate a specific request breadcrumb
+     *
+     * @param int $requestId
+     * @param string $action (view, edit, preview)
+     * @param bool $isAdmin
+     * @return array
+     */
+    protected function getOffersBreadcrumb(int $requestId, string $action = 'view', bool $isAdmin = false): array
+    {
+        $actions = [
+            'view' => ['name' => "View Offer #{$requestId}", 'route' => 'request.show'],
+            'edit' => ['name' => "Edit Offer #{$requestId}", 'route' => 'request.edit'],
+            'preview' => ['name' => "Preview Request #{$requestId}", 'route' => 'request.preview'],
+        ];
+
+        $actionData = $actions[$action] ?? $actions['view'];
+
+        // Map admin routes to actual route names
+        $adminRouteMapping = [
+            'admin.request.show' => 'admin.request.show',
+            'admin.request.edit' => 'admin.request.edit', // May not exist
+            'admin.request.preview' => 'admin.request.preview', // May not exist
+        ];
+
+        $route = $isAdmin ? ($adminRouteMapping["admin.{$actionData['route']}"] ?? $actionData['route']) : $actionData['route'];
+
         return [
             'name' => $actionData['name'],
             'url' => $isAdmin && $action === 'show' ? route($route, ['request' => $requestId]) : route($route, ['id' => $requestId])
@@ -119,7 +152,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate a specific opportunity breadcrumb
-     * 
+     *
      * @param int $opportunityId
      * @param string $action (view, edit)
      * @param bool $isAdmin
@@ -134,7 +167,7 @@ trait HasBreadcrumbs
 
         $actionData = $actions[$action] ?? $actions['view'];
         $route = $isAdmin ? "admin.{$actionData['route']}" : $actionData['route'];
-        
+
         return [
             'name' => $actionData['name'],
             'url' => route($route, ['id' => $opportunityId])
@@ -143,7 +176,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate create action breadcrumb
-     * 
+     *
      * @param string $type (Request, Opportunity)
      * @param bool $isAdmin
      * @return array
@@ -157,7 +190,7 @@ trait HasBreadcrumbs
 
         $route = $routes[$type] ?? null;
         $breadcrumb = ['name' => "Create {$type}"];
-        
+
         if ($route && \Route::has($route)) {
             $breadcrumb['url'] = route($route);
         }
@@ -167,7 +200,7 @@ trait HasBreadcrumbs
 
     /**
      * Generate notification breadcrumb
-     * 
+     *
      * @param string $title
      * @param int|null $notificationId
      * @return array
@@ -175,7 +208,7 @@ trait HasBreadcrumbs
     protected function getNotificationBreadcrumb(string $title, ?int $notificationId = null): array
     {
         $breadcrumb = ['name' => $title];
-        
+
         if ($notificationId) {
             $breadcrumb['url'] = route('admin.notifications.show', ['notification' => $notificationId]);
         }
@@ -185,7 +218,7 @@ trait HasBreadcrumbs
 
     /**
      * Build complete breadcrumb trail for user pages
-     * 
+     *
      * @param array $breadcrumbs Additional breadcrumbs after Home
      * @return array
      */
@@ -196,7 +229,7 @@ trait HasBreadcrumbs
 
     /**
      * Build complete breadcrumb trail for admin pages
-     * 
+     *
      * @param array $breadcrumbs Additional breadcrumbs after Dashboard
      * @return array
      */
@@ -207,7 +240,7 @@ trait HasBreadcrumbs
 
     /**
      * Build request-related breadcrumbs
-     * 
+     *
      * @param string $action (list, create, show, edit, preview)
      * @param int|null $requestId Required for show, edit, preview actions
      * @param bool $isAdmin
@@ -221,10 +254,10 @@ trait HasBreadcrumbs
         switch ($action) {
             case 'list':
                 return array_merge($base, [$requestsSection]);
-            
+
             case 'create':
                 return array_merge($base, [$requestsSection, $this->getCreateBreadcrumb('Request', $isAdmin)]);
-            
+
             case 'show':
             case 'edit':
             case 'preview':
@@ -232,7 +265,7 @@ trait HasBreadcrumbs
                     throw new \InvalidArgumentException("Request ID is required for {$action} action");
                 }
                 return array_merge($base, [$requestsSection, $this->getRequestBreadcrumb($requestId, $action, $isAdmin)]);
-            
+
             default:
                 return array_merge($base, [$requestsSection]);
         }
@@ -240,7 +273,7 @@ trait HasBreadcrumbs
 
     /**
      * Build opportunity-related breadcrumbs
-     * 
+     *
      * @param string $action (list, create, show, edit)
      * @param int|null $opportunityId Required for show, edit actions
      * @param bool $isAdmin
@@ -254,17 +287,17 @@ trait HasBreadcrumbs
         switch ($action) {
             case 'list':
                 return array_merge($base, [$opportunitiesSection]);
-            
+
             case 'create':
                 return array_merge($base, [$opportunitiesSection, $this->getCreateBreadcrumb('Opportunity', $isAdmin)]);
-            
+
             case 'show':
             case 'edit':
                 if (!$opportunityId) {
                     throw new \InvalidArgumentException("Opportunity ID is required for {$action} action");
                 }
                 return array_merge($base, [$opportunitiesSection, $this->getOpportunityBreadcrumb($opportunityId, $action, $isAdmin)]);
-            
+
             default:
                 return array_merge($base, [$opportunitiesSection]);
         }
@@ -272,7 +305,7 @@ trait HasBreadcrumbs
 
     /**
      * Build notification-related breadcrumbs
-     * 
+     *
      * @param string $action (list, show)
      * @param string|null $title Required for show action
      * @param int|null $notificationId Required for show action
@@ -286,13 +319,13 @@ trait HasBreadcrumbs
         switch ($action) {
             case 'list':
                 return array_merge($base, [$notificationsSection]);
-            
+
             case 'show':
                 if (!$title) {
                     throw new \InvalidArgumentException("Title is required for show action");
                 }
                 return array_merge($base, [$notificationsSection, $this->getNotificationBreadcrumb($title, $notificationId)]);
-            
+
             default:
                 return array_merge($base, [$notificationsSection]);
         }
@@ -300,7 +333,7 @@ trait HasBreadcrumbs
 
     /**
      * Build admin-specific breadcrumbs
-     * 
+     *
      * @param string $section (users, settings, dashboard)
      * @param array $additional Additional breadcrumbs
      * @return array

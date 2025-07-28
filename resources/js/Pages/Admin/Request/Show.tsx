@@ -1,6 +1,6 @@
 import React from 'react';
 import {OCDRequest} from '@/types';
-import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {Head} from "@inertiajs/react";
 import {Heading} from "@/components/ui/heading";
 import RequestDetails from '@/components/ui/request/show/request-details';
