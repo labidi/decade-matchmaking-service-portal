@@ -12,7 +12,7 @@ class HomeController extends Controller
     public function index(Request $request): \Inertia\Response
     {
         $user = $request->user();
-        return Inertia::render('User/Home', [
+        return Inertia::render('Home', [
             'title' => 'Welcome ' . $user->name,
             'banner' => [
                 'title' => 'Welcome back ' . $user->name,

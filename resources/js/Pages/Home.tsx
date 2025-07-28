@@ -73,7 +73,7 @@ export default function Home({}: PageProps<{ laravelVersion: string; phpVersion:
                         )}
                         {auth.user && auth.user.is_partner && (
                             <CardLink
-                                link={route('partner.request.list')}
+                                link={route('request.list')}
                                 className={LinkRequestCardClassName}
                                 title="View Request for Training & Workshops"
                                 text="Browse and explore training and workshop requests that align with your interests and expertise as a Partner"

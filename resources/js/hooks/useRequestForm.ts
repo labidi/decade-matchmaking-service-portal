@@ -1,26 +1,17 @@
 import {useForm} from '@inertiajs/react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {UIRequestForm} from '@/Forms/UIRequestForm';
 import {useDialog} from '@/Components/Dialogs';
 import {OCDRequest} from '@/types';
 
 type Mode = 'submit' | 'draft';
 
-interface FormOptions {
-    subthemes?: Array<{ value: string; label: string }>;
-    supportTypes?: Array<{ value: string; label: string }>;
-    relatedActivities?: Array<{ value: string; label: string }>;
-    deliveryFormats?: Array<{ value: string; label: string }>;
-    targetAudiences?: Array<{ value: string; label: string }>;
-    deliveryCountries?: Array<{ value: string; label: string }>;
-}
 
-export function useRequestForm(request: OCDRequest, formOptions?: FormOptions) {
-    console.log('useRequestForm initialized with request:', request);
+export function useRequestForm(request: OCDRequest) {
     const {showDialog, closeDialog} = useDialog();
 
     const form = useForm({
-        id: '',
+        id: request.id || '',
         is_partner: '',
         unique_id: '',
         first_name: '',
@@ -101,6 +92,19 @@ export function useRequestForm(request: OCDRequest, formOptions?: FormOptions) {
             }
         });
     };
+
+    type FormDataKeys = keyof typeof form.data;
+
+    useEffect(() => {
+        if (request && request.id) {
+            form.setData('id', request.id.toString());
+            Object.entries(request.detail).forEach(([key, value]) => {
+                if (key in form.data && key !== 'id') {
+                    form.setData(key as FormDataKeys, value || '');
+                }
+            });
+        }
+    }, []);
 
     const handleFieldChange = (name: string, value: any) => {
         form.setData(name as keyof typeof form.data, value);

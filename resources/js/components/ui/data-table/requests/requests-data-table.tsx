@@ -7,7 +7,7 @@ import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
 import {formatDate} from '@/utils/date-formatter';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
-import {RequestsActionColumn} from '@/components/ui/data-table/requests/requests-action-column';
+import {RequestsActionColumn, RequestAction} from '@/components/ui/data-table/requests/requests-action-column';
 
 // Types and Interfaces
 interface PaginationData {
@@ -50,11 +50,7 @@ interface RequestsDataTableProps {
     searchFields?: DataTableSearchFields[];
     columns?: TableColumn[];
     routeName?: string;
-    actions?: {
-        onViewDetails?: (request: OCDRequest) => void;
-        onUpdateStatus?: (request: OCDRequest) => void;
-        onSeeActiveOffer?: (request: OCDRequest) => void;
-    };
+    actions?: RequestAction[];
     showSearch?: boolean;
     showActions?: boolean;
 }
@@ -205,7 +201,6 @@ export function RequestsDataTable({
                         ))}
                         {showActions && (
                             <TableHeader className="text-right">
-                                
                             </TableHeader>
                         )}
                     </TableRow>
@@ -229,9 +224,7 @@ export function RequestsDataTable({
                                     <TableCell className="text-right">
                                         <RequestsActionColumn
                                             row={request}
-                                            onViewDetails={() => actions?.onViewDetails?.(request) || router.get(route('admin.request.details', request.id), {}, {preserveState: true})}
-                                            onUpdateStatus={() => actions?.onUpdateStatus?.(request) || router.get(route('admin.request.update-status', request.id), {}, {preserveState: true})}
-                                            onSeeActiveOffer={() => actions?.onSeeActiveOffer?.(request) || router.get(route('admin.request.update-status', request.id), {}, {preserveState: true})}
+                                            actions={actions}
                                         />
                                     </TableCell>
                                 )}

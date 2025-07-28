@@ -4,9 +4,6 @@ import DashboardStats from '@/Components/Dashboard/DashboardStats';
 import { PageProps } from '@/types';
 
 import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
-import {Navbar} from '@/components/ui/navbar'
-import {Sidebar} from '@/components/ui/sidebar'
-import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
 
 interface DashboardProps extends PageProps
 {
@@ -29,10 +26,7 @@ export default function Dashboard() {
     const { stats } = usePage<DashboardProps>().props;
     console.log(stats);
     return (
-        <SidebarLayout
-            sidebar={<Sidebar><SidebarContent/></Sidebar>}
-            navbar={<Navbar></Navbar>}
-        >
+        <SidebarLayout>
             <Head title="Dashboard" />
             <div className="space-y-4">
                 <DashboardStats stats={stats} />

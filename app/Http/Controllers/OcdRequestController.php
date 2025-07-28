@@ -53,7 +53,7 @@ class OcdRequestController extends Controller
             'per_page' => 10,
         ];
 
-        $requests = $this->service->getPaginatedRequests($searchFilters, $sortFilters);
+        $requests = $this->service->getUserRequests($httpRequest->user(), $searchFilters, $sortFilters);
 
         // Append query parameters to pagination links
         $requests->appends($httpRequest->only(['sort', 'order', 'user', 'title']));
@@ -66,6 +66,7 @@ class OcdRequestController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'requests' => $requests,
+            'routeName' => 'request.me.list',
             'currentSort' => [
                 'field' => $sortField,
                 'order' => $sortOrder,
@@ -76,7 +77,7 @@ class OcdRequestController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Requests', 'url' => route('request.me.list')],
+                ['name' => 'My requests', 'url' => route('request.me.list')],
             ],
 
         ]);
@@ -85,9 +86,25 @@ class OcdRequestController extends Controller
     /**
      * Display public requests list (for partners)
      */
-    public function list(Request $request)
+    public function list(Request $httpRequest)
     {
-        $requests = $this->service->getPublicRequests($request->user());
+        $sortField = $httpRequest->get('sort', 'created_at');
+        $sortOrder = $httpRequest->get('order', 'desc');
+        $searchUser = $httpRequest->get('user');
+        $searchTitle = $httpRequest->get('title');
+
+        $searchFilters = array_filter([
+            'user' => $searchUser,
+            'title' => $searchTitle,
+        ]);
+
+        $sortFilters = [
+            'field' => $sortField,
+            'order' => $sortOrder,
+            'per_page' => 10,
+        ];
+
+        $requests = $this->service->getPublicRequests($searchFilters, $sortFilters);
 
         return Inertia::render('Request/List', [
             'title' => 'View Request for Training workshops',
@@ -96,10 +113,21 @@ class OcdRequestController extends Controller
                 'description' => 'View requests for training and workshops.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'routeName' => 'request.list',
+            'currentSort' => [
+                'field' => $sortField,
+                'order' => $sortOrder,
+            ],
             'requests' => $requests,
             'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Requests', 'url' => route('partner.request.list')],
+                [
+                    'name' => 'Home',
+                    'url' => route('user.home')
+                ],
+                [
+                    'name' => 'Requests for Training & workshops',
+                    'url' => route('request.list')
+                ],
             ],
             'grid.actions' => [
                 'canEdit' => false,
@@ -107,7 +135,6 @@ class OcdRequestController extends Controller
                 'canView' => true,
                 'canCreate' => false,
                 'canExpressInterest' => true,
-                'canChangeStatus' => $request->user()->is_admin,
                 'canPreview' => true,
             ],
         ]);
@@ -116,9 +143,25 @@ class OcdRequestController extends Controller
     /**
      * Display matched requests for user
      */
-    public function matchedRequest(Request $request)
+    public function matchedRequest(Request $httpRequest)
     {
-        $requests = $this->service->getMatchedRequests($request->user());
+        $sortField = $httpRequest->get('sort', 'created_at');
+        $sortOrder = $httpRequest->get('order', 'desc');
+        $searchUser = $httpRequest->get('user');
+        $searchTitle = $httpRequest->get('title');
+
+        $searchFilters = array_filter([
+            'user' => $searchUser,
+            'title' => $searchTitle,
+        ]);
+
+        $sortFilters = [
+            'field' => $sortField,
+            'order' => $sortOrder,
+            'per_page' => 10,
+        ];
+
+        $requests = $this->service->getMatchedRequests($httpRequest->user(), $searchFilters, $sortFilters);
 
         return Inertia::render('Request/List', [
             'title' => 'View my matched requests',
@@ -127,10 +170,15 @@ class OcdRequestController extends Controller
                 'description' => 'View and browse my matched Request with CDF partners',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'routeName' => 'request.me.matched-requests',
+            'currentSort' => [
+                'field' => $sortField,
+                'order' => $sortOrder,
+            ],
             'requests' => $requests,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Requests', 'url' => route('partner.request.list')],
+                ['name' => 'My matched Requests', 'url' => route('request.list')],
             ],
             'grid.actions' => [
                 'canEdit' => false,
@@ -138,7 +186,6 @@ class OcdRequestController extends Controller
                 'canView' => true,
                 'canCreate' => false,
                 'canExpressInterest' => false,
-                'canChangeStatus' => false
             ],
         ]);
     }
@@ -157,11 +204,11 @@ class OcdRequestController extends Controller
             ],
             'formOptions' => [
                 'subthemes' => SubThemeOptions::getOptions(),
-                'supportTypes' => SupportTypeOptions::getOptions(),
-                'relatedActivities' => RelatedActivityOptions::getOptions(),
-                'deliveryFormats' => DeliveryFormatOptions::getOptions(),
-                'targetAudiences' => TargetAudienceOptions::getOptions(),
-                'deliveryCountries' => CountryOptions::getOptions()
+                'support_types' => SupportTypeOptions::getOptions(),
+                'related_activity' => RelatedActivityOptions::getOptions(),
+                'delivery_format' => DeliveryFormatOptions::getOptions(),
+                'target_audience' => TargetAudienceOptions::getOptions(),
+                'delivery_countries' => CountryOptions::getOptions()
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
@@ -231,7 +278,7 @@ class OcdRequestController extends Controller
             ]);
         } catch (Exception $e) {
             $statusCode = $e->getCode() ?: 500;
-            return respoAGOnse()->json(['error' => $e->getMessage()], $statusCode);
+            return response()->json(['error' => $e->getMessage()], $statusCode);
         }
     }
 
@@ -330,11 +377,11 @@ class OcdRequestController extends Controller
             'request' => $ocdRequest->toArray(),
             'formOptions' => [
                 'subthemes' => SubThemeOptions::getOptions(),
-                'supportTypes' => SupportTypeOptions::getOptions(),
-                'relatedActivities' => RelatedActivityOptions::getOptions(),
-                'deliveryFormats' => DeliveryFormatOptions::getOptions(),
-                'targetAudiences' => TargetAudienceOptions::getOptions(),
-                'deliveryCountries' => CountryOptions::getOptions()
+                'support_types' => SupportTypeOptions::getOptions(),
+                'related_activity' => RelatedActivityOptions::getOptions(),
+                'delivery_format' => DeliveryFormatOptions::getOptions(),
+                'target_audience' => TargetAudienceOptions::getOptions(),
+                'delivery_countries' => CountryOptions::getOptions()
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
@@ -438,7 +485,6 @@ class OcdRequestController extends Controller
                 'success' => true,
                 'message' => 'Your interest has been expressed successfully. The CDF Secretariat will follow up within three business days.'
             ]);
-
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to express interest', [
                 'request_id' => $requestId,
