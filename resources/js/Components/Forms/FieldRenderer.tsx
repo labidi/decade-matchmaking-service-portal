@@ -1,8 +1,15 @@
 import React, {useState} from 'react';
-import {ChevronsUpDown} from 'lucide-react';
-import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react';
+import {XMarkIcon} from '@heroicons/react/16/solid';
 import {UIField} from '@/types';
 import {Request as RequestFields} from '@/Forms/UIRequestForm';
+import {Field, Label, Description, ErrorMessage, Fieldset, Legend} from '@/components/ui/fieldset';
+import {Input} from '@/components/ui/input';
+import {Textarea} from '@/components/ui/textarea';
+import {RadioGroup, RadioField, Radio} from '@/components/ui/radio';
+import {CheckboxGroup, CheckboxField, Checkbox} from '@/components/ui/checkbox';
+import {BadgeButton} from '@/components/ui/badge';
+import {ChevronsUpDown} from 'lucide-react';
+import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react';
 
 interface FieldRendererProps {
     name: string;
@@ -53,7 +60,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
     };
 
     const handleCheckboxChange = (optionValue: string) => {
-        const arr = [...(value || [])];
+        const arr = [...(value ?? [])];
         if (arr.includes(optionValue)) {
             onChange(name, arr.filter((i: string) => i !== optionValue));
         } else {
@@ -62,7 +69,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
     };
 
     const handleRemoveChip = (chipValue: string) => {
-        const selectedValues = (value || []).map((v: any) => String(v));
+        const selectedValues = (value ?? []).map((v: any) => String(v));
         onChange(name, selectedValues.filter((v: string) => v !== chipValue));
     };
 
@@ -70,19 +77,19 @@ export default function FieldRenderer({name, field, value, error, onChange, form
         return null;
     }
 
-    const common = {
-        id: field.id,
-        required: field.required,
-        className: getInputClass(),
-        value: value || '',
-        placeholder: field.placeholder || '',
-        onChange: handleChange,
-    };
-
     switch (field.type) {
         case 'hidden':
             return (
-                <input key={name} type="hidden" {...common} />
+                <Field>
+                    <Input
+                        key={name}
+                        type="hidden"
+                        id={field.id}
+                        value={value ?? ''}
+                        onChange={handleChange}
+                    />
+                </Field>
+
             );
 
         case 'text':
@@ -91,48 +98,63 @@ export default function FieldRenderer({name, field, value, error, onChange, form
         case 'number':
         case 'date':
             return (
-                <div key={name} className="mt-8">
-                    {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
-                    {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                    <input type={field.type} {...common} />
-                    {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
-                </div>
+                <Field key={name} className="mt-8 grid grid-cols-subgrid sm:col-span-3">
+                    {field.label && <Label>{field.label}</Label>}
+                    {field.description && <Description>{field.description}</Description>}
+                    <Input
+                        type={field.type}
+                        id={field.id}
+                        required={field.required}
+                        value={value ?? ''}
+                        placeholder={field.placeholder ?? ''}
+                        onChange={handleChange}
+                        invalid={!!error}
+                    />
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                </Field>
             );
 
         case 'textarea':
             return (
-                <div key={name} className="mt-8">
-                    {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
-                    {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                    <textarea {...common} />
-                    {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
-                </div>
+                <Field key={name} className="mt-8">
+                    {field.label && <Label>{field.label}</Label>}
+                    {field.description && <Description>{field.description}</Description>}
+                    <Textarea
+                        id={field.id}
+                        required={field.required}
+                        value={value ?? ''}
+                        placeholder={field.placeholder ?? ''}
+                        onChange={handleChange}
+                        invalid={!!error}
+                    />
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                </Field>
             );
 
         case 'file':
             return (
-                <div key={name} className="mt-8">
-                    {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
-                    {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                    <input
+                <Field key={name} className="mt-8">
+                    {field.label && <Label>{field.label}</Label>}
+                    {field.description && <Description>{field.description}</Description>}
+                    <Input
                         type="file"
                         id={field.id}
                         accept={field.accept}
-                        className={getInputClass()}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const file = e.currentTarget.files ? e.currentTarget.files[0] : null;
                             onChange(name, file);
                         }}
+                        invalid={!!error}
                     />
-                    {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
-                </div>
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                </Field>
             );
 
         case 'select':
             return (
-                <div key={name} className="mt-8">
-                    {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
-                    {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
+                <Field key={name} className="mt-8">
+                    {field.label && <Label htmlFor={field.id} className="block font-medium">{field.label}</Label>}
+                    {field.description && <Description className="mt-1 text-sm text-gray-500">{field.description}</Description>}
                     <Combobox immediate value={value} onChange={handleComboboxChange}>
                         <div className="relative">
                             <div
@@ -192,21 +214,27 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                         </div>
                     </Combobox>
                     {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
-                </div>
+                </Field>
             );
         case 'raw_select':
             return (
-                <div key={name} className="mt-8">
-                    {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
-                    {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                    <select key={name} {...common}>
-                        <option value="" >Select an option...</option>
+                <Field key={name} className="mt-8">
+                    {field.label && <Label>{field.label}</Label>}
+                    {field.description && <Description>{field.description}</Description>}
+                    <select
+                        id={field.id}
+                        required={field.required}
+                        value={value ?? ''}
+                        onChange={handleChange}
+                        className={`mt-2 block w-full border rounded ${error ? 'border-red-600' : 'border-gray-300'}`}
+                    >
+                        <option value="">Select an option...</option>
                         {field.options?.map(opt => (
                             <option key={opt.value} value={opt.value}>{opt.label}</option>
                         ))}
                     </select>
-                    {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
-                </div>
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                </Field>
             );
         case 'multiselect':
             const selectedValues = (value || []).map((v: any) => String(v));
@@ -305,56 +333,51 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                     {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                 </div>
             );
-
         case 'radio':
             return (
-                <div key={name} className="mt-8">
-                    <label className="block font-medium">{field.label}</label>
-                    {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                    <div className="mt-2 space-x-6">
-                        {field.options?.map(opt => (
-                            <label key={opt.value} className="inline-flex items-center">
-                                <input
-                                    type="radio"
-                                    name={field.id}
-                                    value={opt.value}
-                                    checked={value === opt.value}
-                                    onChange={handleChange}
-                                    className={`form-radio ${error ? 'border-red-600' : 'border-gray-300'}`}
-                                />
-                                <span className={`ml-2 ${error ? 'text-red-600' : 'text-gray'}`}>{opt.label}</span>
-                            </label>
-                        ))}
-                    </div>
-                    {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
-                </div>
+                <Field key={name} className="mt-8">
+                    {field.label && <Label>{field.label}</Label>}
+                    {field.description && <Description>{field.description}</Description>}
+                    <RadioGroup
+                        value={value}
+                        onChange={(newValue) => onChange(name, newValue)}
+                    >
+                        <div className="flex gap-6">
+                            {field.options?.map(opt => (
+                                <RadioField key={opt.value}>
+                                    <Radio value={opt.value}/>
+                                    <Label>{opt.label}</Label>
+                                </RadioField>
+                            ))}
+                        </div>
+                    </RadioGroup>
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                </Field>
             );
 
         case 'checkbox-group':
             return (
-                <fieldset key={name} className="mt-8">
-                    <legend className="block font-medium mb-2">{field.label}</legend>
-                    {(field.image) && (
+                <Fieldset key={name} className="mt-8">
+                    {field.label && <Legend>{field.label}</Legend>}
+                    {field.image && (
                         <div className="w-full">
                             <img src={field.image} alt="Logo" className="object-cover"/>
                         </div>
                     )}
-                    {field.description && <p className="mt-1 text-sm text-gray-500">{field.description}</p>}
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+                    {field.description && <Description>{field.description}</Description>}
+                    <CheckboxGroup className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
                         {field.options?.map(opt => (
-                            <label key={opt.value} className="inline-flex items-center">
-                                <input
-                                    type="checkbox"
-                                    className={`form-checkbox ${error ? 'border-red-600' : 'border-gray-300'}`}
-                                    checked={(value || []).includes(opt.value)}
+                            <CheckboxField key={opt.value}>
+                                <Checkbox
+                                    checked={(value ?? []).includes(opt.value)}
                                     onChange={() => handleCheckboxChange(opt.value)}
                                 />
-                                <span className="ml-2"> {opt.label}</span>
-                            </label>
+                                <Label>{opt.label}</Label>
+                            </CheckboxField>
                         ))}
-                    </div>
-                    {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
-                </fieldset>
+                    </CheckboxGroup>
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                </Fieldset>
             );
 
         default:

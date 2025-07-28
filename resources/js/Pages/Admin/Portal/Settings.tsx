@@ -7,9 +7,6 @@ import { useDialog } from '@/Components/Dialogs';
 
 
 import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
-import {Navbar} from '@/components/ui/navbar'
-import {Sidebar} from '@/components/ui/sidebar'
-import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
 
 export default function SettingsForm() {
     const page = usePage();
@@ -45,10 +42,7 @@ export default function SettingsForm() {
     };
 
     return (
-        <SidebarLayout
-            sidebar={<Sidebar><SidebarContent/></Sidebar>}
-            navbar={<Navbar></Navbar>}
-        >
+        <SidebarLayout>
             <Head title="Admin Requests List"/>
             <div className="bg-white rounded-lg shadow">
                 <div className="mx-auto p-6 ">

@@ -17,20 +17,21 @@ interface BreadcrumbProps {
 
 export function Breadcrumb({ className, items }: BreadcrumbProps) {
   const defaultItems = (usePage().props.breadcrumbs as BreadcrumbItem[]) || []
+    console.log('Breadcrumb items:', defaultItems)
   const breadcrumbItems = items || defaultItems
-  
+
   if (breadcrumbItems.length === 0) return null
 
   return (
-    <nav 
-      aria-label="Breadcrumb" 
+    <nav
+      aria-label="Breadcrumb"
       className={clsx(className, 'flex-grow container mx-auto py-4')}
     >
       <ol className="flex items-center gap-2">
         {breadcrumbItems.map((item, idx) => (
           <li key={`breadcrumb-${idx}`} className="flex items-center gap-2">
             {idx > 0 && (
-              <ChevronRightIcon 
+              <ChevronRightIcon
                 data-slot="icon"
                 className="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500"
                 aria-hidden="true"
@@ -47,7 +48,7 @@ export function Breadcrumb({ className, items }: BreadcrumbProps) {
                 {item.name}
               </Link>
             ) : (
-              <Text 
+              <Text
                 className={clsx(
                   'text-sm/6 font-semibold text-zinc-950 dark:text-white',
                   'truncate'

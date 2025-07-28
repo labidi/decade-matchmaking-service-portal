@@ -80,9 +80,7 @@ class RequestService
                 ]);
             }
             // Create normalized detail if table exists
-            if (Schema::hasTable('request_details')) {
-                $this->createOrUpdateRequestDetail($request, $data);
-            }
+            $this->createOrUpdateRequestDetail($request, $data);
             DB::commit();
             return $request->load(['status', 'detail']);
         } catch (Exception $e) {
@@ -96,20 +94,6 @@ class RequestService
         }
     }
 
-    /**
-     * Get user's requests
-     */
-    public function getUserRequests(User $user): Collection
-    {
-        return OCDRequest::with(['status', 'detail'])
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($request) {
-                return $this->enhanceRequestData($request);
-            });
-    }
-
     public function getAllRequests(bool $raw = false): Collection
     {
         $requests = OCDRequest::with(['status', 'detail', 'user', 'offers']);
@@ -118,42 +102,6 @@ class RequestService
         });
     }
 
-    /**
-     * Get public requests (for partners)
-     */
-    public function getPublicRequests(?User $user = null): Collection
-    {
-        $publicStatuses = ['validated', 'offer_made', 'match_made', 'closed', 'in_implementation'];
-
-        $requests = OCDRequest::with(['status', 'detail'])
-            ->whereHas('status', function (Builder $query) use ($publicStatuses) {
-                $query->whereIn('status_code', $publicStatuses);
-            })
-            ->orderBy('created_at', 'desc');
-        if ($user) {
-            $requests->where('user_id', '!=', $user->id);
-        }
-        return $requests->get()
-            ->map(function ($request) {
-                return $this->enhanceRequestData($request);
-            });
-    }
-
-    /**
-     * Get matched requests for user
-     */
-    public function getMatchedRequests(User $user): Collection
-    {
-        return OCDRequest::with(['status', 'detail'])
-            ->whereHas('offers', function (Builder $query) use ($user) {
-                $query->where('matched_partner_id', $user->id);
-            })
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($request) {
-                return $this->enhanceRequestData($request);
-            });
-    }
 
     /**
      * Find request by ID with authorization
@@ -316,8 +264,8 @@ class RequestService
         if (!empty($sortFilters['field']) && !empty($sortFilters['order'])) {
             if ($sortFilters['field'] === 'user_id') {
                 $query->join('users', 'requests.user_id', '=', 'users.id')
-                      ->orderBy('users.name', $sortFilters['order'])
-                      ->select('requests.*');
+                    ->orderBy('users.name', $sortFilters['order'])
+                    ->select('requests.*');
             } else {
                 $query->orderBy($sortFilters['field'], $sortFilters['order']);
             }
@@ -334,6 +282,98 @@ class RequestService
         $perPage = $sortFilters['per_page'] ?? 10;
 
         return $query->paginate($perPage);
+    }
+
+    /**
+     * Get paginated requests with search and sorting
+     */
+    public function applyFilteringAndPagination(
+        $requests,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        // Apply search filters
+        if (!empty($searchFilters['user'])) {
+            $requests->whereHas('user', function ($q) use ($searchFilters) {
+                $q->where('name', 'like', '%' . $searchFilters['user'] . '%');
+            });
+        }
+
+        if (!empty($searchFilters['title'])) {
+            $requests->whereHas('detail', function ($q) use ($searchFilters) {
+                $q->where('capacity_development_title', 'like', '%' . $searchFilters['title'] . '%');
+            });
+        }
+
+        // Apply sorting with special handling for user relationship
+        if (!empty($sortFilters['field']) && !empty($sortFilters['order'])) {
+            if ($sortFilters['field'] === 'user_id') {
+                $requests->join('users', 'requests.user_id', '=', 'users.id')
+                    ->orderBy('users.name', $sortFilters['order'])
+                    ->select('requests.*');
+            } else {
+                $requests->orderBy($sortFilters['field'], $sortFilters['order']);
+            }
+
+            // If not sorting by created_at, add it as a secondary sort for consistency
+            if ($sortFilters['field'] !== 'created_at') {
+                $requests->orderBy('created_at', 'desc');
+            }
+        } else {
+            // Default sorting
+            $requests->orderBy('created_at', 'desc');
+        }
+
+        $perPage = $sortFilters['per_page'] ?? 10;
+
+        return $requests->paginate($perPage);
+    }
+
+    /**
+     * Get public requests (for partners)
+     */
+    public function getPublicRequests(
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        $publicStatuses = ['validated', 'offer_made', 'match_made', 'closed', 'in_implementation'];
+
+        $requests = OCDRequest::with(['status', 'detail'])
+            ->whereHas('status', function (Builder $query) use ($publicStatuses) {
+                $query->whereIn('status_code', $publicStatuses);
+            });
+        return $this->applyFilteringAndPagination($requests, $searchFilters, $sortFilters);
+    }
+
+    /**
+     * Get matched requests for user
+     */
+    public function getMatchedRequests(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        $requests = OCDRequest::with(['status', 'detail'])
+            ->whereHas('offers', function (Builder $query) use ($user) {
+                $query->where('matched_partner_id', $user->id);
+            });
+        return $this->applyFilteringAndPagination($requests, $searchFilters, $sortFilters);
+    }
+
+
+    /**
+     * Get user's requests
+     */
+    public function getUserRequests(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        $requests = OCDRequest::with(['status', 'detail'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc');
+
+        return $this->applyFilteringAndPagination($requests, $searchFilters, $sortFilters);
     }
 
     /**

@@ -1,9 +1,6 @@
 import {Head} from '@inertiajs/react';
 
 import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
-import {Navbar} from '@/components/ui/navbar'
-import {Sidebar} from '@/components/ui/sidebar'
-import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
 
 import {NotificationList, PaginationLinkProps} from '@/types';
 import {NotificationsDataTable} from '@/components/ui/data-table/notifications/notifications-data-table';
@@ -36,10 +33,7 @@ interface NotificationListPageProps {
 export default function NotificationListPage({notifications, currentSort}: Readonly<NotificationListPageProps>) {
 
     return (
-        <SidebarLayout
-            sidebar={<Sidebar><SidebarContent/></Sidebar>}
-            navbar={<Navbar></Navbar>}
-        >
+        <SidebarLayout>
             <Head title="Notifications"/>
             <div className="mx-auto">
                 <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">

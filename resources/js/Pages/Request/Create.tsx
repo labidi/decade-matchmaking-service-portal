@@ -1,27 +1,76 @@
 import FrontendLayout from '@/Layouts/FrontendLayout';
-import {Head} from '@inertiajs/react';
-import {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
+import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
+
+import {Head, router, useForm, usePage} from '@inertiajs/react';
 import {OCDRequest} from '@/types';
 import {UIRequestForm} from '@/Forms/UIRequestForm';
+import {submitRequest} from '@/Services/Api/request';
 import FieldRenderer from '@/Components/Forms/FieldRenderer';
-import { useRequestForm } from '@/hooks/useRequestForm';
+import {useRequestForm} from "@/hooks/useRequestForm";
 
 interface FormOptions {
     subthemes?: Array<{ value: string; label: string }>;
-    supportTypes?: Array<{ value: string; label: string }>;
-    relatedActivities?: Array<{ value: string; label: string }>;
-    deliveryFormats?: Array<{ value: string; label: string }>;
-    targetAudiences?: Array<{ value: string; label: string }>;
-    deliveryCountries?: Array<{ value: string; label: string }>;
+    support_types?: Array<{ value: string; label: string }>;
+    related_activity?: Array<{ value: string; label: string }>;
+    delivery_formats?: Array<{ value: string; label: string }>;
+    target_audiences?: Array<{ value: string; label: string }>;
+    delivery_countries?: Array<{ value: string; label: string }>;
 }
 
-interface RequestFormProps {
-    request: OCDRequest;
+type RequestFormProps = {
     formOptions: FormOptions;
+    OCDRequest?: OCDRequest;
 }
 
+type Mode = 'submit' | 'draft';
+type Id = '';
+export default function RequestForm({OCDRequest, formOptions}: Readonly<RequestFormProps>) {
 
-export default function RequestForm({request,formOptions}: Readonly<RequestFormProps>) {
+    const ocdRequestFormData = usePage().props.request as OCDRequest;
+    /*
+        const form = useForm({
+            id: '',
+            is_partner: '',
+            unique_id: '',
+            first_name: '',
+            last_name: '',
+            email: '',
+            capacity_development_title: '',
+            has_significant_changes: '',
+            changes_description: '',
+            change_effect: '',
+            request_link_type: '',
+            project_stage: '',
+            project_url: '',
+            related_activity: '',
+            subthemes: [] as string[],
+            subthemes_other: '',
+            support_types: [] as string[],
+            support_types_other: '',
+            gap_description: '',
+            has_partner: '',
+            partner_name: '',
+            partner_confirmed: '',
+            needs_financial_support: '',
+            budget_breakdown: '',
+            support_months: '',
+            completion_date: '',
+            risks: '',
+            personnel_expertise: '',
+            direct_beneficiaries: '',
+            direct_beneficiaries_number: '',
+            expected_outcomes: '',
+            success_metrics: '',
+            long_term_impact: '',
+            mode: 'submit' as Mode,
+            target_audience: '',
+            target_audience_other: '',
+            delivery_format: '',
+            delivery_country: '',
+        });
+    */
+
     const {
         form,
         step,
@@ -31,37 +80,8 @@ export default function RequestForm({request,formOptions}: Readonly<RequestFormP
         handleBack,
         handleSubmit,
         handleFieldChange,
-        setStep,
-    } = useRequestForm(request,formOptions);
-
-    type FormDataKeys = keyof typeof form.data;
-
-    // Helper function to get options for a specific field
-    const getFieldOptions = (fieldName: string) => {
-        const optionsMap: Record<string, keyof FormOptions> = {
-            'subthemes': 'subthemes',
-            'support_types': 'supportTypes',
-            'related_activity': 'relatedActivities',
-            'delivery_format': 'deliveryFormats',
-            'target_audience': 'targetAudiences',
-            'delivery_countries': 'deliveryCountries',
-        };
-
-        const optionKey = optionsMap[fieldName];
-        return optionKey ? formOptions[optionKey] : undefined;
-    };
-
-    // Initialize form data from existing request (if editing)
-    useEffect(() => {
-        if (request && request.id) {
-            form.setData('id', request.id);
-            Object.entries(request.detail).forEach(([key, value]) => {
-                if (key in form.data && key !== 'id' && key !== 'mode') {
-                    form.setData(key as FormDataKeys, value || '');
-                }
-            });
-        }
-    }, []);
+        setStep
+    } = useRequestForm(ocdRequestFormData);
 
     return (
         <FrontendLayout>
@@ -69,7 +89,6 @@ export default function RequestForm({request,formOptions}: Readonly<RequestFormP
             <form className="mx-auto bg-white">
                 <input type="hidden" name="id" value={form.data.id}/>
                 <input type="hidden" name="mode" value={form.data.mode}/>
-
                 {/* Stepper */}
                 <div className="flex mb-6">
                     {steps.map((label, idx) => (
@@ -87,17 +106,18 @@ export default function RequestForm({request,formOptions}: Readonly<RequestFormP
                         </div>
                     ))}
                 </div>
-
-                {/* Form Fields */}
                 {Object.entries(UIRequestForm[step - 1].fields).map(([key, field]) => {
-                    const fieldOptions = getFieldOptions(key);
-                    const enhancedField = fieldOptions ? { ...field, options: fieldOptions } : field;
-
+                    type FormDataKeys = keyof typeof form.data;
+                    // Check if there are formOptions for this field key and assign them
+                    const fieldWithOptions = {...field};
+                    if (formOptions?.[key as keyof FormOptions]) {
+                        fieldWithOptions.options = formOptions[key as keyof FormOptions];
+                    }
                     return (
                         <FieldRenderer
                             key={key}
                             name={key}
-                            field={enhancedField}
+                            field={fieldWithOptions}
                             value={(form.data as any)[key as FormDataKeys]}
                             error={form.errors[key as FormDataKeys]}
                             onChange={handleFieldChange}
@@ -124,7 +144,7 @@ export default function RequestForm({request,formOptions}: Readonly<RequestFormP
                         disabled={form.processing}
                         className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {form.processing ? 'Saving...' : 'Save Draft'}
+                        {form.processing? 'Saving...' : 'Save Draft'}
                     </button>
                     {step < 5 ? (
                         <button

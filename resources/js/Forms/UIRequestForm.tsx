@@ -170,38 +170,37 @@ export const UIRequestForm: UIStep[] = [
                 // Options should be provided from DeliveryFormatOptions::getOptions()
             },
             delivery_countries: {
-                id: 'delivery_countries',
-                type: 'multiselect',
-                // options should be provided by the parent component from backend location data
-                required: false,
-                label: 'What is the delivery country? ',
-                show: data => data.delivery_format !== 'Online',
-            },
-            target_audience: {
-                id: 'target_audience',
-                type: 'multiselect',
-                required: true,
-                label: 'Who is the target audience (multiple choice allowed)?',
-                // Options should be provided from TargetAudienceOptions::getOptions()
-                multiple: true,
-            },
-            target_audience_other: {
-                id: 'target_audience_other',
-                type: 'text',
-                required: false,
-                show: data => data.target_audience === 'Other (Please Specify)',
-                placeholder: 'Please specify the target audience',
-            },
-            subthemes: {
-                id: 'subthemes',
-                type: 'checkbox-group',
-                required: true,
-                label: 'Which sub-theme(s) of the Capacity Development Facility priorities does your request fall under?',
-                image : '/assets/img/cdf_subthemes.svg',
-                description: 'Please review the umbrella theme carefully before selecting the corresponding sub-themes.',
-                // Options should be provided from SubThemeOptions::getOptions()
-            },
-            subthemes_other: {
+                  id: 'delivery_countries',
+                  type: 'multiselect',
+                  // options should be provided by the parent component from backend location data
+                  required: false,
+                  label: 'What is the delivery country? ',
+                  show: data => data.delivery_format !== 'Online',
+              },
+              target_audience: {
+                  id: 'target_audience',
+                  type: 'multiselect',
+                  required: true,
+                  label: 'Who is the target audience (multiple choice allowed)?',
+                  // Options should be provided from TargetAudienceOptions::getOptions()
+              },
+            /*  target_audience_other: {
+                  id: 'target_audience_other',
+                  type: 'text',
+                  required: false,
+                  show: data => data.target_audience === 'Other (Please Specify)',
+                  placeholder: 'Please specify the target audience',
+              },
+              subthemes: {
+                  id: 'subthemes',
+                  type: 'checkbox-group',
+                  required: true,
+                  label: 'Which sub-theme(s) of the Capacity Development Facility priorities does your request fall under?',
+                  image : '/assets/img/cdf_subthemes.svg',
+                  description: 'Please review the umbrella theme carefully before selecting the corresponding sub-themes.',
+                  // Options should be provided from SubThemeOptions::getOptions()
+              },*/
+            /*subthemes_other: {
                 id: 'subthemes_other',
                 type: 'textarea',
                 required: true,
@@ -214,7 +213,7 @@ export const UIRequestForm: UIStep[] = [
                 label: 'What type of support related to workshops or training are you seeking?',
                 description: "If you require support outside listed options, specify under 'Other options'.",
                 // Options should be provided from SupportTypeOptions::getOptions()
-            },
+            },*/
             support_types_other: {
                 id: 'support_types_other',
                 type: 'textarea',

@@ -2,20 +2,27 @@ import {Dropdown, DropdownButton, DropdownItem, DropdownMenu, DropdownDivider} f
 import {ChevronDownIcon} from '@heroicons/react/16/solid'
 import {OCDRequest} from '@/types';
 
+export interface RequestAction {
+    key: string;
+    label: string;
+    onClick: (request: OCDRequest) => void;
+    href?: string;
+    divider?: boolean;
+}
 
 interface RequestsActionColumnProps {
     row: OCDRequest;
-    onViewDetails?: (id: number) => void | null;
-    onUpdateStatus?: (id: number) => void | null;
-    onSeeActiveOffer?: (id: number) => void | null;
+    actions?: RequestAction[];
 }
 
 export function RequestsActionColumn({
                                          row,
-                                         onViewDetails,
-                                         onUpdateStatus,
-                                         onSeeActiveOffer
+                                         actions = []
                                      }: Readonly<RequestsActionColumnProps>) {
+    if (actions.length === 0) {
+        return null;
+    }
+
     return (
         <Dropdown>
             <DropdownButton color="white" className="flex items-center gap-2">
@@ -23,12 +30,14 @@ export function RequestsActionColumn({
                 <ChevronDownIcon className="h-4 w-4"/>
             </DropdownButton>
             <DropdownMenu>
-                <DropdownItem href={route('admin.request.show', row.id)}>View</DropdownItem>
-                {onViewDetails && <DropdownItem onClick={() => onViewDetails(row.id)}>Quick view</DropdownItem>}
-                {onUpdateStatus && <DropdownItem onClick={() => onUpdateStatus(row.id)}>Update Status</DropdownItem>}
-                <DropdownDivider/>
-                {onSeeActiveOffer &&
-                    <DropdownItem onClick={() => onSeeActiveOffer(row.id)}>See active offer</DropdownItem>}
+                {actions.map((action, index) => (
+                    <>
+                        <DropdownItem onClick={() => action.onClick(row)}>
+                            {action.label}
+                        </DropdownItem>
+                        {action.divider && index < actions.length - 1 && <DropdownDivider/>}
+                    </>
+                ))}
             </DropdownMenu>
         </Dropdown>
     )

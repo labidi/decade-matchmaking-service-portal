@@ -87,7 +87,7 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::delete('opportunity/{id}', [OcdOpportunityController::class, 'destroy'])->name(
         'partner.opportunity.destroy'
     );
-    Route::get('request/list', [OcdRequestController::class, 'list'])->name('partner.request.list');
+    Route::get('request/list', [OcdRequestController::class, 'list'])->name('request.list');
     Route::get('opportunity/edit/{id}', [OcdOpportunityController::class, 'edit'])->name('opportunity.edit');
 });
 

@@ -3,9 +3,6 @@ import {Head} from '@inertiajs/react';
 import {OCDOpportunitiesList, PaginationLinkProps} from '@/types';
 
 import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
-import {Navbar} from '@/components/ui/navbar'
-import {Sidebar} from '@/components/ui/sidebar'
-import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
 import {OpportunitiesDataTable} from "@/components/ui/data-table/opportunities/opportunities-data-table";
 
 interface OpportunitiesPagination {
@@ -34,10 +31,7 @@ interface OpportunitiesListPageProps {
 
 export default function OpportunityListPage({opportunities, currentSort}: Readonly<OpportunitiesListPageProps>) {
     return (
-        <SidebarLayout
-            sidebar={<Sidebar><SidebarContent/></Sidebar>}
-            navbar={<Navbar></Navbar>}
-        >
+        <SidebarLayout>
             <Head title="Opportunities List"/>
             <div className="mx-auto">
                 <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
