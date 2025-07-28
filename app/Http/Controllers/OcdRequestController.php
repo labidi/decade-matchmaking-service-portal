@@ -430,17 +430,6 @@ class OcdRequestController extends Controller
     }
 
     /**
-     * Search requests with filters
-     */
-    public function search(Request $request)
-    {
-        $filters = $request->only(['status', 'activity_type', 'subtheme', 'user_requests']);
-        $requests = $this->service->searchRequests($filters, $request->user());
-
-        return response()->json(['requests' => $requests]);
-    }
-
-    /**
      * Get request statistics
      */
     public function stats(Request $request)

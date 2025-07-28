@@ -123,14 +123,22 @@ export interface OCDRequestStatus {
     created_at: string;
     updated_at: string;
 }
+
+export interface RequestStatus {
+    id: number;
+    status_code: string;
+    status_label: string;
+}
 export interface OCDRequest {
     id: number;
     type: string;
     submissionDate: string;
     status: OCDRequestStatus,
+    title: string;
     can_edit: boolean;
     can_view: boolean;
     can_manage_offers: boolean;
+    can_update_status: boolean;
     detail: {
         id: string;
         is_related_decade_action: 'Yes' | 'No';

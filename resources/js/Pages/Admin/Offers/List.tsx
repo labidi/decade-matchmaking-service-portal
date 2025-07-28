@@ -5,6 +5,7 @@ import {RequestOfferList, PaginationLinkProps, RequestOffer} from '@/types';
 import {OffersDataTable} from "@/components/ui/data-table/offers/offers-data-table";
 import {Button} from '@/components/ui/button';
 import {PlusIcon} from '@heroicons/react/16/solid';
+import {Heading} from "@/components/ui/heading";
 
 interface OffersPagination {
     current_page: number;
@@ -104,11 +105,14 @@ export default function OffersList({
 
             <div className="space-y-6">
                 {/* Header */}
+                <div className="mx-auto">
+                    <Heading level={1}>
+                        Manage Offers
+                    </Heading>
+                    <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
+                </div>
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                            Manage Offers
-                        </h1>
                         <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                             View and manage all capacity development offers
                         </p>

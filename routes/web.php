@@ -98,6 +98,7 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('request/list', [AdminOcdRequestController::class, 'list'])->name('admin.request.list');
     Route::get('request/show/{request}', [AdminOcdRequestController::class, 'show'])->name('admin.request.show');
     Route::get('request/offers/{request}', [AdminOcdRequestController::class, 'show'])->name('admin.request.offers.list');
+    Route::post('request/{request}/update-status', [AdminOcdRequestController::class, 'updateStatus'])->name('admin.request.update-status');
 
     Route::get('opportunity/list', [AdminOpportunityController::class, 'list'])->name('admin.opportunity.list');
     Route::get('request/export/csv', [AdminOcdRequestController::class, 'exportCsv'])->name('admin.request.export.csv');

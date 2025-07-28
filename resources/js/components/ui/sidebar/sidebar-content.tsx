@@ -1,4 +1,3 @@
-import {Avatar} from '@/components/ui/avatar'
 import {
     Sidebar,
     SidebarBody,
@@ -17,7 +16,8 @@ import {
     BellAlertIcon,
     ArrowLeftStartOnRectangleIcon,
     PresentationChartBarIcon,
-    UserIcon
+    UserIcon,
+    TagIcon
 } from '@heroicons/react/16/solid'
 
 
@@ -45,7 +45,7 @@ export function SidebarContent() {
                         <SidebarLabel>Requests</SidebarLabel>
                     </SidebarItem>
                     <SidebarItem href={route('admin.offers.list')}>
-                        <DocumentDuplicateIcon/>
+                        <TagIcon/>
                         <SidebarLabel>Offers</SidebarLabel>
                     </SidebarItem>
                     <SidebarItem href={route('admin.opportunity.list')}>

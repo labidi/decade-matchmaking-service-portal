@@ -19,7 +19,7 @@ export const UIOfferForm: UIStep[] = [
         fields: {
             request_id: {
                 id: 'request_id',
-                type: 'raw_select',
+                type: 'select',
                 required: true,
                 label: 'Request',
                 description: 'Select the request you want to make an offer for',
@@ -28,7 +28,7 @@ export const UIOfferForm: UIStep[] = [
             },
             partner_id: {
                 id: 'partner_id',
-                type: 'raw_select',
+                type: 'select',
                 required: true,
                 label: 'Partner',
                 description: 'Select a partner from the list',

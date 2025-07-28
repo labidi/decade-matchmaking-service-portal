@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeftIcon } from '@heroicons/react/16/solid';
 import FieldRenderer from '@/Components/Forms/FieldRenderer';
 import { UIField } from '@/types';
+import {Fieldset,Legend} from "@/components/ui/fieldset";
 
 export interface UIStep {
     label: string;
@@ -100,10 +101,10 @@ export function FormProvider({
     return (
         <div>
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className=" dark:bg-gray-800 shadow rounded-lg p-6">
-                    <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
-                        {currentStepData.label}
-                    </h2>
+                <Fieldset>
+                   <Legend>
+                   {currentStepData.label}
+                   </Legend>
 
                     <div className="space-y-6">
                         {Object.entries(currentStepData.fields).map(([fieldName, field]) => {
@@ -122,7 +123,7 @@ export function FormProvider({
                             );
                         })}
                     </div>
-                </div>
+                </Fieldset>
 
                 {/* Navigation buttons */}
                 <div className="flex items-center justify-between">

@@ -7,7 +7,7 @@ import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
 import {formatDate} from '@/utils/date-formatter';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
-import {OffersActionColumn, OfferAction} from '@/components/ui/data-table/offers/offers-action-column';
+import {DataTableActionsColumn, DataTableAction} from '@/components/ui/data-table/common/DataTableActionsColumn';
 
 // Types and Interfaces
 interface PaginationData {
@@ -50,7 +50,7 @@ interface OffersDataTableProps {
     searchFields?: DataTableSearchFields[];
     columns?: TableColumn[];
     routeName?: string;
-    getActionsForOffer: (offer: RequestOffer) => OfferAction[];
+    getActionsForOffer: (offer: RequestOffer) => DataTableAction<RequestOffer>[];
     showSearch?: boolean;
     showActions?: boolean;
 }
@@ -235,7 +235,7 @@ export function OffersDataTable({
                                 ))}
                                 {showActions && (
                                     <TableCell className="text-right">
-                                        <OffersActionColumn
+                                        <DataTableActionsColumn
                                             row={offer}
                                             actions={getActionsForOffer(offer)}
                                         />

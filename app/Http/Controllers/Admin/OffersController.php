@@ -75,17 +75,32 @@ class OffersController extends Controller
         $partners = User::whereHas('roles', function ($query) {
             $query->whereIn('name', ['partner', 'administrator']);
         })
-            ->select('id', 'name', 'email')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->map(function ($user) {
+                return $user->makeVisible(['id']);
+            });
 
-        // Get available requests that can receive offers
-        $availableRequests = $this->requestService->getPublicRequests([], ['per_page' => 100]);
+        $availableRequests = $this->requestService->getAllRequests();
+
+        $breadcrumbs = [
+            ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
+        ];
+        if ($selectedRequest) {
+            $breadcrumbs[] = [
+                'name' => 'Request #' . $selectedRequest->id,
+                'url' => route('admin.request.show', $selectedRequest->id)
+            ];
+        }else {
+            $breadcrumbs[] =['name' => 'Manage offers', 'url' => route('admin.offers.list')];
+        }
+        $breadcrumbs[] = ['name' => 'Create new offer'];
 
         return Inertia::render('Admin/Offers/Create', [
             'selectedRequest' => $selectedRequest,
             'partners' => $partners,
-            'availableRequests' => $availableRequests->items(),
+            'availableRequests' => $availableRequests,
+            'breadcrumbs' => $breadcrumbs
         ]);
     }
 
@@ -126,7 +141,7 @@ class OffersController extends Controller
                 'breadcrumbs' => [
                     ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
                     ['name' => 'Manage offers', 'url' => route('admin.offers.list')],
-                    ['name' => 'Offer #'.$offer->id, 'url' => route('admin.offers.list')],
+                    ['name' => 'Offer #' . $offer->id, 'url' => route('admin.offers.list')],
                 ]
             ]);
         } catch (\Exception $e) {

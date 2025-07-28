@@ -3,7 +3,6 @@ import {Head, usePage, Link} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {OCDRequest, OCDRequestGrid, RequestOffer} from '@/types';
 import OfferSection from '@/Pages/Request/Components/OfferSection';
-import RequestDetailsSection from '@/Pages/Request/Components/RequestDetailsSection';
 import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
 
 
@@ -28,7 +27,7 @@ export default function ShowRequest() {
         <FrontendLayout>
             <Head title={`Request: ${OcdRequest.id}`}/>
 
-            <RequestDetailsSection OcdRequest={OcdRequest} fieldsToShow={previewFields}/>
+            {/*<RequestDetailsSection OcdRequest={OcdRequest} fieldsToShow={previewFields}/>*/}
 
             {/* Separator */}
             <div className="border-t border-gray-200 my-6"/>

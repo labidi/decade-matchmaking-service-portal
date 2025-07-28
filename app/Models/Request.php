@@ -110,7 +110,7 @@ class Request extends Model
     /**
      * Permission attributes to be appended to model
      */
-    protected $appends = ['can_edit', 'can_view', 'can_manage_offers'];
+    protected $appends = ['can_edit', 'can_view', 'can_manage_offers', 'can_update_status'];
 
     /**
      * Check if current user can edit this request
@@ -154,6 +154,21 @@ class Request extends Model
         }
         
         // Only admins can manage offers
+        return $user->hasRole('administrator');
+    }
+
+    /**
+     * Check if current user can update request status
+     */
+    public function getCanUpdateStatusAttribute(): bool
+    {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return false;
+        }
+        
+        // Only administrators can update status
         return $user->hasRole('administrator');
     }
 }

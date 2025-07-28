@@ -4,6 +4,7 @@ import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout';
 import {RequestOffer, User} from '@/types';
 import {FormProvider} from '@/Forms/FormProvider';
 import {UIOfferForm} from '@/Forms/UIOfferForm';
+import {Heading} from "@/components/ui/heading";
 
 interface EditOfferPageProps {
     offer: RequestOffer;
@@ -29,13 +30,11 @@ export default function EditOffer({
 
             <div className="space-y-6">
                 {/* Header */}
-                <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                        Edit Offer #{offer.id}
-                    </h1>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        Update the offer details and documentation
-                    </p>
+                <div className="mx-auto">
+                    <Heading level={1}>
+                        Notification Details
+                    </Heading>
+                    <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
                 </div>
 
                 {/* Offer Context */}
