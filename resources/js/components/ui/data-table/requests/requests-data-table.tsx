@@ -51,6 +51,7 @@ interface RequestsDataTableProps {
     columns?: TableColumn[];
     routeName?: string;
     actions?: RequestAction[];
+    getActionsForRequest?: (request: OCDRequest) => RequestAction[];
     showSearch?: boolean;
     showActions?: boolean;
 }
@@ -97,6 +98,7 @@ export function RequestsDataTable({
                                       columns,
                                       routeName = 'admin.request.list',
                                       actions,
+                                      getActionsForRequest,
                                       showSearch = true,
                                       showActions = true
                                   }: Readonly<RequestsDataTableProps>) {
@@ -224,7 +226,7 @@ export function RequestsDataTable({
                                     <TableCell className="text-right">
                                         <RequestsActionColumn
                                             row={request}
-                                            actions={actions}
+                                            actions={getActionsForRequest ? getActionsForRequest(request) : actions}
                                         />
                                     </TableCell>
                                 )}

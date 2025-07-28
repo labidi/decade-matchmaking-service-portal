@@ -26,5 +26,4 @@ export { default as FieldRenderer } from './Forms/FieldRenderer';
 export { default as ApplicationLogo } from './Common/ApplicationLogo';
 export { default as FlanderLogo } from './Common/FlanderLogo';
 export { default as Banner } from './Common/Banner';
-export { default as Breadcrumb } from './Common/Breadcrumb';
-export { default as UserGuide } from './Common/UserGuide'; 
+export { default as UserGuide } from './Common/UserGuide';

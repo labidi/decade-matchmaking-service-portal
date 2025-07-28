@@ -106,4 +106,56 @@ class Request extends Model
     {
         return $this->detail !== null;
     }
+
+    /**
+     * Permission attributes to be appended to model
+     */
+    protected $appends = ['can_edit', 'can_view', 'can_add_offer'];
+
+    /**
+     * Check if current user can edit this request
+     */
+    public function getCanEditAttribute(): bool
+    {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return false;
+        }
+
+        // Only the request owner can edit
+        return $user->id === $this->user_id;
+    }
+
+    /**
+     * Check if current user can view this request
+     */
+    public function getCanViewAttribute(): bool
+    {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return false;
+        }
+
+        // Request owner, matched partner, or admin can view
+        return $user->id === $this->user_id 
+            || $user->id === $this->matched_partner_id
+            || $user->administrator;
+    }
+
+    /**
+     * Check if current user can add offer to this request
+     */
+    public function getCanAddOfferAttribute(): bool
+    {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return false;
+        }
+
+        // Only admins or partners can add offers, and not to their own requests
+        return ($user->administrator || $user->partner) && $user->id !== $this->user_id;
+    }
 }

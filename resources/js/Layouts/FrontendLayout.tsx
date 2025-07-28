@@ -4,7 +4,7 @@ import Footer from '@/Components/Layout/Footer';
 import Banner from '@/Components/Common/Banner';
 import UserGuide from '@/Components/Common/UserGuide';
 import { usePage } from '@inertiajs/react';
-import Breadcrumb from '@/Components/Common/Breadcrumb';
+import Breadcrumb from '@/components/ui/breadcrumb';
 
 interface FrontendLayoutProps {
   children: React.ReactNode;

@@ -49,19 +49,50 @@ export default function RequestsList({
         router.visit(route('request.show', {id: request.id}));
     };
 
-    const actions = [
-        {
-            key: 'view-details',
-            label: 'View Details',
-            onClick: (request: OCDRequest) => router.visit(route('request.show', {id: request.id}))
-        },
-        {
-            key: 'see-active-offer',
-            label: 'See Active Offer',
-            onClick: handleSeeActiveOffer,
-            divider: true
+    // Dynamic actions based on request permissions
+    const getActionsForRequest = (request: OCDRequest) => {
+        const actions = [];
+
+        // View Details - available if user can view
+        if (request.can_view) {
+            actions.push({
+                key: 'view-details',
+                label: 'View Details',
+                onClick: () => router.visit(route('request.show', {id: request.id}))
+            });
         }
-    ];
+
+        // Edit - available if user can edit
+        if (request.can_edit) {
+            actions.push({
+                key: 'edit',
+                label: 'Edit',
+                onClick: () => router.visit(route('request.edit', {id: request.id}))
+            });
+        }
+
+        // Add Offer - available if user can add offer
+        if (request.can_add_offer) {
+            actions.push({
+                key: 'add-offer',
+                label: 'Add Offer',
+                onClick: () => router.visit(route('request.offer.create', {id: request.id})),
+                divider: actions.length > 0
+            });
+        }
+
+        // See Active Offer - available if request has active offer and user can view
+        if (request.active_offer && request.can_view) {
+            actions.push({
+                key: 'see-active-offer',
+                label: 'See Active Offer',
+                onClick: () => handleSeeActiveOffer(request),
+                divider: actions.length > 0
+            });
+        }
+
+        return actions;
+    };
 
     return (
         <FrontendLayout>
@@ -73,7 +104,7 @@ export default function RequestsList({
                     currentSearch={currentSearch}
                     columns={userColumns}
                     routeName={routeName}
-                    actions={actions}
+                    getActionsForRequest={getActionsForRequest}
                     pagination={{
                         current_page: requests.current_page,
                         last_page: requests.last_page,

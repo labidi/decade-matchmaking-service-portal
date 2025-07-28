@@ -69,7 +69,7 @@ class RequestEnhancer
             'id' => $request->id,
             'is_partner' => $request->is_partner,
             'unique_id' => $request->unique_id,
-            'request_data' => [
+            'detail' => [
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'email' => $request->email,

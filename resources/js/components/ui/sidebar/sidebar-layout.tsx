@@ -3,7 +3,7 @@
 import * as Headless from '@headlessui/react'
 import React, {useState} from 'react'
 import {NavbarItem} from '@/components/ui/navbar'
-import {Breadcrumb} from '@/Components/Common/Breadcrumb'
+import {Breadcrumb} from '@/components/ui/breadcrumb'
 import {Sidebar} from '@/components/ui/sidebar'
 import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
 

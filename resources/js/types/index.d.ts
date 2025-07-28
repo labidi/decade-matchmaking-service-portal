@@ -122,6 +122,9 @@ export interface OCDRequest {
     type: string;
     submissionDate: string;
     status: OCDRequestStatus,
+    can_edit: boolean;
+    can_view: boolean;
+    can_add_offer: boolean;
     detail: {
         id: string;
         is_related_decade_action: 'Yes' | 'No';
