@@ -269,3 +269,16 @@ export interface PaginationLinkProps {
     label: string;
     url: string;
 }
+
+export interface FlashMessages {
+    success?: string;
+    error?: string;
+    warning?: string;
+    info?: string;
+}
+
+export interface PagePropsWithFlash<
+    T extends Record<string, unknown> = Record<string, unknown>,
+> extends PageProps<T> {
+    flash?: FlashMessages;
+}

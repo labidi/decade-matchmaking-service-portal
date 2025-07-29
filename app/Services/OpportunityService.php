@@ -5,24 +5,28 @@ namespace App\Services;
 use App\Enums\OpportunityStatus;
 use App\Models\Opportunity;
 use App\Models\User;
+use App\Services\Opportunity\OpportunityAnalyticsService;
+use App\Services\Opportunity\OpportunityRepository;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class OpportunityService
 {
+    public function __construct(
+        private readonly OpportunityRepository $repository,
+        private readonly OpportunityAnalyticsService $analytics
+    ) {
+    }
+
     /**
      * Create a new opportunity
      */
     public function createOpportunity(array $data, User $user): Opportunity
     {
         return DB::transaction(function () use ($data, $user) {
-            $opportunity = new Opportunity($data);
-            $opportunity->user_id = $user->id;
-            $opportunity->status = OpportunityStatus::PENDING_REVIEW;
-            $opportunity->save();
+            $opportunity = $this->repository->create($data, $user);
 
             Log::info('Opportunity created', [
                 'opportunity_id' => $opportunity->id,
@@ -39,19 +43,15 @@ class OpportunityService
      */
     public function getUserOpportunities(User $user): Collection
     {
-        return Opportunity::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        return $this->repository->getByUser($user);
     }
 
     /**
-     * Get public opportunities (excluding current user's)
+     * Get public opportunities (active status only)
      */
-    public function getPublicOpportunities(User $user): Collection
+    public function getPublicOpportunities(): Collection
     {
-        return Opportunity::where('status', '=', OpportunityStatus::ACTIVE, false)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        return $this->repository->getPublicOpportunities();
     }
 
     /**
@@ -59,7 +59,7 @@ class OpportunityService
      */
     public function findOpportunity(int $id, ?User $user = null): ?Opportunity
     {
-        $opportunity = Opportunity::find($id);
+        $opportunity = $this->repository->findById($id);
 
         if (!$opportunity) {
             return null;
@@ -98,8 +98,7 @@ class OpportunityService
         }
 
         $oldStatus = $opportunity->status;
-        $opportunity->status = $statusCode;
-        $opportunity->save();
+        $this->repository->update($opportunity, ['status' => $statusCode]);
 
         Log::info('Opportunity status updated', [
             'opportunity_id' => $opportunity->id,
@@ -109,7 +108,7 @@ class OpportunityService
         ]);
 
         return [
-            'opportunity' => $opportunity,
+            'opportunity' => $opportunity->fresh(),
             'status' => [
                 'status_code' => (string)$statusCode,
                 'status_label' => Opportunity::STATUS_LABELS[$statusCode] ?? ''
@@ -138,7 +137,7 @@ class OpportunityService
             throw new Exception('Only pending review opportunities can be deleted', 422);
         }
 
-        $deleted = $opportunity->delete();
+        $deleted = $this->repository->delete($opportunity);
 
         if ($deleted) {
             Log::info('Opportunity deleted', [
@@ -156,14 +155,7 @@ class OpportunityService
      */
     public function getOpportunityStats(User $user): array
     {
-        $userOpportunities = $this->getUserOpportunities($user);
-
-        return [
-            'total' => $userOpportunities->count(),
-            'active' => $userOpportunities->where('status', OpportunityStatus::ACTIVE)->count(),
-            'pending' => $userOpportunities->where('status', OpportunityStatus::PENDING_REVIEW)->count(),
-            'closed' => $userOpportunities->where('status', OpportunityStatus::CLOSED)->count(),
-        ];
+        return $this->analytics->getUserOpportunityStats($user);
     }
 
     /**
@@ -171,27 +163,30 @@ class OpportunityService
      */
     public function searchOpportunities(array $filters, User $user): Collection
     {
-        $query = Opportunity::query();
+        return $this->repository->searchWithFilters($filters, $user);
+    }
 
-        // Apply filters
-        if (isset($filters['type'])) {
-            $query->where('type', $filters['type']);
-        }
+    /**
+     * Get system-wide opportunity analytics
+     */
+    public function getSystemAnalytics(): array
+    {
+        return $this->analytics->getSystemStats();
+    }
 
-        if (isset($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
+    /**
+     * Get user performance metrics
+     */
+    public function getUserPerformanceMetrics(User $user): array
+    {
+        return $this->analytics->getUserPerformanceMetrics($user);
+    }
 
-        if (isset($filters['location'])) {
-            $query->where('implementation_location', 'like', '%' . $filters['location'] . '%');
-        }
-
-        // Exclude user's own opportunities for public search
-        if (isset($filters['public']) && $filters['public']) {
-            $query->where('user_id', '!=', $user->id)
-                ->where('status', OpportunityStatus::ACTIVE);
-        }
-
-        return $query->orderBy('created_at', 'desc')->get();
+    /**
+     * Get trending opportunities
+     */
+    public function getTrendingOpportunities(int $days = 30, int $limit = 10): array
+    {
+        return $this->analytics->getTrendingOpportunities($days, $limit);
     }
 }

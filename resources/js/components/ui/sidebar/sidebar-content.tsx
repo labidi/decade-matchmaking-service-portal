@@ -56,7 +56,7 @@ export function SidebarContent() {
                         <UserIcon/>
                         <SidebarLabel>Users</SidebarLabel>
                     </SidebarItem>
-                    <SidebarItem href={route('admin.portal.settings')}>
+                    <SidebarItem href={route('admin.settings.index')}>
                         <Cog6ToothIcon/>
                         <SidebarLabel>Settings</SidebarLabel>
                     </SidebarItem>

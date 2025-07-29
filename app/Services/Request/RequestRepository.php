@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Request;
 
 use App\Models\Request as OCDRequest;
 use App\Models\Request\Detail;

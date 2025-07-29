@@ -11,7 +11,7 @@ export function useRequestForm(request: OCDRequest) {
     const {showDialog, closeDialog} = useDialog();
 
     const form = useForm({
-        id: request.id || '',
+        id: '',
         is_partner: '',
         unique_id: '',
         first_name: '',

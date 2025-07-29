@@ -94,7 +94,8 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
-    Route::get('settings', [SettingsController::class, 'index'])->name('admin.portal.settings');
+    Route::get('settings', [SettingsController::class, 'index'])->name('admin.settings.index');
+    Route::post('settings', [SettingsController::class, 'update'])->name('admin.settings.update');
     Route::get('request/list', [AdminRequestsController::class, 'list'])->name('admin.request.list');
     Route::get('request/show/{request}', [AdminRequestsController::class, 'show'])->name('admin.request.show');
     Route::get('request/offers/{request}', [AdminRequestsController::class, 'show'])->name('admin.request.offers.list');

@@ -81,7 +81,7 @@ trait HasBreadcrumbs
      */
     protected function getSettingsSectionBreadcrumb(): array
     {
-        return ['name' => 'Settings', 'url' => route('admin.portal.settings')];
+        return ['name' => 'Settings', 'url' => route('admin.settings.index')];
     }
 
     /**

@@ -7,7 +7,11 @@ import CardLink from '@/Components/Home/CardLink';
 import SectionTitle from '@/Components/Home/SectionTitle';
 import CardGuide from '@/Components/Home/CardGuide';
 
-export default function Home({}: PageProps<{ laravelVersion: string; phpVersion: string }>) {
+type HomePageProps = {
+    userGuide?: string;
+    partnerGuide?: string;
+}
+export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>) {
 
     const {auth} = usePage<{ auth: Auth }>().props;
     const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-900 hover:bg-firefly-600 text-white"
@@ -21,30 +25,41 @@ export default function Home({}: PageProps<{ laravelVersion: string; phpVersion:
                     <div className="flex flex-wrap -m-4">
                         {auth.user.is_partner ? (
                             <>
-                                <div className="p-4 lg:w-1/2 md:w-full">
-                                    <CardGuide
-                                        title="Partner guide"
-                                        description="A step-by-step guide to help Partners use the Matchmaking Platform, review requests, and submit opportunities."
-                                        fileUrl="/assets/pdf/partner-guide.pdf"
-                                    />
-                                </div>
-                                <div className="p-4 lg:w-1/2 md:w-full">
-                                    <CardGuide
-                                        title="User guide"
-                                        description="A step-by-step guide to help Users navigate the Matchmaking Platform, submit requests, and engage with partner opportunities."
-                                        fileUrl="/assets/pdf/user-guide.pdf"
-                                    />
-                                </div>
+                                {partnerGuide && (
+                                    <div className="p-4 lg:w-1/2 md:w-full">
+
+                                        <CardGuide
+                                            title="Partner guide"
+                                            description="A step-by-step guide to help Partners use the Matchmaking Platform, review requests, and submit opportunities."
+                                            fileUrl={partnerGuide}
+                                        />
+                                    </div>
+                                )}
+                                {userGuide && (
+                                    <div className="p-4 lg:w-1/2 md:w-full">
+
+                                        <CardGuide
+                                            title="User guide"
+                                            description="A step-by-step guide to help Users navigate the Matchmaking Platform, submit requests, and engage with partner opportunities."
+                                            fileUrl={userGuide}
+                                        />
+                                    </div>
+                                )}
                             </>
 
 
                         ) : (
                             <div className="p-4 lg:w-full md:w-full">
-                                <CardGuide
-                                    title="User guide"
-                                    description="A step-by-step guide to help Users navigate the Matchmaking Platform, submit requests, and engage with partner opportunities."
-                                    fileUrl="/assets/pdf/user-guide.pdf"
-                                />
+                                {userGuide && (
+                                    <div className="p-4 lg:w-1/2 md:w-full">
+
+                                        <CardGuide
+                                            title="User guide"
+                                            description="A step-by-step guide to help Users navigate the Matchmaking Platform, submit requests, and engage with partner opportunities."
+                                            fileUrl={userGuide}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

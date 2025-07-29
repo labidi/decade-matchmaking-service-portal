@@ -75,7 +75,7 @@ class OfferService
                 'request_id' => $data['request_id'],
                 'matched_partner_id' => $data['partner_id'] ?? $user->id,
                 'description' => $data['description'],
-                'status' => RequestOfferStatus::ACTIVE,
+                'status' => RequestOfferStatus::INACTIVE,
             ]);
 
             // Handle document upload if provided

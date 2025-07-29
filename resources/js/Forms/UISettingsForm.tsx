@@ -30,7 +30,7 @@ export const UISettingsForm: UIStep[] = [
             },
             homepage_youtube_video: {
                 id: 'homepage_youtube_video',
-                type: 'text',
+                type: 'textarea',
                 required: false,
                 label: 'Homepage YouTube Video',
                 placeholder: 'Enter the YouTube video URL for the homepage',

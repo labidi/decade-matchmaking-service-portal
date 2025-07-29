@@ -334,7 +334,7 @@ class RequestsController extends Controller
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'request' => new OcdRequestResource($ocdRequest),
+            'request' => $ocdRequest,
             'offer' => $offer,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
