@@ -89,21 +89,14 @@ class RequestsController extends Controller
 
         try {
             $result = $this->service->updateRequestStatus(
-                $requestId, 
-                $validated['status_code'], 
+                $requestId,
+                $validated['status_code'],
                 auth()->user()
             );
+            return to_route('admin.request.list')->with('success', 'Request status updated successfully');
 
-            return response()->json([
-                'success' => true,
-                'message' => $result['message'],
-                'request' => $result['request']
-            ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return to_route('admin.request.list',400)->with('error', $e->getMessage());
         }
     }
 

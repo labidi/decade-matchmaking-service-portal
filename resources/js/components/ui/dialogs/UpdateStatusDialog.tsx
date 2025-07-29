@@ -13,14 +13,14 @@ interface UpdateStatusDialogProps {
     availableStatuses: RequestStatus[];
 }
 
-export function UpdateStatusDialog({ 
-    isOpen, 
-    onClose, 
-    request, 
-    availableStatuses 
-}: UpdateStatusDialogProps) {
+export function UpdateStatusDialog({
+    isOpen,
+    onClose,
+    request,
+    availableStatuses
+}: Readonly<UpdateStatusDialogProps>) {
     const [selectedStatus, setSelectedStatus] = useState<RequestStatus | null>(null);
-    
+
     const { data, setData, post, processing, errors, reset } = useForm({
         status_code: '',
     });
@@ -34,11 +34,11 @@ export function UpdateStatusDialog({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!request || !selectedStatus) {
             return;
         }
-        
+
         post(route('admin.request.update-status', request.id), {
             onSuccess: () => {
                 onClose();
@@ -78,8 +78,8 @@ export function UpdateStatusDialog({
 
                     <Field>
                         <Label>New Status</Label>
-                        <Listbox 
-                            value={selectedStatus} 
+                        <Listbox
+                            value={selectedStatus}
                             onChange={setSelectedStatus}
                             placeholder="Select a new status"
                         >
@@ -97,15 +97,15 @@ export function UpdateStatusDialog({
                     </Field>
 
                     <div className="flex justify-end gap-3">
-                        <Button 
-                            type="button" 
-                            outline 
+                        <Button
+                            type="button"
+                            outline
                             onClick={handleClose}
                             disabled={processing}
                         >
                             Cancel
                         </Button>
-                        <Button 
+                        <Button
                             type="submit"
                             disabled={processing || !selectedStatus}
                         >

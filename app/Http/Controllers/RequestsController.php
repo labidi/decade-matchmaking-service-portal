@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use App\Http\Resources\OcdRequestResource;
 
-class OcdRequestController extends Controller
+class RequestsController extends Controller
 {
     public function __construct(
         private RequestService $service,

@@ -113,7 +113,7 @@ class RequestService
     /**
      * Update request status
      */
-    public function updateRequestStatus(int $requestId, string $statusCode, User $user): array
+    public function updateRequestStatus(int $requestId, string $statusCode, User $user) : OCDRequest
     {
         $request = $this->repository->findById($requestId);
 
@@ -131,13 +131,7 @@ class RequestService
             throw new Exception('Invalid status code');
         }
 
-        $this->repository->update($request, ['status_id' => $statusId]);
-
-        return [
-            'success' => true,
-            'message' => 'Request status updated successfully',
-            'request' => $request
-        ];
+        return $this->repository->update($request, ['status_id' => $statusId]) ? $request : throw new Exception('Failed to update request status');
     }
 
     /**
