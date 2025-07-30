@@ -1,6 +1,6 @@
 import {Head, useForm, usePage, router} from '@inertiajs/react';
 import React, {useEffect, useState} from 'react';
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {UIOpportunityForm, UIField, Opportunity as OpportunityFields} from '@/Forms/UIOpportunityForm';
 import TagsInput from '@/Components/ui/TagsInput';
 import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';

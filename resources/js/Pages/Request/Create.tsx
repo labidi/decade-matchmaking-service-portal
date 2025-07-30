@@ -1,4 +1,4 @@
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import React, {useEffect, useState} from 'react';
 import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
 

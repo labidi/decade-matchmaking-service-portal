@@ -16,7 +16,7 @@ class Offer extends Model
     protected $table = 'request_offers';
     protected $primaryKey = 'id';
     public $timestamps = true;
-    protected $appends = ['status_label'];
+    protected $appends = ['status_label', 'can_edit', 'can_view', 'can_delete'];
 
 
     const STATUS_LABELS = [
@@ -56,5 +56,52 @@ class Offer extends Model
         return Attribute::make(
             get: fn() => Offer::STATUS_LABELS[$this->status->value] ?? '',
         );
+    }
+
+    /**
+     * Check if current user can edit this offer
+     */
+    public function getCanEditAttribute(): bool
+    {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return false;
+        }
+
+        // Only admins or the offer creator can edit
+        return $user->hasRole('administrator') || $user->id === $this->matched_partner_id;
+    }
+
+    /**
+     * Check if current user can view this offer
+     */
+    public function getCanViewAttribute(): bool
+    {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return false;
+        }
+
+        // Admin, offer creator, or request owner can view
+        return $user->hasRole('administrator')
+            || $user->id === $this->matched_partner_id
+            || $user->id === $this->request->user_id;
+    }
+
+    /**
+     * Check if current user can delete this offer
+     */
+    public function getCanDeleteAttribute(): bool
+    {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return false;
+        }
+
+        // Only admins can delete offers
+        return $user->hasRole('administrator');
     }
 }

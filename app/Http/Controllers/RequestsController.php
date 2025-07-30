@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use App\Http\Resources\OcdRequestResource;
 
-class OcdRequestController extends Controller
+class RequestsController extends Controller
 {
     public function __construct(
         private RequestService $service,
@@ -334,7 +334,7 @@ class OcdRequestController extends Controller
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'request' => new OcdRequestResource($ocdRequest),
+            'request' => $ocdRequest,
             'offer' => $offer,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
@@ -427,17 +427,6 @@ class OcdRequestController extends Controller
             $statusCode = $e->getCode() ?: 500;
             return response()->json(['error' => $e->getMessage()], $statusCode);
         }
-    }
-
-    /**
-     * Search requests with filters
-     */
-    public function search(Request $request)
-    {
-        $filters = $request->only(['status', 'activity_type', 'subtheme', 'user_requests']);
-        $requests = $this->service->searchRequests($filters, $request->user());
-
-        return response()->json(['requests' => $requests]);
     }
 
     /**

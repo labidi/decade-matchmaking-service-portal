@@ -33,6 +33,17 @@ class User extends Authenticatable
         'city',
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'id',
+        'password',
+        'remember_token',
+    ];
+
     protected $appends = ['is_partner', 'is_admin'];
 
 
@@ -46,16 +57,7 @@ class User extends Authenticatable
         return $this->hasRole('partner');
     }
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'id',
-        'password',
-        'remember_token',
-    ];
+
 
     /**
      * Get the attributes that should be cast.

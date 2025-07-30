@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
+use App\Models\Request\Status;
 use App\Services\RequestService;
 use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\Request;
@@ -12,11 +13,11 @@ use App\Services\ExportService;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Models\User;
 
-class OcdRequestController extends Controller
+class RequestsController extends Controller
 {
     use HasBreadcrumbs;
 
-    public function __construct(private RequestService $service)
+    public function __construct(private readonly RequestService $service)
     {
     }
 
@@ -47,6 +48,11 @@ class OcdRequestController extends Controller
         // Append query parameters to pagination links
         $requests->appends($httpRequest->only(['sort', 'order', 'user', 'title']));
 
+        // Get available statuses
+        $availableStatuses = Status::select('id', 'status_code', 'status_label')
+            ->orderBy('status_label')
+            ->get();
+
         return Inertia::render('Admin/Request/List', [
             'title' => 'Requests',
             'requests' => $requests,
@@ -58,6 +64,7 @@ class OcdRequestController extends Controller
                 'user' => $searchUser ?? '',
                 'title' => $searchTitle ?? '',
             ],
+            'availableStatuses' => $availableStatuses,
             'breadcrumbs' => $this->buildRequestBreadcrumbs('list', null, true),
         ]);
     }
@@ -72,6 +79,25 @@ class OcdRequestController extends Controller
             'request' => $request,
             'breadcrumbs' => $this->buildRequestBreadcrumbs('show', $requestId, true),
         ]);
+    }
+
+    public function updateStatus(Request $httpRequest, $requestId)
+    {
+        $validated = $httpRequest->validate([
+            'status_code' => 'required|string|exists:request_statuses,status_code',
+        ]);
+
+        try {
+            $result = $this->service->updateRequestStatus(
+                $requestId,
+                $validated['status_code'],
+                auth()->user()
+            );
+            return to_route('admin.request.list')->with('success', 'Request status updated successfully');
+
+        } catch (\Exception $e) {
+            return to_route('admin.request.list',400)->with('error', $e->getMessage());
+        }
     }
 
     public function exportCsv(ExportService $exportService): StreamedResponse

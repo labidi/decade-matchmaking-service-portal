@@ -52,7 +52,7 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
-export interface BannerData {
+export interface Banner {
     title: string;
     description: string;
     image: string;
@@ -71,7 +71,7 @@ export interface YoutubeEmbed {
     src: string;
 }
 
-export interface UserGuideFile {
+export interface PortalGuide {
     url: string;
 }
 
@@ -104,9 +104,15 @@ export interface RequestOffer {
     matched_partner_id: number;
     request_id: number;
     status: number;
+    status_label: string;
     created_at: string;
     updated_at: string;
+    can_edit: boolean;
+    can_view: boolean;
+    can_delete: boolean;
     documents?: Document[];
+    request?: OCDRequest;
+    matched_partner?: User;
 }
 
 export type RequestOfferList = RequestOffer[];
@@ -117,11 +123,22 @@ export interface OCDRequestStatus {
     created_at: string;
     updated_at: string;
 }
+
+export interface RequestStatus {
+    id: number;
+    status_code: string;
+    status_label: string;
+}
 export interface OCDRequest {
     id: number;
     type: string;
     submissionDate: string;
     status: OCDRequestStatus,
+    title: string;
+    can_edit: boolean;
+    can_view: boolean;
+    can_manage_offers: boolean;
+    can_update_status: boolean;
     detail: {
         id: string;
         is_related_decade_action: 'Yes' | 'No';
@@ -251,4 +268,17 @@ export interface PaginationLinkProps {
     active: boolean;
     label: string;
     url: string;
+}
+
+export interface FlashMessages {
+    success?: string;
+    error?: string;
+    warning?: string;
+    info?: string;
+}
+
+export interface PagePropsWithFlash<
+    T extends Record<string, unknown> = Record<string, unknown>,
+> extends PageProps<T> {
+    flash?: FlashMessages;
 }

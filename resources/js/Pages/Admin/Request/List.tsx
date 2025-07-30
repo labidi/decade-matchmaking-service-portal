@@ -1,14 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Head, router} from '@inertiajs/react';
 import {OCDRequest, OCDRequestList, PaginationLinkProps} from '@/types';
-
-import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
-import {Sidebar} from '@/components/ui/sidebar'
-import {SidebarContent} from '@/components/ui/sidebar/sidebar-content'
-
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 import {adminColumns} from "@/components/ui/data-table/requests/column-configs";
-import { HomeIcon } from '@heroicons/react/20/solid'
+import {Heading} from "@/components/ui/heading";
+import {UpdateStatusDialog} from "@/components/ui/dialogs/UpdateStatusDialog";
 
 
 interface RequestsPagination {
@@ -34,35 +31,63 @@ interface RequestsListPageProps {
         order: string;
     };
     currentSearch?: Record<string, string>;
+    availableStatuses: Array<{
+        id: number;
+        status_code: string;
+        status_label: string;
+    }>;
 }
 
-const actions = [
-    {
-        key: 'view-details',
-        label: 'View Details',
-        onClick: (request: OCDRequest) => router.visit(route('admin.request.show', {id: request.id}))
-    },
-    {
-        key: 'see-active-offer',
-        label: 'See Active Offer',
-        onClick: (request: OCDRequest) => router.visit(route('admin.request.show', {id: request.id})),
-        divider: true
-    }
-];
+export default function RequestListPage({requests, currentSort, currentSearch = {}, availableStatuses}: Readonly<RequestsListPageProps>) {
+    const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState<OCDRequest | null>(null);
 
+    const handleUpdateStatus = (request: OCDRequest) => {
+        setSelectedRequest(request);
+        setIsStatusDialogOpen(true);
+    };
 
-export default function RequestListPage({requests, currentSort, currentSearch = {}}: Readonly<RequestsListPageProps>) {
-    const pages = [
-        { name: 'Projects', href: '#', current: false },
-        { name: 'Project Nero', href: '#', current: true },
-    ]
+    const getActionsForRequest = (request: OCDRequest) => {
+        const actions = [];
+
+        // View Details - available if user can view
+        if (request.can_view) {
+            actions.push({
+                key: 'view-details',
+                label: 'View Details',
+                onClick: () => router.visit(route('admin.request.show', {id: request.id}))
+            });
+        }
+
+        // Update Status - available if user can update status
+        if (request.can_update_status) {
+            actions.push({
+                key: 'update-status',
+                label: 'Update Status',
+                onClick: () => handleUpdateStatus(request),
+                divider: actions.length > 0
+            });
+        }
+
+        // Add New Offer - available if user can manage offers
+        if (request.can_manage_offers) {
+            actions.push({
+                key: 'add-offer',
+                label: 'Add New Offer',
+                onClick: () => router.visit(route('admin.offers.create', {request_id: request.id})),
+                divider: actions.length > 0
+            });
+        }
+
+        return actions;
+    };
     return (
         <SidebarLayout>
             <Head title="Requests List"/>
             <div className="mx-auto">
-                <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+                <Heading level={1}>
                     Requests List
-                </h2>
+                </Heading>
                 <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
             </div>
             <div className="py-8">
@@ -72,7 +97,7 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     currentSearch={currentSearch}
                     columns={adminColumns}
                     routeName="admin.request.list"
-                    actions={actions}
+                    getActionsForRequest={getActionsForRequest}
                     pagination={{
                         current_page: requests.current_page,
                         last_page: requests.last_page,
@@ -99,6 +124,17 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     showActions={true}
                 />
             </div>
+
+            {/* Status Update Dialog */}
+            <UpdateStatusDialog
+                isOpen={isStatusDialogOpen}
+                onClose={() => {
+                    setIsStatusDialogOpen(false);
+                    setSelectedRequest(null);
+                }}
+                request={selectedRequest}
+                availableStatuses={availableStatuses}
+            />
         </SidebarLayout>
     );
 }

@@ -4,7 +4,7 @@ import {CheckBadgeIcon, ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/1
 import {Notification, NotificationList, PaginationLinkProps} from '@/types';
 import {NotificationDialogView} from "@/components/ui/data-table/notifications/notification-dialog-view";
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
-import {NotificationsActionColumn} from '@/components/ui/data-table/notifications/notifications-action-column';
+import {DataTableActionsColumn, DataTableAction} from '@/components/ui/data-table/common/DataTableActionsColumn';
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {router} from '@inertiajs/react';
 import {formatDate} from '@/utils/date-formatter';
@@ -79,6 +79,21 @@ export function NotificationsDataTable({
         });
     };
 
+    const getActionsForNotification = (notification: Notification): DataTableAction<Notification>[] => {
+        return [
+            {
+                key: 'mark-as-read',
+                label: 'Mark as Read',
+                onClick: (row) => markAsRead(row.id)
+            },
+            {
+                key: 'view-details',
+                label: 'View more Details',
+                onClick: (row) => onViewDetails(row.id)
+            }
+        ];
+    };
+
     return (
         <div>
             <Table>
@@ -144,10 +159,9 @@ export function NotificationsDataTable({
                                     {formatDate(notification.created_at)}
                                 </TableCell>
                                 <TableCell className="text-right column-actions">
-                                    <NotificationsActionColumn
+                                    <DataTableActionsColumn
                                         row={notification}
-                                        onMarkAsRead={markAsRead}
-                                        onViewDetails={onViewDetails}
+                                        actions={getActionsForNotification(notification)}
                                     />
                                 </TableCell>
                             </TableRow>

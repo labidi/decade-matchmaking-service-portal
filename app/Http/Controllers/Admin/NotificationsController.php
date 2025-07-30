@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NotificationController extends Controller
+class NotificationsController extends Controller
 {
     public function index(Request $request): Response
     {

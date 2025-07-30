@@ -1,17 +1,15 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Head, useForm, usePage} from '@inertiajs/react';
 import {UISettingsForm} from "@/Forms";
 import FieldRenderer from '@/Components/Forms/FieldRenderer';
 import {Settings} from "@/types";
-import { useDialog } from '@/Components/Dialogs';
-
-
-import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {Description, Field, FieldGroup, Fieldset, Label, Legend} from '@/components/ui/fieldset'
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
+import {Heading} from "@/components/ui/heading";
 
 export default function SettingsForm() {
     const page = usePage();
     const SettingsData = page.props.request as Settings || {};
-    const { showDialog } = useDialog();
 
     const {data, setData, post, processing, errors, setError, clearErrors} = useForm({
         site_name: SettingsData.site_name || '',
@@ -25,15 +23,15 @@ export default function SettingsForm() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         clearErrors();
-        showDialog('Saving Settings', 'loading');
-        post(route('partner.opportunity.store'), {
+        
+        post(route('admin.settings.update'), {
             onSuccess: () => {
-                showDialog('Settings saved successfully!', 'success');
+                // Handle success - maybe show a success message
             },
-            onError: (err) => {
-                setError(err as any);
-                showDialog('Failed to save settings.', 'error');
-            },
+            onError: (errors) => {
+                // Errors are automatically handled by Inertia
+                console.error('Settings update failed:', errors);
+            }
         });
     };
 
@@ -44,35 +42,39 @@ export default function SettingsForm() {
     return (
         <SidebarLayout>
             <Head title="Admin Requests List"/>
-            <div className="bg-white rounded-lg shadow">
-                <div className="mx-auto p-6 ">
-                    <form onSubmit={handleSubmit}>
-                        {UISettingsForm.map((step, idx) => (
-                            <div key={step.label}>
-                                <h2 className="text-lg font-bold mt-8 mb-2">{step.label}</h2>
-                                {Object.entries(step.fields).map(([key, field]) =>
-                                    <FieldRenderer
-                                        key={key}
-                                        name={key}
-                                        field={field}
-                                        value={(data as any)[key as FormDataKeys]}
-                                        error={errors[key as FormDataKeys]}
-                                        onChange={handleFieldChange}
-                                        formData={data}
-                                    />)}
-                            </div>
-                        ))}
-                        <div className="flex justify-end mt-6">
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
-                            >
-                                {processing ? 'Saving...' : 'Save Settings'}
-                            </button>
+            <div className="mx-auto">
+                <Heading level={1}>
+                    Portal Settings
+                </Heading>
+                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
+            </div>
+            <div className=" ">
+                <form onSubmit={handleSubmit}>
+                    {UISettingsForm.map((step, idx) => (
+                        <div key={step.label}>
+                            <h2 className="text-lg font-bold mt-8 mb-2">{step.label}</h2>
+                            {Object.entries(step.fields).map(([key, field]) =>
+                                <FieldRenderer
+                                    key={key}
+                                    name={key}
+                                    field={field}
+                                    value={(data as any)[key as FormDataKeys]}
+                                    error={errors[key as FormDataKeys]}
+                                    onChange={handleFieldChange}
+                                    formData={data}
+                                />)}
                         </div>
-                    </form>
-                </div>
+                    ))}
+                    <div className="flex justify-end mt-6">
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
+                        >
+                            {processing ? 'Saving...' : 'Save Settings'}
+                        </button>
+                    </div>
+                </form>
             </div>
         </SidebarLayout>
     )

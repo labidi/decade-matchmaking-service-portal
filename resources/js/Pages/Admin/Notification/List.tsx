@@ -1,10 +1,11 @@
 import {Head} from '@inertiajs/react';
 
-import {SidebarLayout} from '@/components/ui/sidebar/sidebar-layout'
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 
 import {NotificationList, PaginationLinkProps} from '@/types';
 import {NotificationsDataTable} from '@/components/ui/data-table/notifications/notifications-data-table';
 import React from "react";
+import {Heading} from "@/components/ui/heading";
 
 interface NotificationPagination {
     current_page: number;
@@ -36,9 +37,9 @@ export default function NotificationListPage({notifications, currentSort}: Reado
         <SidebarLayout>
             <Head title="Notifications"/>
             <div className="mx-auto">
-                <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+                <Heading level={1}>
                     Notifications List
-                </h2>
+                </Heading>
                 <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
             </div>
             <div className="py-8">

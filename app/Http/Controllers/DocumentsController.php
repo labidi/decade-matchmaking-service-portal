@@ -10,7 +10,7 @@ use App\Enums\DocumentType;
 use App\Services\DocumentService;
 use Exception;
 
-class DocumentController extends Controller
+class DocumentsController extends Controller
 {
     public function __construct(private DocumentService $documentService)
     {

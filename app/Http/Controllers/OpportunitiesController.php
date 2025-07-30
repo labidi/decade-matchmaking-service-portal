@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Exception;
 
-class OcdOpportunityController extends Controller
+class OpportunitiesController extends Controller
 {
     protected OpportunityService $opportunityService;
 

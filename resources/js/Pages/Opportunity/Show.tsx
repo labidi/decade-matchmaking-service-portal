@@ -1,7 +1,7 @@
 // resources/js/Pages/Opportunities/Show.tsx
 import React from 'react';
 import { Head, usePage, Link } from '@inertiajs/react';
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import { OCDOpportunity } from '@/types';
 
 export default function Show() {

@@ -1,11 +1,13 @@
 import {usePage} from '@inertiajs/react';
-import {BannerData, YoutubeEmbed, OCDMetrics} from '@/types';
+import {Banner, YoutubeEmbed, OCDMetrics} from '@/types';
 import YouTube from 'react-youtube';
 
-export default function Banner() {
-    const BannerData = usePage().props.banner as BannerData;
+export default function BannerSection() {
+
+    const bannerConfiguration = usePage().props.banner as Banner;
     const YoutubeEmbed = usePage().props.YoutubeEmbed as YoutubeEmbed;
     const metrics = usePage().props.metrics as OCDMetrics;
+
     const opts = {
         height: '100%',
         width: '100%',
@@ -14,20 +16,20 @@ export default function Banner() {
         },
     };
     return (
-        <section style={{backgroundImage: `url(${BannerData.image})`}}
+        <section style={{backgroundImage: `url(${bannerConfiguration.image})`}}
                  className="bg-cover bg-center bg-casal-700 py-20 px-4 text-center text-white">
-            {BannerData && (
+            {bannerConfiguration && (
                 <>
                     <div className="max-w-5xl mx-auto">
                         <h2 className="text-5xl font-bold mb-6">Capacity Development Matchmaking Platform</h2>
                         <p className="text-xl mb-8">
-                            {BannerData.description}
+                            {bannerConfiguration.description}
                         </p>
                     </div>
                     {YoutubeEmbed?.src && (
                         <div className="max-w-5xl mx-auto">
-                            <div className="aspect-w-16 aspect-h-9">
-                                <YouTube videoId="nfpELa_Jqb0" opts={opts}/>
+                            <div className="aspect-video">
+                                <YouTube videoId={YoutubeEmbed.src} opts={opts} className="inset-0 w-full h-full"/>
                             </div>
                         </div>
                     )}

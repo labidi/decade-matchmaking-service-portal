@@ -14,7 +14,6 @@ export { default as AdminMenu } from './Layout/AdminMenu';
 // Dialog Components
 export { default as XHRAlertDialog } from './Dialogs/XHRAlertDialog';
 export { default as Modal } from './Dialogs/Modal';
-export { default as DataTableDialog } from './Dialogs/DataTableDialog';
 export { default as SignInDialog } from './Dialogs/SignInDialog';
 export { default as OffersDialog } from './Dialogs/OffersDialog';
 
@@ -25,6 +24,3 @@ export { default as FieldRenderer } from './Forms/FieldRenderer';
 // Common Components
 export { default as ApplicationLogo } from './Common/ApplicationLogo';
 export { default as FlanderLogo } from './Common/FlanderLogo';
-export { default as Banner } from './Common/Banner';
-export { default as Breadcrumb } from './Common/Breadcrumb';
-export { default as UserGuide } from './Common/UserGuide'; 

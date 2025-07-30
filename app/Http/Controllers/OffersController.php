@@ -13,7 +13,7 @@ use App\Http\Requests\UpdateRequestOfferStatus;
 use Illuminate\Http\JsonResponse;
 use App\Models\User;
 
-class RequestOfferController extends Controller
+class OffersController extends Controller
 {
     /**
      * Store a newly created offer in storage.

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Head, router} from '@inertiajs/react';
-import FrontendLayout from '@/Layouts/FrontendLayout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {OCDRequestList, PaginationLinkProps, OCDRequest} from '@/types';
 import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 import {userColumns} from "@/components/ui/data-table/requests/column-configs";
@@ -49,19 +49,40 @@ export default function RequestsList({
         router.visit(route('request.show', {id: request.id}));
     };
 
-    const actions = [
-        {
-            key: 'view-details',
-            label: 'View Details',
-            onClick: (request: OCDRequest) => router.visit(route('request.show', {id: request.id}))
-        },
-        {
-            key: 'see-active-offer',
-            label: 'See Active Offer',
-            onClick: handleSeeActiveOffer,
-            divider: true
+    // Dynamic actions based on request permissions
+    const getActionsForRequest = (request: OCDRequest) => {
+        const actions = [];
+
+        // View Details - available if user can view
+        if (request.can_view) {
+            actions.push({
+                key: 'view-details',
+                label: 'View Details',
+                onClick: () => router.visit(route('request.show', {id: request.id}))
+            });
         }
-    ];
+
+        // Edit - available if user can edit
+        if (request.can_edit) {
+            actions.push({
+                key: 'edit',
+                label: 'Edit',
+                onClick: () => router.visit(route('request.edit', {id: request.id}))
+            });
+        }
+
+        // See Active Offer - available if request has active offer and user can view
+        if (request.active_offer && request.can_view) {
+            actions.push({
+                key: 'see-active-offer',
+                label: 'See Active Offer',
+                onClick: () => handleSeeActiveOffer(request),
+                divider: actions.length > 0
+            });
+        }
+
+        return actions;
+    };
 
     return (
         <FrontendLayout>
@@ -73,7 +94,7 @@ export default function RequestsList({
                     currentSearch={currentSearch}
                     columns={userColumns}
                     routeName={routeName}
-                    actions={actions}
+                    getActionsForRequest={getActionsForRequest}
                     pagination={{
                         current_page: requests.current_page,
                         last_page: requests.last_page,
