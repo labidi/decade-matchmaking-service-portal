@@ -52,7 +52,7 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
-export interface BannerData {
+export interface Banner {
     title: string;
     description: string;
     image: string;
@@ -71,7 +71,7 @@ export interface YoutubeEmbed {
     src: string;
 }
 
-export interface UserGuideFile {
+export interface PortalGuide {
     url: string;
 }
 

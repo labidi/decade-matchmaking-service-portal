@@ -1,14 +1,12 @@
 import {useForm} from '@inertiajs/react';
 import {useEffect, useState} from 'react';
 import {UIRequestForm} from '@/Forms/UIRequestForm';
-import {useDialog} from '@/Components/Dialogs';
 import {OCDRequest} from '@/types';
 
 type Mode = 'submit' | 'draft';
 
 
 export function useRequestForm(request: OCDRequest) {
-    const {showDialog, closeDialog} = useDialog();
 
     const form = useForm({
         id: '',
@@ -68,7 +66,6 @@ export function useRequestForm(request: OCDRequest) {
         form.post(route('request.submit'), {
             preserveScroll: true,
             onBefore: () => {
-                showDialog('proccessing', 'loading');
             },
             onSuccess: (page) => {
                 if (mode === 'draft') {
@@ -88,7 +85,6 @@ export function useRequestForm(request: OCDRequest) {
                 setErrorSteps(stepsWithError);
             },
             onFinish: () => {
-                closeDialog()
             }
         });
     };

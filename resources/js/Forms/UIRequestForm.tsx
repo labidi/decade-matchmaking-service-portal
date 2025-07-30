@@ -184,14 +184,14 @@ export const UIRequestForm: UIStep[] = [
                   label: 'Who is the target audience (multiple choice allowed)?',
                   // Options should be provided from TargetAudienceOptions::getOptions()
               },
-            /*  target_audience_other: {
+              target_audience_other: {
                   id: 'target_audience_other',
                   type: 'text',
                   required: false,
                   show: data => data.target_audience === 'Other (Please Specify)',
                   placeholder: 'Please specify the target audience',
               },
-              subthemes: {
+             /* subthemes: {
                   id: 'subthemes',
                   type: 'checkbox-group',
                   required: true,
@@ -205,7 +205,7 @@ export const UIRequestForm: UIStep[] = [
                 type: 'textarea',
                 required: true,
                 show: data => data.subthemes.includes('Other'),
-            },
+            },*/
             support_types: {
                 id: 'support_types',
                 type: 'checkbox-group',
@@ -213,7 +213,7 @@ export const UIRequestForm: UIStep[] = [
                 label: 'What type of support related to workshops or training are you seeking?',
                 description: "If you require support outside listed options, specify under 'Other options'.",
                 // Options should be provided from SupportTypeOptions::getOptions()
-            },*/
+            },
             support_types_other: {
                 id: 'support_types_other',
                 type: 'textarea',

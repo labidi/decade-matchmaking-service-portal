@@ -19,26 +19,7 @@ use App\Http\Controllers\Admin\OpportunitiesController as AdminOpportunityContro
 use App\Http\Controllers\Admin\OffersController as AdminOffersController;
 use App\Http\Controllers\LocationDataController;
 
-Route::get('/', function () {
-    return Inertia::render('Index', [
-        'title' => 'Welcome',
-        'description' => "",
-        'banner' => [
-            'title' => 'Connect for a Sustainable Ocean',
-            'description' => "Whether you're seeking training or offering expertise, this platform makes the connection. It’s where organizations find support—and partners find purpose. By matching demand with opportunity, it brings the right people and resources together. A transparent marketplace driving collaboration, innovation, and impact.",
-            'image' => '/assets/img/sidebar.png'
-        ],
-        'YoutubeEmbed' => [
-            'src' => 'https://www.youtube.com/embed/nfpELa_Jqb0?si=S_imyR0XV4F6YcpU',
-            'title' => 'Connect for a Sustainable Ocean'
-        ],
-        'userguide' => [
-            'description' => 'A user guide to help you navigate the platform.',
-            'url' => '/assets/pdf/user-guide.pdf',
-        ],
-        'metrics' => config('metrics')
-    ]);
-})->name('index');
+Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 
 
 Route::middleware(['auth', 'role:user'])->group(function () {

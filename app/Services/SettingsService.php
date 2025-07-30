@@ -75,7 +75,7 @@ class SettingsService
     public function getSetting(string $path, $default = null)
     {
         $setting = Setting::where('path', $path)->first();
-        
+
         if (!$setting) {
             return $default;
         }
@@ -94,7 +94,7 @@ class SettingsService
     public function validateSettingsData(array $data): array
     {
         $validatedData = [];
-        
+
         foreach ($data as $path => $value) {
             if (in_array($path, Setting::VALID_PATHS)) {
                 $validatedData[$path] = $value;
@@ -115,9 +115,9 @@ class SettingsService
         // Store the new file
         $storageDirectory = Setting::getStorageDirectory($path);
         $fileName = time() . '_' . $file->getClientOriginalName();
-        
+
         $filePath = $file->storeAs($storageDirectory, $fileName, 'public');
-        
+
         Log::info('File uploaded for setting', [
             'path' => $path,
             'file_path' => $filePath,
@@ -133,10 +133,10 @@ class SettingsService
     private function deleteOldFile(string $path): void
     {
         $existingSetting = Setting::where('path', $path)->first();
-        
+
         if ($existingSetting && $existingSetting->value) {
             $oldFilePath = $existingSetting->value;
-            
+
             if (Storage::disk('public')->exists($oldFilePath)) {
                 Storage::disk('public')->delete($oldFilePath);
                 Log::info('Old file deleted', ['path' => $path, 'file_path' => $oldFilePath]);
@@ -150,7 +150,7 @@ class SettingsService
     public function getFileValidationRules(): array
     {
         $rules = [];
-        
+
         foreach (Setting::FILE_UPLOAD_SETTINGS as $path) {
             $rules[$path] = Setting::getFileValidationRules($path);
         }
@@ -158,7 +158,7 @@ class SettingsService
         // Add non-file validation rules
         $rules[Setting::SITE_NAME] = ['nullable', 'string', 'max:255'];
         $rules[Setting::SITE_DESCRIPTION] = ['nullable', 'string', 'max:1000'];
-        $rules[Setting::HOMEPAGE_YOUTUBE_VIDEO] = ['nullable', 'url', 'max:500'];
+        $rules[Setting::HOMEPAGE_YOUTUBE_VIDEO] = ['nullable', 'string', 'max:500'];
 
         return $rules;
     }
