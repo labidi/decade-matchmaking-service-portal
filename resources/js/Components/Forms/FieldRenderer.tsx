@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {XMarkIcon} from '@heroicons/react/16/solid';
 import {UIField} from '@/types';
 import {Request as RequestFields} from '@/Forms/UIRequestForm';
 import {Field, Label, Description, ErrorMessage, Fieldset, Legend} from '@/components/ui/fieldset';
@@ -7,9 +6,9 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {RadioGroup, RadioField, Radio} from '@/components/ui/radio';
 import {CheckboxGroup, CheckboxField, Checkbox} from '@/components/ui/checkbox';
-import {BadgeButton} from '@/components/ui/badge';
 import {ChevronsUpDown} from 'lucide-react';
 import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react';
+import { Text } from '@/components/ui/text'
 
 interface FieldRendererProps {
     name: string;
@@ -364,7 +363,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                             <img src={field.image} alt="Logo" className="object-cover"/>
                         </div>
                     )}
-                    {field.description && <Description>{field.description}</Description>}
+                    {field.description && <Text>{field.description}</Text>}
                     <CheckboxGroup className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
                         {field.options?.map(opt => (
                             <CheckboxField key={opt.value}>
@@ -373,6 +372,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                                     onChange={() => handleCheckboxChange(opt.value)}
                                 />
                                 <Label>{opt.label}</Label>
+
                             </CheckboxField>
                         ))}
                     </CheckboxGroup>

@@ -94,20 +94,11 @@ export const userColumns = [
         label: 'Request Title',
         render: (request: OCDRequest) => (
             <div>
-                <div className="font-medium">{request.detail.capacity_development_title || 'No Title'}</div>
+                <div className="font-medium">{request.detail?.capacity_development_title || 'No Title'}</div>
                 <div className="text-sm text-gray-500 truncate max-w-md">
-                    {request.detail.gap_description}
+                    {request.detail?.gap_description}
                 </div>
             </div>
-        )
-    },
-    {
-        key: 'project_stage',
-        label: 'Project Stage',
-        render: (request: OCDRequest) => (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full font-medium bg-blue-100 text-blue-800">
-                {request.detail.project_stage || 'Not specified'}
-            </span>
         )
     },
     {
@@ -143,8 +134,8 @@ export const userColumns = [
         label: 'Target Completion',
         render: (request: OCDRequest) => (
             <span className="text-gray-600">
-                {request.detail.completion_date ?
-                    formatDate(request.detail.completion_date, 'en-US', {
+                {request.detail?.completion_date ?
+                    formatDate(request.detail?.completion_date, 'en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric'
