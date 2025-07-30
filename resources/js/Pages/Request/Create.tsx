@@ -1,11 +1,8 @@
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import React, {useEffect, useState} from 'react';
-import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
-
-import {Head, router, useForm, usePage} from '@inertiajs/react';
+import React from 'react';
+import {Head, usePage} from '@inertiajs/react';
 import {OCDRequest} from '@/types';
 import {UIRequestForm} from '@/Forms/UIRequestForm';
-import {submitRequest} from '@/Services/Api/request';
 import FieldRenderer from '@/Components/Forms/FieldRenderer';
 import {useRequestForm} from "@/hooks/useRequestForm";
 
@@ -26,51 +23,7 @@ type RequestFormProps = {
 type Mode = 'submit' | 'draft';
 type Id = '';
 export default function RequestForm({OCDRequest, formOptions}: Readonly<RequestFormProps>) {
-
     const ocdRequestFormData = usePage().props.request as OCDRequest;
-    /*
-        const form = useForm({
-            id: '',
-            is_partner: '',
-            unique_id: '',
-            first_name: '',
-            last_name: '',
-            email: '',
-            capacity_development_title: '',
-            has_significant_changes: '',
-            changes_description: '',
-            change_effect: '',
-            request_link_type: '',
-            project_stage: '',
-            project_url: '',
-            related_activity: '',
-            subthemes: [] as string[],
-            subthemes_other: '',
-            support_types: [] as string[],
-            support_types_other: '',
-            gap_description: '',
-            has_partner: '',
-            partner_name: '',
-            partner_confirmed: '',
-            needs_financial_support: '',
-            budget_breakdown: '',
-            support_months: '',
-            completion_date: '',
-            risks: '',
-            personnel_expertise: '',
-            direct_beneficiaries: '',
-            direct_beneficiaries_number: '',
-            expected_outcomes: '',
-            success_metrics: '',
-            long_term_impact: '',
-            mode: 'submit' as Mode,
-            target_audience: '',
-            target_audience_other: '',
-            delivery_format: '',
-            delivery_country: '',
-        });
-    */
-
     const {
         form,
         step,

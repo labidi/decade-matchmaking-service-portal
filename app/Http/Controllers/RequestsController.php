@@ -241,7 +241,9 @@ class RequestsController extends Controller
             throw new Exception('Request not found');
         }
         $ocdRequest = $this->service->saveDraft($request->user(), $request->all(), $ocdRequest);
-        return to_route('request.edit', ['id' => $ocdRequest->id]);
+        return to_route('request.edit', ['id' => $ocdRequest->id])->with([
+            'success' => 'Request draft saved successfully.',
+        ]);
     }
 
     /**
