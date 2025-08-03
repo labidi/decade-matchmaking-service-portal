@@ -299,9 +299,9 @@ export default function FieldRenderer({
                     <Combobox immediate value={value} onChange={handleComboboxChange}>
                         <div className="relative">
                             <div
-                                className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
+                                className="mt-3 relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
                                 <ComboboxInput
-                                    className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                                    className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 "
                                     displayValue={(value: string) => {
                                         const option = field.options?.find(opt => opt.value === value);
                                         return option ? option.label : value;
@@ -390,7 +390,7 @@ export default function FieldRenderer({
                     >
                         <div className="relative">
                             <div
-                                className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
+                                className="mt-3 relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
                                 <ComboboxInput
                                     className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
                                     displayValue={() => comboboxQuery}
