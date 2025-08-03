@@ -17,7 +17,6 @@ interface BreadcrumbProps {
 
 export function Breadcrumb({ className, items }: BreadcrumbProps) {
   const defaultItems = (usePage().props.breadcrumbs as BreadcrumbItem[]) || []
-    console.log('Breadcrumb items:', defaultItems)
   const breadcrumbItems = items || defaultItems
 
   if (breadcrumbItems.length === 0) return null

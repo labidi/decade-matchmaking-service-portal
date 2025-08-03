@@ -1,6 +1,6 @@
 import React from 'react';
 import {ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/16/solid';
-import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus} from "@/types";
+import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus, UIField} from "@/types";
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {Badge} from '@/components/ui/badge'
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
@@ -23,12 +23,6 @@ interface PaginationData {
 
 type SortField = 'id' | 'created_at' | 'status_id' | 'user_id';
 
-interface DataTableSearchFields {
-    key: string;
-    label: string;
-    placeholder: string;
-}
-
 interface TableColumn {
     key: string;
     label: string;
@@ -47,7 +41,7 @@ interface RequestsDataTableProps {
     };
     currentSearch?: Record<string, string>;
     pagination?: PaginationData;
-    searchFields?: DataTableSearchFields[];
+    searchFields?: UIField[];
     columns?: TableColumn[];
     routeName?: string;
     getActionsForRequest: (request: OCDRequest) => DataTableAction<OCDRequest>[];

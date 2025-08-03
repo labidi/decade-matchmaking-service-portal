@@ -53,7 +53,7 @@ export const adminColumns = [
         label: 'Title',
         render: (request: OCDRequest) => (
             <div className="max-w-xs">
-                <span className="truncate">{request.detail.capacity_development_title || 'No Title'}</span>
+                <span className="truncate">{request.detail?.capacity_development_title || 'No Title'}</span>
             </div>
         )
     },
@@ -155,10 +155,10 @@ export const publicColumns = [
         render: (request: OCDRequest) => (
             <div>
                 <div className="font-medium text-blue-600 hover:text-blue-800">
-                    {request.detail.capacity_development_title || 'No Title'}
+                    {request.detail?.capacity_development_title || 'No Title'}
                 </div>
                 <div className="text-sm text-gray-600 mt-1">
-                    {request.detail.subthemes && request.detail.subthemes.length > 0 && (
+                    {request.detail.subthemes && request.detail?.subthemes.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                             {request.detail.subthemes.slice(0, 2).map((theme, index) => (
                                 <span key={index} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -166,7 +166,7 @@ export const publicColumns = [
                                 </span>
                             ))}
                             {request.detail.subthemes.length > 2 && (
-                                <span className="text-xs text-gray-500">+{request.detail.subthemes.length - 2} more</span>
+                                <span className="text-xs text-gray-500">+{request.detail?.subthemes.length - 2} more</span>
                             )}
                         </div>
                     )}

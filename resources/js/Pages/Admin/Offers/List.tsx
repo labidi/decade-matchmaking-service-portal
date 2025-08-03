@@ -31,15 +31,18 @@ interface OffersListPageProps {
     };
     routeName: string;
     currentSearch?: Record<string, string>;
+    searchFieldsOptions?: {
+        requests?: { value: string; label: string }[];
+    }
 }
 
 export default function OffersList({
                                        offers,
                                        currentSort,
                                        routeName,
-                                       currentSearch = {}
+                                       currentSearch = {},
+                                       searchFieldsOptions = {}
                                    }: Readonly<OffersListPageProps>) {
-
     // Dynamic actions based on offer permissions
     const getActionsForOffer = (offer: RequestOffer) => {
         const actions = [];
@@ -118,7 +121,7 @@ export default function OffersList({
                         </p>
                     </div>
                     <Button href={route('admin.offers.create')}>
-                        <PlusIcon data-slot="icon" />
+                        <PlusIcon data-slot="icon"/>
                         Create New Offer
                     </Button>
                 </div>
@@ -143,19 +146,23 @@ export default function OffersList({
                         }}
                         searchFields={[
                             {
-                                key: 'description',
+                                id: 'description',
+                                type: 'text',
                                 label: 'Description',
                                 placeholder: 'Search by offer description...'
                             },
                             {
-                                key: 'partner',
+                                id: 'partner',
+                                type: 'text',
                                 label: 'Partner',
                                 placeholder: 'Search by partner name...'
                             },
                             {
-                                key: 'request',
+                                id: 'request',
                                 label: 'Request',
-                                placeholder: 'Search by request title...'
+                                placeholder: 'Search by request title...',
+                                type: 'select',
+                                options: searchFieldsOptions.requests || []
                             }
                         ]}
                     />

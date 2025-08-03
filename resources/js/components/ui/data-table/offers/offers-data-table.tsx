@@ -1,6 +1,6 @@
 import React from 'react';
 import {ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/16/solid';
-import {RequestOffer, RequestOfferList, PaginationLinkProps} from "@/types";
+import {RequestOffer, RequestOfferList, PaginationLinkProps, UIField} from "@/types";
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {Badge} from '@/components/ui/badge'
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
@@ -27,6 +27,8 @@ interface DataTableSearchFields {
     key: string;
     label: string;
     placeholder: string;
+    type?: 'text' | 'select' | 'date' | 'number';
+    options?: { value: string; label: string }[]; // For select fields
 }
 
 interface TableColumn {
@@ -47,7 +49,7 @@ interface OffersDataTableProps {
     };
     currentSearch?: Record<string, string>;
     pagination?: PaginationData;
-    searchFields?: DataTableSearchFields[];
+    searchFields?: UIField[];
     columns?: TableColumn[];
     routeName?: string;
     getActionsForOffer: (offer: RequestOffer) => DataTableAction<RequestOffer>[];
@@ -58,7 +60,7 @@ interface OffersDataTableProps {
 // Utility Functions
 const statusBadgeRenderer = (statusLabel: string) => {
     let color: "teal" | "cyan" | "amber" | "green" | "blue" | "red" | "orange" | "yellow" | "lime" | "emerald" | "sky" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
-    
+
     switch (statusLabel.toLowerCase()) {
         case 'active':
             color = 'green';

@@ -77,6 +77,12 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                 onClick: () => router.visit(route('admin.offers.create', {request_id: request.id})),
                 divider: actions.length > 0
             });
+            actions.push({
+                key: 'see-offers',
+                label: 'See request offers',
+                onClick: () => router.visit(route('admin.offers.list', {request: request.id})),
+                divider: actions.length > 0
+            });
         }
 
         return actions;
@@ -110,12 +116,14 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     }}
                     searchFields={[
                         {
-                            key: 'user',
+                            id: 'user',
+                            type: 'text',
                             label: 'Submitted By',
                             placeholder: 'Search by user name...'
                         },
                         {
-                            key: 'title',
+                            id: 'title',
+                            type: 'text',
                             label: 'Title',
                             placeholder: 'Search by request title...'
                         }

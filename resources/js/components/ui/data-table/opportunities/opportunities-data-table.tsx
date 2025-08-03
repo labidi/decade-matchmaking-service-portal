@@ -78,12 +78,14 @@ export function OpportunitiesDataTable({opportunities, currentSort, currentSearc
 
     const searchFields = [
         {
-            key: 'user',
+            id: 'user',
+            type: 'text',
             label: 'Submitted By',
             placeholder: 'Search by user name...'
         },
         {
-            key: 'title',
+            id: 'title',
+            type: 'text',
             label: 'Title',
             placeholder: 'Search by Opportunity title...'
         }

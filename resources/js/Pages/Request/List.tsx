@@ -107,7 +107,8 @@ export default function RequestsList({
                     }}
                     searchFields={[
                         {
-                            key: 'title',
+                            id: 'title',
+                            type: 'text',
                             label: 'Title',
                             placeholder: 'Search by request title...'
                         }

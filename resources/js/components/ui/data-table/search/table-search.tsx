@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/16/solid';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
+import FieldRenderer from '@/Components/Forms/FieldRenderer';
+import { UIField } from '@/types';
 
 interface SearchField {
     key: string;
@@ -11,7 +12,7 @@ interface SearchField {
 }
 
 interface TableSearchProps {
-    searchFields: SearchField[];
+    searchFields: UIField[];
     routeName: string;
     currentSearch?: Record<string, string>;
     preserveSort?: boolean;
@@ -35,19 +36,20 @@ export function TableSearch({
         setSearchValues(currentSearch);
     }, [currentSearch]);
 
-    const handleSearchChange = (field: string, value: string) => {
+    const handleSearchChange = (field: string, value: any) => {
         setSearchValues(prev => ({
             ...prev,
             [field]: value
         }));
     };
 
+
     const handleSearch = () => {
         setIsSearching(true);
 
         // Filter out empty search values
         const searchParams = Object.fromEntries(
-            Object.entries(searchValues).filter(([_, value]) => value.trim() !== '')
+            Object.entries(searchValues).filter(([_, value]) => value.toString().trim() !== '')
         );
 
         // Preserve current sort parameters if needed
@@ -93,12 +95,6 @@ export function TableSearch({
         });
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            handleSearch();
-        }
-    };
-
     const hasActiveSearch = Object.values(currentSearch).some(value => value && value.trim() !== '');
 
     return (
@@ -111,21 +107,13 @@ export function TableSearch({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {searchFields.map((field) => (
-                        <div key={field.key}>
-                            <label
-                                htmlFor={field.key}
-                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                            >
-                                {field.label}
-                            </label>
-                            <Input
-                                id={field.key}
-                                type="text"
-                                placeholder={field.placeholder}
-                                value={searchValues[field.key] || ''}
-                                onChange={(e) => handleSearchChange(field.key, e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                className="w-full"
+                        <div key={field.id}>
+                            <FieldRenderer
+                                name={field.id}
+                                field={field}
+                                value={searchValues[field.id] || ''}
+                                onChange={handleSearchChange}
+                                formData={searchValues}
                             />
                         </div>
                     ))}

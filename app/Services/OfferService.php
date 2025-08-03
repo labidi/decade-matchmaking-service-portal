@@ -35,9 +35,7 @@ class OfferService
 
         if (!empty($searchFilters['request'])) {
             $query->whereHas('request', function ($q) use ($searchFilters) {
-                $q->whereHas('detail', function ($subQ) use ($searchFilters) {
-                    $subQ->where('capacity_development_title', 'like', '%' . $searchFilters['request'] . '%');
-                });
+                $q->where('id', '=', $searchFilters['request']);
             });
         }
 
@@ -86,7 +84,6 @@ class OfferService
 
             DB::commit();
             return $offer->load(['request', 'matchedPartner', 'documents']);
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to create offer: ' . $e->getMessage());
@@ -128,7 +125,6 @@ class OfferService
 
             DB::commit();
             return $offer->load(['request', 'matchedPartner', 'documents']);
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to update offer: ' . $e->getMessage());
@@ -162,7 +158,6 @@ class OfferService
 
             DB::commit();
             return true;
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to delete offer: ' . $e->getMessage());
@@ -175,7 +170,9 @@ class OfferService
      */
     public function getOfferById(int $offerId, User $user): Offer
     {
-        $offer = Offer::with(['request', 'request.status', 'request.user', 'matchedPartner', 'documents','request.detail'])
+        $offer = Offer::with(
+            ['request', 'request.status', 'request.user', 'matchedPartner', 'documents', 'request.detail']
+        )
             ->findOrFail($offerId);
 
         if (!$offer->can_view) {
@@ -238,7 +235,6 @@ class OfferService
 
             DB::commit();
             return $offer->load(['request', 'matchedPartner']);
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to change offer status: ' . $e->getMessage());
