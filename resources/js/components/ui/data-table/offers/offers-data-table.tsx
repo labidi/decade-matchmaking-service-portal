@@ -7,7 +7,7 @@ import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
 import {formatDate} from '@/utils/date-formatter';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
-import {DataTableActionsColumn, DataTableAction} from '@/components/ui/data-table/common/DataTableActionsColumn';
+import {DataTableActionsColumn, DataTableAction} from '@/components/ui/data-table/common/data-table-actions-column';
 
 // Types and Interfaces
 interface PaginationData {

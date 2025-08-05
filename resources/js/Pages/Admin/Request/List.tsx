@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import {Head, router} from '@inertiajs/react';
-import {OCDRequest, OCDRequestList, PaginationLinkProps} from '@/types';
+import {Head} from '@inertiajs/react';
+import {OCDRequest, OCDRequestList, PaginationLinkProps, RequestStatus} from '@/types';
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 import {adminColumns} from "@/components/ui/data-table/requests/column-configs";
 import {Heading} from "@/components/ui/heading";
-import {UpdateStatusDialog} from "@/components/ui/dialogs/UpdateStatusDialog";
+import { buildRequestActions } from '@/components/ui/data-table/requests/requests-actions-columns';
+import { UpdateStatusDialog } from '@/components/ui/dialogs/UpdateStatusDialog';
 
 
 interface RequestsPagination {
@@ -31,61 +32,29 @@ interface RequestsListPageProps {
         order: string;
     };
     currentSearch?: Record<string, string>;
-    availableStatuses: Array<{
-        id: number;
-        status_code: string;
-        status_label: string;
-    }>;
+    availableStatuses: RequestStatus[];
 }
 
 export default function RequestListPage({requests, currentSort, currentSearch = {}, availableStatuses}: Readonly<RequestsListPageProps>) {
+    // Dialog state management for UpdateStatusDialog
     const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<OCDRequest | null>(null);
 
+    // Handle status update dialog opening
     const handleUpdateStatus = (request: OCDRequest) => {
         setSelectedRequest(request);
         setIsStatusDialogOpen(true);
     };
 
+    // Handle dialog closing
+    const handleCloseDialog = () => {
+        setIsStatusDialogOpen(false);
+        setSelectedRequest(null);
+    };
+
+    // Build actions for each request - now includes status update functionality
     const getActionsForRequest = (request: OCDRequest) => {
-        const actions = [];
-
-        // View Details - available if user can view
-        if (request.can_view) {
-            actions.push({
-                key: 'view-details',
-                label: 'View Details',
-                onClick: () => router.visit(route('admin.request.show', {id: request.id}))
-            });
-        }
-
-        // Update Status - available if user can update status
-        if (request.can_update_status) {
-            actions.push({
-                key: 'update-status',
-                label: 'Update Status',
-                onClick: () => handleUpdateStatus(request),
-                divider: actions.length > 0
-            });
-        }
-
-        // Add New Offer - available if user can manage offers
-        if (request.can_manage_offers) {
-            actions.push({
-                key: 'add-offer',
-                label: 'Add New Offer',
-                onClick: () => router.visit(route('admin.offers.create', {request_id: request.id})),
-                divider: actions.length > 0
-            });
-            actions.push({
-                key: 'see-offers',
-                label: 'See request offers',
-                onClick: () => router.visit(route('admin.offers.list', {request: request.id})),
-                divider: actions.length > 0
-            });
-        }
-
-        return actions;
+        return buildRequestActions(request, handleUpdateStatus, true);
     };
     return (
         <SidebarLayout>
@@ -133,13 +102,10 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                 />
             </div>
 
-            {/* Status Update Dialog */}
+            {/* UpdateStatusDialog - Single dialog for all rows */}
             <UpdateStatusDialog
                 isOpen={isStatusDialogOpen}
-                onClose={() => {
-                    setIsStatusDialogOpen(false);
-                    setSelectedRequest(null);
-                }}
+                onClose={handleCloseDialog}
                 request={selectedRequest}
                 availableStatuses={availableStatuses}
             />

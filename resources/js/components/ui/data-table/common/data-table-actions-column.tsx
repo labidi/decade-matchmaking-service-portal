@@ -21,21 +21,21 @@ interface DataTableActionsColumnProps<T = any> {
 }
 
 export function DataTableActionsColumn<T = any>({
-    row,
-    actions,
-    buttonLabel = 'Actions',
-    buttonColor = 'white',
-    buttonClassName = 'flex items-center gap-2',
-    menuAnchor = 'bottom end'
-}: DataTableActionsColumnProps<T>) {
+                                                    row,
+                                                    actions,
+                                                    buttonLabel = 'Actions',
+                                                    buttonColor = 'white',
+                                                    buttonClassName = 'flex items-center gap-2',
+                                                    menuAnchor = 'bottom end'
+                                                }: DataTableActionsColumnProps<T>) {
     if (!actions || actions.length === 0) {
         return null;
     }
 
     return (
         <Dropdown>
-            <DropdownButton 
-                color={buttonColor} 
+            <DropdownButton
+                color={buttonColor}
                 className={buttonClassName}
             >
                 {buttonLabel}

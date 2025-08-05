@@ -18,8 +18,7 @@ export default function CreateOffer({
                                         availableRequests
                                     }: Readonly<CreateOfferPageProps>) {
 
-    console.log(partners);
-
+    console.log(availableRequests);
     return (
         <SidebarLayout>
             <Head title="Create New Offer"/>
@@ -51,7 +50,7 @@ export default function CreateOffer({
                         })),
                         request_id: availableRequests.map(request => ({
                             value: request.id.toString(),
-                            label: `${request.detail.capacity_development_title} - ${request.user.name}`
+                            label: `${request.detail?.capacity_development_title} - ${request.user.name}`
                         }))
                     }}
                 />

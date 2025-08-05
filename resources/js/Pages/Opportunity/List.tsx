@@ -1,225 +1,177 @@
-// resources/js/Components/RequestsList.tsx
-import 'primeicons/primeicons.css';
-import 'primereact/resources/primereact.min.css';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import React from 'react';
-import axios from 'axios';
-import {Auth, OCDOpportunity, OCDOpportunitiesList, OCDOpportunitiesListPageActions} from '@/types';
-import {Column} from 'primereact/column';
-import {DataTable} from 'primereact/datatable';
+import React, {useState} from 'react';
 import {Head, Link, usePage} from '@inertiajs/react';
-import {Tag} from 'primereact/tag';
+import {OCDOpportunity, OCDOpportunitiesList, OCDOpportunitiesListPageActions, PaginationLinkProps} from '@/types';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
+import {OpportunitiesDataTable} from '@/components/ui/data-table/opportunities/opportunities-data-table';
+import {partnerColumns} from '@/components/ui/data-table/opportunities/column-configs';
+import {buildOpportunityActions} from '@/components/ui/data-table/opportunities/opportunities-actions-column';
+import {OpportunityStatusDialog} from '@/components/ui/dialogs/OpportunityStatusDialog';
+import {router} from '@inertiajs/react';
 
 
-export default function OpportunitiesList() {
+interface OpportunitiesPagination {
+    current_page: number;
+    data: OCDOpportunitiesList;
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: PaginationLinkProps[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+}
+
+interface OpportunitiesListPageProps {
+    opportunities: OpportunitiesPagination;
+    pageActions: OCDOpportunitiesListPageActions;
+    currentSort?: {
+        field: string;
+        order: string;
+    };
+    currentSearch?: Record<string, string>;
+}
+
+export default function OpportunitiesList({
+                                              opportunities,
+                                              pageActions,
+                                              currentSort = {field: 'created_at', order: 'desc'},
+                                              currentSearch = {}
+                                          }: Readonly<OpportunitiesListPageProps>) {
     const page = usePage();
-    const opportunitiesList = page.props.opportunities as OCDOpportunitiesList;
-    const pageActions = page.props.pageActions as OCDOpportunitiesListPageActions;
-    const locationData = (page.props.locationData as any) || {
-        countries: [],
-        regions: [],
-        oceans: [],
-        targetAudiences: []
-    };
-
     const {auth} = page.props;
-    const [opportunityList, setOpportunityList] = React.useState<OCDOpportunitiesList>(opportunitiesList);
 
-    const statuses = [
-        {value: '1', label: 'ACTIVE'},
-        {value: '2', label: 'Closed'},
-        {value: '3', label: 'Rejected'},
-        {value: '4', label: 'Pending review'},
-    ];
+    // Dialog state management
+    const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+    const [selectedOpportunity, setSelectedOpportunity] = useState<OCDOpportunity | null>(null);
 
-    const handleStatusChange = (id: string, status: string) => {
-        axios.patch(route('partner.opportunity.status', id), {status})
-            .then(res => {
-                setOpportunityList(prev => prev.map(op =>
-                    op.id === id
-                        ? {...op, status: res.data.status.status_code, status_label: res.data.status.status_label}
-                        : op
-                ));
-            });
+    const handleUpdateStatus = (opportunity: OCDOpportunity) => {
+        setSelectedOpportunity(opportunity);
+        setIsStatusDialogOpen(true);
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = (opportunity: OCDOpportunity) => {
         if (!confirm('Are you sure you want to delete this opportunity?')) {
             return;
         }
-        axios.delete(route('partner.opportunity.destroy', id))
-            .then(() => {
-                setOpportunityList(prev => prev.filter(op => op.id !== id));
-            });
+
+        router.delete(route('partner.opportunity.destroy', {id: opportunity.id}), {
+            onSuccess: () => {
+                // Opportunity will be removed from list automatically by Inertia
+            },
+            onError: (errors) => {
+                console.error('Failed to delete opportunity:', errors);
+                alert('Failed to delete opportunity. Please try again.');
+            }
+        });
     };
-    const titleBodyTemplate = (rowData: OCDOpportunity) => rowData.title ?? 'N/A';
-    const ApplicationClosingDate = (rowData: OCDOpportunity) => new Date(rowData.closing_date).toLocaleDateString();
 
-    const ImplementationLocationTemplate = (rowData: OCDOpportunity) => {
-        const implementationLocation = rowData.implementation_location;
-        const coverageActivity = rowData.coverage_activity;
-
-        if (!implementationLocation) {
-            return 'N/A';
-        }
-
-        // Define the options based on coverage activity (same logic as Create form)
-        let options: { value: string; label: string }[] = [];
-
-        switch (coverageActivity) {
-            case 'country':
-                options = locationData.countries;
-                break;
-            case 'Regions':
-                options = locationData.regions;
-                break;
-            case 'Ocean-based':
-                options = locationData.oceans;
-                break;
-            case 'Global':
-                options = [{value: 'Global', label: 'Global'}];
-                break;
-            default:
-                return implementationLocation; // Return as-is if no matching coverage activity
-        }
-
-        // Find the matching option and return the label
-        const option = options.find(opt => opt.value === implementationLocation);
-        return option ? option.label : implementationLocation;
+    const handleCloseDialog = () => {
+        setIsStatusDialogOpen(false);
+        setSelectedOpportunity(null);
     };
-    const statusBodyTemplate = (rowData: OCDOpportunity) => {
-        const code = rowData.status
-        const label = rowData.status_label
-
-        let iconClass = '';
-        let tagSeverity: 'success' | 'info' | 'warning' | 'danger' | undefined = undefined;
-        let iconColor = '';
-        console.log(code);
-        switch (code) {
-            case 1:
-                iconClass = 'pi pi-file-edit';
-                tagSeverity = 'success';
-                iconColor = 'mr-1';
-                break;
-            case 2:
-                iconClass = 'pi pi-clock';
-                tagSeverity = 'info';
-                iconColor = 'mr-1';
-                break;
-            case 3:
-                iconClass = 'pi pi-check-circle';
-                tagSeverity = 'danger';
-                iconColor = 'mr-1';
-                break;
-            case 4:
-                iconClass = 'pi pi-times-circle';
-                tagSeverity = 'info';
-                iconColor = 'mr-1';
-                break;
-            default:
-                iconClass = 'pi pi-info-circle';
-                tagSeverity = undefined;
-                iconColor = 'mr-1';
-        }
-
-        return (
-            <Tag
-                value={label}
-                severity={tagSeverity}
-                icon={<i className={`${iconClass} ${iconColor}`}/>}
-                className="cursor-default text-white"
-                data-pr-tooltip={label}
-            />
+    // Build actions for each opportunity - partners can edit their own opportunities
+    const getActionsForOpportunity = (opportunity: OCDOpportunity) => {
+        return buildOpportunityActions(
+            opportunity,
+            handleUpdateStatus,
+            handleDelete,
+            true, // showViewDetails
+            pageActions.canChangeStatus, // canUpdateStatus
+            pageActions.canDelete && opportunity.can_edit // canDelete - only if they own it
         );
     };
 
-    const actionsTemplate = (rowData: OCDOpportunity) => (
-        <div className="flex space-x-4 items-center">
-            {rowData.can_edit && (
-                <Link
-                    href={route('opportunity.edit', rowData.id)}
-                    className="px-2 py-1 text-base font-medium text-blue-600 hover:text-blue-800"
-                >
-                    <i className="pi pi-pencil mr-1" aria-hidden="true"/>
-                    Edit
-                </Link>
-            )}
-            {pageActions.canDelete && (
-                <button
-                    onClick={() => handleDelete(rowData.id)}
-                    className="flex items-center text-red-600 hover:text-red-800"
-                >
-                    <i className="pi pi-trash mr-1" aria-hidden="true"/>
-                    Delete
-                </button>
-            )}
-
-            {pageActions.canChangeStatus && (
-                <button
-                    onClick={() => handleDelete(rowData.id)}
-                    className="flex items-center text-red-600 hover:text-red-800"
-                >
-                    <i className="pi pi-trash mr-1" aria-hidden="true"/>
-                    Delete
-                </button>
-            )}
-
-            <Link
-                href={route('opportunity.show', rowData.id)}
-                className="flex items-center text-green-600 hover:text-green-800"
-            >
-                <i className="pi pi-eye mr-1" aria-hidden="true"/>
-                View
-            </Link>
-            {pageActions.canChangeStatus && (
-                <select
-                    className="border rounded px-2 py-1"
-                    value={rowData.status}
-                    onChange={e => handleStatusChange(rowData.id, e.currentTarget.value)}
-                >
-                    {statuses.map(s => (
-                        <option key={s.value} value={s.value}>{s.label}</option>
-                    ))}
-                </select>
-            )}
-        </div>
-    );
-
     return (
         <FrontendLayout>
-            <Head title="Welcome"/>
-            <div className="overflow-x-auto">
-                <div className='flex justify-between items-center mb-6'>
-                    {auth.user.is_partner && pageActions.canSubmitNew && (
-                        <Link
-                            href={route('partner.opportunity.create')}
-                            className="px-4 text-xl py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700"
-                        >
-                            Submit New Opportunity
-                        </Link>
-                    )}
+            <Head title="My Opportunities"/>
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        My Opportunities
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                        Manage your published opportunities
+                    </p>
                 </div>
-                <DataTable
-                    value={opportunityList}
-                    paginator
-                    rows={10}
-                    rowsPerPageOptions={[10, 25, 50, 100]}
-                    showGridlines
-                    emptyMessage="No Opportunities found."
-                    className="p-datatable-sm .datatable-rows"
-                >
-                    <Column field="id" header="ID" sortable/>
-                    <Column body={titleBodyTemplate} header="Title"/>
-                    <Column field="type_label" header="Type"/>
-                    <Column field="created_at" body={ApplicationClosingDate} header="Application closing date"
-                            sortable/>
-                    <Column field="status.status_code" body={statusBodyTemplate} header="Status" sortable/>
-                    <Column field="coverage_activity" header="Coverage of CD Activity" sortable/>
-                    <Column body={ImplementationLocationTemplate} header="Implementation location" sortable/>
-                    <Column body={actionsTemplate} header="Actions"/>
-                </DataTable>
+                {auth.user.is_partner && pageActions.canSubmitNew && (
+                    <Link
+                        href={route('partner.opportunity.create')}
+                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                    >
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Submit New Opportunity
+                    </Link>
+                )}
             </div>
+
+            <OpportunitiesDataTable
+                opportunities={opportunities.data}
+                currentSort={currentSort}
+                currentSearch={currentSearch}
+                columns={partnerColumns}
+                routeName="opportunity.list"
+                getActionsForOpportunity={getActionsForOpportunity}
+                pagination={{
+                    current_page: opportunities.current_page,
+                    last_page: opportunities.last_page,
+                    links: opportunities.links,
+                    prev_page_url: opportunities.prev_page_url,
+                    next_page_url: opportunities.next_page_url,
+                    from: opportunities.from,
+                    to: opportunities.to,
+                    total: opportunities.total
+                }}
+                searchFields={[
+                    {
+                        id: 'title',
+                        type: 'text',
+                        label: 'Title',
+                        placeholder: 'Search by opportunity title...'
+                    },
+                    {
+                        id: 'type',
+                        type: 'select',
+                        label: 'Type',
+                        placeholder: 'Filter by type...',
+                        options: [
+                            {value: 'training', label: 'Training'},
+                            {value: 'fellowship', label: 'Fellowship'},
+                            {value: 'grant', label: 'Grant'},
+                            {value: 'scholarship', label: 'Scholarship'},
+                            {value: 'workshop', label: 'Workshop'},
+                            {value: 'conference', label: 'Conference'},
+                            {value: 'other', label: 'Other'}
+                        ]
+                    },
+                    {
+                        id: 'status',
+                        type: 'select',
+                        label: 'Status',
+                        placeholder: 'Filter by status...',
+                        options: [
+                            {value: '1', label: 'Active'},
+                            {value: '2', label: 'Closed'},
+                            {value: '3', label: 'Rejected'},
+                            {value: '4', label: 'Pending Review'}
+                        ]
+                    }
+                ]}
+                showSearch={true}
+                showActions={true}
+            />
+
+            {/* Status Update Dialog */}
+            <OpportunityStatusDialog
+                isOpen={isStatusDialogOpen}
+                onClose={handleCloseDialog}
+                opportunity={selectedOpportunity}
+            />
         </FrontendLayout>
     )
 }

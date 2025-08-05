@@ -76,9 +76,34 @@ class OpportunitiesController extends Controller
         }
     }
 
-    public function mySubmittedList(Request $request)
+    public function mySubmittedList(Request $httpRequest)
     {
-        $opportunities = $this->opportunityService->getUserOpportunities($request->user());
+        $sortField = $httpRequest->get('sort', 'created_at');
+        $sortOrder = $httpRequest->get('order', 'desc');
+        $searchUser = $httpRequest->get('user');
+        $searchTitle = $httpRequest->get('title');
+        $searchType = $httpRequest->get('type');
+        $searchStatus = $httpRequest->get('status');
+        $searchLocation = $httpRequest->get('location');
+
+        $searchFilters = array_filter([
+            'user' => $searchUser,
+            'title' => $searchTitle,
+            'type' => $searchType,
+            'status' => $searchStatus,
+            'location' => $searchLocation,
+        ]);
+
+        $sortFilters = [
+            'field' => $sortField,
+            'order' => $sortOrder,
+            'per_page' => 10,
+        ];
+
+        $opportunities = $this->opportunityService->getUserOpportunitiesPaginated($httpRequest->user(), $searchFilters, $sortFilters);
+
+        // Append query parameters to pagination links
+        $opportunities->appends($httpRequest->only(['sort', 'order', 'user', 'title', 'type', 'status', 'location']));
 
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
@@ -87,6 +112,17 @@ class OpportunitiesController extends Controller
                 'title' => 'List of My submitted Opportunities',
                 'description' => 'Manage your submitted opportunities here.',
                 'image' => '/assets/img/sidebar.png',
+            ],
+            'currentSort' => [
+                'field' => $sortField,
+                'order' => $sortOrder,
+            ],
+            'currentSearch' => [
+                'user' => $searchUser ?? '',
+                'title' => $searchTitle ?? '',
+                'type' => $searchType ?? '',
+                'status' => $searchStatus ?? '',
+                'location' => $searchLocation ?? '',
             ],
             'locationData' => [
                 'countries' => CountryOptions::getOptions(),
@@ -109,9 +145,34 @@ class OpportunitiesController extends Controller
         ]);
     }
 
-    public function list(Request $request)
+    public function list(Request $httpRequest)
     {
-        $opportunities = $this->opportunityService->getPublicOpportunities($request->user());
+        $sortField = $httpRequest->get('sort', 'created_at');
+        $sortOrder = $httpRequest->get('order', 'desc');
+        $searchUser = $httpRequest->get('user');
+        $searchTitle = $httpRequest->get('title');
+        $searchType = $httpRequest->get('type');
+        $searchLocation = $httpRequest->get('location');
+        $searchClosingDate = $httpRequest->get('closing_date');
+
+        $searchFilters = array_filter([
+            'user' => $searchUser,
+            'title' => $searchTitle,
+            'type' => $searchType,
+            'location' => $searchLocation,
+            'closing_date' => $searchClosingDate,
+        ]);
+
+        $sortFilters = [
+            'field' => $sortField,
+            'order' => $sortOrder,
+            'per_page' => 10,
+        ];
+
+        $opportunities = $this->opportunityService->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
+
+        // Append query parameters to pagination links
+        $opportunities->appends($httpRequest->only(['sort', 'order', 'user', 'title', 'type', 'location', 'closing_date']));
 
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
@@ -120,6 +181,17 @@ class OpportunitiesController extends Controller
                 'title' => 'List of Opportunities',
                 'description' => 'Browse and view opportunities submitted by CDF partners here.',
                 'image' => '/assets/img/sidebar.png',
+            ],
+            'currentSort' => [
+                'field' => $sortField,
+                'order' => $sortOrder,
+            ],
+            'currentSearch' => [
+                'user' => $searchUser ?? '',
+                'title' => $searchTitle ?? '',
+                'type' => $searchType ?? '',
+                'location' => $searchLocation ?? '',
+                'closing_date' => $searchClosingDate ?? '',
             ],
             'locationData' => [
                 'countries' => CountryOptions::getOptions(),
@@ -237,12 +309,49 @@ class OpportunitiesController extends Controller
         }
     }
 
-    public function search(Request $request)
+    public function search(Request $httpRequest)
     {
-        $filters = $request->only(['type', 'status', 'location', 'public']);
-        $opportunities = $this->opportunityService->searchOpportunities($filters, $request->user());
+        $sortField = $httpRequest->get('sort', 'created_at');
+        $sortOrder = $httpRequest->get('order', 'desc');
+        $searchUser = $httpRequest->get('user');
+        $searchTitle = $httpRequest->get('title');
+        $searchType = $httpRequest->get('type');
+        $searchStatus = $httpRequest->get('status');
+        $searchLocation = $httpRequest->get('location');
+        $searchClosingDate = $httpRequest->get('closing_date');
 
-        return response()->json(['opportunities' => $opportunities]);
+        $searchFilters = array_filter([
+            'user' => $searchUser,
+            'title' => $searchTitle,
+            'type' => $searchType,
+            'status' => $searchStatus,
+            'location' => $searchLocation,
+            'closing_date' => $searchClosingDate,
+        ]);
+
+        $sortFilters = [
+            'field' => $sortField,
+            'order' => $sortOrder,
+            'per_page' => $httpRequest->get('per_page', 10),
+        ];
+
+        // Determine if searching public opportunities or user's own
+        $isPublicSearch = $httpRequest->get('public', false);
+        
+        if ($isPublicSearch) {
+            $opportunities = $this->opportunityService->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
+        } else {
+            $opportunities = $this->opportunityService->getUserOpportunitiesPaginated($httpRequest->user(), $searchFilters, $sortFilters);
+        }
+
+        return response()->json([
+            'opportunities' => $opportunities,
+            'currentSort' => [
+                'field' => $sortField,
+                'order' => $sortOrder,
+            ],
+            'currentSearch' => $searchFilters,
+        ]);
     }
 
     public function stats(Request $request)

@@ -7,8 +7,7 @@ import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
 import {formatDate} from '@/utils/date-formatter';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
-import {DataTableActionsColumn, DataTableAction} from '@/components/ui/data-table/common/DataTableActionsColumn';
-
+import { DropdownActions, Action } from '@/components/ui/data-table/common/dropdown-actions';
 // Types and Interfaces
 interface PaginationData {
     current_page: number;
@@ -44,7 +43,7 @@ interface RequestsDataTableProps {
     searchFields?: UIField[];
     columns?: TableColumn[];
     routeName?: string;
-    getActionsForRequest: (request: OCDRequest) => DataTableAction<OCDRequest>[];
+    getActionsForRequest: (request: OCDRequest) => Action[];
     showSearch?: boolean;
     showActions?: boolean;
 }
@@ -216,8 +215,7 @@ export function RequestsDataTable({
                                 ))}
                                 {showActions && (
                                     <TableCell className="text-right">
-                                        <DataTableActionsColumn
-                                            row={request}
+                                        <DropdownActions
                                             actions={getActionsForRequest(request)}
                                         />
                                     </TableCell>
