@@ -1,14 +1,13 @@
 import React from 'react';
 import {ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/16/solid';
-import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus} from "@/types";
+import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus, UIField} from "@/types";
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {Badge} from '@/components/ui/badge'
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
 import {formatDate} from '@/utils/date-formatter';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
-import {DataTableActionsColumn, DataTableAction} from '@/components/ui/data-table/common/DataTableActionsColumn';
-
+import { DropdownActions, Action } from '@/components/ui/data-table/common/dropdown-actions';
 // Types and Interfaces
 interface PaginationData {
     current_page: number;
@@ -22,12 +21,6 @@ interface PaginationData {
 }
 
 type SortField = 'id' | 'created_at' | 'status_id' | 'user_id';
-
-interface DataTableSearchFields {
-    key: string;
-    label: string;
-    placeholder: string;
-}
 
 interface TableColumn {
     key: string;
@@ -47,10 +40,10 @@ interface RequestsDataTableProps {
     };
     currentSearch?: Record<string, string>;
     pagination?: PaginationData;
-    searchFields?: DataTableSearchFields[];
+    searchFields?: UIField[];
     columns?: TableColumn[];
     routeName?: string;
-    getActionsForRequest: (request: OCDRequest) => DataTableAction<OCDRequest>[];
+    getActionsForRequest: (request: OCDRequest) => Action[];
     showSearch?: boolean;
     showActions?: boolean;
 }
@@ -222,8 +215,7 @@ export function RequestsDataTable({
                                 ))}
                                 {showActions && (
                                     <TableCell className="text-right">
-                                        <DataTableActionsColumn
-                                            row={request}
+                                        <DropdownActions
                                             actions={getActionsForRequest(request)}
                                         />
                                     </TableCell>

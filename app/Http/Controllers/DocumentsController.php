@@ -28,7 +28,7 @@ class DocumentsController extends Controller
                 $httpRequest->file('file'),
                 $validated['document_type'],
                 $request,
-                $httpRequest->user()->id
+                $httpRequest->user()
             );
 
             return back()->with('success', 'Document uploaded successfully');

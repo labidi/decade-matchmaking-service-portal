@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\NotificationsController;
+use App\Http\Controllers\NotificationPreferencesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RequestsController;
@@ -54,6 +55,16 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('user/opportunity/show/{id}', [UserOpportunityController::class, 'show'])->name('user.opportunity.show');
     Route::get('opportunity/list', [OpportunitiesController::class, 'list'])->name('opportunity.list');
     Route::get('opportunity/show/{id}', [OpportunitiesController::class, 'show'])->name('opportunity.show');
+
+
+    Route::get('notification-preferences', [NotificationPreferencesController::class, 'index'])
+        ->name('notification-preferences');
+    Route::post('notification-preferences.store', [NotificationPreferencesController::class, 'store'])
+        ->name('notification-preferences.store');
+    Route::post('notification-preferences.update', [NotificationPreferencesController::class, 'update'])
+        ->name('notification-preferences.store');
+    Route::delete('notification-preferences.destory', [NotificationPreferencesController::class, 'destroy'])
+        ->name('notification-preferences.destory');
 });
 
 Route::middleware(['auth', 'role:partner'])->group(function () {

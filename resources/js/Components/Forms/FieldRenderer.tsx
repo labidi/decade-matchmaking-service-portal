@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React, {useState, useMemo, useCallback} from 'react';
 import {UIField} from '@/types';
-import {Request as RequestFields} from '@/Forms/UIRequestForm';
 import {Field, Label, Description, ErrorMessage, Fieldset, Legend} from '@/components/ui/fieldset';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
@@ -17,36 +16,170 @@ interface FieldRendererProps {
     error?: string;
     onChange: (name: string, value: any) => void;
     formData: any;
+    onKeyDown?: (e: React.KeyboardEvent) => void;
+    onBlur?: (e: React.FocusEvent) => void;
+    disabled?: boolean;
+    className?: string;
 }
 
-export default function FieldRenderer({name, field, value, error, onChange, formData}: FieldRendererProps) {
+// Field type registry for custom field types
+const fieldTypeRegistry = new Map<string, React.ComponentType<any>>();
+
+export function registerFieldType(type: string, component: React.ComponentType<any>) {
+    fieldTypeRegistry.set(type, component);
+}
+
+// Debounce utility
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): T {
+    let timeout: NodeJS.Timeout;
+    return ((...args: any[]) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+    }) as T;
+}
+
+export default function FieldRenderer({
+    name,
+    field,
+    value,
+    error,
+    onChange,
+    formData,
+    onKeyDown,
+    onBlur,
+    disabled,
+    className
+}: Readonly<FieldRendererProps>) {
     const [comboboxQuery, setComboboxQuery] = useState('');
 
-    // Helper to get filtered options for a field
-    const getFilteredOptions = (field: UIField, selectedValues?: string[]) => {
+    // Field validation
+    const validateField = useCallback((value: any, field: UIField): string | null => {
+      /*  if (field.required && (!value || value.toString().trim() === '')) {
+            return `${field.label || field.id} is required`;
+        }*/
+
+        if (field.pattern && value && !new RegExp(field.pattern).test(value)) {
+            return `${field.label || field.id} format is invalid`;
+        }
+
+        if (field.min && value < field.min) {
+            return `${field.label || field.id} must be at least ${field.min}`;
+        }
+
+        if (field.max && value > field.max) {
+            return `${field.label || field.id} cannot exceed ${field.max}`;
+        }
+
+        if (field.maxLength && value && value.toString().length > field.maxLength) {
+            return `${field.label || field.id} cannot exceed ${field.maxLength} characters`;
+        }
+
+        return null;
+    }, []);
+
+    // Accessibility attributes
+    const getAriaAttributes = useCallback((field: UIField, error?: string) => ({
+        'aria-invalid': !!error,
+        'aria-describedby': error ? `${field.id}-error` : undefined,
+        'aria-required': field.required,
+    }), []);
+
+    // Performance optimization: Memoize filtered options
+    // Only calculate selectedValues for field types that use arrays
+    const selectedValues = useMemo(() => {
+        if (field.type === 'multiselect' || field.type === 'checkbox-group') {
+            return Array.isArray(value) ? value.map((v: any) => String(v)) : [];
+        }
+        return [];
+    }, [value, field.type]);
+
+    const filteredOptions = useMemo(() => {
         let options = field.options ?? [];
         if (!comboboxQuery) return options;
-
         const filtered = options.filter(opt =>
-            opt.label.toLowerCase().includes(comboboxQuery.toLowerCase()) ||
-            opt.value.toLowerCase().includes(comboboxQuery.toLowerCase())
+            opt.label.toString().toLowerCase().includes(comboboxQuery.toLowerCase()) ||
+            opt.value.toString().toLowerCase().includes(comboboxQuery.toLowerCase())
         );
 
         // For multiselect, hide already selected options
-        if (selectedValues) {
+        if (field.type === 'multiselect') {
             return filtered.filter(opt => !selectedValues.includes(String(opt.value)));
         }
 
         return filtered;
-    };
+    }, [field.options, comboboxQuery, selectedValues, field.type]);
 
-    const getInputClass = () => {
-        return `mt-2 block w-full border rounded ${error ? 'border-red-600' : 'border-gray-300'}`;
-    };
+    // Debounced onChange for search fields
+    const debouncedOnChange = useMemo(() =>
+        field.type === 'search' ? debounce(onChange, 300) : onChange,
+        [onChange, field.type]
+    );
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        onChange(name, e.currentTarget.value);
-    };
+    // Keyboard event handling
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (field.onKeyDown) {
+            field.onKeyDown(e);
+        }
+        if (onKeyDown) {
+            onKeyDown(e);
+        }
+    }, [field.onKeyDown, onKeyDown]);
+
+    // Blur event handling
+    const handleBlur = useCallback((e: React.FocusEvent) => {
+        if (onBlur) {
+            onBlur(e);
+        }
+        // Validate on blur
+        const validationError = validateField(value, field);
+        if (validationError && !error) {
+            // Could trigger validation callback here
+        }
+    }, [onBlur, validateField, value, field, error]);
+
+    // Enhanced change handler with validation support
+    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const newValue = e.currentTarget.value;
+        (field.type === 'search' ? debouncedOnChange : onChange)(name, newValue);
+    }, [field.type, debouncedOnChange, onChange, name]);
+
+    // Render error helper
+    const renderError = useCallback(() =>
+        error && <ErrorMessage id={`${field.id}-error`}>{error}</ErrorMessage>,
+        [error, field.id]
+    );
+
+    // Common field props
+    const getCommonFieldProps = useCallback(() => ({
+        id: field.id,
+        required: field.required,
+        disabled: field.disabled || disabled,
+        readOnly: field.readOnly,
+        autoFocus: field.autoFocus,
+        autoComplete: field.autoComplete,
+        onKeyDown: handleKeyDown,
+        onBlur: handleBlur,
+        ...getAriaAttributes(field, error),
+    }), [field, disabled, handleKeyDown, handleBlur, getAriaAttributes, error]);
+
+    // Check for custom field type
+    const CustomComponent = fieldTypeRegistry.get(field.type);
+    if (CustomComponent) {
+        return (
+            <Field key={name} className={field.className || className || "mt-8"}>
+                {field.label && <Label>{field.label}</Label>}
+                {field.description && <Description>{field.description}</Description>}
+                <CustomComponent
+                    {...getCommonFieldProps()}
+                    value={value}
+                    onChange={(newValue: any) => onChange(name, newValue)}
+                    field={field}
+                    formData={formData}
+                />
+                {renderError()}
+            </Field>
+        );
+    }
 
     const handleComboboxChange = (newValue: any) => {
         onChange(name, newValue);
@@ -59,7 +192,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
     };
 
     const handleCheckboxChange = (optionValue: string) => {
-        const arr = [...(value ?? [])];
+        const arr = Array.isArray(value) ? [...value] : [];
         if (arr.includes(optionValue)) {
             onChange(name, arr.filter((i: string) => i !== optionValue));
         } else {
@@ -68,11 +201,11 @@ export default function FieldRenderer({name, field, value, error, onChange, form
     };
 
     const handleRemoveChip = (chipValue: string) => {
-        const selectedValues = (value ?? []).map((v: any) => String(v));
-        onChange(name, selectedValues.filter((v: string) => v !== chipValue));
+        const currentValues = Array.isArray(value) ? value.map((v: any) => String(v)) : [];
+        onChange(name, currentValues.filter((v: string) => v !== chipValue));
     };
 
-    if (field.show && !field.show(formData as RequestFields)) {
+    if (field.show && !field.show(formData)) {
         return null;
     }
 
@@ -96,6 +229,15 @@ export default function FieldRenderer({name, field, value, error, onChange, form
         case 'url':
         case 'number':
         case 'date':
+        case 'password':
+        case 'search':
+        case 'tel':
+        case 'time':
+        case 'datetime-local':
+        case 'month':
+        case 'week':
+        case 'color':
+        case 'range':
             return (
                 <Field key={name} className="mt-8 grid grid-cols-subgrid sm:col-span-3">
                     {field.label && <Label>{field.label}</Label>}
@@ -157,9 +299,9 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                     <Combobox immediate value={value} onChange={handleComboboxChange}>
                         <div className="relative">
                             <div
-                                className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
+                                className="mt-3 relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
                                 <ComboboxInput
-                                    className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                                    className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 "
                                     displayValue={(value: string) => {
                                         const option = field.options?.find(opt => opt.value === value);
                                         return option ? option.label : value;
@@ -176,7 +318,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                             </div>
                             <ComboboxOptions
                                 className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                {getFilteredOptions(field).map((option) => (
+                                {filteredOptions.map((option) => (
                                     <ComboboxOption
                                         key={option.value}
                                         className={({active}) =>
@@ -235,8 +377,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </Field>
             );
-        case 'multiselect':
-            const selectedValues = (value || []).map((v: any) => String(v));
+        case 'multiselect': {
             return (
                 <div key={name} className="mt-8">
                     {field.label && <label htmlFor={field.id} className="block font-medium">{field.label}</label>}
@@ -249,7 +390,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                     >
                         <div className="relative">
                             <div
-                                className="relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
+                                className="mt-3 relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
                                 <ComboboxInput
                                     className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
                                     displayValue={() => comboboxQuery}
@@ -265,7 +406,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                             </div>
                             <ComboboxOptions
                                 className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                {getFilteredOptions(field, selectedValues).map((option) => (
+                                {filteredOptions.map((option) => (
                                     <ComboboxOption
                                         key={option.value}
                                         className={({active}) =>
@@ -332,6 +473,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                     {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
                 </div>
             );
+        }
         case 'radio':
             return (
                 <Field key={name} className="mt-8">
@@ -368,7 +510,7 @@ export default function FieldRenderer({name, field, value, error, onChange, form
                         {field.options?.map(opt => (
                             <CheckboxField key={opt.value}>
                                 <Checkbox
-                                    checked={(value ?? []).includes(opt.value)}
+                                    checked={Array.isArray(value) ? value.includes(opt.value) : false}
                                     onChange={() => handleCheckboxChange(opt.value)}
                                 />
                                 <Label>{opt.label}</Label>

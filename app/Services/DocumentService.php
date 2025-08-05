@@ -9,13 +9,15 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use App\Models\User;
 
 class DocumentService
 {
     /**
      * Store a document for a request
+     * @throws Exception
      */
-    public function storeDocument(UploadedFile $file, string $documentType, OCDRequest $request, int $uploaderId): Document
+    public function storeDocument(UploadedFile $file, string $documentType, OCDRequest $request, User $user): Document
     {
         try {
             $path = $file->store('documents', 'public');
@@ -27,22 +29,21 @@ class DocumentService
                 'document_type' => $documentType,
                 'parent_id' => $request->id,
                 'parent_type' => OCDRequest::class,
-                'uploader_id' => $uploaderId,
+                'uploader_id' => $user->id,
             ]);
 
             Log::info('Document uploaded successfully', [
                 'document_id' => $document->id,
                 'request_id' => $request->id,
-                'uploader_id' => $uploaderId,
+                'uploader_id' => $user->id,
                 'file_name' => $file->getClientOriginalName()
             ]);
 
             return $document;
-
         } catch (Exception $e) {
             Log::error('Failed to upload document', [
                 'request_id' => $request->id,
-                'uploader_id' => $uploaderId,
+                'uploader_id' => $user->id,
                 'error' => $e->getMessage()
             ]);
             throw $e;
@@ -69,7 +70,6 @@ class DocumentService
             }
 
             return $deleted;
-
         } catch (Exception $e) {
             Log::error('Failed to delete document', [
                 'document_id' => $document->id,
@@ -93,8 +93,10 @@ class DocumentService
     /**
      * Get documents by type for a request
      */
-    public function getRequestDocumentsByType(OCDRequest $request, DocumentType $documentType): \Illuminate\Database\Eloquent\Collection
-    {
+    public function getRequestDocumentsByType(
+        OCDRequest $request,
+        DocumentType $documentType
+    ): \Illuminate\Database\Eloquent\Collection {
         return Document::where('parent_id', $request->id)
             ->where('parent_type', OCDRequest::class)
             ->where('document_type', $documentType)

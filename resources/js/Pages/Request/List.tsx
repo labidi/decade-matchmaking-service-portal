@@ -4,6 +4,7 @@ import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {OCDRequestList, PaginationLinkProps, OCDRequest} from '@/types';
 import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 import {userColumns} from "@/components/ui/data-table/requests/column-configs";
+import { Action } from '@/components/ui/data-table/common/dropdown-actions';
 
 interface RequestsPagination {
     current_page: number;
@@ -50,8 +51,8 @@ export default function RequestsList({
     };
 
     // Dynamic actions based on request permissions
-    const getActionsForRequest = (request: OCDRequest) => {
-        const actions = [];
+    const getActionsForRequest = (request: OCDRequest): Action[] => {
+        const actions: Action[] = [];
 
         // View Details - available if user can view
         if (request.can_view) {
@@ -107,7 +108,8 @@ export default function RequestsList({
                     }}
                     searchFields={[
                         {
-                            key: 'title',
+                            id: 'title',
+                            type: 'text',
                             label: 'Title',
                             placeholder: 'Search by request title...'
                         }

@@ -4,7 +4,7 @@ import {CheckBadgeIcon, ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/1
 import {Notification, NotificationList, PaginationLinkProps} from '@/types';
 import {NotificationDialogView} from "@/components/ui/data-table/notifications/notification-dialog-view";
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
-import {DataTableActionsColumn, DataTableAction} from '@/components/ui/data-table/common/DataTableActionsColumn';
+import {DataTableActionsColumn, DataTableAction} from '@/components/ui/data-table/common/data-table-actions-column';
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {router} from '@inertiajs/react';
 import {formatDate} from '@/utils/date-formatter';

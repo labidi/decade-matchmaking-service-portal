@@ -9,6 +9,7 @@ use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -47,11 +48,27 @@ class OpportunityService
     }
 
     /**
+     * Get paginated opportunities submitted by a specific user (compatible with RequestsController pattern)
+     */
+    public function getUserOpportunitiesPaginated(User $user, array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    {
+        return $this->repository->getUserOpportunitiesPaginated($user, $searchFilters, $sortFilters);
+    }
+
+    /**
      * Get public opportunities (active status only)
      */
     public function getPublicOpportunities(): Collection
     {
         return $this->repository->getPublicOpportunities();
+    }
+
+    /**
+     * Get paginated public opportunities (compatible with RequestsController pattern)
+     */
+    public function getPublicOpportunitiesPaginated(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    {
+        return $this->repository->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
     }
 
     /**

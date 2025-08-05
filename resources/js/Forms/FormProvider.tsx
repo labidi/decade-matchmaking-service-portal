@@ -31,7 +31,7 @@ export function FormProvider({
     backLabel = 'Back',
     submitLabel = 'Save',
     dynamicOptions = {}
-}: FormProviderProps) {
+}: Readonly<FormProviderProps>) {
     const [currentStep, setCurrentStep] = useState(0);
 
     const { data, setData, post, put, patch, processing, errors, reset } = useForm(initialData);

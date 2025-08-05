@@ -47,6 +47,14 @@ class OffersController extends Controller
                 'order' => $sortFilters['order'],
             ],
             'currentSearch' => array_filter($searchFilters),
+            'searchFieldsOptions'=> [
+                'requests'=> $this->requestService->getAllRequests()->map(function ($request) {
+                    return [
+                        'label' => '#' . $request->id.' - ' . $request->detail?->capacity_development_title. ' - '.$request->user->name ,
+                        'value' => $request->id
+                    ];
+                }),
+            ],
             'routeName' => 'admin.offers.list',
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],

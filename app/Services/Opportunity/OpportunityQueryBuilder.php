@@ -6,6 +6,7 @@ use App\Enums\OpportunityStatus;
 use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OpportunityQueryBuilder
 {
@@ -65,12 +66,54 @@ class OpportunityQueryBuilder
     }
 
     /**
-     * Apply sorting to query
+     * Apply search filters to query (compatible with RequestsController pattern)
+     */
+    public function applySearchFilters(Builder $query, array $searchFilters): Builder
+    {
+        // Filter by user (search by user name or email)
+        if (isset($searchFilters['user']) && !empty($searchFilters['user'])) {
+            $userSearchTerm = $searchFilters['user'];
+            $query->whereHas('user', function ($q) use ($userSearchTerm) {
+                $q->where('name', 'like', '%' . $userSearchTerm . '%')
+                  ->orWhere('email', 'like', '%' . $userSearchTerm . '%');
+            });
+        }
+
+        // Filter by title
+        if (isset($searchFilters['title']) && !empty($searchFilters['title'])) {
+            $query->where('title', 'like', '%' . $searchFilters['title'] . '%');
+        }
+
+        // Filter by type
+        if (isset($searchFilters['type']) && !empty($searchFilters['type'])) {
+            $query->where('type', $searchFilters['type']);
+        }
+
+        // Filter by status
+        if (isset($searchFilters['status']) && !empty($searchFilters['status'])) {
+            $query->where('status', $searchFilters['status']);
+        }
+
+        // Filter by location
+        if (isset($searchFilters['location']) && !empty($searchFilters['location'])) {
+            $query->where('implementation_location', 'like', '%' . $searchFilters['location'] . '%');
+        }
+
+        // Filter by closing date
+        if (isset($searchFilters['closing_date']) && !empty($searchFilters['closing_date'])) {
+            $query->whereDate('closing_date', '>=', $searchFilters['closing_date']);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Apply sorting to query (compatible with RequestsController pattern)
      */
     public function applySorting(Builder $query, array $sortFilters): Builder
     {
-        $sortBy = $sortFilters['sort_by'] ?? 'created_at';
-        $sortDirection = $sortFilters['sort_direction'] ?? 'desc';
+        $sortField = $sortFilters['field'] ?? 'created_at';
+        $sortOrder = $sortFilters['order'] ?? 'desc';
 
         // Validate sort fields
         $allowedSortFields = [
@@ -78,17 +121,27 @@ class OpportunityQueryBuilder
             'title',
             'type',
             'status',
+            'closing_date',
             'implementation_location'
         ];
 
-        if (in_array($sortBy, $allowedSortFields)) {
-            $query->orderBy($sortBy, $sortDirection);
+        if (in_array($sortField, $allowedSortFields)) {
+            $query->orderBy($sortField, $sortOrder);
         } else {
             // Default sorting
             $query->orderBy('created_at', 'desc');
         }
 
         return $query;
+    }
+
+    /**
+     * Apply pagination to query
+     */
+    public function applyPagination(Builder $query, array $sortFilters): LengthAwarePaginator
+    {
+        $perPage = $sortFilters['per_page'] ?? 10;
+        return $query->paginate($perPage);
     }
 
     /**

@@ -191,7 +191,7 @@ export const UIRequestForm: UIStep[] = [
                   show: data => data.target_audience === 'Other (Please Specify)',
                   placeholder: 'Please specify the target audience',
               },
-             /* subthemes: {
+              subthemes: {
                   id: 'subthemes',
                   type: 'checkbox-group',
                   required: true,
@@ -199,13 +199,13 @@ export const UIRequestForm: UIStep[] = [
                   image : '/assets/img/cdf_subthemes.svg',
                   description: 'Please review the umbrella theme carefully before selecting the corresponding sub-themes.',
                   // Options should be provided from SubThemeOptions::getOptions()
-              },*/
-            /*subthemes_other: {
+              },
+            subthemes_other: {
                 id: 'subthemes_other',
                 type: 'textarea',
                 required: true,
                 show: data => data.subthemes.includes('Other'),
-            },*/
+            },
             support_types: {
                 id: 'support_types',
                 type: 'checkbox-group',

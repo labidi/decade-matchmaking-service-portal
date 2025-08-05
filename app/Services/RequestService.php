@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Request as OCDRequest;
+use App\Models\Request;
 use App\Models\Request\Offer;
 use App\Models\User;
 use App\Services\Request\RequestAnalyticsService;
@@ -18,14 +18,15 @@ class RequestService
 {
     public function __construct(
         private readonly RequestRepository $repository,
-        private readonly RequestAnalyticsService $analytics
+        private readonly RequestAnalyticsService $analytics,
+        private readonly NotificationService $notificationService
     ) {
     }
 
     /**
      * Store a new request or update existing one
      */
-    public function storeRequest(User $user, array $data, ?OCDRequest $request = null): OCDRequest
+    public function storeRequest(User $user, array $data, ?Request $request = null): Request
     {
         DB::beginTransaction();
 
@@ -38,6 +39,7 @@ class RequestService
             ];
 
             // Create or update the main request record
+            $isNewRequest = !$request;
             if ($request) {
                 $this->repository->update($request, $requestData);
             } else {
@@ -47,6 +49,24 @@ class RequestService
             // Create normalized detail if table exists
             if (Schema::hasTable('request_details')) {
                 $this->repository->createOrUpdateDetail($request, $data);
+            }
+
+            // Send notifications for new requests only
+            if ($isNewRequest) {
+                try {
+                    $notificationsSent = $this->notificationService->notifyUsersForNewRequest($request);
+                    Log::info('Request notifications processed', [
+                        'request_id' => $request->id,
+                        'notifications_sent' => count($notificationsSent),
+                        'users_notified' => array_column($notificationsSent, 'user_id')
+                    ]);
+                } catch (Exception $notificationError) {
+                    // Log notification errors but don't fail the request creation
+                    Log::error('Failed to send request notifications', [
+                        'request_id' => $request->id,
+                        'error' => $notificationError->getMessage()
+                    ]);
+                }
             }
 
             DB::commit();
@@ -65,7 +85,7 @@ class RequestService
     /**
      * Save request as draft
      */
-    public function saveDraft(User $user, array $data, ?OCDRequest $request = null): OCDRequest
+    public function saveDraft(User $user, array $data, ?Request $request = null): Request
     {
         DB::beginTransaction();
         try {
@@ -103,11 +123,16 @@ class RequestService
         return $this->repository->getAll();
     }
 
+    public function getAllRequestsAvailableForOffers(): Collection
+    {
+        return $this->repository->getAllAvailableForOffers();
+    }
+
 
     /**
      * Find request by ID with authorization
      */
-    public function findRequest(int $id, ?User $user = null): ?OCDRequest
+    public function findRequest(int $id, ?User $user = null): ?Request
     {
         return $this->repository->findWithAuthorization($id, $user);
     }
@@ -115,7 +140,7 @@ class RequestService
     /**
      * Update request status
      */
-    public function updateRequestStatus(int $requestId, string $statusCode, User $user) : OCDRequest
+    public function updateRequestStatus(int $requestId, string $statusCode, User $user) : Request
     {
         $request = $this->repository->findById($requestId);
 
@@ -244,7 +269,7 @@ class RequestService
     /**
      * Get request actions based on status and user
      */
-    public function getRequestActions(OCDRequest $request, User $user): array
+    public function getRequestActions(Request $request, User $user): array
     {
         $actions = [];
 
@@ -270,7 +295,7 @@ class RequestService
     /**
      * Get request for export
      */
-    public function getRequestForExport(int $requestId, User $user): ?OCDRequest
+    public function getRequestForExport(int $requestId, User $user): ?Request
     {
         $request = $this->findRequest($requestId, $user);
 
@@ -284,7 +309,7 @@ class RequestService
     /**
      * Get request by ID (for admin/system use)
      */
-    public function getRequestById(int $id, ?User $user = null): ?OCDRequest
+    public function getRequestById(int $id, ?User $user = null): ?Request
     {
         return $this->repository->findById($id);
     }
@@ -292,7 +317,7 @@ class RequestService
     /**
      * Get request title
      */
-    public function getRequestTitle(OCDRequest $request): string
+    public function getRequestTitle(Request $request): string
     {
         if ($request->detail && $request->detail->capacity_development_title) {
             return $request->detail->capacity_development_title;
@@ -305,7 +330,7 @@ class RequestService
     /**
      * Get requester name
      */
-    public function getRequesterName(OCDRequest $request): string
+    public function getRequesterName(Request $request): string
     {
         if ($request->detail) {
             return trim($request->detail->first_name . ' ' . $request->detail->last_name);

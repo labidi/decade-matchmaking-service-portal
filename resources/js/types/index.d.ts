@@ -8,10 +8,24 @@ export interface UIField {
     placeholder?: string;
     options?: { value: string; label: string }[];
     required?: boolean;
-    show?: (data: RequestForm) => boolean;
+    show?: (data: any) => boolean;  // Remove RequestForm dependency
     multiple?: boolean;
     image?: string;
     accept?: string;
+    // New additions:
+    disabled?: boolean;
+    min?: number;
+    max?: number;
+    step?: number;
+    pattern?: string;
+    maxLength?: number;
+    rows?: number;  // For textarea
+    cols?: number;  // For textarea
+    autoComplete?: string;
+    autoFocus?: boolean;
+    readOnly?: boolean;
+    className?: string;
+    onKeyDown?: (e: React.KeyboardEvent) => void;
 }
 
 export interface User {
@@ -251,6 +265,25 @@ export interface Notification {
 }
 
 export type NotificationList = Notification[];
+
+export interface UserNotificationPreference {
+    id: number;
+    user_id: number;
+    attribute_type: string;
+    attribute_value: string;
+    notification_enabled: boolean;
+    email_notification_enabled: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+export type UserNotificationPreferenceList = UserNotificationPreference[];
+
+export interface NotificationPreferencesPageProps extends PageProps {
+    preferences: Record<string, UserNotificationPreference[]>; // Grouped by attribute_type
+    availableOptions: Record<string, Array<{value: string, label: string}>>;
+    attributeTypes: Record<string, string>; // e.g., {'subtheme': 'Subtheme', 'coverage_activity': 'Coverage Activity'}
+}
 
 export type OpportunityTypeOptions = Record<string, string>;
 
