@@ -59,21 +59,20 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::get('notification-preferences', [NotificationPreferencesController::class, 'index'])
         ->name('notification-preferences');
-    Route::post('notification-preferences.store', [NotificationPreferencesController::class, 'store'])
+    Route::post('notification-preferences/store', [NotificationPreferencesController::class, 'store'])
         ->name('notification-preferences.store');
-    Route::post('notification-preferences.update', [NotificationPreferencesController::class, 'update'])
+    Route::post('notification-preferences/update', [NotificationPreferencesController::class, 'update'])
         ->name('notification-preferences.store');
-    Route::delete('notification-preferences.destory', [NotificationPreferencesController::class, 'destroy'])
-        ->name('notification-preferences.destory');
+    Route::delete('notification-preferences/destroy', [NotificationPreferencesController::class, 'destroy'])
+        ->name('notification-preferences.destroy');
 });
 
 Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::get('opportunity/me/list', [OpportunitiesController::class, 'mySubmittedList'])->name(
         'opportunity.me.list'
     );
-    Route::get('opportunity/create', [OpportunitiesController::class, 'create'])->name('partner.opportunity.create');
-    Route::post('opportunity/store', [OpportunitiesController::class, 'store'])->name('partner.opportunity.store');
-    Route::get('opportunity/browse', [OpportunitiesController::class, 'list'])->name('opportunity.browse');
+    Route::get('opportunity/create', [OpportunitiesController::class, 'create'])->name('opportunity.create');
+    Route::post('opportunity/store', [OpportunitiesController::class, 'store'])->name('opportunity.store');
     Route::patch('opportunity/{id}/status', [OpportunitiesController::class, 'updateStatus'])->name(
         'partner.opportunity.status'
     );
@@ -88,6 +87,7 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
     Route::get('settings', [SettingsController::class, 'index'])->name('admin.settings.index');
     Route::post('settings', [SettingsController::class, 'update'])->name('admin.settings.update');
+    Route::post('settings/organizations/csv-upload', [SettingsController::class, 'uploadOrganizationsCsv'])->name('admin.settings.organizations.csv-upload');
     Route::get('request/list', [AdminRequestsController::class, 'list'])->name('admin.request.list');
     Route::get('request/show/{request}', [AdminRequestsController::class, 'show'])->name('admin.request.show');
     Route::get('request/offers/{request}', [AdminRequestsController::class, 'show'])->name('admin.request.offers.list');

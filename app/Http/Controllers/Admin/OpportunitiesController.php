@@ -48,6 +48,7 @@ class OpportunitiesController extends Controller
                 'user' => $searchUser ?? '',
                 'title' => $searchTitle ?? '',
             ],
+            'routeName' => 'admin.opportunity.list',
             'breadcrumbs' => $this->buildOpportunityBreadcrumbs('list', null, true),
         ]);
     }

@@ -210,7 +210,9 @@ export interface OCDOpportunity {
     closing_date: string;
     coverage_activity: string;
     implementation_location: string;
+    implementation_location_label: string;
     target_audience: string;
+    target_audience_label: string;
     target_audience_other: string;
     summary: string;
     url: string;
@@ -220,7 +222,7 @@ export interface OCDOpportunity {
     status: number;
     status_label: string;
     can_edit: boolean;
-    keywords: string
+    keywords: string;
     user?: User;
 }
 
@@ -293,7 +295,18 @@ export interface Settings {
     site_logo: string;
     site_favicon: string;
     contact_email: string;
-    homepage_youtube_video:string;
+    homepage_youtube_video: string;
+    portal_guide: string;
+    user_guide: string;
+    partner_guide: string;
+    organizations_csv: string;
+}
+
+export interface CSVUploadResponse {
+    success: boolean;
+    message: string;
+    imported_count?: number;
+    errors?: string[];
 }
 
 

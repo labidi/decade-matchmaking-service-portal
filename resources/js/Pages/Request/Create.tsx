@@ -3,7 +3,7 @@ import React from 'react';
 import {Head, usePage} from '@inertiajs/react';
 import {OCDRequest} from '@/types';
 import {UIRequestForm} from '@/Forms/UIRequestForm';
-import FieldRenderer from '@/Components/Forms/FieldRenderer';
+import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {useRequestForm} from "@/hooks/useRequestForm";
 
 interface FormOptions {

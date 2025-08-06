@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { UIField } from '@/types';
-import FieldRenderer from './FieldRenderer';
+import FieldRenderer from './field-renderer';
 import { Button } from '@/components/ui/button';
 
 interface FormBuilderProps {
@@ -35,55 +35,55 @@ export function FormBuilder({
     // Validate form
     const validateForm = useCallback((formValues: Record<string, any>): Record<string, string> => {
         const fieldErrors: Record<string, string> = {};
-        
+
         fields.forEach(field => {
             const value = formValues[field.id];
-            
+
             // Required field validation
             if (field.required && (!value || value.toString().trim() === '')) {
                 fieldErrors[field.id] = `${field.label || field.id} is required`;
                 return;
             }
-            
+
             // Pattern validation
             if (field.pattern && value && !new RegExp(field.pattern).test(value)) {
                 fieldErrors[field.id] = `${field.label || field.id} format is invalid`;
                 return;
             }
-            
+
             // Min/Max validation for numbers
             if (field.min !== undefined && value < field.min) {
                 fieldErrors[field.id] = `${field.label || field.id} must be at least ${field.min}`;
                 return;
             }
-            
+
             if (field.max !== undefined && value > field.max) {
                 fieldErrors[field.id] = `${field.label || field.id} cannot exceed ${field.max}`;
                 return;
             }
-            
+
             // MaxLength validation
             if (field.maxLength && value && value.toString().length > field.maxLength) {
                 fieldErrors[field.id] = `${field.label || field.id} cannot exceed ${field.maxLength} characters`;
                 return;
             }
         });
-        
+
         // Custom validation if provided
         if (onValidate) {
             const customErrors = onValidate(formValues);
             Object.assign(fieldErrors, customErrors);
         }
-        
+
         return fieldErrors;
     }, [fields, onValidate]);
 
     const handleSubmit = useCallback((e: React.FormEvent) => {
         e.preventDefault();
-        
+
         const formErrors = validateForm(values);
         setValidationErrors(formErrors);
-        
+
         if (Object.keys(formErrors).length === 0) {
             onSubmit(values);
         }
@@ -91,7 +91,7 @@ export function FormBuilder({
 
     const handleFieldChange = useCallback((name: string, value: any) => {
         onChange(name, value);
-        
+
         // Clear validation error for this field
         if (validationErrors[name]) {
             setValidationErrors(prev => {
@@ -120,7 +120,7 @@ export function FormBuilder({
                     className={fieldClassName}
                 />
             ))}
-            
+
             <div className="flex justify-end pt-6">
                 <Button
                     type="submit"

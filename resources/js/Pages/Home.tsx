@@ -116,7 +116,7 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
                         )}
                         {auth.user && auth.user.is_partner && (
                             <CardLink
-                                link={route('partner.opportunity.create')}
+                                link={route('opportunity.create')}
                                 className={LinkOpportunityCardClassName}
                                 title="Submit Opportunity"
                                 text="Submit a new capacity development opportunity as an User."

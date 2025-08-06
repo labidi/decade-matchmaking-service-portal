@@ -9,9 +9,9 @@ interface TagInputProps {
 	placeholder?: string;
 }
 
-export default function TagsInput({ 
-	initialTags = [], 
-	onTagsChange, 
+export default function TagsInputss({
+	initialTags = [],
+	onTagsChange,
 	maxTags = 3,
 	placeholder = "Type and press enter"
 }: TagInputProps) {
@@ -24,12 +24,12 @@ export default function TagsInput({
 
 	const handleChange = (e: ChipsChangeEvent) => {
 		const newTags = e.value || [];
-		
+
 		if (newTags.length > maxTags) {
 			setError(`You can add up to ${maxTags} tags only.`);
 			return;
 		}
-		
+
 		setTags(newTags);
 		setError('');
 	};

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/16/solid';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
-import FieldRenderer from '@/Components/Forms/FieldRenderer';
+import FieldRenderer from '@/components/ui/forms/field-renderer';
 import { UIField } from '@/types';
 
 interface SearchField {

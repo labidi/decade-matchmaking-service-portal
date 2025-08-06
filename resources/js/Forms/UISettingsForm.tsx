@@ -65,5 +65,18 @@ export const UISettingsForm: UIStep[] = [
                 accept: 'application/pdf',
             }
         }
+    },
+    {
+        label: 'Data Management',
+        fields: {
+            organizations_csv: {
+                id: 'organizations_csv',
+                type: 'csv-upload',
+                required: false,
+                label: 'Organizations CSV Import',
+                description: 'Upload a CSV file containing organization data. The file should have 3 columns: organization name, description, and website link.',
+                accept: '.csv,text/csv,application/csv',
+            }
+        }
     }
 ]

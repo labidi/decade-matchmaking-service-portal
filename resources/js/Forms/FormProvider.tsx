@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeftIcon } from '@heroicons/react/16/solid';
-import FieldRenderer from '@/Components/Forms/FieldRenderer';
+import FieldRenderer from '@/components/ui/forms/field-renderer';
 import { UIField } from '@/types';
 import {Fieldset,Legend} from "@/components/ui/fieldset";
 
@@ -51,9 +51,9 @@ export function FormProvider({
         return field;
     };
 
-    const handleFieldChange = (name: string, value: any) => {
+    const handleFieldChange = useCallback((name: string, value: any) => {
         setData(name, value);
-    };
+    }, [setData]);
 
     const handleNext = () => {
         if (!isLastStep) {

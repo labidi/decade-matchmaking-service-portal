@@ -151,9 +151,9 @@ class SettingsService
     {
         $rules = [];
 
-        foreach (Setting::FILE_UPLOAD_SETTINGS as $path) {
-            $rules[$path] = Setting::getFileValidationRules($path);
-        }
+//        foreach (Setting::FILE_UPLOAD_SETTINGS as $path) {
+//            $rules[$path] = Setting::getFileValidationRules($path);
+//        }
 
         // Add non-file validation rules
         $rules[Setting::SITE_NAME] = ['nullable', 'string', 'max:255'];

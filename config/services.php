@@ -38,4 +38,7 @@ return [
         'auth_url' => 'https://oceanexpert.org/api/login_check',
         'search_url' =>'https://oceanexpert.org/api/v1/advancedSearch/search.json',
     ],
+    'linkedin-openid'=> [
+
+    ]
 ];

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Dialog} from 'primereact/dialog';
 import axios from 'axios';
-import FieldRenderer from '@/Components/Forms/FieldRenderer';
+import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {UIOfferForm, Offer} from '@/Forms/UIOfferForm';
 import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
 import { useForm } from '@inertiajs/react';
