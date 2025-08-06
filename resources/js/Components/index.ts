@@ -1,5 +1,5 @@
 // UI Components
-export { default as TagsInput } from './ui/TagsInput';
+// export { default as TagsInput } from './ui/TagsInput';
 export { default as InputError } from './ui/InputError';
 export { default as PrimaryButton } from './ui/PrimaryButton';
 
@@ -18,8 +18,8 @@ export { default as SignInDialog } from './Dialogs/SignInDialog';
 export { default as OffersDialog } from './Dialogs/OffersDialog';
 
 // Form Components
-export { default as SignInForm } from './Forms/SignInForm';
-export { default as FieldRenderer } from './Forms/FieldRenderer';
+export { default as SignInForm } from '../components/ui/forms/SignInForm';
+export { default as FieldRenderer } from '../components/ui/forms/field-renderer';
 
 // Common Components
 export { default as ApplicationLogo } from './Common/ApplicationLogo';

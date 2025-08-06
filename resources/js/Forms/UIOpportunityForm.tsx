@@ -64,13 +64,7 @@ export const UIOpportunityForm: UIStep[] = [
                 type: 'date',
                 required: true,
                 label: 'Application closing date (MM/DD/YY)',
-            },
-        },
-    },
-    {
-        label: 'Details',
-        fields: {
-            coverage_activity: {
+            }, coverage_activity: {
                 id: 'coverage_activity',
                 type: 'select',
                 required: true,
@@ -114,11 +108,11 @@ export const UIOpportunityForm: UIStep[] = [
             },
             key_words: {
                 id: 'key_words',
-                type: 'tags',
+                type: 'text',
                 required: false,
                 label: 'Three key words',
                 description: 'Add comma (,) to separate key words or press enter',
             },
         },
-    },
+    }
 ];

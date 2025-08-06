@@ -57,7 +57,7 @@ class RequestRepository
         return OCDRequest::with(['status', 'detail', 'user', 'offers'])->get();
     }
 
-    public function getAllAvailableForOffers():collection
+    public function getAllAvailableForOffers(): collection
     {
         return OCDRequest::with(['status', 'detail'])
             ->whereHas('status', function ($query) {
@@ -91,8 +91,11 @@ class RequestRepository
     /**
      * Get user's requests
      */
-    public function getUserRequests(User $user, array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
-    {
+    public function getUserRequests(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
         $query = $this->queryBuilder->buildUserRequestsQuery($user->id);
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
@@ -102,8 +105,11 @@ class RequestRepository
     /**
      * Get matched requests for user
      */
-    public function getMatchedRequests(User $user, array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
-    {
+    public function getMatchedRequests(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
         $query = $this->queryBuilder->buildMatchedRequestsQuery($user->id);
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
@@ -134,24 +140,18 @@ class RequestRepository
      */
     public function createOrUpdateDetail(OCDRequest $request, array $data): void
     {
-        $detailData = [
-            'capacity_development_title' => $data['capacity_development_title'] ?? null,
-            'first_name' => $data['first_name'] ?? null,
-            'last_name' => $data['last_name'] ?? null,
-            'email' => $data['email'] ?? null,
-            'related_activity' => $data['related_activity'] ?? null,
-            'gap_description' => $data['gap_description'] ?? null,
-            'expected_outcomes' => $data['expected_outcomes'] ?? null,
-            'unique_related_decade_action_id' => $data['unique_related_decade_action_id'] ?? null,
-            'project_url' => $data['project_url'] ?? null,
-            'delivery_countries' => $data['delivery_countries'] ?? null,
-            'budget_breakdown' => $data['budget_breakdown'] ?? null,
-            'completion_date' => $data['completion_date'] ?? null,
-            'subthemes' => $data['subthemes'] ?? [],
-            'support_types' => $data['support_types'] ?? [],
-            'target_audience' => $data['target_audience'] ?? [],
-        ];
-
+        foreach ($data as $key => $value) {
+            if ($key == 'mode') {
+                continue; // Skip is_partner field as it is not stored in detail
+            }
+            if (is_array($value)) {
+                $detailData[$key] = json_encode($value);
+            } elseif (is_null($value)) {
+                $detailData[$key] = null;
+            } else {
+                $detailData[$key] = $value;
+            }
+        }
         if ($request->detail) {
             $request->detail()->update($detailData);
         } else {
@@ -162,8 +162,10 @@ class RequestRepository
     /**
      * Check if request exists and user has access
      */
-    public function findWithAuthorization(int $id, ?User $user = null): ?OCDRequest
-    {
+    public function findWithAuthorization(
+        int $id,
+        ?User $user = null
+    ): ?OCDRequest {
         $request = $this->findById($id);
 
         if (!$request) {

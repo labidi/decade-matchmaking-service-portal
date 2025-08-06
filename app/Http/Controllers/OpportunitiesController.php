@@ -34,7 +34,7 @@ class OpportunitiesController extends Controller
                 'description' => 'Create a new Opportunity to get started.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'form' => [
+            'formOptions' => [
                 'countries' => CountryOptions::getOptions(),
                 'regions' => RegionOptions::getOptions(),
                 'oceans' => OceanOptions::getOptions(),
@@ -43,8 +43,8 @@ class OpportunitiesController extends Controller
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
-                ['name' => 'Create Opportunity', 'url' => route('partner.opportunity.create')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.me.list')],
+                ['name' => 'Create Opportunity', 'url' => route('opportunity.create')],
             ],
         ]);
     }
@@ -65,14 +65,11 @@ class OpportunitiesController extends Controller
         try {
             $opportunity = $this->opportunityService->createOpportunity($validatedData, $request->user());
 
-            return response()->json([
-                'message' => 'Opportunity created successfully',
-                'opportunity' => $opportunity
-            ], 201);
+            return to_route('opportunity.me.list')
+                ->with('success', 'Opportunity submitted successfully');
         } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Error creating opportunity: ' . $e->getMessage()
-            ], 500);
+            return to_route('opportunity.me.list')
+                ->with('error', 'Error while submitting Opportunity');
         }
     }
 
@@ -80,18 +77,15 @@ class OpportunitiesController extends Controller
     {
         $sortField = $httpRequest->get('sort', 'created_at');
         $sortOrder = $httpRequest->get('order', 'desc');
-        $searchUser = $httpRequest->get('user');
+
         $searchTitle = $httpRequest->get('title');
         $searchType = $httpRequest->get('type');
         $searchStatus = $httpRequest->get('status');
-        $searchLocation = $httpRequest->get('location');
 
         $searchFilters = array_filter([
-            'user' => $searchUser,
             'title' => $searchTitle,
             'type' => $searchType,
             'status' => $searchStatus,
-            'location' => $searchLocation,
         ]);
 
         $sortFilters = [
@@ -108,6 +102,7 @@ class OpportunitiesController extends Controller
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
             'title' => 'Opportunities',
+            'routeName' => 'opportunity.me.list',
             'banner' => [
                 'title' => 'List of My submitted Opportunities',
                 'description' => 'Manage your submitted opportunities here.',
@@ -117,23 +112,18 @@ class OpportunitiesController extends Controller
                 'field' => $sortField,
                 'order' => $sortOrder,
             ],
+            'searchFieldsOptions'=> [
+                'types' => Opportunity::getTypeOptions(),
+                'statuses' => OpportunityStatus::getOptions(),
+            ],
             'currentSearch' => [
-                'user' => $searchUser ?? '',
                 'title' => $searchTitle ?? '',
                 'type' => $searchType ?? '',
                 'status' => $searchStatus ?? '',
-                'location' => $searchLocation ?? '',
-            ],
-            'locationData' => [
-                'countries' => CountryOptions::getOptions(),
-                'regions' => RegionOptions::getOptions(),
-                'oceans' => OceanOptions::getOptions(),
-                'targetAudiences' => TargetAudienceOptions::getOptions(),
-                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.me.list')],
             ],
             'pageActions' => [
                 "canAddNew" => true,
@@ -149,18 +139,12 @@ class OpportunitiesController extends Controller
     {
         $sortField = $httpRequest->get('sort', 'created_at');
         $sortOrder = $httpRequest->get('order', 'desc');
-        $searchUser = $httpRequest->get('user');
         $searchTitle = $httpRequest->get('title');
         $searchType = $httpRequest->get('type');
-        $searchLocation = $httpRequest->get('location');
-        $searchClosingDate = $httpRequest->get('closing_date');
 
         $searchFilters = array_filter([
-            'user' => $searchUser,
             'title' => $searchTitle,
             'type' => $searchType,
-            'location' => $searchLocation,
-            'closing_date' => $searchClosingDate,
         ]);
 
         $sortFilters = [
@@ -182,23 +166,18 @@ class OpportunitiesController extends Controller
                 'description' => 'Browse and view opportunities submitted by CDF partners here.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'searchFieldsOptions'=> [
+                'types' => Opportunity::getTypeOptions(),
+                'statuses' => OpportunityStatus::getOptions(),
+            ],
             'currentSort' => [
                 'field' => $sortField,
                 'order' => $sortOrder,
             ],
+            'routeName' => 'opportunity.list',
             'currentSearch' => [
-                'user' => $searchUser ?? '',
                 'title' => $searchTitle ?? '',
                 'type' => $searchType ?? '',
-                'location' => $searchLocation ?? '',
-                'closing_date' => $searchClosingDate ?? '',
-            ],
-            'locationData' => [
-                'countries' => CountryOptions::getOptions(),
-                'regions' => RegionOptions::getOptions(),
-                'oceans' => OceanOptions::getOptions(),
-                'targetAudiences' => TargetAudienceOptions::getOptions(),
-                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
@@ -223,25 +202,28 @@ class OpportunitiesController extends Controller
             abort(404, 'Opportunity not found');
         }
 
+        $user = Auth::user();
+        $isOwner = $user && $opportunity->user_id === $user->id;
+        $canApply = $opportunity->status === OpportunityStatus::ACTIVE && $opportunity->url;
+
         return Inertia::render('Opportunity/Show', [
-            'opportunity' => $opportunity,
-            'title' => 'Opportunity Details',
             'banner' => [
-                'title' => 'Opportunity Details',
-                'description' => 'View the details of the selected opportunity.',
+                'title' => 'List of Opportunities',
+                'description' => 'Browse and view opportunities submitted by CDF partners here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'locationData' => [
-                'countries' => CountryOptions::getOptions(),
-                'regions' => RegionOptions::getOptions(),
-                'oceans' => OceanOptions::getOptions(),
-                'targetAudiences' => TargetAudienceOptions::getOptions(),
-                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
+            'opportunity' => $opportunity,
+            'title' => $opportunity->title,
+            'userPermissions' => [
+                'canEdit' => $isOwner,
+                'canDelete' => $isOwner && $opportunity->status === OpportunityStatus::PENDING_REVIEW,
+                'canApply' => $canApply,
+                'isOwner' => $isOwner,
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
-                ['name' => 'View Opportunity', 'url' => route('opportunity.show', ['id' => $id])],
+                ['name' => 'Opportunities', 'url' => route('opportunity.me.list')],
+                ['name' => $opportunity->title],
             ],
         ]);
     }
@@ -262,17 +244,17 @@ class OpportunitiesController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'opportunityTypes' => Opportunity::getTypeOptions(),
-            'form' => [
+            'formOptions' => [
                 'countries' => CountryOptions::getOptions(),
                 'regions' => RegionOptions::getOptions(),
                 'oceans' => OceanOptions::getOptions(),
                 'targetAudiences' => TargetAudienceOptions::getOptions(),
                 'opportunityTypes' => OpportunityTypeOptions::getOptions(),
             ],
-            'request' => $opportunity->toArray(),
+            'opportunity' => $opportunity->toArray(),
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
+                ['name' => 'Opportunities', 'url' => route('opportunity.me.list')],
                 [
                     'name' => 'Edit Opportunity #' . $opportunity->id,
                     'url' => route('opportunity.edit', ['id' => $opportunity->id])
@@ -337,7 +319,7 @@ class OpportunitiesController extends Controller
 
         // Determine if searching public opportunities or user's own
         $isPublicSearch = $httpRequest->get('public', false);
-        
+
         if ($isPublicSearch) {
             $opportunities = $this->opportunityService->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
         } else {

@@ -10,8 +10,8 @@ export function useRequestForm(request: OCDRequest) {
 
     const form = useForm({
         id: '',
-        is_partner: '',
-        unique_id: '',
+        is_related_decade_action: '',
+        unique_related_decade_action_id: '',
         first_name: '',
         last_name: '',
         email: '',

@@ -28,18 +28,25 @@ interface OpportunitiesPagination {
 interface OpportunitiesListPageProps {
     opportunities: OpportunitiesPagination;
     pageActions: OCDOpportunitiesListPageActions;
-    currentSort?: {
+    currentSort: {
         field: string;
         order: string;
     };
+    routeName: string;
     currentSearch?: Record<string, string>;
+    searchFieldsOptions?: {
+        types?: { value: string; label: string }[];
+        statuses?: { value: string; label: string }[];
+    }
 }
 
 export default function OpportunitiesList({
                                               opportunities,
                                               pageActions,
-                                              currentSort = {field: 'created_at', order: 'desc'},
-                                              currentSearch = {}
+                                              currentSort,
+                                              routeName,
+                                              currentSearch = {},
+                                              searchFieldsOptions
                                           }: Readonly<OpportunitiesListPageProps>) {
     const page = usePage();
     const {auth} = page.props;
@@ -89,17 +96,9 @@ export default function OpportunitiesList({
         <FrontendLayout>
             <Head title="My Opportunities"/>
             <div className="flex justify-between items-center mb-6">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        My Opportunities
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">
-                        Manage your published opportunities
-                    </p>
-                </div>
                 {auth.user.is_partner && pageActions.canSubmitNew && (
                     <Link
-                        href={route('partner.opportunity.create')}
+                        href={route('opportunity.create')}
                         className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
                     >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +114,7 @@ export default function OpportunitiesList({
                 currentSort={currentSort}
                 currentSearch={currentSearch}
                 columns={partnerColumns}
-                routeName="opportunity.list"
+                routeName={routeName}
                 getActionsForOpportunity={getActionsForOpportunity}
                 pagination={{
                     current_page: opportunities.current_page,
@@ -139,27 +138,14 @@ export default function OpportunitiesList({
                         type: 'select',
                         label: 'Type',
                         placeholder: 'Filter by type...',
-                        options: [
-                            {value: 'training', label: 'Training'},
-                            {value: 'fellowship', label: 'Fellowship'},
-                            {value: 'grant', label: 'Grant'},
-                            {value: 'scholarship', label: 'Scholarship'},
-                            {value: 'workshop', label: 'Workshop'},
-                            {value: 'conference', label: 'Conference'},
-                            {value: 'other', label: 'Other'}
-                        ]
+                        options: searchFieldsOptions?.types || []
                     },
                     {
                         id: 'status',
                         type: 'select',
                         label: 'Status',
                         placeholder: 'Filter by status...',
-                        options: [
-                            {value: '1', label: 'Active'},
-                            {value: '2', label: 'Closed'},
-                            {value: '3', label: 'Rejected'},
-                            {value: '4', label: 'Pending Review'}
-                        ]
+                        options: searchFieldsOptions?.statuses || []
                     }
                 ]}
                 showSearch={true}

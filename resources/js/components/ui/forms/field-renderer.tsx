@@ -8,6 +8,7 @@ import {CheckboxGroup, CheckboxField, Checkbox} from '@/components/ui/checkbox';
 import {ChevronsUpDown} from 'lucide-react';
 import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react';
 import { Text } from '@/components/ui/text'
+import CSVUpload from './csv-upload';
 
 interface FieldRendererProps {
     name: string;
@@ -276,7 +277,12 @@ export default function FieldRenderer({
             return (
                 <Field key={name} className="mt-8">
                     {field.label && <Label>{field.label}</Label>}
-                    {field.description && <Description>{field.description}</Description>}
+                    <Description>
+
+                    </Description>
+                    {field.description && <Description>
+                        {field.description}
+                    </Description>}
                     <Input
                         type="file"
                         id={field.id}
@@ -303,7 +309,7 @@ export default function FieldRenderer({
                                 <ComboboxInput
                                     className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 "
                                     displayValue={(value: string) => {
-                                        const option = field.options?.find(opt => opt.value === value);
+                                        const option = field.options?.find(opt => opt.value == value);
                                         return option ? option.label : value;
                                     }}
                                     onChange={event => setComboboxQuery(event.target.value)}
@@ -520,6 +526,20 @@ export default function FieldRenderer({
                     </CheckboxGroup>
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </Fieldset>
+            );
+
+        case 'csv-upload':
+            return (
+                <CSVUpload
+                    key={name}
+                    name={name}
+                    label={field.label}
+                    description={field.description}
+                    accept={field.accept}
+                    onChange={onChange}
+                    error={error}
+                    disabled={field.disabled || disabled}
+                />
             );
 
         default:

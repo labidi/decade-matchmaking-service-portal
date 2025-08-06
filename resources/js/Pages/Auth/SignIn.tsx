@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import SignInForm from '@/Components/Forms/SignInForm';
+import SignInForm from '@/components/ui/forms/SignInForm';
 
 export default function SignIn() {
     return (

@@ -27,7 +27,7 @@ export function DataTableActionsColumn<T = any>({
                                                     buttonColor = 'white',
                                                     buttonClassName = 'flex items-center gap-2',
                                                     menuAnchor = 'bottom end'
-                                                }: DataTableActionsColumnProps<T>) {
+                                                }: Readonly<DataTableActionsColumnProps<T>>) {
     if (!actions || actions.length === 0) {
         return null;
     }

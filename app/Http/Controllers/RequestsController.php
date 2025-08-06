@@ -220,19 +220,25 @@ class RequestsController extends Controller
 
     /**
      * Submit request (draft or final)
+     * @throws Exception
      */
     public function submit(\App\Http\Requests\StoreOcdRequest $request)
     {
         $requestId = $request->input('id') ?? null;
         $mode = $request->input('mode', 'submit');
-        if ($mode == 'draft') {
-            return $this->saveRequestAsDraft($request, $requestId);
+        try {
+            if ($mode == 'draft') {
+                return $this->saveRequestAsDraft($request, $requestId);
+            }
+            return $this->store($request, $requestId);
+        }catch (Exception $e) {
+            return to_route('request.create')->with('error', $e->getMessage());
         }
-        return $this->store($request, $requestId);
     }
 
     /**
      * Save request as draft
+     * @throws Exception
      */
     public function saveRequestAsDraft(Request $request, $requestId = null)
     {

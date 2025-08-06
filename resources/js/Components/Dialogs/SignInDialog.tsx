@@ -1,6 +1,6 @@
 import React from 'react';
 import {Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle} from '@/components/ui/dialog'
-import SignInForm from '@/Components/Forms/SignInForm';
+import SignInForm from '@/components/ui/forms/SignInForm';
 import {useState} from 'react';
 
 export default function SignInDialog() {

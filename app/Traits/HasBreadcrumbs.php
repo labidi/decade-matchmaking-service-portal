@@ -185,7 +185,7 @@ trait HasBreadcrumbs
     {
         $routes = [
             'Request' => $isAdmin ? 'admin.request.create' : 'request.create',
-            'Opportunity' => $isAdmin ? 'admin.opportunity.create' : 'partner.opportunity.create',
+            'Opportunity' => $isAdmin ? 'admin.opportunity.create' : 'opportunity.create',
         ];
 
         $route = $routes[$type] ?? null;
