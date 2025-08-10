@@ -31,6 +31,12 @@ class NotificationPreferencesController extends Controller
             'preferences' => $preferences,
             'availableOptions' => $availableOptions,
             'attributeTypes' => UserNotificationPreference::ATTRIBUTE_TYPES,
+            'title' => 'Test',
+            'banner' => [
+                'title' => 'Test',
+                'description' => 'Edit my notifications preferences details here.',
+                'image' => '/assets/img/sidebar.png',
+            ],
         ]);
     }
 

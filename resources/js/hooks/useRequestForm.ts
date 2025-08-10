@@ -63,7 +63,7 @@ export function useRequestForm(request: OCDRequest) {
             ...data,
             mode: mode,
         }));
-        form.post(route('request.submit'), {
+        form.post(route('request.submit',{'id':request?.id}), {
             preserveScroll: true,
             onBefore: () => {
             },

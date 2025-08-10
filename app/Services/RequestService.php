@@ -18,8 +18,7 @@ class RequestService
 {
     public function __construct(
         private readonly RequestRepository $repository,
-        private readonly RequestAnalyticsService $analytics,
-        private readonly NotificationService $notificationService
+        private readonly RequestAnalyticsService $analytics
     ) {
     }
 
@@ -28,58 +27,18 @@ class RequestService
      */
     public function storeRequest(User $user, array $data, ?Request $request = null): Request
     {
-        DB::beginTransaction();
-
-        try {
-            $statusId = $this->getStatusId('under_review');
-            $requestData = [
-                'user_id' => $user->id,
-                'status_id' => $statusId,
-                'request_data' => json_encode($data), // Keep JSON for backward compatibility
-            ];
-
-            // Create or update the main request record
-            $isNewRequest = !$request;
-            if ($request) {
-                $this->repository->update($request, $requestData);
-            } else {
-                $request = $this->repository->create($requestData);
-            }
-
-            // Create normalized detail if table exists
-            if (Schema::hasTable('request_details')) {
-                $this->repository->createOrUpdateDetail($request, $data);
-            }
-
-            // Send notifications for new requests only
-            if ($isNewRequest) {
-                try {
-                    $notificationsSent = $this->notificationService->notifyUsersForNewRequest($request);
-                    Log::info('Request notifications processed', [
-                        'request_id' => $request->id,
-                        'notifications_sent' => count($notificationsSent),
-                        'users_notified' => array_column($notificationsSent, 'user_id')
-                    ]);
-                } catch (Exception $notificationError) {
-                    // Log notification errors but don't fail the request creation
-                    Log::error('Failed to send request notifications', [
-                        'request_id' => $request->id,
-                        'error' => $notificationError->getMessage()
-                    ]);
-                }
-            }
-
-            DB::commit();
-            return $request->load(['status', 'detail']);
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to store request', [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-                'data' => $data
-            ]);
-            throw $e;
+        $statusId = $this->getStatusId('under_review');
+        $requestData = [
+            'user_id' => $user->id,
+            'status_id' => $statusId
+        ];
+        if ($request) {
+            $this->repository->update($request, $requestData);
+        } else {
+            $request = $this->repository->create($requestData);
         }
+        $this->repository->createOrUpdateDetail($request, $data);
+        return $request->load(['status', 'detail']);
     }
 
     /**
@@ -87,35 +46,18 @@ class RequestService
      */
     public function saveDraft(User $user, array $data, ?Request $request = null): Request
     {
-        DB::beginTransaction();
-        try {
-            $statusId = $this->getStatusId('draft');
-            $requestData = [
-                'user_id' => $user->id,
-                'status_id' => $statusId,
-                'request_data' => json_encode($data),
-            ];
-
-            // Create or update the main request record
-            if ($request) {
-                $this->repository->update($request, $requestData);
-            } else {
-                $request = $this->repository->create($requestData);
-            }
-
-            // Create normalized detail if table exists
-            $this->repository->createOrUpdateDetail($request, $data);
-            DB::commit();
-            return $request->load(['status', 'detail']);
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to save draft', [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-                'data' => $data
-            ]);
-            throw $e;
+        $statusId = $this->getStatusId('draft');
+        $requestData = [
+            'user_id' => $user->id,
+            'status_id' => $statusId,
+        ];
+        if ($request) {
+            $this->repository->update($request, $requestData);
+        } else {
+            $request = $this->repository->create($requestData);
         }
+        $this->repository->createOrUpdateDetail($request, $data);
+        return $request->load(['status', 'detail']);
     }
 
     public function getAllRequests(): Collection
@@ -140,7 +82,7 @@ class RequestService
     /**
      * Update request status
      */
-    public function updateRequestStatus(int $requestId, string $statusCode, User $user) : Request
+    public function updateRequestStatus(int $requestId, string $statusCode, User $user): Request
     {
         $request = $this->repository->findById($requestId);
 
@@ -158,7 +100,9 @@ class RequestService
             throw new Exception('Invalid status code');
         }
 
-        return $this->repository->update($request, ['status_id' => $statusId]) ? $request : throw new Exception('Failed to update request status');
+        return $this->repository->update($request, ['status_id' => $statusId]) ? $request : throw new Exception(
+            'Failed to update request status'
+        );
     }
 
     /**
@@ -262,7 +206,18 @@ class RequestService
     public function getActiveOffer(int $requestId): ?Offer
     {
         return Offer::where('request_id', $requestId)
-            ->where('status', 'active')
+            ->where('status', \App\Enums\RequestOfferStatus::ACTIVE)
+            ->first();
+    }
+
+    /**
+     * Get active offer with documents for a request
+     */
+    public function getActiveOfferWithDocuments(int $requestId): ?Offer
+    {
+        return Offer::where('request_id', $requestId)
+            ->where('status', \App\Enums\RequestOfferStatus::ACTIVE)
+            ->with(['documents', 'matchedPartner'])
             ->first();
     }
 
@@ -322,9 +277,7 @@ class RequestService
         if ($request->detail && $request->detail->capacity_development_title) {
             return $request->detail->capacity_development_title;
         }
-        $request->toJson();
-        $data = json_decode(json_encode($request->request_data), true);
-        return $data['capacity_development_title'] ?? 'Untitled Request';
+        return 'N/A';
     }
 
     /**
@@ -335,9 +288,7 @@ class RequestService
         if ($request->detail) {
             return trim($request->detail->first_name . ' ' . $request->detail->last_name);
         }
-
-        $data = json_decode(json_encode($request->request_data), true);
-        return trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? ''));
+        return 'N/A';
     }
 
 

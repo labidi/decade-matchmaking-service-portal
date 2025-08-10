@@ -4,7 +4,6 @@ use App\Http\Controllers\Admin\NotificationsController;
 use App\Http\Controllers\NotificationPreferencesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\RequestsController;
 use Inertia\Inertia;
 use App\Http\Controllers\User\OpportunityController as UserOpportunityController;
 use App\Http\Controllers\OpportunitiesController;
@@ -15,7 +14,9 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Dashboard\IndexController;
 use App\Http\Controllers\Admin\SettingsController;
 
-use App\Http\Controllers\Admin\RequestsController as AdminRequestsController;
+use App\Http\Controllers\Request\RequestListController;
+use App\Http\Controllers\Request\RequestViewController;
+use App\Http\Controllers\Request\RequestManagementController;
 use App\Http\Controllers\Admin\OpportunitiesController as AdminOpportunityController;
 use App\Http\Controllers\Admin\OffersController as AdminOffersController;
 use App\Http\Controllers\LocationDataController;
@@ -25,44 +26,26 @@ Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('user.home');
-    Route::get('user/request/create', [RequestsController::class, 'create'])->name('request.create');
-    Route::get('request/me/list', [RequestsController::class, 'myRequestsList'])->name('request.me.list');
-    Route::get('user/request/edit/{id}', [RequestsController::class, 'edit'])->name('request.edit');
-    Route::get('user/request/show/{id}', [RequestsController::class, 'show'])->name('request.show');
-    Route::get('request/preview/{id}', [RequestsController::class, 'preview'])->name('request.preview');
-    Route::get('request/me/matched-requests', [RequestsController::class, 'matchedRequest'])->name(
-        'request.me.matched-requests'
-    );
-
-    Route::get('user/request/pdf/{id}', [RequestsController::class, 'exportPdf'])->name('request.pdf');
-    Route::post('user/request/submit', [RequestsController::class, 'submit'])->name('request.submit');
-    Route::post('request/{id}/express-interest', [RequestsController::class, 'expressInterest'])->name(
-        'request.express.interest'
-    );
-
-    Route::patch('request/{id}/update-status', [RequestsController::class, 'updateStatus'])->name(
-        'request.update.status'
-    );
-    Route::post('user/request/{request}/document', [\App\Http\Controllers\DocumentsController::class, 'store'])->name(
-        'user.request.document.store'
+    
+    Route::post('user/offer/{offer}/document', [\App\Http\Controllers\DocumentsController::class, 'storeOfferDocument'])->name(
+        'user.offer.document.store'
     );
     Route::delete('user/document/{document}', [\App\Http\Controllers\DocumentsController::class, 'destroy'])->name(
         'user.document.destroy'
     );
     Route::get('user/document/{document}/download', [\App\Http\Controllers\DocumentsController::class, 'download']
     )->name('user.document.download');
-    Route::delete('user/request/{id}', [RequestsController::class, 'destroy'])->name('user.request.destroy');
+    
     Route::get('user/opportunity/show/{id}', [UserOpportunityController::class, 'show'])->name('user.opportunity.show');
     Route::get('opportunity/list', [OpportunitiesController::class, 'list'])->name('opportunity.list');
     Route::get('opportunity/show/{id}', [OpportunitiesController::class, 'show'])->name('opportunity.show');
-
 
     Route::get('notification-preferences', [NotificationPreferencesController::class, 'index'])
         ->name('notification-preferences');
     Route::post('notification-preferences/store', [NotificationPreferencesController::class, 'store'])
         ->name('notification-preferences.store');
     Route::post('notification-preferences/update', [NotificationPreferencesController::class, 'update'])
-        ->name('notification-preferences.store');
+        ->name('notification-preferences.update');
     Route::delete('notification-preferences/destroy', [NotificationPreferencesController::class, 'destroy'])
         ->name('notification-preferences.destroy');
 });
@@ -79,7 +62,6 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::delete('opportunity/{id}', [OpportunitiesController::class, 'destroy'])->name(
         'partner.opportunity.destroy'
     );
-    Route::get('request/list', [RequestsController::class, 'list'])->name('request.list');
     Route::get('opportunity/edit/{id}', [OpportunitiesController::class, 'edit'])->name('opportunity.edit');
 });
 
@@ -88,13 +70,13 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('settings', [SettingsController::class, 'index'])->name('admin.settings.index');
     Route::post('settings', [SettingsController::class, 'update'])->name('admin.settings.update');
     Route::post('settings/organizations/csv-upload', [SettingsController::class, 'uploadOrganizationsCsv'])->name('admin.settings.organizations.csv-upload');
-    Route::get('request/list', [AdminRequestsController::class, 'list'])->name('admin.request.list');
-    Route::get('request/show/{request}', [AdminRequestsController::class, 'show'])->name('admin.request.show');
-    Route::get('request/offers/{request}', [AdminRequestsController::class, 'show'])->name('admin.request.offers.list');
-    Route::post('request/{request}/update-status', [AdminRequestsController::class, 'updateStatus'])->name('admin.request.update-status');
+    Route::get('request/list', [RequestListController::class, 'list'])->name('admin.request.list');
+    Route::get('request/show/{request}', [RequestViewController::class, 'show'])->name('admin.request.show');
+    Route::get('request/offers/{request}', [RequestViewController::class, 'show'])->name('admin.request.offers.list');
+    Route::post('request/{request}/update-status', [RequestManagementController::class, 'updateStatus'])->name('admin.request.update-status');
 
     Route::get('opportunity/list', [AdminOpportunityController::class, 'list'])->name('admin.opportunity.list');
-    Route::get('request/export/csv', [AdminRequestsController::class, 'exportCsv'])->name('admin.request.export.csv');
+    Route::get('request/export/csv', [RequestListController::class, 'exportCsv'])->name('admin.request.export.csv');
 
     // Offer Management Routes
     Route::get('offers', [AdminOffersController::class, 'list'])->name('admin.offers.list');
@@ -137,3 +119,4 @@ Route::get('api/partners', [OffersController::class, 'partnersList'])->name('api
 
 
 require __DIR__ . '/auth.php';
+require __DIR__ . '/request.php';

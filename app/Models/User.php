@@ -31,6 +31,9 @@ class User extends Authenticatable
         'last_name',
         'country',
         'city',
+        'provider',
+        'provider_id',
+        'avatar',
     ];
 
     /**
@@ -90,6 +93,36 @@ class User extends Authenticatable
     public function notificationPreferences(): HasMany
     {
         return $this->hasMany(UserNotificationPreference::class);
+    }
+
+    /**
+     * Check if user is authenticated via social provider
+     */
+    public function isSocialUser(): bool
+    {
+        return !empty($this->provider) && !empty($this->provider_id);
+    }
+
+    /**
+     * Check if user is authenticated via LinkedIn
+     */
+    public function isLinkedInUser(): bool
+    {
+        return $this->provider === 'linkedin';
+    }
+
+    /**
+     * Get the user's avatar URL with fallback
+     */
+    public function getAvatarUrl(): string
+    {
+        if ($this->avatar) {
+            return $this->avatar;
+        }
+
+        // Fallback to Gravatar or default avatar
+        $hash = md5(strtolower(trim($this->email)));
+        return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=150";
     }
 
 }

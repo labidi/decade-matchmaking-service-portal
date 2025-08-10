@@ -119,7 +119,7 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
                                 link={route('opportunity.create')}
                                 className={LinkOpportunityCardClassName}
                                 title="Submit Opportunity"
-                                text="Submit a new capacity development opportunity as an User."
+                                text="Submit a new capacity development opportunity as a Partner."
                             />
                         )}
                         {auth.user && auth.user.is_partner && (

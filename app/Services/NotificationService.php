@@ -17,6 +17,7 @@ class NotificationService
      */
     public function notifyUsersForNewRequest(OCDRequest $request): array
     {
+        // needs refactoring to handle only normalized storage
         $notificationsSent = [];
 
         DB::transaction(function () use ($request, &$notificationsSent) {
@@ -29,7 +30,7 @@ class NotificationService
                 }
 
                 $notification = $this->createNotificationForRequest($request, $preference);
-                
+
                 if ($notification) {
                     $notificationsSent[] = [
                         'user_id' => $preference->user_id,
@@ -37,13 +38,6 @@ class NotificationService
                         'attribute_type' => $preference->attribute_type,
                         'attribute_value' => $preference->attribute_value,
                     ];
-
-                    Log::info('Request notification sent', [
-                        'request_id' => $request->id,
-                        'user_id' => $preference->user_id,
-                        'attribute_type' => $preference->attribute_type,
-                        'attribute_value' => $preference->attribute_value,
-                    ]);
                 }
             }
         });
@@ -60,7 +54,7 @@ class NotificationService
 
         // Get request data - handle both JSON and normalized storage
         $requestData = $request->request_data ?? [];
-        
+
         // Extract attributes to check against preferences
         $attributesToCheck = $this->extractRequestAttributes($request, $requestData);
 
@@ -204,9 +198,9 @@ class NotificationService
      */
     private function generateNotificationDescription(OCDRequest $request, UserNotificationPreference $preference): string
     {
-        $requestTitle = $request->request_data['title'] ?? $request->requestDetail?->title ?? 'New Request';
+        $requestTitle = $request->detail?->title ?? 'New Request';
         $attributeDisplayName = $preference->getAttributeTypeDisplayName();
-        
+
         return "A new request '{$requestTitle}' has been submitted that matches your {$attributeDisplayName} interest in '{$preference->attribute_value}'.";
     }
 
@@ -227,10 +221,10 @@ class NotificationService
      * Update or create user preference
      */
     public function updateUserPreference(
-        User $user, 
-        string $attributeType, 
-        string $attributeValue, 
-        bool $notificationEnabled = true, 
+        User $user,
+        string $attributeType,
+        string $attributeValue,
+        bool $notificationEnabled = true,
         bool $emailNotificationEnabled = false
     ): UserNotificationPreference {
         return UserNotificationPreference::updateOrCreate(

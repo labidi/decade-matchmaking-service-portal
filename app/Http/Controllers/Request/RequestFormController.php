@@ -1,0 +1,141 @@
+<?php
+
+namespace App\Http\Controllers\Request;
+
+use Inertia\Inertia;
+use Inertia\Response;
+use App\Models\Data\CountryOptions;
+use App\Models\Data\SubThemeOptions;
+use App\Models\Data\SupportTypeOptions;
+use App\Models\Data\RelatedActivityOptions;
+use App\Models\Data\DeliveryFormatOptions;
+use App\Models\Data\TargetAudienceOptions;
+use App\Models\Request as OCDRequest;
+use App\Http\Requests\StoreOcdRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use Exception;
+
+class RequestFormController extends BaseRequestController
+{
+    /**
+     * Show the form for creating a new resource or editing an existing one.
+     */
+    public function form(?int $id = null): Response|RedirectResponse
+    {
+        // Check if this is edit mode (ID provided) or create mode (no ID)
+        $isEditMode = !is_null($id);
+        if ($isEditMode) {
+            $request = $this->service->findRequest($id, Auth::user());
+            // Edit mode - fetch the existing request
+            if (!$request) {
+                return to_route('request.me.list')->with('error', 'Request not found.');
+            }
+        }
+        $data = [
+            'formOptions' => [
+                'subthemes' => SubThemeOptions::getOptions(),
+                'support_types' => SupportTypeOptions::getOptions(),
+                'related_activity' => RelatedActivityOptions::getOptions(),
+                'delivery_format' => DeliveryFormatOptions::getOptions(),
+                'target_audience' => TargetAudienceOptions::getOptions(),
+                'delivery_countries' => CountryOptions::getOptions()
+            ],
+        ];
+        if ($isEditMode) {
+            $requestTitle = $this->service->getRequestTitle($request);
+            $data = array_merge($data, [
+                'title' => 'Request : ' . $requestTitle,
+                'banner' => [
+                    'title' => 'Request : ' . $requestTitle,
+                    'description' => 'Edit my request details here.',
+                    'image' => '/assets/img/sidebar.png',
+                ],
+                'request' => $request->toArray(),
+                'breadcrumbs' => [
+                    ['name' => 'Home', 'url' => route('user.home')],
+                    ['name' => 'Requests', 'url' => route('request.me.list')],
+                    [
+                        'name' => 'Edit Request #' . $request->id,
+                        'url' => route('request.edit', ['id' => $request->id])
+                    ],
+                ],
+            ]);
+        } else {
+            // Create mode - new request
+            $data = array_merge($data, [
+                'title' => 'Create a new request',
+                'banner' => [
+                    'title' => 'Create a new request',
+                    'description' => 'Create a new request to get started.',
+                    'image' => '/assets/img/sidebar.png',
+                ],
+                'breadcrumbs' => [
+                    ['name' => 'Home', 'url' => route('user.home')],
+                    ['name' => 'Requests', 'url' => route('request.me.list')],
+                    ['name' => 'Create Request', 'url' => route('request.create')],
+                ],
+            ]);
+        }
+
+        return Inertia::render('Request/Create', $data);
+    }
+
+    /**
+     * Handle all form submissions (store, submit, draft)
+     */
+    public function submit(StoreOcdRequest $request, ?int $id = null): RedirectResponse
+    {
+        $mode = $request->input('mode', 'submit');
+
+        try {
+            if ($mode === 'draft') {
+                return $this->saveRequestAsDraft($request, $id);
+            }
+            return $this->storeRequest($request, $id);
+        } catch (Exception $e) {
+            if ($id) {
+                return to_route('request.edit', ['id' => $id])->with('error', $e->getMessage());
+            }
+            return to_route('request.create')->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Save request as draft
+     * @throws Exception
+     */
+    private function saveRequestAsDraft(StoreOcdRequest $request, $requestId = null): RedirectResponse
+    {
+        $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
+        if ($requestId && !$ocdRequest) {
+            throw new Exception('Request not found');
+        }
+
+        $ocdRequest = $this->service->saveDraft($request->user(), $request->all(), $ocdRequest);
+
+        return to_route('request.edit', ['id' => $ocdRequest->id])->with([
+            'success' => 'Request draft saved successfully.',
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     * @throws Exception
+     */
+    private function storeRequest(StoreOcdRequest $request, $requestId = null): RedirectResponse
+    {
+        $validated = $request->validated();
+
+        $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
+        if ($requestId && !$ocdRequest) {
+            throw new Exception('Request not found');
+        }
+
+        $ocdRequest = $this->service->storeRequest($request->user(), $validated, $ocdRequest);
+
+        return to_route('request.me.list')->with([
+            'success' => 'Request submitted successfully.',
+        ]);
+    }
+}

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Document;
 use App\Models\Request as OCDRequest;
+use App\Models\Request\Offer;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Validation\Rule;
 use App\Enums\DocumentType;
@@ -32,6 +33,32 @@ class DocumentsController extends Controller
             );
 
             return back()->with('success', 'Document uploaded successfully');
+        } catch (Exception $e) {
+            return back()->with('error', 'Failed to upload document: ' . $e->getMessage());
+        }
+    }
+
+    public function storeOfferDocument(HttpRequest $httpRequest, Offer $offer)
+    {
+        // Check if user can upload documents to this offer
+        if (!$offer->can_edit) {
+            return back()->with('error', 'You are not authorized to upload documents to this offer');
+        }
+
+        $validated = $httpRequest->validate([
+            'document_type' => ['required', Rule::enum(DocumentType::class)],
+            'file' => ['required', 'file'],
+        ]);
+
+        try {
+            $this->documentService->storeDocument(
+                $httpRequest->file('file'),
+                $validated['document_type'],
+                $offer,
+                $httpRequest->user()
+            );
+
+            return back()->with('success', 'Document uploaded successfully to offer');
         } catch (Exception $e) {
             return back()->with('error', 'Failed to upload document: ' . $e->getMessage());
         }

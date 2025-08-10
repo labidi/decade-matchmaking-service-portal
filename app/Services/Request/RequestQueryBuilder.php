@@ -36,10 +36,6 @@ class RequestQueryBuilder
             });
         }
 
-        if (!empty($searchFilters['activity'])) {
-            $query->where('request_data->related_activity', $searchFilters['activity']);
-        }
-
         return $query;
     }
 
@@ -83,22 +79,12 @@ class RequestQueryBuilder
      */
     private function applyGeneralSearch(Builder $query, string $searchTerm): void
     {
-        // Search in JSON data (fallback)
-        $query->where(function (Builder $q) use ($searchTerm) {
-            $q->where('request_data->capacity_development_title', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('request_data->gap_description', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('request_data->expected_outcomes', 'LIKE', "%{$searchTerm}%");
+        $query->orWhereHas('detail', function (Builder $q) use ($searchTerm) {
+            $q->whereRaw(
+                'MATCH(capacity_development_title, gap_description, expected_outcomes) AGAINST(? IN BOOLEAN MODE)',
+                [$searchTerm]
+            );
         });
-
-        // Use normalized search if available (better performance)
-        if (Schema::hasTable('request_details')) {
-            $query->orWhereHas('detail', function (Builder $q) use ($searchTerm) {
-                $q->whereRaw(
-                    'MATCH(capacity_development_title, gap_description, expected_outcomes) AGAINST(? IN BOOLEAN MODE)',
-                    [$searchTerm]
-                );
-            });
-        }
     }
 
     /**
