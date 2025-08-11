@@ -18,7 +18,7 @@ enum TargetAudience: string
     case WOMEN = 'Women';
     case GOVERNMENT = 'Government';
     case YOUTH = 'Youth';
-    case OTHER = 'Other (Please Specify)';
+    case OTHER = 'Other';
 
     public function label(): string
     {

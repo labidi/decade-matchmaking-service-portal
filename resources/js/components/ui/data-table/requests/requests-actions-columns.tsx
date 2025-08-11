@@ -42,14 +42,14 @@ export function buildRequestActions(
         actions.push({
             key: 'add-offer',
             label: 'Add New Offer',
-            onClick: () => router.visit(route('admin.offers.create', {request_id: request.id})),
+            onClick: () => router.visit(route('admin.offers.create', {id: request.id})),
             divider: actions.length > 0
         });
 
         actions.push({
             key: 'see-offers',
             label: 'See request offers',
-            onClick: () => router.visit(route('admin.offers.list', {request: request.id}))
+            onClick: () => router.visit(route('admin.offers.list', {id: request.id}))
         });
     }
 

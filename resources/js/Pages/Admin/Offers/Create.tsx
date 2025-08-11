@@ -11,14 +11,11 @@ interface CreateOfferPageProps {
     partners: User[];
     availableRequests: OCDRequest[];
 }
-
 export default function CreateOffer({
                                         selectedRequest,
                                         partners,
                                         availableRequests
                                     }: Readonly<CreateOfferPageProps>) {
-
-    console.log(availableRequests);
     return (
         <SidebarLayout>
             <Head title="Create New Offer"/>

@@ -11,9 +11,6 @@ use App\Http\Controllers\OffersController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Dashboard\IndexController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Request\RequestListController;
-use App\Http\Controllers\Request\RequestViewController;
-use App\Http\Controllers\Request\RequestManagementController;
 use App\Http\Controllers\Opportunities\ListController as OpportunityListController;
 use App\Http\Controllers\Admin\OffersController as AdminOffersController;
 use App\Http\Controllers\LocationDataController;
@@ -33,21 +30,11 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     )->name('user.document.download');
 });
 
-Route::middleware(['auth', 'role:partner'])->group(function () {
-});
-
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard.index');
     Route::get('settings', [SettingsController::class, 'index'])->name('admin.settings.index');
     Route::post('settings', [SettingsController::class, 'update'])->name('admin.settings.update');
     Route::post('settings/organizations/csv-upload', [SettingsController::class, 'uploadOrganizationsCsv'])->name('admin.settings.organizations.csv-upload');
-    Route::get('request/list', [RequestListController::class, 'list'])->name('admin.request.list');
-    Route::get('request/show/{request}', [RequestViewController::class, 'show'])->name('admin.request.show');
-    Route::get('request/offers/{request}', [RequestViewController::class, 'show'])->name('admin.request.offers.list');
-    Route::post('request/{request}/update-status', [RequestManagementController::class, 'updateStatus'])->name('admin.request.update-status');
-
-    Route::get('opportunity/list', OpportunityListController::class)->name('admin.opportunity.list');
-    Route::get('request/export/csv', [RequestListController::class, 'exportCsv'])->name('admin.request.export.csv');
 
     // Offer Management Routes
     Route::get('offers', [AdminOffersController::class, 'list'])->name('admin.offers.list');
@@ -58,6 +45,7 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::put('offers/{id}', [AdminOffersController::class, 'update'])->name('admin.offers.update');
     Route::delete('offers/{id}', [AdminOffersController::class, 'destroy'])->name('admin.offers.destroy');
 
+    Route::get('opportunity/list', OpportunityListController::class)->name('admin.opportunity.list');
     Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
     Route::get('user/list', [UserRoleController::class, 'index'])->name('admin.users.roles.list');
     Route::get('notifications', [NotificationsController::class, 'index'])->name('admin.notifications.index');

@@ -38,25 +38,16 @@ abstract class BaseOpportunitiesController extends Controller
     protected function getRouteContext(): string
     {
         $routeName = request()->route()->getName() ?? '';
-        
+
         if (str_starts_with($routeName, 'admin.')) {
             return 'admin';
         }
-        
+
         if (str_contains($routeName, '.me.')) {
             return 'user_own';
         }
-        
-        return 'public';
-    }
 
-    protected function buildBanner(string $title, string $description): array
-    {
-        return [
-            'title' => $title,
-            'description' => $description,
-            'image' => '/assets/img/sidebar.png',
-        ];
+        return 'public';
     }
 
     protected function formOptions(): array
@@ -68,7 +59,6 @@ abstract class BaseOpportunitiesController extends Controller
             'targetAudiences' => TargetAudience::getOptions(),
             'opportunityTypes' => OpportunityType::getOptions(),
             'yes_no' => YesNo::getOptions(),
-            'yes_no_lowercase' => YesNo::getOptionsLowercase(),
         ];
     }
 
@@ -108,4 +98,4 @@ abstract class BaseOpportunitiesController extends Controller
             'isOwner' => $isOwner,
         ];
     }
-} 
+}

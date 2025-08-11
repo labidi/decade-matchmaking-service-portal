@@ -11,13 +11,38 @@ class RequestManagementController extends BaseRequestController
     /**
      * Update request status - unified method for both admin and user contexts
      */
-    public function updateStatus(Request $request, ?int $requestId = null)
+    public function updateStatus(Request $request, ?int $id = null)
     {
-        // Handle admin route parameter format
-        if ($this->isAdminRoute() && !$requestId) {
-            $requestId = (int) $request->route('request');
+        try {
+            $validated = $this->validateStatusUpdate($request);
+
+            $result = $this->service->updateRequestStatus(
+                $id,
+                $validated['status_code'],
+                $request->user()
+            );
+
+            $message = 'Request status updated successfully';
+
+            if ($this->isAdminRoute()) {
+                return $this->getSuccessResponse($message, 'admin.request.list');
+            }
+
+            // For non-admin routes, return JSON with updated status
+            return response()->json([
+                'message' => $message,
+                'status' => $result['request']->status
+            ]);
+
+        } catch (\Exception $e) {
+            $statusCode = $e->getCode() ?: 500;
+
+            if ($this->isAdminRoute()) {
+                return $this->getErrorResponse($e->getMessage(), $statusCode, 'admin.request.list');
+            }
+
+            return response()->json(['error' => $e->getMessage()], $statusCode);
         }
-        return $this->handleStatusUpdate($request, $requestId);
     }
 
     /**

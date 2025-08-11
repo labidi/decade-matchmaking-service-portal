@@ -13,45 +13,49 @@ class RequestViewController extends BaseRequestController
     /**
      * Display the full request details - unified method for both admin and user contexts
      */
-    public function show(Request $request, ?int $requestId = null): Response
+    public function show(Request $request, ?int $id = null): Response
     {
-        // Handle admin route parameter format (request vs id)
-        if ($this->isAdminRoute() && !$requestId) {
-            $requestId = (int) $request->route('request');
-        }
+        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'offers'])
+            ->findOrFail($id);
 
-        if ($this->isAdminRoute()) {
-            // Admin view - can see any request
-            $ocdRequest = OCDRequest::with(['status', 'detail', 'user', 'offers'])
-                ->findOrFail($requestId);
-        } else {
-            // User view - only their accessible requests
-            $ocdRequest = $this->service->findRequest($requestId, $request->user());
-
-            if (!$ocdRequest) {
-                abort(404, 'Request not found');
-            }
-        }
-        $title = 'Request : ' . $this->service->getRequestTitle($ocdRequest);
         if ($this->isAdminRoute()) {
             // Admin view - simplified
-            $viewData = $this->getShowViewData('Request Details', $ocdRequest, $requestId);
+            $viewData = [
+                'title' => $this->service->getRequestTitle($userRequest),
+                'request' => $userRequest,
+                'breadcrumbs' => [
+                    ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
+                    ['name' => 'Requests', 'url' => route('admin.request.list')],
+                    [
+                        'name' => 'View Request #' . $userRequest->id,
+                        'url' => route('admin.request.show', ['id' => $userRequest->id])
+                    ],
+                ],
+            ];
             return Inertia::render($this->getViewPrefix() . 'Request/Show', $viewData);
         }
 
         // User view - with enhanced data and actions
-        $activeOffer = $this->service->getActiveOfferWithDocuments($requestId);
-        $actions = $this->service->getRequestActions($ocdRequest, $request->user());
+        $activeOffer = $this->service->getActiveOfferWithDocuments($id);
+        $actions = $this->service->getRequestActions($userRequest, $request->user());
 
-        $viewData = $this->getShowViewData($title, RequestEnhancer::enhanceRequest($ocdRequest), $requestId, [
+        $viewData = [
             'banner' => [
-                'title' => $title,
+                'title' => $this->service->getRequestTitle($userRequest),
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => route('user.home')],
+                [
+                    'name' => 'View Request #' . $userRequest->id,
+                    'url' => route('request.show', ['id' => $userRequest->id])
+                ],
+            ],
+            'request' => $userRequest,
             'activeOffer' => $activeOffer,
             'requestDetail.actions' => $actions,
-        ]);
+        ];
 
         return Inertia::render('Request/Show', $viewData);
     }

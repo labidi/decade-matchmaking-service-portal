@@ -189,6 +189,10 @@ export interface OCDRequest {
         success_metrics: string;
         long_term_impact: string;
         delivery_countries:string[];
+        target_audience: string[];
+        target_audience_other: string;
+        target_languages: string[];
+        target_languages_other: string;
     }
     created_at: string;
     matched_partner_id: string | null;
@@ -282,7 +286,23 @@ export interface UserNotificationPreference {
 export type UserNotificationPreferenceList = UserNotificationPreference[];
 
 // Common form options interface for consistent structure across forms
+export interface RequestFormOptions {
+    delivery_countries?: Array<{ value: string; label: string }>;
+    regions?: Array<{ value: string; label: string }>;
+    oceans?: Array<{ value: string; label: string }>;
+    subthemes?: Array<{ value: string; label: string }>;
+    support_types?: Array<{ value: string; label: string }>;
+    target_audience?: Array<{ value: string; label: string }>;
+    target_languages?: Array<{ value: string; label: string }>;
+    delivery_format?: Array<{ value: string; label: string }>;
+    opportunity_types?: Array<{ value: string; label: string }>;
+    related_activity?: Array<{ value: string; label: string }>;
+    yes_no?: Array<{ value: string; label: string }>;
+    project_stage?: Array<{ value: string; label: string }>;
+}
+// Common form options interface for consistent structure across forms
 export interface FormOptions {
+    delivery_countries?: Array<{ value: string; label: string }>;
     countries?: Array<{ value: string; label: string }>;
     regions?: Array<{ value: string; label: string }>;
     oceans?: Array<{ value: string; label: string }>;
@@ -293,7 +313,7 @@ export interface FormOptions {
     opportunity_types?: Array<{ value: string; label: string }>;
     related_activity?: Array<{ value: string; label: string }>;
     yes_no?: Array<{ value: string; label: string }>;
-    yes_no_lowercase?: Array<{ value: string; label: string }>;
+    project_stage?: Array<{ value: string; label: string }>;
 }
 
 export interface NotificationPreferencesPageProps extends PageProps {

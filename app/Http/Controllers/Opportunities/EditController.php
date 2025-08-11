@@ -42,8 +42,7 @@ class EditController extends Controller
                 'oceans' => Ocean::getOptions(),
                 'targetAudiences' => TargetAudience::getOptions(),
                 'opportunityTypes' => OpportunityType::getOptions(),
-                'yes_no' => YesNo::getOptions(),
-                'yes_no_lowercase' => YesNo::getOptionsLowercase(),
+                'yes_no' => YesNo::getOptions()
             ],
             'opportunity' => $opportunity->toArray(),
             'breadcrumbs' => [
@@ -56,4 +55,4 @@ class EditController extends Controller
             ],
         ]);
     }
-} 
+}

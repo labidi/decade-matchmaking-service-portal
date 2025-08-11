@@ -9,6 +9,15 @@ abstract class Controller
      */
     protected function isAdminRoute(): bool
     {
-        return request()->route()->getPrefix() ===  'admin';
+        return str_contains(request()->route()->getPrefix(),'admin');
+    }
+
+    protected function buildBanner(string $title, string $description): array
+    {
+        return [
+            'title' => $title,
+            'description' => $description,
+            'image' => '/assets/img/sidebar.png',
+        ];
     }
 }

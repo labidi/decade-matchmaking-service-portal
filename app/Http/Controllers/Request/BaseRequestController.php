@@ -27,14 +27,6 @@ abstract class BaseRequestController extends Controller
     }
 
     /**
-     * Detect if current route is an admin route
-     */
-    protected function isAdminRoute(): bool
-    {
-        return str_starts_with(request()->route()->getName() ?? '', 'admin.');
-    }
-
-    /**
      * Get the view prefix based on route context
      */
     protected function getViewPrefix(): string
@@ -166,20 +158,6 @@ abstract class BaseRequestController extends Controller
     }
 
     /**
-     * Get context-appropriate view data for show operations
-     */
-    protected function getShowViewData(string $title, $request, ?int $requestId = null, array $additional = []): array
-    {
-        $baseData = [
-            'title' => $title,
-            'request' => $request,
-            'breadcrumbs' => $this->buildContextualRequestBreadcrumbs('show', $requestId),
-        ];
-
-        return array_merge($baseData, $additional);
-    }
-
-    /**
      * Handle common status update validation
      */
     protected function validateStatusUpdate(Request $request): array
@@ -189,40 +167,4 @@ abstract class BaseRequestController extends Controller
         ]);
     }
 
-    /**
-     * Handle status update with context-aware response
-     */
-    protected function handleStatusUpdate(Request $request, int $requestId): mixed
-    {
-        try {
-            $validated = $this->validateStatusUpdate($request);
-
-            $result = $this->service->updateRequestStatus(
-                $requestId,
-                $validated['status_code'],
-                $request->user()
-            );
-
-            $message = 'Request status updated successfully';
-
-            if ($this->isAdminRoute()) {
-                return $this->getSuccessResponse($message, 'admin.request.list');
-            }
-
-            // For non-admin routes, return JSON with updated status
-            return response()->json([
-                'message' => $message,
-                'status' => $result['request']->status
-            ]);
-
-        } catch (\Exception $e) {
-            $statusCode = $e->getCode() ?: 500;
-
-            if ($this->isAdminRoute()) {
-                return $this->getErrorResponse($e->getMessage(), $statusCode, 'admin.request.list');
-            }
-
-            return response()->json(['error' => $e->getMessage()], $statusCode);
-        }
-    }
 }

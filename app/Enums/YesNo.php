@@ -4,8 +4,8 @@ namespace App\Enums;
 
 enum YesNo: string
 {
-    case YES = 'Yes';
-    case NO = 'No';
+    case YES = 'yes';
+    case NO = 'no';
 
     public function label(): string
     {
@@ -40,16 +40,5 @@ enum YesNo: string
     public static function fromBool(bool $value): self
     {
         return $value ? self::YES : self::NO;
-    }
-
-    /**
-     * Get options with lowercase values for backward compatibility
-     */
-    public static function getOptionsLowercase(): array
-    {
-        return [
-            ['value' => 'yes', 'label' => 'Yes'],
-            ['value' => 'no', 'label' => 'No'],
-        ];
     }
 }

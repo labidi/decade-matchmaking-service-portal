@@ -224,12 +224,27 @@ export default function FieldRenderer({
                 </Field>
 
             );
-
+        case 'date':
+            return (
+                <Field key={name} className="mt-8 grid grid-cols-subgrid sm:col-span-3">
+                    {field.label && <Label>{field.label}</Label>}
+                    {field.description && <Description>{field.description}</Description>}
+                    <Input
+                        type={field.type}
+                        id={field.id}
+                        required={field.required}
+                        value={ new Date(value).toISOString().slice(0, 10) || ''}
+                        placeholder={field.placeholder ?? ''}
+                        onChange={handleChange}
+                        invalid={!!error}
+                    />
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                </Field>
+            );
         case 'text':
         case 'email':
         case 'url':
         case 'number':
-        case 'date':
         case 'password':
         case 'search':
         case 'tel':

@@ -10,6 +10,8 @@ use App\Enums\SupportType;
 use App\Enums\RelatedActivity;
 use App\Enums\DeliveryFormat;
 use App\Enums\TargetAudience;
+use App\Enums\Language;
+use App\Enums\ProjectStage;
 use App\Enums\YesNo;
 use App\Models\Request;
 use App\Http\Requests\StoreRequest;
@@ -40,20 +42,20 @@ class RequestFormController extends BaseRequestController
                 'related_activity' => RelatedActivity::getOptions(),
                 'delivery_format' => DeliveryFormat::getOptions(),
                 'target_audience' => TargetAudience::getOptions(),
+                'target_languages' => Language::getOptions(),
                 'delivery_countries' => Country::getOptions(),
+                'project_stage' => ProjectStage::getOptions(),
                 'yes_no' => YesNo::getOptions(),
-                'yes_no_lowercase' => YesNo::getOptionsLowercase()
             ],
         ];
         if ($isEditMode) {
             $requestTitle = $this->service->getRequestTitle($request);
             $data = array_merge($data, [
                 'title' => 'Request : ' . $requestTitle,
-                'banner' => [
-                    'title' => 'Request : ' . $requestTitle,
-                    'description' => 'Edit my request details here.',
-                    'image' => '/assets/img/sidebar.png',
-                ],
+                'banner' => $this->buildBanner(
+                    'Request : ' . $requestTitle,
+                    'Edit my request details here.'
+                ),
                 'request' => $request->toArray(),
                 'breadcrumbs' => [
                     ['name' => 'Home', 'url' => route('user.home')],
@@ -130,12 +132,12 @@ class RequestFormController extends BaseRequestController
     {
         $validated = $request->validated();
 
-        $request = $id ? Request::find($id) : null;
+        $userRequest = $id ? Request::find($id) : null;
         if ($id && !$request) {
             throw new Exception('Request not found');
         }
 
-        $request = $this->service->storeRequest($request->user(), $validated, $request);
+        $request = $this->service->storeRequest($request->user(), $validated, $userRequest);
 
         return to_route('request.me.list')->with([
             'success' => 'Request submitted successfully.',
