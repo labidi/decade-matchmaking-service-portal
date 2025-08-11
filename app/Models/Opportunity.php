@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 use App\Models\LocationData;
-use App\Models\Data\TargetAudienceOptions;
+use App\Enums\TargetAudience;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Enums\OpportunityStatus;
-use App\Models\Data\OpportunityTypeOptions;
+use App\Enums\OpportunityType;
 
 
 class Opportunity extends Model
@@ -29,7 +29,7 @@ class Opportunity extends Model
 
     public static function getTypeOptions(): array
     {
-        return OpportunityTypeOptions::getOptions();
+        return OpportunityType::getOptions();
     }
 
     protected $casts = [
@@ -64,7 +64,7 @@ class Opportunity extends Model
     protected function typeLabel(): Attribute
     {
         return Attribute::make(
-            get: fn() => OpportunityTypeOptions::getLabel($this->type),
+            get: fn() => OpportunityType::getLabelByValue($this->type),
         );
     }
 
@@ -98,7 +98,7 @@ class Opportunity extends Model
                     return '';
                 }
 
-                return TargetAudienceOptions::getLabel($this->target_audience);
+                return TargetAudience::getLabelByValue($this->target_audience);
             }
         );
     }

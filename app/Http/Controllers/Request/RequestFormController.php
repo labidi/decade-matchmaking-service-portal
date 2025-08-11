@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Request;
 
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\Data\CountryOptions;
-use App\Models\Data\SubThemeOptions;
-use App\Models\Data\SupportTypeOptions;
-use App\Models\Data\RelatedActivityOptions;
-use App\Models\Data\DeliveryFormatOptions;
-use App\Models\Data\TargetAudienceOptions;
-use App\Models\Request as OCDRequest;
-use App\Http\Requests\StoreOcdRequest;
+use App\Enums\Country;
+use App\Enums\SubTheme;
+use App\Enums\SupportType;
+use App\Enums\RelatedActivity;
+use App\Enums\DeliveryFormat;
+use App\Enums\TargetAudience;
+use App\Enums\YesNo;
+use App\Models\Request;
+use App\Http\Requests\StoreRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Exception;
@@ -34,12 +35,14 @@ class RequestFormController extends BaseRequestController
         }
         $data = [
             'formOptions' => [
-                'subthemes' => SubThemeOptions::getOptions(),
-                'support_types' => SupportTypeOptions::getOptions(),
-                'related_activity' => RelatedActivityOptions::getOptions(),
-                'delivery_format' => DeliveryFormatOptions::getOptions(),
-                'target_audience' => TargetAudienceOptions::getOptions(),
-                'delivery_countries' => CountryOptions::getOptions()
+                'subthemes' => SubTheme::getOptions(),
+                'support_types' => SupportType::getOptions(),
+                'related_activity' => RelatedActivity::getOptions(),
+                'delivery_format' => DeliveryFormat::getOptions(),
+                'target_audience' => TargetAudience::getOptions(),
+                'delivery_countries' => Country::getOptions(),
+                'yes_no' => YesNo::getOptions(),
+                'yes_no_lowercase' => YesNo::getOptionsLowercase()
             ],
         ];
         if ($isEditMode) {
@@ -84,7 +87,7 @@ class RequestFormController extends BaseRequestController
     /**
      * Handle all form submissions (store, submit, draft)
      */
-    public function submit(StoreOcdRequest $request, ?int $id = null): RedirectResponse
+    public function submit(StoreRequest $request, ?int $id = null): RedirectResponse
     {
         $mode = $request->input('mode', 'submit');
 
@@ -105,16 +108,16 @@ class RequestFormController extends BaseRequestController
      * Save request as draft
      * @throws Exception
      */
-    private function saveRequestAsDraft(StoreOcdRequest $request, $requestId = null): RedirectResponse
+    private function saveRequestAsDraft(StoreRequest $request, $id = null): RedirectResponse
     {
-        $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
-        if ($requestId && !$ocdRequest) {
+        $userRequest = $id ? Request::find($id) : null;
+        if ($id && !$userRequest) {
             throw new Exception('Request not found');
         }
 
-        $ocdRequest = $this->service->saveDraft($request->user(), $request->all(), $ocdRequest);
+        $userRequest = $this->service->saveDraft($request->user(), $request->all(), $userRequest);
 
-        return to_route('request.edit', ['id' => $ocdRequest->id])->with([
+        return to_route('request.edit', ['id' => $userRequest->id])->with([
             'success' => 'Request draft saved successfully.',
         ]);
     }
@@ -123,16 +126,16 @@ class RequestFormController extends BaseRequestController
      * Store a newly created resource in storage.
      * @throws Exception
      */
-    private function storeRequest(StoreOcdRequest $request, $requestId = null): RedirectResponse
+    private function storeRequest(StoreRequest $request, $id = null): RedirectResponse
     {
         $validated = $request->validated();
 
-        $ocdRequest = $requestId ? OCDRequest::find($requestId) : null;
-        if ($requestId && !$ocdRequest) {
+        $request = $id ? Request::find($id) : null;
+        if ($id && !$request) {
             throw new Exception('Request not found');
         }
 
-        $ocdRequest = $this->service->storeRequest($request->user(), $validated, $ocdRequest);
+        $request = $this->service->storeRequest($request->user(), $validated, $request);
 
         return to_route('request.me.list')->with([
             'success' => 'Request submitted successfully.',

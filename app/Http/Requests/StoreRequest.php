@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Data\SubThemeOptions;
-use App\Models\Data\SupportTypeOptions;
+use App\Enums\SubTheme;
+use App\Enums\SupportType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreOcdRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -39,7 +39,7 @@ class StoreOcdRequest extends FormRequest
             ],
             'project_stage' => [
                 Rule::requiredIf(
-                    fn() => $this->input("request_link_type") === 'Yes'
+                    fn() => $this->input("request_link_type") === 'Yes' && $this->input("is_related_decade_action") === 'Yes'
                 ),
                 'string'
             ],
@@ -67,7 +67,7 @@ class StoreOcdRequest extends FormRequest
             'subthemes.*' => [
                 Rule::in(
                     array_column(
-                        SubThemeOptions::getOptions(),
+                        SubTheme::getOptions(),
                         'value'
                     )
                 )
@@ -76,7 +76,7 @@ class StoreOcdRequest extends FormRequest
             'support_types.*' => [
                 Rule::in(
                     array_column(
-                        SupportTypeOptions::getOptions(),
+                        SupportType::getOptions(),
                         'value'
                     )
                 )
@@ -87,7 +87,7 @@ class StoreOcdRequest extends FormRequest
             'partner_confirmed' => [Rule::requiredIf(fn() => $this->input("has_partner") === 'Yes')],
             'needs_financial_support' => ['required', Rule::in(['Yes', 'No'])],
             'budget_breakdown' => [Rule::requiredIf(fn() => $this->input("needs_financial_support") === 'Yes')],
-            'support_months' => ['required', 'string'],
+            'support_months' => ['required', 'numeric'],
             'completion_date' => ['required', 'string'],
             'risks' => ['required', 'string'],
             'personnel_expertise' => ['required', 'string'],

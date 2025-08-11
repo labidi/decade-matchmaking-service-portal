@@ -16,14 +16,14 @@ class RequestListController extends BaseRequestController
     public function list(Request $httpRequest): Response
     {
         $filters = $this->buildFilters($httpRequest);
-        
+
         if ($this->isAdminRoute()) {
             // Admin view - all requests
             $requests = $this->service->getPaginatedRequests($filters['search'], $filters['sort']);
             $this->applyPaginationParams($requests, $httpRequest);
 
             $viewData = $this->getListViewData('Requests', $requests, $filters);
-            
+
             return Inertia::render($this->getViewPrefix() . 'Request/List', $viewData);
         }
 
@@ -75,7 +75,7 @@ class RequestListController extends BaseRequestController
      */
     public function publicRequests(Request $httpRequest): Response
     {
-        $filters = RequestControllerHelper::buildFilters($httpRequest);
+        $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getPublicRequests($filters['search'], $filters['sort']);
 
         return Inertia::render('Request/List', [

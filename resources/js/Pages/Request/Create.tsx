@@ -1,19 +1,11 @@
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import React from 'react';
 import {Head, usePage} from '@inertiajs/react';
-import {OCDRequest} from '@/types';
+import {OCDRequest, FormOptions} from '@/types';
 import {UIRequestForm} from '@/Forms/UIRequestForm';
 import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {useRequestForm} from "@/hooks/useRequestForm";
 
-interface FormOptions {
-    subthemes?: Array<{ value: string; label: string }>;
-    support_types?: Array<{ value: string; label: string }>;
-    related_activity?: Array<{ value: string; label: string }>;
-    delivery_formats?: Array<{ value: string; label: string }>;
-    target_audiences?: Array<{ value: string; label: string }>;
-    delivery_countries?: Array<{ value: string; label: string }>;
-}
 
 type RequestFormProps = {
     formOptions: FormOptions;
@@ -22,6 +14,25 @@ type RequestFormProps = {
 
 type Mode = 'submit' | 'draft';
 type Id = '';
+// Helper function to map field keys to formOptions keys
+function getOptionsKey(fieldKey: string): string | null {
+    const keyMap: Record<string, string> = {
+        'delivery_countries': 'countries',
+        'subthemes': 'subthemes',
+        'support_types': 'support_types', 
+        'target_audience': 'target_audience',
+        'delivery_format': 'delivery_format',
+        'related_activity': 'related_activity',
+        'is_related_decade_action': 'yes_no',
+        'has_significant_changes': 'yes_no',
+        'has_partner': 'yes_no',
+        'partner_confirmed': 'yes_no',
+        'needs_financial_support': 'yes_no',
+        'request_link_type': 'yes_no_lowercase'
+    };
+    return keyMap[fieldKey] || null;
+}
+
 export default function RequestForm({OCDRequest, formOptions}: Readonly<RequestFormProps>) {
     const ocdRequestFormData = usePage().props.request as OCDRequest;
     const {
@@ -63,9 +74,13 @@ export default function RequestForm({OCDRequest, formOptions}: Readonly<RequestF
                     type FormDataKeys = keyof typeof form.data;
                     // Check if there are formOptions for this field key and assign them
                     const fieldWithOptions = {...field};
-                    if (formOptions?.[key as keyof FormOptions]) {
-                        fieldWithOptions.options = formOptions[key as keyof FormOptions];
+                    
+                    // Map field keys to formOptions keys
+                    const optionsKey = getOptionsKey(key);
+                    if (optionsKey && formOptions?.[optionsKey as keyof FormOptions]) {
+                        fieldWithOptions.options = formOptions[optionsKey as keyof FormOptions];
                     }
+                    
                     return (
                         <FieldRenderer
                             key={key}

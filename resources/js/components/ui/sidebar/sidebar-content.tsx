@@ -60,7 +60,7 @@ export function SidebarContent() {
                         <Cog6ToothIcon/>
                         <SidebarLabel>Settings</SidebarLabel>
                     </SidebarItem>
-                    <SidebarItem href={route('notification-preferences')}>
+                    <SidebarItem href={route('admin.notifications.index')}>
                         <Cog6ToothIcon/>
                         <SidebarLabel>Notification settings</SidebarLabel>
                     </SidebarItem>

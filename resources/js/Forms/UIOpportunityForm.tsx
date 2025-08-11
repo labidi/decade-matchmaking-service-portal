@@ -30,16 +30,13 @@ export interface UIStep {
     fields: Record<string, UIField>;
 }
 
-// opportunityTypeOptions should be provided by the parent component from backend
+// Coverage activity options (static as they define the structure of location selection)
 export const coverageActivityOptions = [
     {value: 'country', label: 'Country'},
     {value: 'Regions', label: 'Regions'},
     {value: 'Global', label: 'Global'},
     {value: 'Ocean-based', label: 'Ocean Based'},
 ];
-
-// Target audience options will be provided by the backend
-export const targetAudienceOptions: { value: string; label: string }[] = [];
 
 export const UIOpportunityForm: UIStep[] = [
     {
@@ -83,7 +80,7 @@ export const UIOpportunityForm: UIStep[] = [
                 type: 'select',
                 required: true,
                 label: 'Target Audience',
-                options: targetAudienceOptions,
+                // options will be provided by the parent component from FormOptions
             },
             target_audience_other: {
                 id: 'target_audience_other',

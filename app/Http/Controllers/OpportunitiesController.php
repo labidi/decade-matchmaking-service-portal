@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\OpportunityStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Data\CountryOptions;
-use App\Models\Data\OceanOptions;
-use App\Models\Data\OpportunityTypeOptions;
-use App\Models\Data\RegionOptions;
-use App\Models\Data\TargetAudienceOptions;
+use App\Enums\Country;
+use App\Enums\Ocean;
+use App\Enums\OpportunityType;
+use App\Enums\Region;
+use App\Enums\TargetAudience;
 use App\Models\Opportunity;
 use App\Services\OpportunityService;
 use Illuminate\Http\Request;
@@ -35,11 +35,11 @@ class OpportunitiesController extends Controller
                 'image' => '/assets/img/sidebar.png',
             ],
             'formOptions' => [
-                'countries' => CountryOptions::getOptions(),
-                'regions' => RegionOptions::getOptions(),
-                'oceans' => OceanOptions::getOptions(),
-                'targetAudiences' => TargetAudienceOptions::getOptions(),
-                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
+                'countries' => Country::getOptions(),
+                'regions' => Region::getOptions(),
+                'oceans' => Ocean::getOptions(),
+                'targetAudiences' => TargetAudience::getOptions(),
+                'opportunityTypes' => OpportunityType::getOptions(),
             ],
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
@@ -73,126 +73,6 @@ class OpportunitiesController extends Controller
         }
     }
 
-    public function mySubmittedList(Request $httpRequest)
-    {
-        $sortField = $httpRequest->get('sort', 'created_at');
-        $sortOrder = $httpRequest->get('order', 'desc');
-
-        $searchTitle = $httpRequest->get('title');
-        $searchType = $httpRequest->get('type');
-        $searchStatus = $httpRequest->get('status');
-
-        $searchFilters = array_filter([
-            'title' => $searchTitle,
-            'type' => $searchType,
-            'status' => $searchStatus,
-        ]);
-
-        $sortFilters = [
-            'field' => $sortField,
-            'order' => $sortOrder,
-            'per_page' => 10,
-        ];
-
-        $opportunities = $this->opportunityService->getUserOpportunitiesPaginated($httpRequest->user(), $searchFilters, $sortFilters);
-
-        // Append query parameters to pagination links
-        $opportunities->appends($httpRequest->only(['sort', 'order', 'user', 'title', 'type', 'status', 'location']));
-
-        return Inertia::render('Opportunity/List', [
-            'opportunities' => $opportunities,
-            'title' => 'Opportunities',
-            'routeName' => 'opportunity.me.list',
-            'banner' => [
-                'title' => 'List of My submitted Opportunities',
-                'description' => 'Manage your submitted opportunities here.',
-                'image' => '/assets/img/sidebar.png',
-            ],
-            'currentSort' => [
-                'field' => $sortField,
-                'order' => $sortOrder,
-            ],
-            'searchFieldsOptions'=> [
-                'types' => Opportunity::getTypeOptions(),
-                'statuses' => OpportunityStatus::getOptions(),
-            ],
-            'currentSearch' => [
-                'title' => $searchTitle ?? '',
-                'type' => $searchType ?? '',
-                'status' => $searchStatus ?? '',
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.me.list')],
-            ],
-            'pageActions' => [
-                "canAddNew" => true,
-                "canChangeStatus" => false,
-                "canDelete" => true,
-                "canSubmitNew" => true,
-                'canApply' => false
-            ],
-        ]);
-    }
-
-    public function list(Request $httpRequest)
-    {
-        $sortField = $httpRequest->get('sort', 'created_at');
-        $sortOrder = $httpRequest->get('order', 'desc');
-        $searchTitle = $httpRequest->get('title');
-        $searchType = $httpRequest->get('type');
-
-        $searchFilters = array_filter([
-            'title' => $searchTitle,
-            'type' => $searchType,
-        ]);
-
-        $sortFilters = [
-            'field' => $sortField,
-            'order' => $sortOrder,
-            'per_page' => 10,
-        ];
-
-        $opportunities = $this->opportunityService->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
-
-        // Append query parameters to pagination links
-        $opportunities->appends($httpRequest->only(['sort', 'order', 'user', 'title', 'type', 'location', 'closing_date']));
-
-        return Inertia::render('Opportunity/List', [
-            'opportunities' => $opportunities,
-            'title' => 'Opportunities',
-            'banner' => [
-                'title' => 'List of Opportunities',
-                'description' => 'Browse and view opportunities submitted by CDF partners here.',
-                'image' => '/assets/img/sidebar.png',
-            ],
-            'searchFieldsOptions'=> [
-                'types' => Opportunity::getTypeOptions(),
-                'statuses' => OpportunityStatus::getOptions(),
-            ],
-            'currentSort' => [
-                'field' => $sortField,
-                'order' => $sortOrder,
-            ],
-            'routeName' => 'opportunity.list',
-            'currentSearch' => [
-                'title' => $searchTitle ?? '',
-                'type' => $searchType ?? '',
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
-            ],
-            'pageActions' => [
-                "canAddNew" => false,
-                "canChangeStatus" => false,
-                "canDelete" => false,
-                "canEdit" => false,
-                "canSubmitNew" => false,
-                'canApply' => true,
-            ],
-        ]);
-    }
 
     public function show(int $id)
     {
@@ -245,11 +125,11 @@ class OpportunitiesController extends Controller
             ],
             'opportunityTypes' => Opportunity::getTypeOptions(),
             'formOptions' => [
-                'countries' => CountryOptions::getOptions(),
-                'regions' => RegionOptions::getOptions(),
-                'oceans' => OceanOptions::getOptions(),
-                'targetAudiences' => TargetAudienceOptions::getOptions(),
-                'opportunityTypes' => OpportunityTypeOptions::getOptions(),
+                'countries' => Country::getOptions(),
+                'regions' => Region::getOptions(),
+                'oceans' => Ocean::getOptions(),
+                'targetAudiences' => TargetAudience::getOptions(),
+                'opportunityTypes' => OpportunityType::getOptions(),
             ],
             'opportunity' => $opportunity->toArray(),
             'breadcrumbs' => [

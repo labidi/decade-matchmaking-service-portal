@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Data\SubThemeOptions;
+use App\Enums\SubTheme;
 use App\Models\UserNotificationPreference;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -138,7 +138,7 @@ class NotificationPreferencesController extends Controller
      */
     private function getSubthemeOptions(): array
     {
-        return SubThemeOptions::getOptions();
+        return SubTheme::getOptions();
     }
 
     /**

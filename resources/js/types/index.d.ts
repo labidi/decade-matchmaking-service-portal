@@ -281,6 +281,21 @@ export interface UserNotificationPreference {
 
 export type UserNotificationPreferenceList = UserNotificationPreference[];
 
+// Common form options interface for consistent structure across forms
+export interface FormOptions {
+    countries?: Array<{ value: string; label: string }>;
+    regions?: Array<{ value: string; label: string }>;
+    oceans?: Array<{ value: string; label: string }>;
+    subthemes?: Array<{ value: string; label: string }>;
+    support_types?: Array<{ value: string; label: string }>;
+    target_audience?: Array<{ value: string; label: string }>;
+    delivery_format?: Array<{ value: string; label: string }>;
+    opportunity_types?: Array<{ value: string; label: string }>;
+    related_activity?: Array<{ value: string; label: string }>;
+    yes_no?: Array<{ value: string; label: string }>;
+    yes_no_lowercase?: Array<{ value: string; label: string }>;
+}
+
 export interface NotificationPreferencesPageProps extends PageProps {
     preferences: Record<string, UserNotificationPreference[]>; // Grouped by attribute_type
     availableOptions: Record<string, Array<{value: string, label: string}>>;

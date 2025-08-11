@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Data\CountryOptions;
-use App\Models\Data\OceanOptions;
-use App\Models\Data\RegionOptions;
-use App\Models\Data\TargetAudienceOptions;
+use App\Enums\Country;
+use App\Enums\Ocean;
+use App\Enums\Region;
+use App\Enums\TargetAudience;
 use App\Models\LocationData;
 use Illuminate\Http\JsonResponse;
 
@@ -19,10 +19,10 @@ class LocationDataController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'countries' => CountryOptions::getOptions(),
-                'regions' => RegionOptions::getOptions(),
-                'oceans' => OceanOptions::getOptions(),
-                'targetAudiences' => TargetAudienceOptions::getOptions(),
+                'countries' => Country::getOptions(),
+                'regions' => Region::getOptions(),
+                'oceans' => Ocean::getOptions(),
+                'targetAudiences' => TargetAudience::getOptions(),
             ]
         ]);
     }

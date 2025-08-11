@@ -5,28 +5,24 @@ use App\Http\Controllers\NotificationPreferencesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use Inertia\Inertia;
-use App\Http\Controllers\User\OpportunityController as UserOpportunityController;
-use App\Http\Controllers\OpportunitiesController;
 use App\Http\Controllers\UserGuideController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\OffersController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Dashboard\IndexController;
 use App\Http\Controllers\Admin\SettingsController;
-
 use App\Http\Controllers\Request\RequestListController;
 use App\Http\Controllers\Request\RequestViewController;
 use App\Http\Controllers\Request\RequestManagementController;
-use App\Http\Controllers\Admin\OpportunitiesController as AdminOpportunityController;
+use App\Http\Controllers\Opportunities\ListController as OpportunityListController;
 use App\Http\Controllers\Admin\OffersController as AdminOffersController;
 use App\Http\Controllers\LocationDataController;
 
 Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 
-
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('user.home');
-    
+
     Route::post('user/offer/{offer}/document', [\App\Http\Controllers\DocumentsController::class, 'storeOfferDocument'])->name(
         'user.offer.document.store'
     );
@@ -35,34 +31,9 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     );
     Route::get('user/document/{document}/download', [\App\Http\Controllers\DocumentsController::class, 'download']
     )->name('user.document.download');
-    
-    Route::get('user/opportunity/show/{id}', [UserOpportunityController::class, 'show'])->name('user.opportunity.show');
-    Route::get('opportunity/list', [OpportunitiesController::class, 'list'])->name('opportunity.list');
-    Route::get('opportunity/show/{id}', [OpportunitiesController::class, 'show'])->name('opportunity.show');
-
-    Route::get('notification-preferences', [NotificationPreferencesController::class, 'index'])
-        ->name('notification-preferences');
-    Route::post('notification-preferences/store', [NotificationPreferencesController::class, 'store'])
-        ->name('notification-preferences.store');
-    Route::post('notification-preferences/update', [NotificationPreferencesController::class, 'update'])
-        ->name('notification-preferences.update');
-    Route::delete('notification-preferences/destroy', [NotificationPreferencesController::class, 'destroy'])
-        ->name('notification-preferences.destroy');
 });
 
 Route::middleware(['auth', 'role:partner'])->group(function () {
-    Route::get('opportunity/me/list', [OpportunitiesController::class, 'mySubmittedList'])->name(
-        'opportunity.me.list'
-    );
-    Route::get('opportunity/create', [OpportunitiesController::class, 'create'])->name('opportunity.create');
-    Route::post('opportunity/store', [OpportunitiesController::class, 'store'])->name('opportunity.store');
-    Route::patch('opportunity/{id}/status', [OpportunitiesController::class, 'updateStatus'])->name(
-        'partner.opportunity.status'
-    );
-    Route::delete('opportunity/{id}', [OpportunitiesController::class, 'destroy'])->name(
-        'partner.opportunity.destroy'
-    );
-    Route::get('opportunity/edit/{id}', [OpportunitiesController::class, 'edit'])->name('opportunity.edit');
 });
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
@@ -75,7 +46,7 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('request/offers/{request}', [RequestViewController::class, 'show'])->name('admin.request.offers.list');
     Route::post('request/{request}/update-status', [RequestManagementController::class, 'updateStatus'])->name('admin.request.update-status');
 
-    Route::get('opportunity/list', [AdminOpportunityController::class, 'list'])->name('admin.opportunity.list');
+    Route::get('opportunity/list', OpportunityListController::class)->name('admin.opportunity.list');
     Route::get('request/export/csv', [RequestListController::class, 'exportCsv'])->name('admin.request.export.csv');
 
     // Offer Management Routes
@@ -98,7 +69,6 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     );
 });
 
-
 Route::post('request/{request}/offer', [OffersController::class, 'store'])->name('request.offer.store');
 Route::get('request/{request}/offers', [OffersController::class, 'list'])->name('request.offer.list');
 Route::patch('request/{request}/offer/{offer}/status', [OffersController::class, 'updateStatus'])->name(
@@ -117,6 +87,6 @@ Route::get(
 )->name('api.location-data.implementation');
 Route::get('api/partners', [OffersController::class, 'partnersList'])->name('api.partners.list');
 
-
 require __DIR__ . '/auth.php';
 require __DIR__ . '/request.php';
+require __DIR__ . '/opportunities.php';
