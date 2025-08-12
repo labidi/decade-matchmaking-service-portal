@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Document;
-use App\Models\Request as OCDRequest;
+use App\Models\Request\Offer;
 use App\Enums\DocumentType;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +13,28 @@ use App\Models\User;
 
 class DocumentService
 {
+    /**
+     * Store a document for a request
+     * @throws Exception
+     */
+    public function storeDocumentForOffer(UploadedFile $file, string $documentType, Offer $offer, User $user): Document
+    {
+        try {
+            $path = $file->store('documents', 'public');
+            return Document::create([
+                'name' => $file->getClientOriginalName(),
+                'path' => $path,
+                'file_type' => $file->getMimeType(),
+                'document_type' => $documentType,
+                'parent_id' => $offer->id,
+                'parent_type' => Offer::class,
+                'uploader_id' => $user->id,
+            ]);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
     /**
      * Store a document for a request
      * @throws Exception
@@ -31,21 +53,8 @@ class DocumentService
                 'parent_type' => OCDRequest::class,
                 'uploader_id' => $user->id,
             ]);
-
-            Log::info('Document uploaded successfully', [
-                'document_id' => $document->id,
-                'request_id' => $request->id,
-                'uploader_id' => $user->id,
-                'file_name' => $file->getClientOriginalName()
-            ]);
-
             return $document;
         } catch (Exception $e) {
-            Log::error('Failed to upload document', [
-                'request_id' => $request->id,
-                'uploader_id' => $user->id,
-                'error' => $e->getMessage()
-            ]);
             throw $e;
         }
     }

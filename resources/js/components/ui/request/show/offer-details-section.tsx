@@ -6,18 +6,19 @@ import { Field, Label } from '@/components/ui/fieldset';
 import { Badge } from '@/components/ui/badge';
 import { DocumentArrowUpIcon, TrashIcon } from '@heroicons/react/16/solid';
 import axios from 'axios';
+import {Heading} from "@/components/ui/heading";
 
 interface OfferDetailsSectionProps {
-    activeOffer: RequestOffer;
+    offer: RequestOffer;
 }
 
-export default function OfferDetailsSection({ activeOffer }: Readonly<OfferDetailsSectionProps>) {
+export default function OfferDetailsSection({ offer }: Readonly<OfferDetailsSectionProps>) {
     const { auth } = usePage<{ auth: Auth }>().props;
-    const [documents, setDocuments] = useState<Document[]>(activeOffer.documents || []);
-    
-    const form = useForm<{ 
-        file: File | null; 
-        document_type: string 
+    const [documents, setDocuments] = useState<Document[]>(offer.documents || []);
+
+    const form = useForm<{
+        file: File | null;
+        document_type: string
     }>({
         file: null,
         document_type: 'offer_document',
@@ -25,10 +26,8 @@ export default function OfferDetailsSection({ activeOffer }: Readonly<OfferDetai
 
     const handleDocumentUpload = (e: React.FormEvent) => {
         e.preventDefault();
-        
         if (!form.data.file) return;
-        
-        form.post(route('user.offer.document.store', { offer: activeOffer.id }), {
+        form.post(route('user.offer.document.store', { offer: offer.id }), {
             forceFormData: true,
             onSuccess: (response) => {
                 form.reset();
@@ -43,7 +42,7 @@ export default function OfferDetailsSection({ activeOffer }: Readonly<OfferDetai
 
     const handleDeleteDocument = async (documentId: number) => {
         if (!confirm('Are you sure you want to delete this document?')) return;
-        
+
         try {
             await axios.delete(route('user.document.destroy', documentId));
             setDocuments(prev => prev.filter(doc => doc.id !== documentId));
@@ -65,68 +64,53 @@ export default function OfferDetailsSection({ activeOffer }: Readonly<OfferDetai
 
     return (
         <section id="offer-details" className="my-8">
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-                <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
-                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                        Partner Offer
-                    </h2>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        Offer details from your matched partner
-                    </p>
-                </div>
-
+            <div className="bg-white dark:bg-gray-800">
+                <Heading level={2}>
+                    Offer Details
+                </Heading>
                 {/* Offer Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                            Offer Details
-                        </h3>
-                        
                         <dl className="space-y-3">
                             <div>
                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     Status
                                 </dt>
                                 <dd className="mt-1">
-                                    <Badge color={getStatusBadgeColor(activeOffer.status_label)}>
-                                        {activeOffer.status_label}
+                                    <Badge color={getStatusBadgeColor(offer.status_label)}>
+                                        {offer.status_label}
                                     </Badge>
                                 </dd>
                             </div>
-                            
+
                             <div>
                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     Description
                                 </dt>
                                 <dd className="mt-1 text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                                    {activeOffer.description}
+                                    {offer.description}
                                 </dd>
                             </div>
                         </dl>
                     </div>
-
                     <div>
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                            Partner Information
-                        </h3>
-                        
                         <dl className="space-y-3">
                             <div>
                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     Partner Name
                                 </dt>
                                 <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                                    {activeOffer.matched_partner?.name || 'Unknown Partner'}
+                                    {offer.matched_partner?.name || 'Unknown Partner'}
                                 </dd>
                             </div>
-                            
-                            {activeOffer.matched_partner?.email && (
+
+                            {offer.matched_partner?.email && (
                                 <div>
                                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                         Email
                                     </dt>
                                     <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                                        {activeOffer.matched_partner.email}
+                                        {offer.matched_partner.email}
                                     </dd>
                                 </div>
                             )}
@@ -157,9 +141,9 @@ export default function OfferDetailsSection({ activeOffer }: Readonly<OfferDetai
                                     <p className="mt-1 text-sm text-red-600">{form.errors.file}</p>
                                 )}
                             </div>
-                            
-                            <Button 
-                                type="submit" 
+
+                            <Button
+                                type="submit"
                                 disabled={form.processing || !form.data.file}
                                 className="shrink-0"
                             >
@@ -190,7 +174,7 @@ export default function OfferDetailsSection({ activeOffer }: Readonly<OfferDetai
                                             </Badge>
                                         )}
                                     </div>
-                                    
+
                                     <div className="flex items-center space-x-2">
                                         <Button
                                             outline
@@ -199,7 +183,7 @@ export default function OfferDetailsSection({ activeOffer }: Readonly<OfferDetai
                                         >
                                             Download
                                         </Button>
-                                        
+
                                         {document.uploader_id === auth.user.id && (
                                             <Button
                                                 outline

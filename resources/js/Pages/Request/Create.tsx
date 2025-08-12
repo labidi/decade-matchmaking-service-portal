@@ -6,8 +6,6 @@ import {UIRequestForm} from '@/Forms/UIRequestForm';
 import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {useRequestForm} from "@/hooks/useRequestForm";
 
-
-
 type Mode = 'submit' | 'draft';
 type Id = '';
 // Helper function to map field keys to formOptions keys

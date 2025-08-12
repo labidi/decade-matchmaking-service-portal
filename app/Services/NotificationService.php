@@ -250,4 +250,111 @@ class NotificationService
             ->where('attribute_value', $attributeValue)
             ->delete() > 0;
     }
+
+    /**
+     * Notify administrators about offer acceptance
+     */
+    public function notifyAdminOfOfferAcceptance(OCDRequest $request, User $user): void
+    {
+        try {
+            // Get all administrator users
+            $adminUsers = User::role('administrator')->get();
+
+            foreach ($adminUsers as $admin) {
+                $this->createNotificationForAdmin($admin, [
+                    'title' => 'Offer Accepted',
+                    'description' => $this->generateOfferAcceptanceDescription($request, $user),
+                    'type' => 'offer_accepted',
+                    'request_id' => $request->id
+                ]);
+            }
+
+            Log::info('Admin notifications sent for offer acceptance', [
+                'request_id' => $request->id,
+                'user_id' => $user->id,
+                'admin_count' => $adminUsers->count()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send admin notifications for offer acceptance', [
+                'request_id' => $request->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Notify administrators about clarification request
+     */
+    public function notifyAdminOfClarificationRequest(OCDRequest $request, User $user, ?string $message = null): void
+    {
+        try {
+            // Get all administrator users
+            $adminUsers = User::role('administrator')->get();
+
+            foreach ($adminUsers as $admin) {
+                $this->createNotificationForAdmin($admin, [
+                    'title' => 'Clarification Requested',
+                    'description' => $this->generateClarificationRequestDescription($request, $user, $message),
+                    'type' => 'clarification_requested',
+                    'request_id' => $request->id
+                ]);
+            }
+
+            Log::info('Admin notifications sent for clarification request', [
+                'request_id' => $request->id,
+                'user_id' => $user->id,
+                'admin_count' => $adminUsers->count()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send admin notifications for clarification request', [
+                'request_id' => $request->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Create notification for admin user
+     */
+    private function createNotificationForAdmin(User $admin, array $data): ?Notification
+    {
+        return Notification::create([
+            'user_id' => $admin->id,
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'is_read' => false,
+        ]);
+    }
+
+    /**
+     * Generate description for offer acceptance notification
+     */
+    private function generateOfferAcceptanceDescription(OCDRequest $request, User $user): string
+    {
+        $requestTitle = $request->detail?->capacity_development_title ?? 'Request #' . $request->id;
+        $userName = $user->name ?? 'User';
+        
+        return "User '{$userName}' has accepted the offer for request '{$requestTitle}'. The offer is now confirmed and ready for implementation.";
+    }
+
+    /**
+     * Generate description for clarification request notification
+     */
+    private function generateClarificationRequestDescription(OCDRequest $request, User $user, ?string $message = null): string
+    {
+        $requestTitle = $request->detail?->capacity_development_title ?? 'Request #' . $request->id;
+        $userName = $user->name ?? 'User';
+        
+        $description = "User '{$userName}' has requested clarification for the offer on request '{$requestTitle}'.";
+        
+        if ($message) {
+            $description .= " Message: '{$message}'";
+        }
+        
+        return $description;
+    }
 }

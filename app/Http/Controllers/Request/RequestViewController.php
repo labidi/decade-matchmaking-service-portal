@@ -15,7 +15,7 @@ class RequestViewController extends BaseRequestController
      */
     public function show(Request $request, ?int $id = null): Response
     {
-        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'offers'])
+        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'offers','activeOffer.documents'])
             ->findOrFail($id);
 
         if ($this->isAdminRoute()) {
@@ -39,6 +39,11 @@ class RequestViewController extends BaseRequestController
         $activeOffer = $this->service->getActiveOfferWithDocuments($id);
         $actions = $this->service->getRequestActions($userRequest, $request->user());
 
+        // Check if offer action buttons should be shown
+        $showOfferActions = $userRequest->status->status_code === 'offer_made'
+            && $userRequest->user_id === $request->user()->id
+            && $activeOffer !== null;
+
         $viewData = [
             'banner' => [
                 'title' => $this->service->getRequestTitle($userRequest),
@@ -55,6 +60,7 @@ class RequestViewController extends BaseRequestController
             'request' => $userRequest,
             'activeOffer' => $activeOffer,
             'requestDetail.actions' => $actions,
+            'showOfferActions' => $showOfferActions,
         ];
 
         return Inertia::render('Request/Show', $viewData);

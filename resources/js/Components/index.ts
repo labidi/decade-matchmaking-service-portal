@@ -15,7 +15,6 @@ export { default as AdminMenu } from './Layout/AdminMenu';
 export { default as XHRAlertDialog } from './Dialogs/XHRAlertDialog';
 export { default as Modal } from './Dialogs/Modal';
 export { default as SignInDialog } from './Dialogs/SignInDialog';
-export { default as OffersDialog } from './Dialogs/OffersDialog';
 
 // Form Components
 export { default as SignInForm } from '../components/ui/forms/SignInForm';

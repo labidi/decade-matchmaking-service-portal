@@ -60,8 +60,6 @@ class OfferService
      */
     public function createOffer(array $data, User $user): Offer
     {
-        DB::beginTransaction();
-
         try {
             // Validate that user can create offers for this request
             $request = Request::findOrFail($data['request_id']);
@@ -84,18 +82,15 @@ class OfferService
 
             // Handle document upload if provided
             if (isset($data['document']) && $data['document']) {
-                $this->documentService->storeDocument(
+                $this->documentService->storeDocumentForOffer(
                     $data['document'],
                     DocumentType::OFFER_DOCUMENT->value,
-                    $offer->request,
+                    $offer,
                     $user
                 );
             }
-            DB::commit();
             return $offer->load(['request', 'matchedPartner', 'documents']);
         } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to create offer: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -177,7 +172,7 @@ class OfferService
     /**
      * Get offer by ID with authorization check
      */
-    public function getOfferById(int $offerId, User $user): Offer
+    public function getOfferById(int $offerId): Offer
     {
         $offer = Offer::with(
             ['request', 'request.status', 'request.user', 'matchedPartner', 'documents', 'request.detail']
@@ -218,7 +213,6 @@ class OfferService
         if (!$user->hasRole('administrator') && $user->id !== $partnerId) {
             throw new Exception('Unauthorized to view offers by this partner');
         }
-
         return Offer::with(['request', 'request.status', 'request.user', 'documents'])
             ->where('matched_partner_id', $partnerId)
             ->orderBy('created_at', 'desc')
@@ -228,26 +222,9 @@ class OfferService
     /**
      * Change offer status
      */
-    public function changeOfferStatus(int $offerId, RequestOfferStatus $status, User $user): Offer
+    public function changeOfferStatus(Offer $offer, RequestOfferStatus $status): Offer
     {
-        DB::beginTransaction();
-
-        try {
-            $offer = Offer::findOrFail($offerId);
-
-            // Check authorization
-            if (!$offer->can_edit) {
-                throw new Exception('Unauthorized to change offer status');
-            }
-
-            $offer->update(['status' => $status]);
-
-            DB::commit();
-            return $offer->load(['request', 'matchedPartner']);
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to change offer status: ' . $e->getMessage());
-            throw $e;
-        }
+        $offer->update(['status' => $status]);
+        return $offer;
     }
 }

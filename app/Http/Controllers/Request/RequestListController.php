@@ -115,7 +115,7 @@ class RequestListController extends BaseRequestController
      */
     public function matchedRequests(Request $httpRequest): Response
     {
-        $filters = RequestControllerHelper::buildFilters($httpRequest);
+        $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getMatchedRequests($httpRequest->user(), $filters['search'], $filters['sort']);
 
         return Inertia::render('Request/List', [
