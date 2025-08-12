@@ -2,21 +2,26 @@ import {Head} from '@inertiajs/react';
 import React from 'react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {UIOpportunityForm} from '@/Forms/UIOpportunityForm';
-import {OCDOpportunity} from '@/types';
+import {OCDOpportunity, FormOptions} from '@/types';
 import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {useOpportunityForm} from '@/hooks/useOpportunityForm';
 import {Button} from '@/components/ui/button';
 
 interface CreateOpportunityProps {
     opportunity?: OCDOpportunity;
-    formOptions?: {
-        countries: { value: string; label: string }[];
-        regions: { value: string; label: string }[];
-        oceans: { value: string; label: string }[];
-        targetAudiences: { value: string; label: string }[];
-        opportunityTypes: { value: string; label: string }[];
-    };
+    formOptions?: FormOptions;
 }
+
+// Helper function to map opportunity field keys to formOptions keys
+function getOptionsKeyForOpportunity(fieldKey: string): string | null {
+    const keyMap: Record<string, string> = {
+        'implementation_location': 'implementation_location', // This is handled dynamically in the hook
+        'type': 'opportunity_types',
+        'target_audience': 'target_audience'
+    };
+    return keyMap[fieldKey] || null;
+}
+
 export default function CreateOpportunity({opportunity , formOptions}: Readonly<CreateOpportunityProps>) {
     const {
         form,
@@ -43,12 +48,9 @@ export default function CreateOpportunity({opportunity , formOptions}: Readonly<
                             const fieldWithOptions = {...field};
 
                             // Assign dynamic options based on field type
-                            if (key === 'implementation_location') {
-                                fieldWithOptions.options = getFieldOptions('implementation_location');
-                            } else if (key === 'type') {
-                                fieldWithOptions.options = getFieldOptions('type');
-                            } else if (key === 'target_audience') {
-                                fieldWithOptions.options = getFieldOptions('target_audience');
+                            const optionsKey = getOptionsKeyForOpportunity(key);
+                            if (optionsKey) {
+                                fieldWithOptions.options = getFieldOptions(optionsKey);
                             }
 
                             type FormDataKeys = keyof typeof form.data;

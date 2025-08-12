@@ -3,19 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Enums\RequestOfferStatus;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateRequestOfferStatus extends FormRequest
+class UpdateRequestOfferStatus extends BaseOfferRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return auth()->check();
-    }
 
     /**
      * Get the validation rules that apply to the request.
@@ -24,6 +14,7 @@ class UpdateRequestOfferStatus extends FormRequest
      */
     public function rules(): array
     {
+//        return  [];
         return [
             'status' => [
                 'required',
@@ -34,11 +25,9 @@ class UpdateRequestOfferStatus extends FormRequest
     }
 
     /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
+     * Get additional custom messages specific to status updates
      */
-    public function messages(): array
+    protected function getCustomMessages(): array
     {
         return [
             'status.required' => 'The status is required.',
@@ -48,51 +37,12 @@ class UpdateRequestOfferStatus extends FormRequest
     }
 
     /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array<string, string>
+     * Get additional custom attributes specific to status updates
      */
-    public function attributes(): array
+    protected function getCustomAttributes(): array
     {
         return [
             'status' => 'offer status',
         ];
     }
-
-    /**
-     * Handle a failed validation attempt.
-     *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return void
-     *
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException
-     */
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(
-            response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422)
-        );
-    }
-
-    /**
-     * Handle a failed authorization attempt.
-     *
-     * @return void
-     *
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException
-     */
-    protected function failedAuthorization()
-    {
-        throw new HttpResponseException(
-            response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-                'error' => 'You are not authorized to perform this action.',
-            ], 403)
-        );
-    }
-} 
+}

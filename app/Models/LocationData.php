@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Data\CountryOptions;
-use App\Models\Data\RegionOptions;
-use App\Models\Data\OceanOptions;
-use App\Models\Data\TargetAudienceOptions;
+use App\Enums\Country;
+use App\Enums\Region;
+use App\Enums\Ocean;
+use App\Enums\TargetAudience;
 
 class LocationData
 {
@@ -15,9 +15,9 @@ class LocationData
     public static function getImplementationLocationOptions(string $coverageActivity): array
     {
         return match ($coverageActivity) {
-            'country' => CountryOptions::getOptions(),
-            'Regions' => RegionOptions::getOptions(),
-            'Ocean-based' => OceanOptions::getOptions(),
+            'country' => Country::getOptions(),
+            'Regions' => Region::getOptions(),
+            'Ocean-based' => Ocean::getOptions(),
             'Global' => [['value' => 'Global', 'label' => 'Global']],
             default => [],
         };
@@ -29,9 +29,9 @@ class LocationData
     public static function getImplementationLocationLabel(string $value, string $coverageActivity): string
     {
         return match ($coverageActivity) {
-            'country' => CountryOptions::getLabel($value),
-            'Regions' => RegionOptions::getLabel($value),
-            'Ocean-based' => OceanOptions::getLabel($value),
+            'country' => Country::getLabelByValue($value),
+            'Regions' => Region::getLabelByValue($value),
+            'Ocean-based' => Ocean::getLabelByValue($value),
             'Global' => $value === 'Global' ? 'Global' : $value,
             default => $value,
         };

@@ -9,16 +9,13 @@ import {Heading} from "@/components/ui/heading";
 interface CreateOfferPageProps {
     selectedRequest?: OCDRequest;
     partners: User[];
-    availableRequests: OCDRequest[];
+    availableRequests: Array<{ value: string; label: string }>;
 }
-
 export default function CreateOffer({
                                         selectedRequest,
                                         partners,
                                         availableRequests
                                     }: Readonly<CreateOfferPageProps>) {
-
-    console.log(availableRequests);
     return (
         <SidebarLayout>
             <Head title="Create New Offer"/>
@@ -48,10 +45,7 @@ export default function CreateOffer({
                             value: partner.id.toString(),
                             label: `${partner.name} (${partner.email})`
                         })),
-                        request_id: availableRequests.map(request => ({
-                            value: request.id.toString(),
-                            label: `${request.detail?.capacity_development_title} - ${request.user.name}`
-                        }))
+                        request_id: availableRequests
                     }}
                 />
             </div>

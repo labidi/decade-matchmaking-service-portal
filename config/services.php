@@ -39,6 +39,8 @@ return [
         'search_url' =>'https://oceanexpert.org/api/v1/advancedSearch/search.json',
     ],
     'linkedin-openid'=> [
-
+        'client_id' => env('LINKEDIN_CLIENT_ID', '86xhrmw892wl1w'),
+        'client_secret' => env('LINKEDIN_CLIENT_SECRET', 'WPL_AP1.LaADJ3kCxauZZwyF.4Xggag=='),
+        'redirect' => env('LINKEDIN_REDIRECT_URI', env('APP_URL', 'http://localhost:8000') . '/auth/linkedin/callback'),
     ]
 ];

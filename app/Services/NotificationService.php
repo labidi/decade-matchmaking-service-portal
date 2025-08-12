@@ -17,6 +17,7 @@ class NotificationService
      */
     public function notifyUsersForNewRequest(OCDRequest $request): array
     {
+        // needs refactoring to handle only normalized storage
         $notificationsSent = [];
 
         DB::transaction(function () use ($request, &$notificationsSent) {
@@ -29,7 +30,7 @@ class NotificationService
                 }
 
                 $notification = $this->createNotificationForRequest($request, $preference);
-                
+
                 if ($notification) {
                     $notificationsSent[] = [
                         'user_id' => $preference->user_id,
@@ -37,13 +38,6 @@ class NotificationService
                         'attribute_type' => $preference->attribute_type,
                         'attribute_value' => $preference->attribute_value,
                     ];
-
-                    Log::info('Request notification sent', [
-                        'request_id' => $request->id,
-                        'user_id' => $preference->user_id,
-                        'attribute_type' => $preference->attribute_type,
-                        'attribute_value' => $preference->attribute_value,
-                    ]);
                 }
             }
         });
@@ -60,7 +54,7 @@ class NotificationService
 
         // Get request data - handle both JSON and normalized storage
         $requestData = $request->request_data ?? [];
-        
+
         // Extract attributes to check against preferences
         $attributesToCheck = $this->extractRequestAttributes($request, $requestData);
 
@@ -204,9 +198,9 @@ class NotificationService
      */
     private function generateNotificationDescription(OCDRequest $request, UserNotificationPreference $preference): string
     {
-        $requestTitle = $request->request_data['title'] ?? $request->requestDetail?->title ?? 'New Request';
+        $requestTitle = $request->detail?->title ?? 'New Request';
         $attributeDisplayName = $preference->getAttributeTypeDisplayName();
-        
+
         return "A new request '{$requestTitle}' has been submitted that matches your {$attributeDisplayName} interest in '{$preference->attribute_value}'.";
     }
 
@@ -227,10 +221,10 @@ class NotificationService
      * Update or create user preference
      */
     public function updateUserPreference(
-        User $user, 
-        string $attributeType, 
-        string $attributeValue, 
-        bool $notificationEnabled = true, 
+        User $user,
+        string $attributeType,
+        string $attributeValue,
+        bool $notificationEnabled = true,
         bool $emailNotificationEnabled = false
     ): UserNotificationPreference {
         return UserNotificationPreference::updateOrCreate(
@@ -255,5 +249,112 @@ class NotificationService
             ->where('attribute_type', $attributeType)
             ->where('attribute_value', $attributeValue)
             ->delete() > 0;
+    }
+
+    /**
+     * Notify administrators about offer acceptance
+     */
+    public function notifyAdminOfOfferAcceptance(OCDRequest $request, User $user): void
+    {
+        try {
+            // Get all administrator users
+            $adminUsers = User::role('administrator')->get();
+
+            foreach ($adminUsers as $admin) {
+                $this->createNotificationForAdmin($admin, [
+                    'title' => 'Offer Accepted',
+                    'description' => $this->generateOfferAcceptanceDescription($request, $user),
+                    'type' => 'offer_accepted',
+                    'request_id' => $request->id
+                ]);
+            }
+
+            Log::info('Admin notifications sent for offer acceptance', [
+                'request_id' => $request->id,
+                'user_id' => $user->id,
+                'admin_count' => $adminUsers->count()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send admin notifications for offer acceptance', [
+                'request_id' => $request->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Notify administrators about clarification request
+     */
+    public function notifyAdminOfClarificationRequest(OCDRequest $request, User $user, ?string $message = null): void
+    {
+        try {
+            // Get all administrator users
+            $adminUsers = User::role('administrator')->get();
+
+            foreach ($adminUsers as $admin) {
+                $this->createNotificationForAdmin($admin, [
+                    'title' => 'Clarification Requested',
+                    'description' => $this->generateClarificationRequestDescription($request, $user, $message),
+                    'type' => 'clarification_requested',
+                    'request_id' => $request->id
+                ]);
+            }
+
+            Log::info('Admin notifications sent for clarification request', [
+                'request_id' => $request->id,
+                'user_id' => $user->id,
+                'admin_count' => $adminUsers->count()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send admin notifications for clarification request', [
+                'request_id' => $request->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Create notification for admin user
+     */
+    private function createNotificationForAdmin(User $admin, array $data): ?Notification
+    {
+        return Notification::create([
+            'user_id' => $admin->id,
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'is_read' => false,
+        ]);
+    }
+
+    /**
+     * Generate description for offer acceptance notification
+     */
+    private function generateOfferAcceptanceDescription(OCDRequest $request, User $user): string
+    {
+        $requestTitle = $request->detail?->capacity_development_title ?? 'Request #' . $request->id;
+        $userName = $user->name ?? 'User';
+        
+        return "User '{$userName}' has accepted the offer for request '{$requestTitle}'. The offer is now confirmed and ready for implementation.";
+    }
+
+    /**
+     * Generate description for clarification request notification
+     */
+    private function generateClarificationRequestDescription(OCDRequest $request, User $user, ?string $message = null): string
+    {
+        $requestTitle = $request->detail?->capacity_development_title ?? 'Request #' . $request->id;
+        $userName = $user->name ?? 'User';
+        
+        $description = "User '{$userName}' has requested clarification for the offer on request '{$requestTitle}'.";
+        
+        if ($message) {
+            $description .= " Message: '{$message}'";
+        }
+        
+        return $description;
     }
 }

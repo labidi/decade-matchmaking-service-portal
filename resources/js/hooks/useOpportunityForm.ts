@@ -1,9 +1,9 @@
 import {useForm} from '@inertiajs/react';
 import {useEffect, useState} from 'react';
 import {UIOpportunityForm} from '@/Forms/UIOpportunityForm';
-import {OCDOpportunity} from '@/types';
+import {OCDOpportunity, FormOptions} from '@/types';
 
-export function useOpportunityForm(opportunity?: OCDOpportunity, formOptions?: any) {
+export function useOpportunityForm(opportunity?: OCDOpportunity, formOptions?: FormOptions) {
     const form = useForm({
         id: opportunity?.id || '',
         title: opportunity?.title || '',
@@ -90,9 +90,10 @@ export function useOpportunityForm(opportunity?: OCDOpportunity, formOptions?: a
             case 'implementation_location':
                 return implementationOptions;
             case 'type':
-                return formOptions.opportunityTypes || [];
+            case 'opportunity_types':
+                return formOptions.opportunity_types || [];
             case 'target_audience':
-                return formOptions.targetAudiences || [];
+                return formOptions.target_audience || [];
             default:
                 return [];
         }

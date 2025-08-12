@@ -141,7 +141,7 @@ class RequestRepository
     public function createOrUpdateDetail(OCDRequest $request, array $data): void
     {
         foreach ($data as $key => $value) {
-            if ($key == 'mode') {
+            if ($key == 'mode' || $key == 'id') {
                 continue; // Skip is_partner field as it is not stored in detail
             }
             if (is_array($value)) {

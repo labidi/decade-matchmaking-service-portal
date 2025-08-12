@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Data\SubThemeOptions;
+use App\Enums\SubTheme;
 use App\Models\UserNotificationPreference;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -31,6 +31,12 @@ class NotificationPreferencesController extends Controller
             'preferences' => $preferences,
             'availableOptions' => $availableOptions,
             'attributeTypes' => UserNotificationPreference::ATTRIBUTE_TYPES,
+            'title' => 'Test',
+            'banner' => [
+                'title' => 'Test',
+                'description' => 'Edit my notifications preferences details here.',
+                'image' => '/assets/img/sidebar.png',
+            ],
         ]);
     }
 
@@ -132,7 +138,7 @@ class NotificationPreferencesController extends Controller
      */
     private function getSubthemeOptions(): array
     {
-        return SubThemeOptions::getOptions();
+        return SubTheme::getOptions();
     }
 
     /**

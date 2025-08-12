@@ -1,9 +1,10 @@
 import React from 'react';
 import {useForm} from '@inertiajs/react';
 import {FormEventHandler} from 'react';
-import {Field, Label, Description, ErrorMessage} from '@/components/ui/fieldset'
-import {Input} from '@/components/ui/input'
 import {Checkbox, CheckboxField} from '@/components/ui/checkbox'
+import {Label} from '@/components/ui/fieldset'
+import FieldRenderer from '@/components/ui/forms/field-renderer';
+import {UIField} from '@/types';
 
 interface LoginProps {
     status?: string;
@@ -17,13 +18,14 @@ type LoginForm = {
 
 export default function SignInForm({status}: LoginProps) {
 
-    const UISignInForm = {
+    const UISignInForm: { email: UIField; password: UIField } = {
         email: {
             id: 'email',
             type: 'email',
             label: 'Email address',
             description: "We'll never share your email.",
             required: true,
+            placeholder: 'Enter your email address'
         },
         password: {
             id: 'password',
@@ -31,13 +33,8 @@ export default function SignInForm({status}: LoginProps) {
             label: 'Password',
             description: 'Enter your secure password.',
             required: true,
-        },
-        rememberMe: {
-            id: 'remember',
-            type: 'checkbox',
-            label: 'Remember me',
-            description: 'Keep me signed in on this device.',
-        },
+            placeholder: 'Enter your password'
+        }
     };
 
     const {data, setData, post, processing, errors, reset} = useForm<Required<LoginForm>>({
@@ -45,6 +42,10 @@ export default function SignInForm({status}: LoginProps) {
         password: '',
         remember: false,
     });
+
+    const handleFieldChange = (name: string, value: any) => {
+        setData(name as keyof LoginForm, value);
+    };
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -58,41 +59,25 @@ export default function SignInForm({status}: LoginProps) {
     return (
         <div className="mt-10 sm:mx-auto sm:w-full">
             <form onSubmit={handleSubmit} className="space-y-6">
-                <Field>
-                    <Label htmlFor={UISignInForm.email.id} className="block font-medium">
-                        {UISignInForm.email.label}{UISignInForm.email.required && ' *'}
-                    </Label>
-                    {UISignInForm.email.description &&
-                        <Description>{UISignInForm.email.description}</Description>}
-                    <Input
-                        id={UISignInForm.email.id}
-                        type={UISignInForm.email.type}
-                        value={data["email"] ?? ''}
-                        onChange={e => setData("email", e.currentTarget.value)}
-                        required={UISignInForm.email.required}
-                        className="mt-2 block w-full border-gray-300 rounded"
-                        invalid={!!errors["email"]}
-                    />
-                    {errors["email"] && <ErrorMessage>{errors["email"]}</ErrorMessage>}
-                </Field>
-
-                <Field>
-                    <Label htmlFor={UISignInForm.password.id} className="block font-medium">
-                        {UISignInForm.password.label}{UISignInForm.password.required && ' *'}
-                    </Label>
-                    {UISignInForm.password.description &&
-                        <Description>{UISignInForm.password.description}</Description>}
-                    <Input
-                        id={UISignInForm.password.id}
-                        type={UISignInForm.password.type}
-                        value={data["password"] ?? ''}
-                        onChange={e => setData("password", e.currentTarget.value)}
-                        required={UISignInForm.password.required}
-                        className="mt-2 block w-full border-gray-300 rounded"
-                        invalid={!!errors["password"]}
-                    />
-                    {errors["password"] && <ErrorMessage>{errors["password"]}</ErrorMessage>}
-                </Field>
+                <FieldRenderer
+                    name="email"
+                    field={UISignInForm.email}
+                    value={data.email}
+                    error={errors.email}
+                    onChange={handleFieldChange}
+                    formData={data}
+                    className="space-y-0"
+                />
+                
+                <FieldRenderer
+                    name="password"
+                    field={UISignInForm.password}
+                    value={data.password}
+                    error={errors.password}
+                    onChange={handleFieldChange}
+                    formData={data}
+                    className="space-y-0"
+                />
                 <CheckboxField>
                     <Checkbox
                         checked={data.remember}
@@ -124,6 +109,8 @@ export default function SignInForm({status}: LoginProps) {
 
                 <div className="mt-6 grid grid-cols-2 gap-4">
                     <button
+                        type="button"
+                        onClick={() => window.location.href = route('auth.google')}
                         className="flex items-center bg-white border border-gray-300 rounded-lg shadow-md max-w-xs px-6 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                         <svg className="h-6 w-6 mr-2" xmlns="http://www.w3.org/2000/svg"
                              xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -151,6 +138,8 @@ export default function SignInForm({status}: LoginProps) {
                         <span>Continue with Google</span>
                     </button>
                     <button
+                        type="button"
+                        onClick={() => window.location.href = route('auth.linkedin')}
                         className="flex items-center bg-white border border-gray-300 rounded-lg shadow-md max-w-xs px-6 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                         <svg className="h-6 w-6 mr-2" xmlns="http://www.w3.org/2000/svg"
                              xmlnsXlink="http://www.w3.org/1999/xlink"

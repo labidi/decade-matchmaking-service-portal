@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Data\SubThemeOptions;
-use App\Models\Data\SupportTypeOptions;
-use App\Models\Data\DeliveryFormatOptions;
-use App\Models\Data\RelatedActivityOptions;
-use App\Models\Data\TargetAudienceOptions;
-use App\Models\Data\CountryOptions;
+use App\Enums\SubTheme;
+use App\Enums\SupportType;
+use App\Enums\DeliveryFormat;
+use App\Enums\RelatedActivity;
+use App\Enums\TargetAudience;
+use App\Enums\Country;
 use App\Models\Request;
 
 class RequestEnhancer
@@ -17,7 +17,7 @@ class RequestEnhancer
      */
     public static function getSubthemeLabels(array $subthemes): array
     {
-        return array_map(fn($value) => SubThemeOptions::getLabel($value), $subthemes);
+        return array_map(fn($value) => SubTheme::getLabelByValue($value), $subthemes);
     }
 
     /**
@@ -25,7 +25,7 @@ class RequestEnhancer
      */
     public static function getSupportTypeLabels(array $supportTypes): array
     {
-        return array_map(fn($value) => SupportTypeOptions::getLabel($value), $supportTypes);
+        return array_map(fn($value) => SupportType::getLabelByValue($value), $supportTypes);
     }
 
     /**
@@ -33,7 +33,7 @@ class RequestEnhancer
      */
     public static function getDeliveryFormatLabel(string $deliveryFormat): string
     {
-        return DeliveryFormatOptions::getLabel($deliveryFormat);
+        return DeliveryFormat::getLabelByValue($deliveryFormat);
     }
 
     /**
@@ -41,7 +41,7 @@ class RequestEnhancer
      */
     public static function getRelatedActivityLabel(string $relatedActivity): string
     {
-        return RelatedActivityOptions::getLabel($relatedActivity);
+        return RelatedActivity::getLabelByValue($relatedActivity);
     }
 
     /**
@@ -49,7 +49,7 @@ class RequestEnhancer
      */
     public static function getTargetAudienceLabels(array $targetAudience): array
     {
-        return array_map(fn($value) => TargetAudienceOptions::getLabel($value), $targetAudience);
+        return array_map(fn($value) => TargetAudience::getLabelByValue($value), $targetAudience);
     }
 
     /**
@@ -57,7 +57,7 @@ class RequestEnhancer
      */
     public static function getCountryLabels(array $countries): array
     {
-        return array_map(fn($value) => CountryOptions::getLabel($value), $countries);
+        return array_map(fn($value) => Country::getLabelByValue($value), $countries);
     }
 
     /**
@@ -81,15 +81,15 @@ class RequestEnhancer
                 'project_stage' => $request->project_stage,
                 'project_url' => $request->project_url,
                 'related_activity' => $request->related_activity,
-                'related_activity_label' => $request->related_activity ? RelatedActivityOptions::getLabel(
+                'related_activity_label' => $request->related_activity ? RelatedActivity::getLabelByValue(
                     $request->related_activity
                 ) : null,
                 'subthemes' => $request->subthemes,
-                'subthemes_labels' => is_array($request->subthemes) ? array_map([SubThemeOptions::class, 'getLabel'],
+                'subthemes_labels' => is_array($request->subthemes) ? array_map(fn($value) => SubTheme::getLabelByValue($value),
                     $request->subthemes) : [],
                 'support_types' => $request->support_types,
                 'support_types_labels' => is_array($request->support_types) ? array_map(
-                    [SupportTypeOptions::class, 'getLabel'],
+                    fn($value) => SupportType::getLabelByValue($value),
                     $request->support_types
                 ) : [],
                 'gap_description' => $request->gap_description,
@@ -109,17 +109,17 @@ class RequestEnhancer
                 'long_term_impact' => $request->long_term_impact,
                 'target_audience' => $request->target_audience,
                 'target_audience_labels' => is_array($request->target_audience) ? array_map(
-                    [TargetAudienceOptions::class, 'getLabel'],
+                    fn($value) => TargetAudience::getLabelByValue($value),
                     $request->target_audience
                 ) : [],
                 'target_audience_other' => $request->target_audience_other,
                 'delivery_format' => $request->delivery_format,
-                'delivery_format_label' => $request->delivery_format ? DeliveryFormatOptions::getLabel(
+                'delivery_format_label' => $request->delivery_format ? DeliveryFormat::getLabelByValue(
                     $request->delivery_format
                 ) : null,
                 'delivery_countries' => $request->delivery_countries,
                 'delivery_countries_labels' => is_array($request->delivery_countries) ? array_map(
-                    [CountryOptions::class, 'getLabel'],
+                    fn($value) => Country::getLabelByValue($value),
                     $request->delivery_countries
                 ) : [],
                 'subthemes_other' => $request->subthemes_other,

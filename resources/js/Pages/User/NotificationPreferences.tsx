@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
-import { SidebarLayout } from '@/components/ui/layouts/sidebar-layout';
+import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import { Heading } from '@/components/ui/heading';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/ui/dialog';
@@ -86,7 +86,7 @@ export default function NotificationPreferences({
     const enabledEmailCount = Object.values(preferences).flat().filter(p => p.email_notification_enabled).length;
 
     return (
-        <SidebarLayout>
+        <FrontendLayout>
             <Head title="Notification Preferences" />
 
             <div className="space-y-8">
@@ -193,6 +193,6 @@ export default function NotificationPreferences({
                     </DialogActions>
                 </Dialog>
             </div>
-        </SidebarLayout>
+        </FrontendLayout>
     );
 }

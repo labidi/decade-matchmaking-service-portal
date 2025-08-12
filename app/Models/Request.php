@@ -18,13 +18,17 @@ class Request extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'request_data',
         'status_id',
         'user_id',
         'matched_partner_id'
     ];
 
     protected $hidden = ['updated_at'];
+
+    /**
+     * Permission attributes to be appended to model
+     */
+    protected $appends = ['can_edit', 'can_view', 'can_manage_offers', 'can_update_status'];
 
     public function user(): BelongsTo
     {
@@ -78,8 +82,7 @@ class Request extends Model
         if ($this->detail) {
             return $this->detail->capacity_development_title ?? 'N/A';
         }
-
-        return $this->request_data?->capacity_development_title ?? 'N/A';
+        return 'N/A';
     }
 
     /**
@@ -88,29 +91,11 @@ class Request extends Model
     public function getRequesterNameAttribute(): string
     {
         if ($this->detail) {
-            return $this->detail->full_name;
+            return $this->detail->first_name . ' ' . $this->detail->last_name;
         }
-
-        $data = $this->request_data;
-        if ($data && isset($data->first_name) && isset($data->last_name)) {
-            return trim($data->first_name . ' ' . $data->last_name);
-        }
-
         return 'N/A';
     }
 
-    /**
-     * Check if request has normalized data
-     */
-    public function hasNormalizedData(): bool
-    {
-        return $this->detail !== null;
-    }
-
-    /**
-     * Permission attributes to be appended to model
-     */
-    protected $appends = ['can_edit', 'can_view', 'can_manage_offers', 'can_update_status'];
 
     /**
      * Check if current user can edit this request
@@ -148,11 +133,11 @@ class Request extends Model
     public function getCanManageOffersAttribute(): bool
     {
         $user = auth()->user();
-        
+
         if (!$user) {
             return false;
         }
-        
+
         // Only admins can manage offers
         return $user->hasRole('administrator');
     }
@@ -163,11 +148,11 @@ class Request extends Model
     public function getCanUpdateStatusAttribute(): bool
     {
         $user = auth()->user();
-        
+
         if (!$user) {
             return false;
         }
-        
+
         // Only administrators can update status
         return $user->hasRole('administrator');
     }

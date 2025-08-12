@@ -24,7 +24,6 @@ export default function RequestDetails({
                         <div className="grid divide-y divide-neutral-200 mx-auto">
                             {UIRequestForm.map(step => {
                                 const visibleFields = Object.entries(step.fields).filter(([key, field]) => {
-
                                     if (fieldsToShow.length > 0 && !fieldsToShow.includes(key)) return false;
                                     if (!field.label || field.type === 'hidden') return false;
                                     if (field.show && !field.show(request)) return false;
@@ -37,13 +36,13 @@ export default function RequestDetails({
                                         <DisclosureButton
                                             className="group flex w-full items-center justify-between">
                                             <span
-                                                className="text-xl font-medium  group-data-hover:text-firefly-700/80">
+                                                className="text-xl font-medium  group-data-hover:text-firefly-700">
                                              {step.label}
                                             </span>
                                             <ChevronDownIcon
-                                                className="size-5 fill-firefly-700/60 group-data-hover:fill-firefly-600/50 group-data-open:rotate-180"/>
+                                                className="size-5 fill-firefly-700/60 group-data-hover:fill-firefly-600 group-data-open:rotate-180"/>
                                         </DisclosureButton>
-                                        <DisclosurePanel className="mt-2 text-xl/5 text-firefly-700/50">
+                                        <DisclosurePanel className="mt-2 text-xl/5 text-firefly-900/80">
                                             <ul className=" group-open:animate-fadeIn list-none">
                                                 {visibleFields.map(([key, field]) => {
                                                     const value = (request.detail as any)[key];
@@ -51,7 +50,7 @@ export default function RequestDetails({
                                                     return (
                                                         <li key={key} className='py-2 text-xl'>
                                                                 <span
-                                                                    className="text-firefly-600">{field.label}: </span>
+                                                                    className="text-firefly-800">{field.label}: </span>
                                                             <br/>
                                                             {formatted ?? 'N/A'}
                                                         </li>

@@ -48,13 +48,11 @@ export default function OffersList({
         const actions = [];
 
         // View Details - available if user can view
-        if (offer.can_view) {
-            actions.push({
-                key: 'view-details',
-                label: 'View Details',
-                onClick: () => router.visit(route('admin.offers.show', {id: offer.id}))
-            });
-        }
+        actions.push({
+            key: 'view-details',
+            label: 'View Details',
+            onClick: () => router.visit(route('admin.offers.show', {id: offer.id}))
+        });
 
         // Edit - available if user can edit
         if (offer.can_edit) {
@@ -64,9 +62,30 @@ export default function OffersList({
                 onClick: () => router.visit(route('admin.offers.edit', {id: offer.id}))
             });
         }
+        // Edit - available if user can edit
+        if (offer.status == 2) {
+            actions.push({
+                key: 'update-status',
+                label: 'Enable',
+                onClick: () => router.post(route('admin.offer.update-status', {id: offer.id}), {
+                    status: 1
+                })
+            });
+        }
+
+        // Edit - available if user can edit
+        if (offer.status == 1) {
+            actions.push({
+                key: 'update-status',
+                label: 'Disable',
+                onClick: () => router.post(route('admin.offer.update-status', {id: offer.id}), {
+                    status: 2
+                })
+            });
+        }
 
         // View Request - available if user can view the offer
-        if (offer.can_view && offer.request) {
+        if (offer.request) {
             actions.push({
                 key: 'view-request',
                 label: 'View Request',
@@ -74,6 +93,7 @@ export default function OffersList({
                 divider: actions.length > 0
             });
         }
+
 
         // Delete - available if user can delete
         if (offer.can_delete) {

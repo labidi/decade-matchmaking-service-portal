@@ -1,44 +1,5 @@
 import {UIField} from '@/types';
 
-export interface Request {
-    id: string;
-    is_related_decade_action: 'Yes' | 'No';
-    unique_related_decade_action_id: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    capacity_development_title: string;
-    has_significant_changes: 'Yes' | 'No';
-    changes_description: string;
-    change_effect: string;
-    request_link_type: string;
-    project_stage: string;
-    project_url: string;
-    related_activity: 'Training' | 'Workshop' | 'Both';
-    subthemes: string[];
-    subthemes_other: string;
-    support_types: string[];
-    support_types_other: string;
-    gap_description: string;
-    has_partner: string;
-    partner_name: string;
-    partner_confirmed: string;
-    needs_financial_support: string;
-    budget_breakdown: string;
-    support_months: string;
-    completion_date: string;
-    risks: string;
-    personnel_expertise: string;
-    direct_beneficiaries: string;
-    direct_beneficiaries_number: string;
-    expected_outcomes: string;
-    success_metrics: string;
-    long_term_impact: string;
-    delivery_format: 'Online' | 'On-site Choose countries' | 'Blended  Choose countries';
-    delivery_countries: string[];
-    target_audience: string;
-}
-
 export interface UIStep {
     label: string;
     fields: Record<string, UIField>;
@@ -54,10 +15,7 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Is this request related an Ocean Decade Action ?',
                 description: 'Only Ocean Decade Programmes, Projects, and Contributions are considered official Decade Actions. Activities are not considered Decade Actions.',
-                options: [
-                    {value: 'Yes', label: 'Yes'},
-                    {value: 'No', label: 'No'},
-                ],
+                // Options should be provided via formOptions.yes_no from page props
             },
             unique_related_decade_action_id: {
                 id: 'unique_action_id',
@@ -65,7 +23,7 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Unique Action ID',
                 description: 'Unique Action ID.  If you do not know your unique ID, please provide the title of your Action as submitted for the Call for Decade Action.',
-                show: data => data.is_related_decade_action === 'Yes',
+                show: data => data.is_related_decade_action === 'yes',
             },
             first_name: {
                 id: 'first_name',
@@ -104,42 +62,30 @@ export const UIRequestForm: UIStep[] = [
                 type: 'select',
                 required: true,
                 label: 'Is this request linked to a broader initiative ?',
-                options: [
-                    {value: 'yes', label: 'Yes'},
-                    {value: 'no', label: 'No'},
-                ],
-                show: data => data.is_related_decade_action !== 'Yes',
+                // Options should be provided via formOptions.yes_no from page props
+                show: data => data.is_related_decade_action !== 'yes',
             },
             project_stage: {
                 id: 'project_stage',
                 type: 'select',
                 required: true,
                 label: 'Could you specify the current stage of the initiative?',
-                options: [
-                    {value: 'Planning', label: 'Planning'},
-                    {value: 'Approved', label: 'Approved'},
-                    {value: 'Implementation', label: 'In implementation'},
-                    {value: 'Closed', label: 'Closed'},
-                    {value: 'Other', label: 'Other'},
-                ],
-                show: data => data.request_link_type === 'yes',
+                // Options should be provided via formOptions.project_stage from page props
+                show: data => data.request_link_type === 'yes' && data.is_related_decade_action !== 'yes',
             },
             project_url: {
                 id: 'project_url',
                 type: 'url',
                 label: 'Please share any URLs related to the project document or information to help us better understand how this request fits within the broader framework.',
-                show: data => data.is_related_decade_action !== 'Yes',
+                show: data => data.is_related_decade_action?.toLowerCase() != 'yes',
             },
             has_significant_changes: {
                 id: 'has_significant_changes',
                 type: 'select',
                 required: true,
                 label: 'Has your Action undergone any significant changes to its activities or framework since its endorsement ?',
-                options: [
-                    {value: 'Yes', label: 'Yes'},
-                    {value: 'No', label: 'No'},
-                ],
-                show: data => data.is_related_decade_action === 'Yes',
+                // Options should be provided via formOptions.yes_no from page props
+                show: data => data.is_related_decade_action?.toLowerCase() == 'yes',
             },
             changes_description: {
                 id: 'changes_description',
@@ -147,7 +93,7 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Please explain how this is affecting your Action.',
                 description: "If the capacity development gap/challenge is not affecting the overall implementation of your Action, please enter 'NA'.",
-                show: data => data.is_related_decade_action === 'Yes' && data.has_significant_changes === 'Yes',
+                show: data => data.has_significant_changes?.toLowerCase() == 'yes',
             },
         },
     },
@@ -160,14 +106,14 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Is your request related to a training, a workshop, or both ?',
                 description: 'Please select the option that best describes your request.',
-                // Options should be provided from RelatedActivityOptions::getOptions()
+                // Options should be provided via formOptions.related_activity from page props
             },
             delivery_format: {
                 id: 'delivery_format',
                 type: 'select',
                 required: true,
                 label: 'What is the delivery format of this training/workshop? ',
-                // Options should be provided from DeliveryFormatOptions::getOptions()
+                // Options should be provided via formOptions.delivery_format from page props
             },
             delivery_countries: {
                   id: 'delivery_countries',
@@ -175,21 +121,35 @@ export const UIRequestForm: UIStep[] = [
                   // options should be provided by the parent component from backend location data
                   required: false,
                   label: 'What is the delivery country? ',
-                  show: data => data.delivery_format !== 'Online',
+                  show: data => data.delivery_format?.toLowerCase() === 'on-site' || data.delivery_format?.toLowerCase() === 'blended',
               },
               target_audience: {
                   id: 'target_audience',
                   type: 'multiselect',
                   required: true,
                   label: 'Who is the target audience (multiple choice allowed)?',
-                  // Options should be provided from TargetAudienceOptions::getOptions()
+                  // Options should be provided via formOptions.target_audience from page props
               },
               target_audience_other: {
                   id: 'target_audience_other',
                   type: 'text',
                   required: false,
-                  show: data => data.target_audience === 'Other (Please Specify)',
+                  show: data => data.target_audience?.includes('Other'),
                   placeholder: 'Please specify the target audience',
+              },
+              target_languages: {
+                  id: 'target_languages',
+                  type: 'multiselect',
+                  required: true,
+                  label: 'In which language(s) will the content be delivered? (multiple choice)',
+                  // Options should be provided via formOptions.target_languages from page props
+              },
+              target_languages_other: {
+                  id: 'target_languages_other',
+                  type: 'text',
+                  required: false,
+                  label: 'Please specify the other target language(s)',
+                  show: data => data.target_languages?.includes('Other'),
               },
               subthemes: {
                   id: 'subthemes',
@@ -198,13 +158,13 @@ export const UIRequestForm: UIStep[] = [
                   label: 'Which sub-theme(s) of the Capacity Development Facility priorities does your request fall under?',
                   image : '/assets/img/cdf_subthemes.svg',
                   description: 'Please review the umbrella theme carefully before selecting the corresponding sub-themes.',
-                  // Options should be provided from SubThemeOptions::getOptions()
+                  // Options should be provided via formOptions.subthemes from page props
               },
             subthemes_other: {
                 id: 'subthemes_other',
                 type: 'textarea',
                 required: true,
-                show: data => data.subthemes.includes('Other'),
+                show: data => data.subthemes?.includes('Other'),
             },
             support_types: {
                 id: 'support_types',
@@ -212,13 +172,13 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'What type of support related to workshops or training are you seeking?',
                 description: "If you require support outside listed options, specify under 'Other options'.",
-                // Options should be provided from SupportTypeOptions::getOptions()
+                // Options should be provided via formOptions.support_types from page props
             },
             support_types_other: {
                 id: 'support_types_other',
                 type: 'textarea',
                 required: true,
-                show: data => data.support_types.includes('Other'),
+                show: data => data.support_types?.includes('Other'),
             },
             gap_description: {
                 id: 'gap_description',
@@ -237,10 +197,7 @@ export const UIRequestForm: UIStep[] = [
                 type: 'select',
                 required: true,
                 label: 'Do you already have a partner/service provider in mind to execute your request?',
-                options: [
-                    {value: 'Yes', label: 'Yes'},
-                    {value: 'No', label: 'No'},
-                ],
+                // Options should be provided via formOptions.yes_no from page props
             },
             partner_name: {
                 id: 'partner_name',
@@ -248,28 +205,22 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'What is the name of the partner or service provider you have identified?',
                 description: 'If your organization intends to deliver the services, please indicate the name of your organization.',
-                show: data => data.has_partner === 'Yes',
+                show: data => data.has_partner?.toLowerCase() == 'yes',
             },
             partner_confirmed: {
                 id: 'partner_confirmed',
                 type: 'select',
                 required: true,
                 label: 'Has this partner already been contacted and confirmed?',
-                options: [
-                    {value: 'Yes', label: 'Yes'},
-                    {value: 'No', label: 'No'},
-                ],
-                show: data => data.has_partner === 'Yes',
+                // Options should be provided via formOptions.yes_no from page props
+                show: data => data.has_partner?.toLowerCase() == 'yes',
             },
             needs_financial_support: {
                 id: 'needs_financial_support',
                 type: 'select',
                 required: true,
                 label: 'Do you require financial support from the Capacity Development Facility to address this request?',
-                options: [
-                    {value: 'Yes', label: 'Yes'},
-                    {value: 'No', label: 'No'},
-                ],
+                // Options should be provided via formOptions.yes_no from page props
             },
             budget_breakdown: {
                 id: 'budget_breakdown',
@@ -284,7 +235,7 @@ export const UIRequestForm: UIStep[] = [
                     '0utreach  & Communication (e.g., awareness campaigns, publications, media) Monitoring  & Evaluation (e.g., impact assessments, reporting, data collection)\n' +
                     'Administration & Overhead (e.g., office costs, operational expenses, institutional support)\n' +
                     'Other (please specify)',
-                show: data => data.needs_financial_support === 'Yes',
+                show: data => data.needs_financial_support?.toLowerCase() == 'yes',
             },
             support_months: {
                 id: 'support_months',

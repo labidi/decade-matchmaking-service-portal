@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from 'react'
 import { usePage } from '@inertiajs/react'
 import clsx from 'clsx'
-import { 
-    CheckCircleIcon, 
-    ExclamationTriangleIcon, 
-    ExclamationCircleIcon, 
+import {
+    CheckCircleIcon,
+    ExclamationTriangleIcon,
+    ExclamationCircleIcon,
     InformationCircleIcon,
-    XMarkIcon 
+    XMarkIcon
 } from '@heroicons/react/24/outline'
 import { Button } from '@/components/ui/button'
 import { FlashMessages as FlashMessagesType, PagePropsWithFlash } from '@/types'
@@ -94,10 +94,10 @@ const FlashMessage: React.FC<FlashMessageProps> = ({
         )}>
             <div className="flex items-start">
                 <div className="flex-shrink-0">
-                    <Icon 
-                        data-slot="icon" 
-                        className={clsx('size-5', config.iconColor)} 
-                        aria-hidden="true" 
+                    <Icon
+                        data-slot="icon"
+                        className={clsx('size-5', config.iconColor)}
+                        aria-hidden="true"
                     />
                 </div>
                 <div className="ml-3 flex-1">
@@ -133,7 +133,7 @@ interface FlashMessagesContainerProps {
 export const FlashMessages: React.FC<FlashMessagesContainerProps> = ({
     className,
     autoDismiss = true,
-    autoDismissDelay = 5000
+    autoDismissDelay = 10000
 }) => {
     const { flash } = usePage<PagePropsWithFlash>().props
     const [visibleMessages, setVisibleMessages] = useState<FlashMessagesType>({})

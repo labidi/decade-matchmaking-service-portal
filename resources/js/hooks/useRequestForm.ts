@@ -6,7 +6,7 @@ import {OCDRequest} from '@/types';
 type Mode = 'submit' | 'draft';
 
 
-export function useRequestForm(request: OCDRequest) {
+export function useRequestForm(request?: OCDRequest) {
 
     const form = useForm({
         id: '',
@@ -43,8 +43,10 @@ export function useRequestForm(request: OCDRequest) {
         success_metrics: '',
         long_term_impact: '',
         mode: 'submit' as Mode,
-        target_audience: '',
+        target_audience: [] as string[],
         target_audience_other: '',
+        target_languages: [] as string[],
+        target_languages_other: '',
         delivery_format: '',
         delivery_countries: [] as string[],
     });
@@ -63,10 +65,7 @@ export function useRequestForm(request: OCDRequest) {
             ...data,
             mode: mode,
         }));
-        form.post(route('request.submit'), {
-            preserveScroll: true,
-            onBefore: () => {
-            },
+        form.post(route('request.submit',{'id':request?.id}), {
             onSuccess: (page) => {
                 if (mode === 'draft') {
                     let editId: string = '';
@@ -92,7 +91,7 @@ export function useRequestForm(request: OCDRequest) {
     type FormDataKeys = keyof typeof form.data;
 
     useEffect(() => {
-        if (request && request.id) {
+        if (request?.id) {
             form.setData('id', request.id.toString());
             Object.entries(request.detail).forEach(([key, value]) => {
                 if (key in form.data && key !== 'id') {
