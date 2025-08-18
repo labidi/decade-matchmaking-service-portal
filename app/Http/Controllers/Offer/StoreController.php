@@ -8,8 +8,9 @@ use Illuminate\Http\Request;
 
 class StoreController extends BaseOfferController
 {
-    public function __construct(private readonly OfferService $offerService)
+    public function __construct(OfferService $offerService)
     {
+        parent::__construct($offerService);
     }
 
     public function __invoke(Request $request)

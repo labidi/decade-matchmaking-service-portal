@@ -168,8 +168,8 @@ export default function FieldRenderer({
     if (CustomComponent) {
         return (
             <Field key={name} className={field.className || className || "mt-8"}>
-                {field.label && <Label>{field.label}</Label>}
-                {field.description && <Description>{field.description}</Description>}
+                {field.label && <Label className="capitalize">{field.label}</Label>}
+                {field.description && <Description className="capitalize">{field.description}</Description>}
                 <CustomComponent
                     {...getCommonFieldProps()}
                     value={value}
@@ -227,13 +227,13 @@ export default function FieldRenderer({
         case 'date':
             return (
                 <Field key={name} className="mt-8 grid grid-cols-subgrid sm:col-span-3">
-                    {field.label && <Label>{field.label}</Label>}
-                    {field.description && <Description>{field.description}</Description>}
+                    {field.label && <Label className="capitalize">{field.label}</Label>}
+                    {field.description && <Description className="capitalize">{field.description}</Description>}
                     <Input
                         type={field.type}
                         id={field.id}
                         required={field.required}
-                        value={new Date(value).toISOString().slice(0, 10) || ''}
+                        value={value && new Date(value).toISOString().slice(0, 10) || ''}
                         placeholder={field.placeholder ?? ''}
                         onChange={handleChange}
                         invalid={!!error}
@@ -256,8 +256,8 @@ export default function FieldRenderer({
         case 'range':
             return (
                 <Field key={name} className="mt-8 grid grid-cols-subgrid sm:col-span-3">
-                    {field.label && <Label>{field.label}</Label>}
-                    {field.description && <Description>{field.description}</Description>}
+                    {field.label && <Label className="capitalize">{field.label}</Label>}
+                    {field.description && <Description className="capitalize">{field.description}</Description>}
                     <Input
                         type={field.type}
                         id={field.id}
@@ -274,8 +274,8 @@ export default function FieldRenderer({
         case 'textarea':
             return (
                 <Field key={name} className="mt-8">
-                    {field.label && <Label>{field.label}</Label>}
-                    {field.description && <Description>{field.description}</Description>}
+                    {field.label && <Label className="capitalize">{field.label}</Label>}
+                    {field.description && <Description className="capitalize">{field.description}</Description>}
                     <Textarea
                         id={field.id}
                         required={field.required}
@@ -291,14 +291,14 @@ export default function FieldRenderer({
         case 'file':
             const existingDocuments = formData?.existing_documents || [];
             const hasExistingDocuments = Array.isArray(existingDocuments) && existingDocuments.length > 0;
-            
+
             return (
                 <Field key={name} className="mt-8">
-                    {field.label && <Label>{field.label}</Label>}
-                    {field.description && <Description>
+                    {field.label && <Label className="capitalize" >{field.label}</Label>}
+                    {field.description && <Description className="capitalize">
                         {field.description}
                     </Description>}
-                    
+
                     {/* Show existing documents if any */}
                     {hasExistingDocuments && (
                         <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -307,20 +307,25 @@ export default function FieldRenderer({
                                 {existingDocuments.map((doc: any, index: number) => (
                                     <div key={index} className="flex items-center justify-between text-sm">
                                         <div className="flex items-center space-x-2">
-                                            <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                                            <svg className="w-4 h-4 text-gray-500" fill="currentColor"
+                                                 viewBox="0 0 20 20">
+                                                <path fillRule="evenodd"
+                                                      d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                                                      clipRule="evenodd"/>
                                             </svg>
-                                            <span className="text-gray-700 dark:text-gray-300">{doc.name || 'Unnamed document'}</span>
+                                            <span
+                                                className="text-gray-700 dark:text-gray-300">{doc.name || 'Unnamed document'}</span>
                                             {doc.file_type && (
-                                                <span className="text-xs text-gray-500 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
+                                                <span
+                                                    className="text-xs text-gray-500 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
                                                     {doc.file_type.toUpperCase()}
                                                 </span>
                                             )}
                                         </div>
                                         {doc.path && (
-                                            <a 
-                                                href={doc.path} 
-                                                target="_blank" 
+                                            <a
+                                                href={doc.path}
+                                                target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                                             >
@@ -332,7 +337,7 @@ export default function FieldRenderer({
                             </div>
                         </div>
                     )}
-                    
+
                     <Input
                         type="file"
                         id={field.id}
@@ -363,7 +368,7 @@ export default function FieldRenderer({
                             <div
                                 className="mt-3 relative w-full cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:border-firefly-500 focus-within:ring-1 focus-within:ring-firefly-500">
                                 <ComboboxInput
-                                    className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 "
+                                    className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0  "
                                     displayValue={(value: string) => {
                                         const option = field.options?.find(opt => opt.value == value);
                                         return option ? option.label : value;
@@ -393,7 +398,7 @@ export default function FieldRenderer({
                                         {({selected, active}) => (
                                             <>
                                                 <span
-                                                    className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                    className={`block capitalize truncate ${selected ? 'font-medium' : 'font-normal'}`}>
                                                     {option.label}
                                                 </span>
                                                 {selected ? (
@@ -549,7 +554,7 @@ export default function FieldRenderer({
                             {field.options?.map(opt => (
                                 <RadioField key={opt.value}>
                                     <Radio value={opt.value}/>
-                                    <Label>{opt.label}</Label>
+                                    <Label className="capitalize">{opt.label}</Label>
                                 </RadioField>
                             ))}
                         </div>
@@ -561,7 +566,7 @@ export default function FieldRenderer({
         case 'checkbox-group':
             return (
                 <Fieldset key={name} className="mt-8">
-                    {field.label && <Legend>{field.label}</Legend>}
+                    {field.label && <Legend className="capitalize">{field.label}</Legend>}
                     {field.image && (
                         <div className="w-full">
                             <img src={field.image} alt="Logo" className="object-cover"/>

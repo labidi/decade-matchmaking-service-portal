@@ -14,8 +14,9 @@ class FormController extends BaseOfferController
 {
     public function __construct(
         private readonly RequestService $requestService,
-        private readonly OfferService $offerService
+        OfferService $offerService
     ) {
+        parent::__construct($offerService);
     }
 
 

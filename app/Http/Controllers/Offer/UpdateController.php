@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Offer\Admin;
+namespace App\Http\Controllers\Offer;
 
-use App\Http\Controllers\Offer\BaseOfferController;
 use App\Services\OfferService;
 use Exception;
 use Illuminate\Http\Request;
 
 class UpdateController extends BaseOfferController
 {
-    public function __construct(private readonly OfferService $offerService)
+    public function __construct(OfferService $offerService)
     {
+        parent::__construct($offerService);
     }
 
     public function __invoke(Request $request, int $id)

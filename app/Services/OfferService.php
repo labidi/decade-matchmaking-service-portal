@@ -225,4 +225,35 @@ class OfferService
         $offer->update(['status' => $status]);
         return $offer;
     }
+
+    /**
+     * Accept an offer
+     */
+    public function acceptOffer(Offer $offer, User $acceptedBy): Offer
+    {
+        try {
+            // Validate that the user can accept this offer
+            if ($offer->request->user_id !== $acceptedBy->id) {
+                throw new Exception('Only the request owner can accept offers for their request');
+            }
+
+            // Validate that the offer is in a state that can be accepted
+            if ($offer->status !== RequestOfferStatus::ACTIVE) {
+                throw new Exception('Only active offers can be accepted');
+            }
+
+            if ($offer->is_accepted) {
+                throw new Exception('This offer has already been accepted');
+            }
+
+            // Update the offer to accepted status
+            $offer->update([
+                'is_accepted' => true,
+            ]);
+
+            return $offer->fresh();
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
 }
