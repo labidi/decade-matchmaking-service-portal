@@ -38,7 +38,7 @@ abstract class BaseOfferController extends Controller
     /**
      * Get partners formatted for dropdowns/selection
      */
-/*    protected function getPartnersForSelection(): array
+    protected function getPartnersForSelection(): array
     {
         $partners = User::whereHas('roles', function ($query) {
             $query->whereIn('name', ['partner', 'administrator']);
@@ -53,7 +53,7 @@ abstract class BaseOfferController extends Controller
                 'label' => $partner->name . ' (' . $partner->email . ')',
             ];
         })->toArray();
-    }*/
+    }
 
     /**
      * Get partners with full details (for admin contexts)
@@ -116,7 +116,7 @@ abstract class BaseOfferController extends Controller
                 'url' => route('admin.request.show', $requestId)
             ];
         } else {
-            $breadcrumbs[] = ['name' => 'Manage offers', 'url' => route('admin.offers.list')];
+            $breadcrumbs[] = ['name' => 'Manage offers', 'url' => route('admin.offer.list')];
         }
 
         switch ($action) {
@@ -127,7 +127,7 @@ abstract class BaseOfferController extends Controller
                 $breadcrumbs[] = ['name' => 'Edit offer #' . $offerId];
                 break;
             case 'show':
-                $breadcrumbs[] = ['name' => 'Offer #' . $offerId, 'url' => route('admin.offers.show', $offerId)];
+                $breadcrumbs[] = ['name' => 'Offer #' . $offerId, 'url' => route('admin.offer.show', $offerId)];
                 break;
         }
 

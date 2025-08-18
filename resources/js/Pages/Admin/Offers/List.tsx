@@ -51,7 +51,7 @@ export default function OffersList({
         actions.push({
             key: 'view-details',
             label: 'View Details',
-            onClick: () => router.visit(route('admin.offers.show', {id: offer.id}))
+            onClick: () => router.visit(route('admin.offer.show', {id: offer.id}))
         });
 
         // Edit - available if user can edit
@@ -59,7 +59,7 @@ export default function OffersList({
             actions.push({
                 key: 'edit',
                 label: 'Edit',
-                onClick: () => router.visit(route('admin.offers.edit', {id: offer.id}))
+                onClick: () => router.visit(route('admin.offer.edit', {id: offer.id}))
             });
         }
         // Edit - available if user can edit
@@ -111,7 +111,7 @@ export default function OffersList({
 
     const handleDeleteOffer = (offer: RequestOffer) => {
         if (confirm(`Are you sure you want to delete this offer? This action cannot be undone.`)) {
-            router.delete(route('admin.offers.destroy', {id: offer.id}), {
+            router.delete(route('admin.offer.destroy', {id: offer.id}), {
                 onSuccess: () => {
                     // Success message will be handled by the backend
                 },
@@ -140,7 +140,7 @@ export default function OffersList({
                             View and manage all capacity development offers
                         </p>
                     </div>
-                    <Button href={route('admin.offers.create')}>
+                    <Button href={route('admin.offer.create')}>
                         <PlusIcon data-slot="icon"/>
                         Create New Offer
                     </Button>

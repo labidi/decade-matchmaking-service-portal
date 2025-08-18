@@ -1,24 +1,14 @@
 <?php
 
-use App\Http\Controllers\Admin\NotificationsController;
-use App\Http\Controllers\NotificationPreferencesController;
-use App\Http\Controllers\Offer\Admin\DestroyController;
-use App\Http\Controllers\Offer\Admin\EditController;
-use App\Http\Controllers\Offer\Admin\UpdateController;
-use App\Http\Controllers\Offer\ListController;
-use App\Http\Controllers\Offer\PartnersListController;
-use App\Http\Controllers\Offer\StoreController;
-use App\Http\Controllers\Offer\UpdateStatusController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use Inertia\Inertia;
-use App\Http\Controllers\UserGuideController;
-use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Dashboard\IndexController;
+use App\Http\Controllers\Admin\NotificationsController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Opportunities\ListController as OpportunityListController;
+use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocationDataController;
+use App\Http\Controllers\Offer\PartnersListController;
+use App\Http\Controllers\UserGuideController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 

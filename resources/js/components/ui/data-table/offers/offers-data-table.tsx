@@ -84,7 +84,7 @@ export function OffersDataTable({
                                     pagination,
                                     searchFields = [],
                                     columns,
-                                    routeName = 'admin.offers.list',
+                                    routeName = 'admin.offer.list',
                                     getActionsForOffer,
                                     showSearch = true,
                                     showActions = true

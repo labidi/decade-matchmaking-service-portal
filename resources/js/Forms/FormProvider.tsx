@@ -69,9 +69,7 @@ export function FormProvider({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
         const submitMethod = method === 'POST' ? post : method === 'PUT' ? put : patch;
-
         submitMethod(submitUrl, {
             onSuccess: () => {
                 reset();

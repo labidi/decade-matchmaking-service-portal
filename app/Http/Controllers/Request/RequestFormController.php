@@ -133,7 +133,7 @@ class RequestFormController extends BaseRequestController
         $validated = $request->validated();
 
         $userRequest = $id ? Request::find($id) : null;
-        if ($id && !$request) {
+        if ($id && !$userRequest) {
             throw new Exception('Request not found');
         }
 

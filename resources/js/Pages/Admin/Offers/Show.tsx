@@ -15,9 +15,9 @@ export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
 
     const handleDeleteOffer = () => {
         if (confirm(`Are you sure you want to delete this offer? This action cannot be undone.`)) {
-            router.delete(route('admin.offers.destroy', {id: offer.id}), {
+            router.delete(route('admin.offer.destroy', {id: offer.id}), {
                 onSuccess: () => {
-                    router.visit(route('admin.offers.list'));
+                    router.visit(route('admin.offer.list'));
                 },
                 onError: (errors) => {
                     console.error('Failed to delete offer:', errors);
@@ -58,7 +58,7 @@ export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
                         {offer.request && (
                             <Button
                                 outline
-                                href={route('request.show', {id: offer.request_id})}
+                                href={route('admin.request.show', {id: offer.request_id})}
                             >
                                 <EyeIcon data-slot="icon" />
                                 View Request
@@ -69,7 +69,7 @@ export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
                         {offer.can_edit && (
                             <Button
                                 outline
-                                href={route('admin.offers.edit', {id: offer.id})}
+                                href={route('admin.offer.edit', {id: offer.id})}
                             >
                                 <PencilIcon data-slot="icon" />
                                 Edit

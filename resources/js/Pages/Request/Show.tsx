@@ -15,14 +15,14 @@ interface ShowRequestProps {
 }
 
 export default function ShowRequest({request, requestDetail, activeOffer, canManageOfferResponse}: Readonly<ShowRequestProps>) {
-    const shouldShowOfferResponseButtons = 
-        request.status.status_code === 'offer_made' && 
-        activeOffer && 
+    const shouldShowOfferResponseButtons =
+        request.status.status_code === 'offer_made' &&
+        activeOffer &&
         canManageOfferResponse;
 
     const handleAcceptOffer = () => {
         if (!activeOffer) return;
-        
+
         router.post(route('request.accept-offer', {
             request: request.id,
             offer: activeOffer.id
@@ -38,13 +38,13 @@ export default function ShowRequest({request, requestDetail, activeOffer, canMan
 
     const handleRequestClarifications = () => {
         if (!activeOffer) return;
-        
+
         router.post(route('request.request-clarifications', {
             request: request.id,
             offer: activeOffer.id
         }), {}, {
             onSuccess: () => {
-                // Handle success if needed  
+                // Handle success if needed
             },
             onError: (errors) => {
                 console.error('Error requesting clarifications:', errors);
@@ -64,24 +64,24 @@ export default function ShowRequest({request, requestDetail, activeOffer, canMan
             {activeOffer && (
                 <OfferDetailsSection offer={activeOffer} />
             )}
-            
+
             {/* Conditional offer response buttons */}
-            {shouldShowOfferResponseButtons && (
+
                 <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <Button 
+                    <Button
                         color="green"
                         onClick={handleAcceptOffer}
                     >
                         Accept Offer
                     </Button>
-                    <Button 
-                        outline 
+                    <Button
+                        outline
                         onClick={handleRequestClarifications}
                     >
                         Request clarifications from IOC
                     </Button>
                 </div>
-            )}
+
         </FrontendLayout>
     );
 }

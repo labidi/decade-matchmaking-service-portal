@@ -1,21 +1,22 @@
 <?php
 
-use App\Http\Controllers\Offer\Admin\DestroyController;
-use App\Http\Controllers\Offer\Admin\EditController;
+use App\Http\Controllers\Offer\Admin\ListController;
 use App\Http\Controllers\Offer\Admin\UpdateController;
+use App\Http\Controllers\Offer\DestroyController;
+use App\Http\Controllers\Offer\FormController;
+use App\Http\Controllers\Offer\ShowController;
+use App\Http\Controllers\Offer\StoreController;
 use App\Http\Controllers\Offer\UpdateStatusController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
-    Route::get('offers', \App\Http\Controllers\Offer\Admin\ListController::class)->name('admin.offers.list');
-    Route::get('offers/create', \App\Http\Controllers\Offer\Admin\CreateController::class)->name(
-        'admin.offers.create'
-    );
-    Route::post('offers', \App\Http\Controllers\Offer\Admin\StoreController::class)->name('admin.offers.store');
-    Route::get('offers/{id}', \App\Http\Controllers\Offer\Admin\ShowController::class)->name('admin.offers.show');
-    Route::get('offers/{id}/edit', EditController::class)->name('admin.offers.edit');
-    Route::put('offers/{id}', UpdateController::class)->name('admin.offers.update');
-    Route::delete('offers/{id}', DestroyController::class)->name('admin.offers.destroy');
+    Route::get('offer', ListController::class)->name('admin.offer.list');
+    Route::get('offer/create', FormController::class)->name('admin.offer.create');
+    Route::get('offer/{id}', ShowController::class)->name('admin.offer.show');
+    Route::get('offer/{id}/edit', FormController::class)->name('admin.offer.edit');
+    Route::post('offer', StoreController::class)->name('admin.offer.store');
+    Route::put('offer/{id}', UpdateController::class)->name('admin.offer.update');
+    Route::delete('offer/{id}', DestroyController::class)->name('admin.offer.destroy');
 
     Route::post('offer/{id}/update-status', UpdateStatusController::class)->name(
         'admin.offer.update-status'

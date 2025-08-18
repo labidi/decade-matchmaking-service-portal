@@ -1,53 +1,163 @@
 import React from 'react';
 import {Head} from '@inertiajs/react';
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout';
-import {OCDRequest, User} from '@/types';
-import {FormProvider} from '@/Forms/FormProvider';
+import {RequestOffer} from '@/types';
+import {useOfferForm} from '@/hooks/useOfferForm';
 import {UIOfferForm} from '@/Forms/UIOfferForm';
 import {Heading} from "@/components/ui/heading";
+import {Button} from '@/components/ui/button';
+import {ChevronLeftIcon} from '@heroicons/react/16/solid';
+import FieldRenderer from '@/components/ui/forms/field-renderer';
+import {Fieldset, Legend} from "@/components/ui/fieldset";
+
+function getOptionsKey(fieldKey: string): string | null {
+    const keyMap: Record<string, string> = {
+        'request_id': 'availableRequests',
+        'partner_id': 'partners'
+    };
+    return keyMap[fieldKey] || null;
+}
+
+export interface OfferFormOptions {
+    availableRequests: Array<{ value: string; label: string }>;
+    partners: Array<{ value: string; label: string }>;
+}
 
 interface CreateOfferPageProps {
-    selectedRequest?: OCDRequest;
-    partners: User[];
-    availableRequests: Array<{ value: string; label: string }>;
+    offer: RequestOffer;
+    formOptions?: OfferFormOptions
 }
+
 export default function CreateOffer({
-                                        selectedRequest,
-                                        partners,
-                                        availableRequests
+                                        offer,
+                                        formOptions,
                                     }: Readonly<CreateOfferPageProps>) {
+    const isEditing = Boolean(offer?.id);
+    
+    const {
+        form,
+        step,
+        handleSubmit,
+        handleFieldChange,
+    } = useOfferForm({
+        partners: formOptions?.partners || [],
+        availableRequests: formOptions?.availableRequests || [],
+        offer: offer,
+        isEditing: isEditing,
+    });
+    const currentStepData = UIOfferForm[step - 1];
+    const validateCurrentStep = (): boolean => {
+        const requiredFields = Object.entries(currentStepData.fields)
+            .filter(([_, field]) => field.required)
+            .map(([name, _]) => name);
+
+        return requiredFields.every(fieldName => {
+            const value = form.data[fieldName as keyof typeof form.data];
+            if (Array.isArray(value)) {
+                return value.length > 0;
+            }
+            return value !== null && value !== undefined && value !== '';
+        });
+    };
+
+    const canProceed = validateCurrentStep();
+
+    const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        handleSubmit();
+    };
+
     return (
         <SidebarLayout>
-            <Head title="Create New Offer"/>
+            <Head title={offer.id ? 'Edit Offer #' + offer.id : 'Create a new Offer'}/>
 
             <div className="space-y-6">
                 {/* Header */}
                 <Heading>
-                    Create New Offer
+                    {offer.id ? 'Edit Offer #' + offer.id : 'Create a new Offer'}
                 </Heading>
                 <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
+
                 {/* Form */}
-                <FormProvider
-                    steps={UIOfferForm}
-                    initialData={{
-                        request_id: selectedRequest?.id?.toString() || '',
-                        partner_id: '',
-                        description: '',
-                        document: null
-                    }}
-                    submitUrl={route('admin.offers.store')}
-                    method="POST"
-                    backUrl={route('admin.offers.list')}
-                    backLabel="Back to Offers"
-                    submitLabel="Create Offer"
-                    dynamicOptions={{
-                        partner_id: partners.map(partner => ({
-                            value: partner.id.toString(),
-                            label: `${partner.name} (${partner.email})`
-                        })),
-                        request_id: availableRequests
-                    }}
-                />
+                <div>
+                    <form onSubmit={handleFormSubmit} className="space-y-6">
+                        <Fieldset>
+                            <Legend>
+                                {currentStepData.label}
+                            </Legend>
+
+                            <div className="space-y-6">
+                                {Object.entries(currentStepData.fields).map(([fieldName, field]) => {
+                                    // Check if there are formOptions for this field key and assign them
+                                    const fieldWithOptions = {...field};
+
+                                    // Map field keys to formOptions keys
+                                    const optionsKey = getOptionsKey(fieldName);
+                                    if (optionsKey && Array.isArray(formOptions?.[optionsKey as keyof OfferFormOptions])) {
+                                        fieldWithOptions.options = formOptions[optionsKey as keyof OfferFormOptions] as Array<{
+                                            value: string;
+                                            label: string
+                                        }>;
+                                    }
+
+                                    return (
+                                        <FieldRenderer
+                                            key={fieldName}
+                                            name={fieldName}
+                                            field={fieldWithOptions}
+                                            value={form.data[fieldName as keyof typeof form.data]}
+                                            error={form.errors[fieldName as keyof typeof form.errors]}
+                                            onChange={handleFieldChange}
+                                            formData={form.data}
+                                        />
+
+                                    );
+                                })}
+                            </div>
+                        </Fieldset>
+
+                        {/* Navigation buttons */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <Button
+                                    type="button"
+                                    outline
+                                    href={route('admin.offer.list')}
+                                >
+                                    <ChevronLeftIcon data-slot="icon"/>
+                                    Back to Offers
+                                </Button>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Button
+                                    type="submit"
+                                    disabled={form.processing || !canProceed}
+                                    className={!canProceed ? 'opacity-50 cursor-not-allowed' : ''}
+                                >
+                                    {(() => {
+                                        if (form.processing) return 'Saving...';
+                                        return isEditing ? 'Update Offer' : 'Create Offer';
+                                    })()}
+                                </Button>
+                            </div>
+                        </div>
+                    </form>
+
+                    {/* Global errors */}
+                    {Object.keys(form.errors).length > 0 && (
+                        <div className="mt-4 rounded-md bg-red-50 dark:bg-red-900/20 p-4">
+                            <div className="text-sm text-red-800 dark:text-red-200">
+                                <strong>Please correct the following errors:</strong>
+                                <ul className="mt-2 list-disc list-inside space-y-1">
+                                    {Object.entries(form.errors).map(([field, message]) => (
+                                        <li key={field}>{message}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </SidebarLayout>
     );
