@@ -28,13 +28,6 @@ class OpportunityService
     {
         return DB::transaction(function () use ($data, $user) {
             $opportunity = $this->repository->create($data, $user);
-
-            Log::info('Opportunity created', [
-                'opportunity_id' => $opportunity->id,
-                'user_id' => $user->id,
-                'title' => $opportunity->title
-            ]);
-
             return $opportunity;
         });
     }

@@ -10,7 +10,7 @@ use Exception;
 
 class StoreController extends Controller
 {
-    public function __construct(private OpportunityService $opportunityService)
+    public function __construct(private readonly OpportunityService $opportunityService)
     {
     }
 
@@ -34,4 +34,4 @@ class StoreController extends Controller
             return to_route('opportunity.me.list')->with('error', 'Error while submitting Opportunity');
         }
     }
-} 
+}

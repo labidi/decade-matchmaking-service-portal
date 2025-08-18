@@ -18,11 +18,12 @@ class Opportunity extends Model
     protected $primaryKey = 'id';
 
     public $timestamps = true;
-    protected $appends = ['status_label', 'type_label', 'implementation_location_label', 'target_audience_label'];
+    protected $appends = ['status_label', 'type_label'];
 
     protected $casts = [
         'status' => OpportunityStatus::class,
         'target_audience' => 'array',
+        'implementation_location' => 'array',
     ];
 
 

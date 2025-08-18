@@ -16,7 +16,7 @@ type LoginForm = {
     remember: boolean;
 };
 
-export default function SignInForm({status}: LoginProps) {
+export default function SignInForm({status}: Readonly<LoginProps>) {
 
     const UISignInForm: { email: UIField; password: UIField } = {
         email: {
@@ -68,7 +68,7 @@ export default function SignInForm({status}: LoginProps) {
                     formData={data}
                     className="space-y-0"
                 />
-                
+
                 <FieldRenderer
                     name="password"
                     field={UISignInForm.password}
@@ -83,7 +83,6 @@ export default function SignInForm({status}: LoginProps) {
                         checked={data.remember}
                         onChange={checked => setData('remember', checked)}
                         name="remember"
-                        className="group block size-4 rounded border bg-white transition data-[checked]:bg-blue-500"
                         id="remember"
                     />
                     <Label>Remember me</Label>
@@ -100,7 +99,7 @@ export default function SignInForm({status}: LoginProps) {
 
                 <div className="relative mt-10">
                     <div aria-hidden="true" className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-200" />
+                        <div className="w-full border-t border-gray-200"/>
                     </div>
                     <div className="relative flex justify-center text-sm/6 font-medium">
                         <span className="bg-white px-6 text-gray-900">Or continue with</span>

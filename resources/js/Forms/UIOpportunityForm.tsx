@@ -70,14 +70,14 @@ export const UIOpportunityForm: UIStep[] = [
             },
             implementation_location: {
                 id: 'implementation_location',
-                type: 'select',
+                type: 'multiselect',
                 required: true,
                 label: 'Implementation Location',
                 // options will be set dynamically based on coverage_activity
             },
             target_audience: {
                 id: 'target_audience',
-                type: 'select',
+                type: 'multiselect',
                 required: true,
                 label: 'Target Audience',
                 // options will be provided by the parent component from FormOptions
@@ -87,7 +87,7 @@ export const UIOpportunityForm: UIStep[] = [
                 type: 'text',
                 required: false,
                 label: 'Please specify the target audience',
-                show: data => data.target_audience === 'other',
+                show: data => data.target_audience?.includes('Other')
             },
             summary: {
                 id: 'summary',
