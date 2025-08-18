@@ -8,7 +8,7 @@ use Inertia\Response;
 use App\Models\RequestEnhancer;
 use App\Models\Request as OCDRequest;
 
-class RequestViewController extends BaseRequestController
+class ViewController extends BaseRequestController
 {
     /**
      * Display the full request details - unified method for both admin and user contexts

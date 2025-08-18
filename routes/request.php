@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Request\RequestListController;
 use App\Http\Controllers\Request\RequestFormController;
-use App\Http\Controllers\Request\RequestViewController;
+use App\Http\Controllers\Request\ViewController;
 use App\Http\Controllers\Request\ExportRequestPdfController;
 use App\Http\Controllers\Request\ExpressInterestController;
 use App\Http\Controllers\Request\RequestManagementController;
@@ -25,12 +25,12 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     // Request CRUD operations
     Route::get('request/create', [RequestFormController::class, 'form'])->name('request.create');
     Route::get('request/{id}/edit', [RequestFormController::class, 'form'])->name('request.edit');
-    Route::get('request/{id}/show', [RequestViewController::class, 'show'])->name('request.show');
+    Route::get('request/{id}/show', [ViewController::class, 'show'])->name('request.show');
     Route::post('request/submit/{id?}', [RequestFormController::class, 'submit'])->name('request.submit');
     Route::delete('request/{id}', [RequestManagementController::class, 'destroy'])->name('user.request.destroy');
 
     // Request viewing and preview
-    Route::get('request/preview/{id}', [RequestViewController::class, 'preview'])->name('request.preview');
+    Route::get('request/preview/{id}', [ViewController::class, 'preview'])->name('request.preview');
     Route::get('pdf/{id}', ExportRequestPdfController::class)->name('request.pdf');
 
     // Request listings
@@ -69,8 +69,8 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('request/list', [RequestListController::class, 'list'])->name('admin.request.list');
-    Route::get('request/{id}/show', [RequestViewController::class, 'show'])->name('admin.request.show');
-    Route::get('request/{id}/offers/', [RequestViewController::class, 'show'])->name('admin.request.offers.list');
+    Route::get('request/{id}/show', [ViewController::class, 'show'])->name('admin.request.show');
+    Route::get('request/{id}/offers/', [ViewController::class, 'show'])->name('admin.request.offers.list');
     Route::post('request/{id}/update-status', [RequestManagementController::class, 'updateStatus'])->name(
         'admin.request.update-status'
     );

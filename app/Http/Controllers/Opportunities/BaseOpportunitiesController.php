@@ -50,18 +50,6 @@ abstract class BaseOpportunitiesController extends Controller
         return 'public';
     }
 
-    protected function formOptions(): array
-    {
-        return [
-            'countries' => Country::getOptions(),
-            'regions' => Region::getOptions(),
-            'oceans' => Ocean::getOptions(),
-            'targetAudiences' => TargetAudience::getOptions(),
-            'opportunityTypes' => OpportunityType::getOptions(),
-            'yes_no' => YesNo::getOptions(),
-        ];
-    }
-
     protected function buildSearchFilters(Request $request, array $fields): array
     {
         $filters = [];
