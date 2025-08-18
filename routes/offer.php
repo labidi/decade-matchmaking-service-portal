@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\Offer\Admin\ListController;
-use App\Http\Controllers\Offer\Admin\UpdateController;
+use App\Http\Controllers\Offer\AcceptOfferController;
 use App\Http\Controllers\Offer\DestroyController;
 use App\Http\Controllers\Offer\FormController;
+use App\Http\Controllers\Offer\ListController;
 use App\Http\Controllers\Offer\ShowController;
 use App\Http\Controllers\Offer\StoreController;
+use App\Http\Controllers\Offer\UpdateController;
 use App\Http\Controllers\Offer\UpdateStatusController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,11 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::post('offer/{id}/update-status', UpdateStatusController::class)->name(
         'admin.offer.update-status'
     );
+});
+
+// Public routes for offer acceptance (authenticated users only)
+Route::middleware(['auth'])->group(function () {
+    Route::post('offer/{id}/accept', AcceptOfferController::class)->name('offer.accept');
 });
 
 //Route::post('request/{request}/offer', StoreController::class)->name('request.offer.store');

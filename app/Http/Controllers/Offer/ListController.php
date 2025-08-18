@@ -2,39 +2,41 @@
 
 namespace App\Http\Controllers\Offer;
 
-use App\Models\Request as OCDRequest;
-use Exception;
-use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Http\JsonResponse;
+use App\Services\OfferService;
+use App\Services\RequestService;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ListController extends BaseOfferController
 {
-    public function __invoke(HttpRequest $httpRequest, OCDRequest $request): JsonResponse
+    public function __construct(
+        OfferService $offerService,
+        private readonly RequestService $requestService
+    ) {
+        parent::__construct($offerService);
+    }
+
+    public function __invoke(Request $request): Response
     {
-        try {
-            // Request is guaranteed to exist due to route model binding
+        $filters = $this->buildFilters($request);
+        $offers = $this->offerService->getPaginatedOffers($filters['search'], $filters['sort']);
+        $breadcrumbs = $this->buildOfferBreadcrumbs('list');
 
-            $requestOffers = $request->offers()
-                ->with(['documents' => function ($query) {
-                    $query->select('id', 'name', 'path', 'parent_id', 'parent_type');
-                }])
-                ->orderBy('created_at', 'desc')
-                ->get();
-
-            return $this->jsonSuccessResponse(
-                'Offers retrieved successfully',
-                [
-                    'offers' => $requestOffers,
-                    'count' => $requestOffers->count()
-                ]
-            );
-
-        } catch (Exception $exception) {
-            return $this->handleException(
-                $exception,
-                'list offers for request',
-                ['request_id' => $request->id ?? null]
-            );
-        }
+        return Inertia::render('Admin/Offers/List', [
+            'offers' => $offers,
+            'currentSort' => $filters['current']['sort'],
+            'currentSearch' => $filters['current']['search'],
+            'searchFieldsOptions' => [
+                'requests' => $this->requestService->getAllRequests()->map(function ($request) {
+                    return [
+                        'label' => '#' . $request->id . ' - ' . ($request->detail?->capacity_development_title ?? 'Untitled') . ' - ' . $request->user->name,
+                        'value' => $request->id
+                    ];
+                })
+            ],
+            'routeName' => 'admin.offer.list',
+            'breadcrumbs' => $breadcrumbs
+        ]);
     }
 }

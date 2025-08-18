@@ -46,15 +46,16 @@ class StoreRequest extends FormRequest
             ],
             'project_stage' => [
                 Rule::excludeIf(
-                    fn() => $this->input("request_link_type") === YesNo::YES->value
-                        && $this->input("is_related_decade_action") === YesNo::YES->value
+                    fn() => $this->input("is_related_decade_action") === YesNo::YES->value || $this->input(
+                            "request_link_type"
+                        ) === YesNo::YES->value
                 ),
                 'string'
             ],
             'project_url' => [
                 Rule::excludeIf(
                     fn() => $this->input("request_link_type") === YesNo::YES->value
-                        && $this->input("is_related_decade_action") === YesNo::YES->value
+                        || $this->input("is_related_decade_action") === YesNo::YES->value
                 ),
                 'url'
             ],
@@ -80,7 +81,7 @@ class StoreRequest extends FormRequest
             'target_languages' => ['required', 'array'],
             'target_languages.*' => [Rule::enum(Language::class)],
             'target_languages_other' => [
-                Rule::requiredIf(fn() => in_array('Other', $this->input('target_languages', []))),
+                Rule::excludeIf(fn() => !in_array(Language::OTHER->value, $this->input('target_languages', []))),
                 'string'
             ],
             'subthemes' => ['required', 'array'],
@@ -102,10 +103,12 @@ class StoreRequest extends FormRequest
                 )
             ],
             'gap_description' => ['required', 'string'],
-            'has_partner' => ['required', Rule::in(['Yes', 'No'])],
-            'partner_name' => [Rule::requiredIf(fn() => $this->input("has_partner") === 'Yes')],
+            'has_partner' => [Rule::enum(YesNo::class)],
+            'partner_name' => [
+                Rule::excludeIf(fn() => $this->input("has_partner") === YesNo::NO->value)
+            ],
             'partner_confirmed' => [Rule::requiredIf(fn() => $this->input("has_partner") === 'Yes')],
-            'needs_financial_support' => ['required', Rule::in(['Yes', 'No'])],
+            'needs_financial_support' => ['required', Rule::enum(YesNo::class)],
             'budget_breakdown' => [Rule::requiredIf(fn() => $this->input("needs_financial_support") === 'Yes')],
             'support_months' => ['required', 'numeric'],
             'completion_date' => ['required', 'string'],

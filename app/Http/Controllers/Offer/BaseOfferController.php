@@ -27,6 +27,11 @@ abstract class BaseOfferController extends Controller
 {
     use HasBreadcrumbs;
 
+    public function __construct(
+        protected readonly OfferService $offerService
+    ) {
+    }
+
     /**
      * Get the view prefix based on route context
      */

@@ -9,8 +9,9 @@ use Inertia\Response;
 
 class ShowController extends BaseOfferController
 {
-    public function __construct(private readonly OfferService $offerService)
+    public function __construct(OfferService $offerService)
     {
+        parent::__construct($offerService);
     }
 
     /**

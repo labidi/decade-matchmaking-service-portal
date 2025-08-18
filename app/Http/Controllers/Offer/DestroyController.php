@@ -7,8 +7,9 @@ use Exception;
 
 class DestroyController extends BaseOfferController
 {
-    public function __construct(private readonly OfferService $offerService)
+    public function __construct(OfferService $offerService)
     {
+        parent::__construct($offerService);
     }
 
     public function __invoke(int $id)

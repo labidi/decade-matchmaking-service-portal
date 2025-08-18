@@ -16,7 +16,7 @@ class Offer extends Model
     protected $table = 'request_offers';
     protected $primaryKey = 'id';
     public $timestamps = true;
-    protected $appends = ['status_label', 'can_edit', 'can_view', 'can_delete'];
+    protected $appends = ['status_label', 'can_edit', 'can_view', 'can_delete', 'can_accept'];
 
 
     const STATUS_LABELS = [
@@ -26,6 +26,7 @@ class Offer extends Model
 
     protected $casts = [
         'status' => RequestOfferStatus::class,
+        'is_accepted' => 'boolean',
     ];
 
 
@@ -34,6 +35,7 @@ class Offer extends Model
         'matched_partner_id',
         'description',
         'status',
+        'is_accepted',
     ];
 
     public function request(): BelongsTo
@@ -103,5 +105,26 @@ class Offer extends Model
 
         // Only admins can delete offers
         return $user->hasRole('administrator');
+    }
+
+    /**
+     * Check if current user can accept this offer
+     */
+    public function getCanAcceptAttribute(): bool
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+        if(!$this->request) {
+            return false; // Ensure request is loaded
+        }
+
+        // Only the request owner can accept offers for their request
+        // And the offer must be active and not already accepted
+        return $user->id === $this->request->user_id
+            && $this->status === RequestOfferStatus::ACTIVE
+            && !$this->is_accepted;
     }
 }
