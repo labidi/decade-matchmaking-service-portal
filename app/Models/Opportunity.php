@@ -16,8 +16,14 @@ class Opportunity extends Model
 {
     protected $table = 'opportunities';
     protected $primaryKey = 'id';
+
     public $timestamps = true;
-    protected $appends = ['status_label','type_label','implementation_location_label','target_audience_label'];
+    protected $appends = ['status_label', 'type_label', 'implementation_location_label', 'target_audience_label'];
+
+    protected $casts = [
+        'status' => OpportunityStatus::class,
+        'target_audience' => 'array',
+    ];
 
 
     public const STATUS_LABELS = [
@@ -32,11 +38,6 @@ class Opportunity extends Model
         return OpportunityType::getOptions();
     }
 
-    protected $casts = [
-        'status' => OpportunityStatus::class,
-    ];
-
-
     protected $fillable = [
         'title',
         'type',
@@ -44,7 +45,7 @@ class Opportunity extends Model
         'coverage_activity',
         'implementation_location',
         'target_audience',
-        // 'target_audience_other',
+        'target_audience_other',
         'summary',
         'url',
     ];

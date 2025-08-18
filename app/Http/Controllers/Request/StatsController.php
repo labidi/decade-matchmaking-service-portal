@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Request;
 
 use Illuminate\Http\Request;
 
-class RequestStatsController extends BaseRequestController
+class StatsController extends BaseRequestController
 {
     /**
      * Get request statistics

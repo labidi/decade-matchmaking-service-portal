@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Opportunities\CreateController as OpportunityCreateController;
+use App\Http\Controllers\Opportunities\FormController as OpportunityCreateController;
 use App\Http\Controllers\Opportunities\StoreController as OpportunityStoreController;
 use App\Http\Controllers\Opportunities\ListController as OpportunityListController;
 use App\Http\Controllers\Opportunities\ShowController as OpportunityShowController;
