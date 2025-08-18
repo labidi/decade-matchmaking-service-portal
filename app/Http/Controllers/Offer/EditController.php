@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Offer\Admin;
+namespace App\Http\Controllers\Offer;
 
-use App\Http\Controllers\Offer\BaseOfferController;
 use App\Services\OfferService;
 use App\Services\RequestService;
 use Inertia\Inertia;

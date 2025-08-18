@@ -64,7 +64,7 @@ export function useRequestActions(
                     key: 'add-offer',
                     label: 'Add New Offer',
                     icon: PlusIcon,
-                    onClick: () => router.visit(route('admin.offers.create', { request_id: request.id })),
+                    onClick: () => router.visit(route('admin.offer.create', { request_id: request.id })),
                     divider: actions.length > 0,
                     variant: 'success'
                 },
@@ -72,7 +72,7 @@ export function useRequestActions(
                     key: 'see-offers',
                     label: 'See Request Offers',
                     icon: DocumentTextIcon,
-                    onClick: () => router.visit(route('admin.offers.list', { request: request.id })),
+                    onClick: () => router.visit(route('admin.offer.list', { request: request.id })),
                     variant: 'secondary'
                 }
             );

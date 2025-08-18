@@ -35,7 +35,7 @@ class ListController extends BaseOfferController
                     ];
                 })
             ],
-            'routeName' => 'admin.offers.list',
+            'routeName' => 'admin.offer.list',
             'breadcrumbs' => $breadcrumbs
         ]);
     }

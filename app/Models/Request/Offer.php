@@ -54,7 +54,7 @@ class Offer extends Model
     protected function statusLabel(): Attribute
     {
         return Attribute::make(
-            get: fn() => Offer::STATUS_LABELS[$this->status->value] ?? '',
+            get: fn() => Offer::STATUS_LABELS[$this->status?->value] ?? '',
         );
     }
 
@@ -64,7 +64,7 @@ class Offer extends Model
     public function getCanEditAttribute(): bool
     {
         $user = auth()->user();
-        
+
         if (!$user) {
             return false;
         }
@@ -79,7 +79,7 @@ class Offer extends Model
     public function getCanViewAttribute(): bool
     {
         $user = auth()->user();
-        
+
         if (!$user) {
             return false;
         }
@@ -96,7 +96,7 @@ class Offer extends Model
     public function getCanDeleteAttribute(): bool
     {
         $user = auth()->user();
-        
+
         if (!$user) {
             return false;
         }

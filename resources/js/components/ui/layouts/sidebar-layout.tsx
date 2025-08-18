@@ -90,12 +90,12 @@ export function SidebarLayout({
 
                     {/* Flash Messages */}
                     <div className="px-6 lg:px-10 pt-6">
-                        <FlashMessages className="mx-auto max-w-6xl" />
+                        <FlashMessages className="mx-auto  container max-w-8xl" />
                     </div>
 
                     {/* Main Content */}
                     <div className="p-6 lg:p-10">
-                        <div className="mx-auto max-w-6xl">{children}</div>
+                        <div className="mx-auto container max-w-8xl">{children}</div>
                     </div>
                 </div>
             </main>

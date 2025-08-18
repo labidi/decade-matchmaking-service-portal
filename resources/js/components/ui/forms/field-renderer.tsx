@@ -7,7 +7,7 @@ import {RadioGroup, RadioField, Radio} from '@/components/ui/radio';
 import {CheckboxGroup, CheckboxField, Checkbox} from '@/components/ui/checkbox';
 import {ChevronsUpDown} from 'lucide-react';
 import {Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions} from '@headlessui/react';
-import { Text } from '@/components/ui/text'
+import {Text} from '@/components/ui/text'
 import CSVUpload from './csv-upload';
 
 interface FieldRendererProps {
@@ -40,24 +40,24 @@ function debounce<T extends (...args: any[]) => any>(func: T, wait: number): T {
 }
 
 export default function FieldRenderer({
-    name,
-    field,
-    value,
-    error,
-    onChange,
-    formData,
-    onKeyDown,
-    onBlur,
-    disabled,
-    className
-}: Readonly<FieldRendererProps>) {
+                                          name,
+                                          field,
+                                          value,
+                                          error,
+                                          onChange,
+                                          formData,
+                                          onKeyDown,
+                                          onBlur,
+                                          disabled,
+                                          className
+                                      }: Readonly<FieldRendererProps>) {
     const [comboboxQuery, setComboboxQuery] = useState('');
 
     // Field validation
     const validateField = useCallback((value: any, field: UIField): string | null => {
-      /*  if (field.required && (!value || value.toString().trim() === '')) {
-            return `${field.label || field.id} is required`;
-        }*/
+        /*  if (field.required && (!value || value.toString().trim() === '')) {
+              return `${field.label || field.id} is required`;
+          }*/
 
         if (field.pattern && value && !new RegExp(field.pattern).test(value)) {
             return `${field.label || field.id} format is invalid`;
@@ -112,7 +112,7 @@ export default function FieldRenderer({
 
     // Debounced onChange for search fields
     const debouncedOnChange = useMemo(() =>
-        field.type === 'search' ? debounce(onChange, 300) : onChange,
+            field.type === 'search' ? debounce(onChange, 300) : onChange,
         [onChange, field.type]
     );
 
@@ -146,7 +146,7 @@ export default function FieldRenderer({
 
     // Render error helper
     const renderError = useCallback(() =>
-        error && <ErrorMessage id={`${field.id}-error`}>{error}</ErrorMessage>,
+            error && <ErrorMessage id={`${field.id}-error`}>{error}</ErrorMessage>,
         [error, field.id]
     );
 
@@ -233,7 +233,7 @@ export default function FieldRenderer({
                         type={field.type}
                         id={field.id}
                         required={field.required}
-                        value={ new Date(value).toISOString().slice(0, 10) || ''}
+                        value={new Date(value).toISOString().slice(0, 10) || ''}
                         placeholder={field.placeholder ?? ''}
                         onChange={handleChange}
                         invalid={!!error}
@@ -289,15 +289,50 @@ export default function FieldRenderer({
             );
 
         case 'file':
+            const existingDocuments = formData?.existing_documents || [];
+            const hasExistingDocuments = Array.isArray(existingDocuments) && existingDocuments.length > 0;
+            
             return (
                 <Field key={name} className="mt-8">
                     {field.label && <Label>{field.label}</Label>}
-                    <Description>
-
-                    </Description>
                     {field.description && <Description>
                         {field.description}
                     </Description>}
+                    
+                    {/* Show existing documents if any */}
+                    {hasExistingDocuments && (
+                        <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
+                            <Text className="text-sm font-medium mb-2">Current documents:</Text>
+                            <div className="space-y-2">
+                                {existingDocuments.map((doc: any, index: number) => (
+                                    <div key={index} className="flex items-center justify-between text-sm">
+                                        <div className="flex items-center space-x-2">
+                                            <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                                            </svg>
+                                            <span className="text-gray-700 dark:text-gray-300">{doc.name || 'Unnamed document'}</span>
+                                            {doc.file_type && (
+                                                <span className="text-xs text-gray-500 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
+                                                    {doc.file_type.toUpperCase()}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {doc.path && (
+                                            <a 
+                                                href={doc.path} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            >
+                                                Download
+                                            </a>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    
                     <Input
                         type="file"
                         id={field.id}
@@ -308,6 +343,11 @@ export default function FieldRenderer({
                         }}
                         invalid={!!error}
                     />
+                    {hasExistingDocuments && (
+                        <Description className="mt-1 text-xs">
+                            Select a new file to replace the existing document(s)
+                        </Description>
+                    )}
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </Field>
             );
@@ -316,7 +356,8 @@ export default function FieldRenderer({
             return (
                 <Field key={name} className="mt-8">
                     {field.label && <Label htmlFor={field.id} className="block font-medium">{field.label}</Label>}
-                    {field.description && <Description className="mt-1 text-sm text-gray-500">{field.description}</Description>}
+                    {field.description &&
+                        <Description className="mt-1 text-sm text-gray-500">{field.description}</Description>}
                     <Combobox immediate value={value} onChange={handleComboboxChange}>
                         <div className="relative">
                             <div

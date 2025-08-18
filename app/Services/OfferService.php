@@ -153,13 +153,11 @@ class OfferService
 
             // Delete associated documents
             foreach ($offer->documents as $document) {
-                $documentService = app(DocumentService::class);
-                $documentService->deleteDocument($document->id, $user);
+                $this->documentService->deleteDocument($document);
             }
 
             // Delete the offer
             $offer->delete();
-
             DB::commit();
             return true;
         } catch (Exception $e) {

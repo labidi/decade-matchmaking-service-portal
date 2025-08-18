@@ -44,7 +44,7 @@ export function SidebarContent() {
                         <DocumentDuplicateIcon/>
                         <SidebarLabel>Requests</SidebarLabel>
                     </SidebarItem>
-                    <SidebarItem href={route('admin.offers.list')}>
+                    <SidebarItem href={route('admin.offer.list')}>
                         <TagIcon/>
                         <SidebarLabel>Offers</SidebarLabel>
                     </SidebarItem>

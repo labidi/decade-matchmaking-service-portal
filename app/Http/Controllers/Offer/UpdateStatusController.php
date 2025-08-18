@@ -14,7 +14,7 @@ class UpdateStatusController extends BaseOfferController
         try {
             $validated = $statusRequest->validated();
             $offer = $this->offerService->getOfferById($id);
-            
+
             switch ($validated['status']) {
                 case RequestOfferStatus::ACTIVE->value:
                     $this->offerService->changeOfferStatus($offer, RequestOfferStatus::ACTIVE);
@@ -27,13 +27,13 @@ class UpdateStatusController extends BaseOfferController
                         'Invalid status provided',
                         null,
                         400,
-                        'admin.offers.list'
+                        'admin.offer.list'
                     );
             }
-            
+
             return $this->getSuccessResponse(
                 'Offer status updated successfully',
-                'admin.offers.list'
+                'admin.offer.list'
             );
         } catch (Exception $exception) {
             return $this->handleException(

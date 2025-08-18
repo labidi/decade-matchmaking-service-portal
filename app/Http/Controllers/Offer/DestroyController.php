@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Offer\Admin;
+namespace App\Http\Controllers\Offer;
 
-use App\Http\Controllers\Offer\BaseOfferController;
+use App\Services\OfferService;
 use Exception;
 
 class DestroyController extends BaseOfferController
 {
+    public function __construct(private readonly OfferService $offerService)
+    {
+    }
+
     public function __invoke(int $id)
     {
         try {
@@ -14,7 +18,7 @@ class DestroyController extends BaseOfferController
 
             return $this->getSuccessResponse(
                 'Offer deleted successfully',
-                'admin.offers.list'
+                'admin.offer.list'
             );
         } catch (Exception $e) {
             return $this->handleException(
