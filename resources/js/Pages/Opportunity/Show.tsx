@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Text, TextLink } from '@/components/ui/text';
 import { Divider } from '@/components/ui/divider';
-import { CalendarIcon, GlobeAltIcon, UsersIcon, ArrowTopRightOnSquareIcon, PencilIcon } from '@heroicons/react/16/solid';
+import { CalendarIcon, GlobeAltIcon, UsersIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/16/solid';
 
 interface ShowPageProps extends PageProps {
     opportunity: OCDOpportunity;
@@ -85,7 +85,7 @@ export default function Show() {
 
                 {/* Basic Information Grid */}
                 <section className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                         <div className="space-y-2">
                             <Text className="font-medium text-zinc-950 dark:text-white">Type</Text>
                             <Text>{opportunity.type_label || opportunity.type}</Text>

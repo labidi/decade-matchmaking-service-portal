@@ -33,12 +33,11 @@ class ListController extends BaseOpportunitiesController
      */
     private function adminOpportunities(Request $httpRequest): Response
     {
-        $searchFilters = $this->buildSearchFilters($httpRequest, ['user', 'title', 'type', 'status', 'location', 'closing_date']);
+        $searchFilters = $this->buildSearchFilters($httpRequest, ['user', 'title']);
         $sortFilters = $this->buildSortFilters($httpRequest);
 
         // Admin can see all opportunities - could be implemented later
-        $opportunities = $this->opportunityService->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
-        $this->appendPagination($opportunities, $httpRequest, ['sort', 'order', 'user', 'title', 'type', 'status', 'location', 'closing_date']);
+        $opportunities = $this->opportunityService->getAllOpportunitiesPaginated($searchFilters, $sortFilters);
 
         return Inertia::render('Admin/Opportunity/List', [
             'opportunities' => $opportunities,
@@ -118,10 +117,8 @@ class ListController extends BaseOpportunitiesController
     {
         $searchFilters = $this->buildSearchFilters($httpRequest, ['title', 'type']);
         $sortFilters = $this->buildSortFilters($httpRequest);
-
-        $opportunities = $this->opportunityService->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
+        $opportunities = $this->opportunityService->getActiveOpportunitiesPaginated($searchFilters, $sortFilters);
         $this->appendPagination($opportunities, $httpRequest, ['sort', 'order', 'user', 'title', 'type', 'location', 'closing_date']);
-
         return Inertia::render('Opportunity/List', [
             'opportunities' => $opportunities,
             'title' => 'Opportunities',

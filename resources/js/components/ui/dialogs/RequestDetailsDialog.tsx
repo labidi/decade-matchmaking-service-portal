@@ -33,7 +33,7 @@ export function RequestDetailsDialog({
                     {/* Request Header */}
                     <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            {request.title}
+                            {request.detail.capacity_development_title}
                         </h3>
                         <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                             <span>Submitted: {new Date(request.submissionDate).toLocaleDateString()}</span>
@@ -127,7 +127,7 @@ export function RequestDetailsDialog({
                                 Gap Description
                             </h4>
                             <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
-                                {request.detail.gap_description.length > 200 
+                                {request.detail.gap_description.length > 200
                                     ? `${request.detail.gap_description.substring(0, 200)}...`
                                     : request.detail.gap_description
                                 }

@@ -1,4 +1,4 @@
-import { OCDRequest, RequestStatus } from '@/types';
+import { OCDRequest, OCDRequestStatus } from '@/types';
 
 export interface RequestAction {
     key: string;
@@ -27,7 +27,7 @@ export interface RequestActionsConfig {
 export interface RequestActionsProviderProps {
     request: OCDRequest;
     config?: RequestActionsConfig;
-    availableStatuses?: RequestStatus[];
+    availableStatuses?: OCDRequestStatus[];
     onStatusUpdate?: (request: OCDRequest) => void;
     children: (actions: RequestAction[]) => React.ReactNode;
 }
@@ -35,7 +35,7 @@ export interface RequestActionsProviderProps {
 export interface RequestActionButtonsProps {
     request: OCDRequest;
     config?: RequestActionsConfig;
-    availableStatuses?: RequestStatus[];
+    availableStatuses?: OCDRequestStatus[];
     onStatusUpdate?: (request: OCDRequest) => void;
     layout?: 'horizontal' | 'vertical' | 'dropdown';
     className?: string;

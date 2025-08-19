@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { router } from '@inertiajs/react';
-import { OCDRequest, RequestStatus } from '@/types';
+import { OCDRequest, OCDRequestStatus } from '@/types';
 import { RequestAction, RequestActionsConfig } from '@/types/request-actions';
 import {
     EyeIcon,

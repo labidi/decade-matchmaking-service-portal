@@ -7,7 +7,9 @@ use App\Models\Opportunity;
 use App\Models\User;
 use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
+use App\Services\PaginationService;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -17,18 +19,19 @@ class OpportunityService
 {
     public function __construct(
         private readonly OpportunityRepository $repository,
-        private readonly OpportunityAnalyticsService $analytics
+        private readonly OpportunityAnalyticsService $analytics,
+        private readonly PaginationService $paginationService
     ) {
     }
 
     /**
      * Create a new opportunity
+     * @throws \Throwable
      */
     public function createOpportunity(array $data, User $user): Opportunity
     {
         return DB::transaction(function () use ($data, $user) {
-            $opportunity = $this->repository->create($data, $user);
-            return $opportunity;
+            return $this->repository->create($data, $user);
         });
     }
 
@@ -41,27 +44,71 @@ class OpportunityService
     }
 
     /**
-     * Get paginated opportunities submitted by a specific user (compatible with RequestsController pattern)
+     * Get paginated opportunities submitted by a specific user
      */
-    public function getUserOpportunitiesPaginated(User $user, array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    public function getUserOpportunitiesPaginated(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        $query = $this->getBaseOpportunitiesQuery($searchFilters)
+            ->where('user_id', $user->id);
+        $query = $this->paginationService->applySorting($query, $sortFilters);
+        return $this->paginationService->paginate($query, ['per_page' => 10]);
+    }
+
+
+    private function getBaseOpportunitiesQuery(array $searchFilters = []): Builder
     {
-        return $this->repository->getUserOpportunitiesPaginated($user, $searchFilters, $sortFilters);
+        $query = Opportunity::with(['user']);
+
+        // Apply search filters (like OfferService pattern)
+        if (!empty($searchFilters['title'])) {
+            $query->where('title', 'like', '%' . $searchFilters['title'] . '%');
+        }
+
+        if (!empty($searchFilters['type'])) {
+            $query->where('type', $searchFilters['type']);
+        }
+
+        if (!empty($searchFilters['location'])) {
+            $query->where('implementation_location', 'like', '%' . $searchFilters['location'] . '%');
+        }
+
+        if (!empty($searchFilters['closing_date'])) {
+            $query->whereDate('closing_date', '>=', $searchFilters['closing_date']);
+        }
+
+        if (!empty($searchFilters['user'])) {
+            $query->whereHas('user', function ($q) use ($searchFilters) {
+                $q->where('name', 'like', '%' . $searchFilters['user'] . '%')
+                    ->orWhere('email', 'like', '%' . $searchFilters['user'] . '%');
+            });
+        }
+
+        return $query;
+    }
+
+    public function getAllOpportunitiesPaginated(
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        $query = $this->getBaseOpportunitiesQuery($searchFilters);
+        $query = $this->paginationService->applySorting($query, $sortFilters);
+        return $this->paginationService->paginate($query, ['per_page' => 10]);
     }
 
     /**
-     * Get public opportunities (active status only)
+     * Get paginated active opportunities (active status only)
      */
-    public function getPublicOpportunities(): Collection
-    {
-        return $this->repository->getPublicOpportunities();
-    }
-
-    /**
-     * Get paginated public opportunities (compatible with RequestsController pattern)
-     */
-    public function getPublicOpportunitiesPaginated(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
-    {
-        return $this->repository->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
+    public function getActiveOpportunitiesPaginated(
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        $query = $this->getBaseOpportunitiesQuery($searchFilters);
+        $query->where('status', OpportunityStatus::ACTIVE);
+        $query = $this->paginationService->applySorting($query, $sortFilters);
+        return $this->paginationService->paginate($query, ['per_page' => 10]);
     }
 
     /**
@@ -88,35 +135,23 @@ class OpportunityService
 
     /**
      * Update opportunity status
+     * @throws Exception
      */
     public function updateOpportunityStatus(int $opportunityId, int $statusCode, User $user): array
     {
         $opportunity = $this->findOpportunity($opportunityId, $user);
-
         if (!$opportunity) {
             throw new Exception('Opportunity not found', 404);
         }
-
         // Validate status
         if (!in_array($statusCode, array_column(OpportunityStatus::cases(), 'value'))) {
             throw new Exception('Invalid status code', 422);
         }
-
         // Check if user can update this opportunity
         if ($opportunity->user_id !== $user->id) {
             throw new Exception('Unauthorized to update this opportunity', 403);
         }
-
-        $oldStatus = $opportunity->status;
         $this->repository->update($opportunity, ['status' => $statusCode]);
-
-        Log::info('Opportunity status updated', [
-            'opportunity_id' => $opportunity->id,
-            'user_id' => $user->id,
-            'old_status' => $oldStatus,
-            'new_status' => $statusCode
-        ]);
-
         return [
             'opportunity' => $opportunity->fresh(),
             'status' => [
@@ -173,30 +208,44 @@ class OpportunityService
      */
     public function searchOpportunities(array $filters, User $user): Collection
     {
-        return $this->repository->searchWithFilters($filters, $user);
-    }
+        $query = Opportunity::with(['user']);
 
-    /**
-     * Get system-wide opportunity analytics
-     */
-    public function getSystemAnalytics(): array
-    {
-        return $this->analytics->getSystemStats();
-    }
+        // Apply filters (like OfferService pattern)
+        if (!empty($filters['type'])) {
+            $query->where('type', $filters['type']);
+        }
 
-    /**
-     * Get user performance metrics
-     */
-    public function getUserPerformanceMetrics(User $user): array
-    {
-        return $this->analytics->getUserPerformanceMetrics($user);
-    }
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
 
-    /**
-     * Get trending opportunities
-     */
-    public function getTrendingOpportunities(int $days = 30, int $limit = 10): array
-    {
-        return $this->analytics->getTrendingOpportunities($days, $limit);
+        if (!empty($filters['location'])) {
+            $query->where('implementation_location', 'like', '%' . $filters['location'] . '%');
+        }
+
+        if (!empty($filters['search'])) {
+            $searchTerm = $filters['search'];
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('summary', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('keywords', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        if (!empty($filters['date_from'])) {
+            $query->whereDate('created_at', '>=', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $query->whereDate('created_at', '<=', $filters['date_to']);
+        }
+
+        // Public opportunities filter (exclude user's own opportunities)
+        if (!empty($filters['public'])) {
+            $query->where('user_id', '!=', $user->id)
+                ->where('status', OpportunityStatus::ACTIVE);
+        }
+
+        return $query->orderBy('created_at', 'desc')->get();
     }
 }

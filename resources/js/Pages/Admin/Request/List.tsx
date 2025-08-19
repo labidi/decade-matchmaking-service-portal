@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {Head} from '@inertiajs/react';
-import {OCDRequest, OCDRequestList, PaginationLinkProps, RequestStatus} from '@/types';
+import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus} from '@/types';
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 import {adminColumns} from "@/components/ui/data-table/requests/column-configs";
@@ -32,7 +32,7 @@ interface RequestsListPageProps {
         order: string;
     };
     currentSearch?: Record<string, string>;
-    availableStatuses: RequestStatus[];
+    availableStatuses: OCDRequestStatus[];
 }
 
 export default function RequestListPage({requests, currentSort, currentSearch = {}, availableStatuses}: Readonly<RequestsListPageProps>) {

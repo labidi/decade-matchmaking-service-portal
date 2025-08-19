@@ -1,5 +1,5 @@
 import React from 'react';
-import {OCDRequest, RequestStatus} from '@/types';
+import {OCDRequest, OCDRequestStatus} from '@/types';
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {Head} from "@inertiajs/react";
 import {Heading} from "@/components/ui/heading";
@@ -9,7 +9,7 @@ import { RequestActions } from '@/components/ui/data-table/requests/requests-act
 
 interface RequestShowPageProps {
     request: OCDRequest;
-    availableStatuses?: RequestStatus[];
+    availableStatuses?: OCDRequestStatus[];
 }
 
 export default function RequestShowPage({request, availableStatuses = []}: Readonly<RequestShowPageProps>) {

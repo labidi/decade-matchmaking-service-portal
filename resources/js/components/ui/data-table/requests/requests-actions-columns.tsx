@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {router} from '@inertiajs/react';
 import {DropdownActions, Action} from '@/components/ui/data-table/common/dropdown-actions';
-import {OCDRequest, RequestStatus} from '@/types';
+import {OCDRequest, OCDRequestStatus} from '@/types';
 import { UpdateStatusDialog } from '@/components/ui/dialogs/UpdateStatusDialog';
 
 interface RequestActionsProps {
     request: OCDRequest;
     showViewDetails?: boolean;
-    availableStatuses?: RequestStatus[];
+    availableStatuses?: OCDRequestStatus[];
 }
 
 // Helper function to build actions - can be used independently

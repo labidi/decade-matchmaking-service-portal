@@ -49,7 +49,7 @@ class OpportunityServiceTest extends TestCase
     {
         // Create opportunities for the user
         Opportunity::factory()->count(3)->create(['user_id' => $this->user->id]);
-        
+
         // Create opportunities for another user
         Opportunity::factory()->count(2)->create();
 
@@ -59,40 +59,20 @@ class OpportunityServiceTest extends TestCase
         $this->assertTrue($opportunities->every(fn($opp) => $opp->user_id === $this->user->id));
     }
 
-    public function test_can_get_public_opportunities()
-    {
-        // Create active opportunities from other users
-        Opportunity::factory()->count(3)->create([
-            'user_id' => User::factory()->create()->id,
-            'status' => OpportunityStatus::ACTIVE
-        ]);
-        
-        // Create user's own opportunities
-        Opportunity::factory()->count(2)->create([
-            'user_id' => $this->user->id,
-            'status' => OpportunityStatus::ACTIVE
-        ]);
-
-        $opportunities = $this->opportunityService->getPublicOpportunities($this->user);
-
-        $this->assertCount(3, $opportunities);
-        $this->assertTrue($opportunities->every(fn($opp) => $opp->user_id !== $this->user->id));
-        $this->assertTrue($opportunities->every(fn($opp) => $opp->status === OpportunityStatus::ACTIVE));
-    }
 
     public function test_can_find_opportunity_with_authorization()
     {
         $opportunity = Opportunity::factory()->create(['user_id' => $this->user->id]);
-        
+
         $found = $this->opportunityService->findOpportunity($opportunity->id, $this->user);
-        
+
         $this->assertEquals($opportunity->id, $found->id);
     }
 
     public function test_cannot_find_nonexistent_opportunity()
     {
         $found = $this->opportunityService->findOpportunity(999, $this->user);
-        
+
         $this->assertNull($found);
     }
 
@@ -104,8 +84,8 @@ class OpportunityServiceTest extends TestCase
         ]);
 
         $result = $this->opportunityService->updateOpportunityStatus(
-            $opportunity->id, 
-            OpportunityStatus::ACTIVE->value, 
+            $opportunity->id,
+            OpportunityStatus::ACTIVE->value,
             $this->user
         );
 
@@ -122,8 +102,8 @@ class OpportunityServiceTest extends TestCase
         $this->expectExceptionMessage('Unauthorized to update this opportunity');
 
         $this->opportunityService->updateOpportunityStatus(
-            $opportunity->id, 
-            OpportunityStatus::ACTIVE->value, 
+            $opportunity->id,
+            OpportunityStatus::ACTIVE->value,
             $this->user
         );
     }
@@ -185,7 +165,7 @@ class OpportunityServiceTest extends TestCase
             'type' => 'training',
             'implementation_location' => 'Europe'
         ]);
-        
+
         Opportunity::factory()->create([
             'user_id' => $this->user->id,
             'type' => 'fellowships',
@@ -198,4 +178,4 @@ class OpportunityServiceTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertEquals('training', $results->first()->type);
     }
-} 
+}

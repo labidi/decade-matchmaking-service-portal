@@ -15,6 +15,12 @@ Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('user.home');
 
+    // User subscription routes
+    Route::get('subscriptions', [\App\Http\Controllers\SubscriptionController::class, 'index'])->name('user.subscriptions.index');
+    Route::post('subscriptions/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('user.subscriptions.subscribe');
+    Route::post('subscriptions/unsubscribe', [\App\Http\Controllers\SubscriptionController::class, 'unsubscribe'])->name('user.subscriptions.unsubscribe');
+    Route::get('subscriptions/status', [\App\Http\Controllers\SubscriptionController::class, 'status'])->name('user.subscriptions.status');
+
     Route::post('offer/{id}/document', [\App\Http\Controllers\DocumentsController::class, 'storeOfferDocument'])->name(
         'user.offer.document.store'
     );
@@ -31,6 +37,13 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::post('settings', [SettingsController::class, 'update'])->name('admin.settings.update');
     Route::post('settings/organizations/csv-upload', [SettingsController::class, 'uploadOrganizationsCsv'])->name('admin.settings.organizations.csv-upload');
 
+    // Admin subscription management routes
+    Route::get('subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('admin.subscriptions.index');
+    Route::post('subscriptions/subscribe-user', [\App\Http\Controllers\Admin\SubscriptionController::class, 'subscribeUser'])->name('admin.subscriptions.subscribe-user');
+    Route::post('subscriptions/unsubscribe-user', [\App\Http\Controllers\Admin\SubscriptionController::class, 'unsubscribeUser'])->name('admin.subscriptions.unsubscribe-user');
+    Route::get('subscriptions/request/{request}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'requestSubscribers'])->name('admin.subscriptions.request-subscribers');
+    Route::get('subscriptions/user/{user}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'userSubscriptions'])->name('admin.subscriptions.user-subscriptions');
+    Route::post('subscriptions/bulk-unsubscribe', [\App\Http\Controllers\Admin\SubscriptionController::class, 'bulkUnsubscribe'])->name('admin.subscriptions.bulk-unsubscribe');
 
     Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
     Route::get('user/list', [UserRoleController::class, 'index'])->name('admin.users.roles.list');

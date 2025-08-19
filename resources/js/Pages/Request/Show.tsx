@@ -15,11 +15,6 @@ interface ShowRequestProps {
 }
 
 export default function ShowRequest({request, requestDetail, activeOffer, canManageOfferResponse}: Readonly<ShowRequestProps>) {
-    const shouldShowOfferResponseButtons =
-        request.status.status_code === 'offer_made' &&
-        activeOffer &&
-        canManageOfferResponse;
-
     const handleAcceptOffer = () => {
         if (!activeOffer) return;
 
