@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\Common\TargetAudience;
+use App\Enums\Opportunity\OpportunityStatus;
+use App\Enums\Opportunity\OpportunityType;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\User;
-use App\Models\LocationData;
-use App\Enums\TargetAudience;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Enums\OpportunityStatus;
-use App\Enums\OpportunityType;
 
 
 class Opportunity extends Model

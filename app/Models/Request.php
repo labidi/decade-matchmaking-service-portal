@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-use App\Models\Request\Offer;
 use App\Models\Request\Detail;
+use App\Models\Request\Offer;
 use App\Models\Request\Status;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 
 class Request extends Model
@@ -63,7 +62,7 @@ class Request extends Model
     public function activeOffer()
     {
         return $this->hasOne(Offer::class)
-            ->where('status', \App\Enums\RequestOfferStatus::ACTIVE);
+            ->where('status', \App\Enums\Offer\RequestOfferStatus::ACTIVE);
     }
 
     /**

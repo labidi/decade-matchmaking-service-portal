@@ -2,14 +2,8 @@
 
 namespace App\Http\Controllers\Opportunities;
 
+use App\Enums\Opportunity\OpportunityStatus;
 use App\Http\Controllers\Controller;
-use App\Enums\OpportunityStatus;
-use App\Enums\Country;
-use App\Enums\Ocean;
-use App\Enums\OpportunityType;
-use App\Enums\Region;
-use App\Enums\TargetAudience;
-use App\Enums\YesNo;
 use App\Models\Opportunity;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;

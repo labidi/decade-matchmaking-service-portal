@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\RequestOfferStatus;
+use App\Enums\Offer\RequestOfferStatus;
 
 class UpdateRequestOfferStatus extends BaseOfferRequest
 {

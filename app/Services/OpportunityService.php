@@ -2,17 +2,16 @@
 
 namespace App\Services;
 
-use App\Enums\OpportunityStatus;
+use App\Enums\Opportunity\OpportunityStatus;
 use App\Models\Opportunity;
 use App\Models\User;
 use App\Services\Opportunity\EnhancerService;
 use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
-use App\Services\PaginationService;
 use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

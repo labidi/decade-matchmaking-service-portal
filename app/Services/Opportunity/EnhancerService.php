@@ -2,7 +2,6 @@
 
 namespace App\Services\Opportunity;
 
-use App\Enums\OpportunityStatus;
 use App\Models\Opportunity;
 
 class EnhancerService

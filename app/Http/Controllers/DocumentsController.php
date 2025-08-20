@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Document\DocumentType;
 use App\Models\Document;
 use App\Models\Request as OCDRequest;
 use App\Models\Request\Offer;
-use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Validation\Rule;
-use App\Enums\DocumentType;
 use App\Services\DocumentService;
 use Exception;
+use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Validation\Rule;
 
 class DocumentsController extends Controller
 {

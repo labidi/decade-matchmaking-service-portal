@@ -3,7 +3,7 @@ import {Head} from '@inertiajs/react';
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout';
 import {RequestOffer} from '@/types';
 import {useOfferForm} from '@/hooks/useOfferForm';
-import {UIOfferForm} from '@/Forms/UIOfferForm';
+import {UIOfferForm} from '@/components/forms/UIOfferForm';
 import {Heading} from "@/components/ui/heading";
 import {Button} from '@/components/ui/button';
 import {ChevronLeftIcon} from '@heroicons/react/16/solid';

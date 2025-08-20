@@ -2,12 +2,12 @@
 
 namespace App\Services\Request;
 
+use App\Enums\Common\TargetAudience;
 use App\Enums\Country;
-use App\Enums\DeliveryFormat;
-use App\Enums\RelatedActivity;
-use App\Enums\SubTheme;
-use App\Enums\SupportType;
-use App\Enums\TargetAudience;
+use App\Enums\Opportunity\DeliveryFormat;
+use App\Enums\Request\RelatedActivity;
+use App\Enums\Request\SubTheme;
+use App\Enums\Request\SupportType;
 use App\Models\Request;
 
 class EnhancerService

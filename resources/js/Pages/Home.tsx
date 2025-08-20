@@ -3,9 +3,9 @@ import {Head} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {Auth, User} from '@/types';
 import {usePage} from '@inertiajs/react';
-import CardLink from '@/Components/Home/CardLink';
-import SectionTitle from '@/Components/Home/SectionTitle';
-import CardGuide from '@/Components/Home/CardGuide';
+import CardLink from '@/components/features/home/CardLink';
+import SectionTitle from '@/components/features/home/SectionTitle';
+import CardGuide from '@/components/features/home/CardGuide';
 
 type HomePageProps = {
     userGuide?: string;

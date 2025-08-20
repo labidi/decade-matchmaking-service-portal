@@ -1,7 +1,7 @@
 import {Head} from '@inertiajs/react';
 import React from 'react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import {UIOpportunityForm} from '@/Forms/UIOpportunityForm';
+import {UIOpportunityForm} from '@/components/forms/UIOpportunityForm';
 import {Opportunity, FormOptions} from '@/types';
 import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {useOpportunityForm} from '@/hooks/useOpportunityForm';

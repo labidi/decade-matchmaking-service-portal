@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head , usePage} from '@inertiajs/react';
-import DashboardStats from '@/Components/Dashboard/DashboardStats';
+import DashboardStats from '@/components/features/dashboard/DashboardStats';
 import { PageProps } from '@/types';
 
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'

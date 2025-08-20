@@ -1,6 +1,6 @@
 import React, {useState, useRef} from 'react';
 import {Head, useForm} from '@inertiajs/react';
-import {UISettingsForm} from "@/Forms";
+import {UISettingsForm} from "@/components/forms";
 import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {Settings, CSVUploadResponse} from "@/types";
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'

@@ -2,7 +2,7 @@
 
 namespace App\Services\Opportunity;
 
-use App\Enums\OpportunityStatus;
+use App\Enums\Opportunity\OpportunityStatus;
 use App\Models\Opportunity;
 use App\Models\User;
 use Carbon\Carbon;

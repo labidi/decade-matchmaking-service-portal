@@ -12,7 +12,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 
 class RequestService
 {
@@ -206,7 +205,7 @@ class RequestService
     public function getActiveOffer(int $requestId): ?Offer
     {
         return Offer::where('request_id', $requestId)
-            ->where('status', \App\Enums\RequestOfferStatus::ACTIVE)
+            ->where('status', \App\Enums\Offer\RequestOfferStatus::ACTIVE)
             ->first();
     }
 
@@ -216,7 +215,7 @@ class RequestService
     public function getActiveOfferWithDocuments(int $requestId): ?Offer
     {
         return Offer::where('request_id', $requestId)
-            ->where('status', \App\Enums\RequestOfferStatus::ACTIVE)
+            ->where('status', \App\Enums\Offer\RequestOfferStatus::ACTIVE)
             ->with(['documents', 'matchedPartner'])
             ->first();
     }
@@ -314,7 +313,7 @@ class RequestService
 
                 // Update the offer status to 'accepted'
                 $request->activeOffer->update([
-                    'status' => \App\Enums\RequestOfferStatus::ACCEPTED
+                    'status' => \App\Enums\Offer\RequestOfferStatus::ACCEPTED
                 ]);
             });
 
@@ -360,7 +359,7 @@ class RequestService
 
                 // Update the offer status to 'clarification_requested'
                 $request->activeOffer->update([
-                    'status' => \App\Enums\RequestOfferStatus::CLARIFICATION_REQUESTED
+                    'status' => \App\Enums\Offer\RequestOfferStatus::CLARIFICATION_REQUESTED
                 ]);
             });
 

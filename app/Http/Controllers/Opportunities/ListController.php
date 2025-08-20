@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Opportunities;
 
-use App\Enums\OpportunityStatus;
-use App\Enums\OpportunityType;
+use App\Enums\Opportunity\OpportunityStatus;
+use App\Enums\Opportunity\OpportunityType;
 use App\Models\Opportunity;
 use App\Services\OpportunityService;
 use Illuminate\Http\Request;

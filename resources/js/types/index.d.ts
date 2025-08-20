@@ -1,4 +1,4 @@
-import {RequestForm} from "@/Forms/UIRequestForm";
+import {RequestForm} from "@/components/forms/UIRequestForm";
 
 export interface UIField {
     id: string;

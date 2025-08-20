@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Opportunities;
 
-use App\Http\Controllers\Controller;
+use App\Enums\Common\TargetAudience;
+use App\Enums\Common\YesNo;
 use App\Enums\Country;
-use App\Enums\Ocean;
-use App\Enums\OpportunityType;
+use App\Enums\Opportunity\Ocean;
+use App\Enums\Opportunity\OpportunityType;
 use App\Enums\Region;
-use App\Enums\TargetAudience;
-use App\Enums\YesNo;
+use App\Http\Controllers\Controller;
 use App\Services\OpportunityService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;

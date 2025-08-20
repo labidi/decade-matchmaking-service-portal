@@ -1,6 +1,6 @@
 import {useForm} from '@inertiajs/react';
 import {useEffect, useState} from 'react';
-import {UIRequestForm} from '@/Forms/UIRequestForm';
+import {UIRequestForm} from '@/components/forms/UIRequestForm';
 import {OCDRequest} from '@/types';
 
 type Mode = 'submit' | 'draft';

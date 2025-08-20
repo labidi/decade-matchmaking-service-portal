@@ -2,7 +2,7 @@ import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import React from 'react';
 import {Head} from '@inertiajs/react';
 import {OCDRequest, RequestFormOptions} from '@/types';
-import {UIRequestForm} from '@/Forms/UIRequestForm';
+import {UIRequestForm} from '@/components/forms/UIRequestForm';
 import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {useRequestForm} from "@/hooks/useRequestForm";
 

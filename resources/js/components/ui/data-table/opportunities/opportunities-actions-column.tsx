@@ -1,7 +1,7 @@
 import React from 'react';
 import { DropdownActions } from '@/components/ui/data-table/common/dropdown-actions';
 import { Opportunity } from '@/types';
-import { OpportunityStatusDialog } from '@/components/ui/dialogs/OpportunityStatusDialog';
+import { OpportunityStatusDialog } from '@/components/features/opportunity';
 import { useOpportunityActions } from '@/hooks/useOpportunityActions';
 
 interface OpportunityActionsProps {

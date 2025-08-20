@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 import {Head, usePage, Link} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {OCDRequest, OCDRequestGrid, RequestOffer} from '@/types';
-import OfferSection from '@/Pages/Request/Components/OfferSection';
-import XHRAlertDialog from '@/Components/Dialogs/XHRAlertDialog';
+import OfferSection from '@/components/features/request/OfferSection';
+import XHRAlertDialog from '@/components/dialogs/XHRAlertDialog';
 
 
 export default function ShowRequest() {

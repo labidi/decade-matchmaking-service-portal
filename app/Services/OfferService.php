@@ -2,18 +2,16 @@
 
 namespace App\Services;
 
-use App\Enums\DocumentType;
-use App\Models\Request\Offer;
+use App\Enums\Document\DocumentType;
+use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request;
+use App\Models\Request\Offer;
 use App\Models\User;
-use App\Models\Document;
-use App\Enums\RequestOfferStatus;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Services\DocumentService;
 
 class OfferService
 {
