@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Models;
+namespace App\Services\Request;
 
-use App\Enums\SubTheme;
-use App\Enums\SupportType;
+use App\Enums\Country;
 use App\Enums\DeliveryFormat;
 use App\Enums\RelatedActivity;
+use App\Enums\SubTheme;
+use App\Enums\SupportType;
 use App\Enums\TargetAudience;
-use App\Enums\Country;
 use App\Models\Request;
 
-class RequestEnhancer
+class EnhancerService
 {
     /**
      * Get enhanced labels for subthemes

@@ -158,17 +158,23 @@ export interface OCDRequestStatus {
     created_at: string;
     updated_at: string;
 }
+
+export interface RequestPermissions {
+    can_view?: boolean;
+    can_delete?: boolean;
+    can_edit?: boolean;
+    can_manage_offers?: boolean;
+    can_update_status?: boolean;
+    can_accept_offer?: boolean;
+    can_request_clarifications?: boolean;
+}
+
 export interface OCDRequest {
     id: number;
     type: string;
     submissionDate: string;
     requester_name?: string;
     status: OCDRequestStatus,
-    title: string;
-    can_edit: boolean;
-    can_view: boolean;
-    can_manage_offers: boolean;
-    can_update_status: boolean;
     detail: {
         id: string;
         is_related_decade_action: 'Yes' | 'No';
@@ -216,6 +222,7 @@ export interface OCDRequest {
     user: User;
     offers?: RequestOfferList
     active_offer?: RequestOffer;
+    permissions: RequestPermissions;
 };
 
 export type OCDRequestList = OCDRequest[];
@@ -248,20 +255,6 @@ export interface Opportunity {
 
 export type OpportunitiesList = Opportunity[];
 
-export type OCDRequestGrid = {
-    actions: {
-        canEdit: boolean;
-        canDelete: boolean;
-        canView: boolean;
-        canCreate?: boolean;
-        canExpressInterest?: boolean;
-        canExportPdf?: boolean;
-        canAcceptOffer?: boolean;
-        canRequestClarificationForOffer?: boolean,
-        canChangeStatus?: boolean,
-        canPreview?: boolean
-    }
-}
 export interface OfferProps {
     OcdRequest: OCDRequest;
 }

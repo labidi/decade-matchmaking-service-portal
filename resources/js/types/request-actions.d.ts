@@ -19,6 +19,8 @@ export interface RequestActionsConfig {
     showUpdateStatus?: boolean;
     /** Whether to show offer-related actions */
     showOfferActions?: boolean;
+    /** Whether to show frontend-specific actions (accept offer, request clarifications, etc.) */
+    showFrontendActions?: boolean;
     /** Custom context for action generation */
     context?: 'list' | 'show' | 'modal';
     /** Additional custom actions to include */
@@ -44,7 +46,7 @@ export interface RequestActionButtonsProps {
 }
 
 // Action types that can be performed on requests
-export type RequestActionType = 
+export type RequestActionType =
     | 'view-details'
     | 'update-status'
     | 'add-offer'
@@ -52,7 +54,12 @@ export type RequestActionType =
     | 'edit'
     | 'delete'
     | 'duplicate'
-    | 'export';
+    | 'export'
+    | 'accept-offer'
+    | 'request-clarifications'
+    | 'withdraw'
+    | 'view-offers'
+    | 'export-pdf';
 
 // Permission context for building actions
 export interface RequestActionContext {
@@ -69,6 +76,14 @@ export interface RequestActionContext {
     };
 }
 
+
+// Props for specialized show page action buttons
+export interface RequestShowActionButtonsProps {
+    request: OCDRequest;
+    activeOffer?: import('@/types').RequestOffer;
+    className?: string;
+}
+
 // Handler function type for each action
 export type RequestActionHandler = (
     request: OCDRequest,
@@ -82,7 +97,7 @@ export interface UseRequestActionsReturn {
     selectedRequest: OCDRequest | null;
     isLoading: boolean;
     availableStatuses: OCDRequestStatus[];
-    
+
     // Actions
     closeStatusDialog: () => void;
     getActionsForRequest: (
@@ -90,7 +105,7 @@ export interface UseRequestActionsReturn {
         customPermissions?: RequestActionContext['permissions'],
         customAvailableStatuses?: OCDRequestStatus[]
     ) => Action[];
-    
+
     // Direct handlers (optional, for custom usage)
     handleUpdateStatus: (request: OCDRequest, statuses?: OCDRequestStatus[]) => void;
     handleViewDetails: (request: OCDRequest) => void;

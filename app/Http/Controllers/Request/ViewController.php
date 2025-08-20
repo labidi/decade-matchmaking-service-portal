@@ -2,14 +2,23 @@
 
 namespace App\Http\Controllers\Request;
 
+use App\Http\Resources\RequestResource;
+use App\Models\Request as OCDRequest;
+use App\Services\Request\EnhancerService;
+use App\Services\RequestPermissionService;
+use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\RequestEnhancer;
-use App\Models\Request as OCDRequest;
 
 class ViewController extends BaseRequestController
 {
+    public function __construct(
+        RequestService $service,
+        protected readonly RequestPermissionService $permissionService
+    ) {
+        parent::__construct($service);
+    }
     /**
      * Display the full request details - unified method for both admin and user contexts
      */
@@ -18,11 +27,16 @@ class ViewController extends BaseRequestController
         $userRequest = OCDRequest::with(['status', 'detail', 'user', 'offers','activeOffer.documents'])
             ->findOrFail($id);
 
+        $currentUser = $request->user();
+
         if ($this->isAdminRoute()) {
-            // Admin view - simplified
+            // Admin view - with admin permissions
+            $permissions = $this->permissionService->getAdminActions($userRequest, $currentUser);
+            $requestResource = RequestResource::withPermissions($userRequest, $permissions);
+
             $viewData = [
                 'title' => $this->service->getRequestTitle($userRequest),
-                'request' => $userRequest,
+                'request' => $requestResource->forAdmin($permissions),
                 'breadcrumbs' => [
                     ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
                     ['name' => 'Requests', 'url' => route('admin.request.list')],
@@ -35,14 +49,10 @@ class ViewController extends BaseRequestController
             return Inertia::render($this->getViewPrefix() . 'Request/Show', $viewData);
         }
 
-        // User view - with enhanced data and actions
+        // User view - with user permissions and enhanced data
+        $permissions = $this->permissionService->getActionsForRequest($userRequest, $currentUser);
+        $requestResource = RequestResource::withPermissions($userRequest, $permissions);
         $activeOffer = $this->service->getActiveOfferWithDocuments($id);
-        $actions = $this->service->getRequestActions($userRequest, $request->user());
-
-        // Check if offer action buttons should be shown
-        $showOfferActions = $userRequest->status->status_code === 'offer_made'
-            && $userRequest->user_id === $request->user()->id
-            && $activeOffer !== null;
 
         $viewData = [
             'banner' => [
@@ -57,10 +67,8 @@ class ViewController extends BaseRequestController
                     'url' => route('request.show', ['id' => $userRequest->id])
                 ],
             ],
-            'request' => $userRequest,
+            'request' => $requestResource->forUser($permissions),
             'activeOffer' => $activeOffer,
-            'requestDetail.actions' => $actions,
-            'showOfferActions' => $showOfferActions,
         ];
 
         return Inertia::render('Request/Show', $viewData);
@@ -79,6 +87,11 @@ class ViewController extends BaseRequestController
 
         $offer = $this->service->getActiveOffer($requestId);
 
+        // Preview mode disables all actions
+        $previewActions = $this->permissionService->getRequestDetailActions($ocdRequest, $request->user());
+        // Override all permissions to false for preview mode
+        $previewActions = array_map(fn() => false, $previewActions);
+
         return Inertia::render('Request/Preview', [
             'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
             'banner' => [
@@ -86,7 +99,7 @@ class ViewController extends BaseRequestController
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'request' => $ocdRequest,
+            'request' => RequestResource::withPermissions($ocdRequest, [])->forPublic(),
             'offer' => $offer,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
@@ -96,15 +109,7 @@ class ViewController extends BaseRequestController
                     'url' => route('request.show', ['id' => $ocdRequest->id])
                 ],
             ],
-            'requestDetail.actions' => [
-                'canEdit' => false,
-                'canDelete' => false,
-                'canCreate' => false,
-                'canExpressInterest' => false,
-                'canExportPdf' => false,
-                'canAcceptOffer' => false,
-                'canRequestClarificationForOffer' => false
-            ],
+            'requestDetail.actions' => $previewActions,
         ]);
     }
 }
