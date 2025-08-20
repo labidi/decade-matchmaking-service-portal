@@ -1,17 +1,21 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
-import { RequestShowActionButtonsProps } from '@/types/request-actions';
 import { clsx } from 'clsx';
 import {
     CheckIcon,
     QuestionMarkCircleIcon,
     PencilSquareIcon,
     TrashIcon,
-    DocumentArrowDownIcon,
     DocumentTextIcon
 } from '@heroicons/react/16/solid';
+import {OCDRequest} from "@/types";
 
+export interface RequestShowActionButtonsProps {
+    request: OCDRequest;
+    auth?: import('@/types').Auth;
+    className?: string;
+}
 /**
  * RequestShowActionButtons - Specialized action buttons for the Request Show page
  *
@@ -20,40 +24,23 @@ import {
  */
 export function RequestShowActionButtons({
     request,
-    activeOffer,
+    auth,
     className
-}: RequestShowActionButtonsProps) {
+}: Readonly<RequestShowActionButtonsProps>) {
 
     const handleAcceptOffer = () => {
-        if (!activeOffer) return;
-
-        router.post(route('request.accept-offer', {
-            request: request.id,
-            offer: activeOffer.id
-        }), {}, {
-            onSuccess: () => {
-                // Handle success if needed
-            },
-            onError: (errors) => {
-                console.error('Error accepting offer:', errors);
-            }
-        });
+        if (!request.active_offer) return;
+        router.post(route('offer.accept', {
+            id: request.active_offer.id,
+        }));
     };
 
     const handleRequestClarifications = () => {
-        if (!activeOffer) return;
-
+        if (!request.active_offer) return;
         router.post(route('request.request-clarifications', {
             request: request.id,
-            offer: activeOffer.id
-        }), {}, {
-            onSuccess: () => {
-                // Handle success if needed
-            },
-            onError: (errors) => {
-                console.error('Error requesting clarifications:', errors);
-            }
-        });
+            offer: request.active_offer.id
+        }));
     };
 
     const handleEdit = () => {
@@ -81,7 +68,7 @@ export function RequestShowActionButtons({
     // Collect all available actions based on permissions
     const actions = [];
     // Offer-related actions (highest priority)
-    if (activeOffer && request.permissions.can_accept_offer) {
+    if (request.active_offer && request.permissions.can_accept_offer) {
         actions.push(
             <Button
                 key="accept-offer"
@@ -95,7 +82,7 @@ export function RequestShowActionButtons({
         );
     }
 
-    if (activeOffer && request.permissions.can_request_clarifications) {
+    if (request.active_offer && request.permissions.can_request_clarifications) {
         actions.push(
             <Button
                 key="request-clarifications"

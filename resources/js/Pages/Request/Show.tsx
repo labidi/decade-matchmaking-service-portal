@@ -36,7 +36,7 @@ export default function ShowRequest({
 
             <RequestShowActionButtons
                 request={request}
-                activeOffer={activeOffer}
+                auth={auth}
             />
 
         </FrontendLayout>

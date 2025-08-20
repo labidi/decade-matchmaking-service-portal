@@ -77,12 +77,6 @@ export interface RequestActionContext {
 }
 
 
-// Props for specialized show page action buttons
-export interface RequestShowActionButtonsProps {
-    request: OCDRequest;
-    activeOffer?: import('@/types').RequestOffer;
-    className?: string;
-}
 
 // Handler function type for each action
 export type RequestActionHandler = (

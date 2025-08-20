@@ -26,12 +26,5 @@ class PaginationService
         return $query->orderBy($field, $order);
     }
 
-    /**
-     * Apply search filters and pagination together
-     */
-    public function applyFiltersAndPaginate(
-        Builder $query
-    ): LengthAwarePaginator {
-        return $this->paginate($query);
-    }
+
 }

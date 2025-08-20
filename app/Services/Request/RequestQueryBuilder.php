@@ -71,7 +71,7 @@ class RequestQueryBuilder
     public function applyPagination(Builder $query, array $sortFilters): LengthAwarePaginator
     {
         $perPage = $sortFilters['per_page'] ?? 10;
-        return $query->paginate($perPage);
+        return $query->paginate($perPage)->withQueryString();
     }
 
     /**
