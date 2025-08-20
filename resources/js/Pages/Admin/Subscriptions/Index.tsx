@@ -257,7 +257,7 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats }: AdminS
                                                 {subscription.request?.detail.capacity_development_title || `Request #${subscription.request_id}`}
                                             </Text>
                                             <Text className="text-sm text-gray-500">
-                                                {subscription.request?.requester_name}
+                                                {subscription.request?.user?.name || 'Unknown Requester'}
                                             </Text>
                                         </div>
                                     </TableCell>

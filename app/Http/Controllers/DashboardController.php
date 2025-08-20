@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Opportunity;
 use App\Models\Request as RequestModel;
 use App\Models\User;
@@ -10,7 +9,6 @@ use App\Traits\HasBreadcrumbs;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
 
 class DashboardController extends Controller
 {

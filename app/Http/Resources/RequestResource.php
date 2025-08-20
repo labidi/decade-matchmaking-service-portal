@@ -39,12 +39,12 @@ class RequestResource extends JsonResource
             'matched_partner_id' => $this->matched_partner_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            
+
             // Computed attributes
             'title' => $this->title,
             'requester_name' => $this->requester_name,
             'active_offer' => $this->active_offer,
-            
+
             // Relationships
             'status' => $this->whenLoaded('status'),
             'user' => $this->whenLoaded('user'),
@@ -58,12 +58,6 @@ class RequestResource extends JsonResource
         // Include permissions if they were set
         if ($this->permissions !== null) {
             $baseData['permissions'] = $this->permissions;
-            
-            // Also include legacy format for backward compatibility
-            $baseData['can_edit'] = $this->permissions['can_edit'] ?? false;
-            $baseData['can_view'] = $this->permissions['can_view'] ?? false;
-            $baseData['can_manage_offers'] = $this->permissions['can_manage_offers'] ?? false;
-            $baseData['can_update_status'] = $this->permissions['can_update_status'] ?? false;
         }
 
         return $baseData;
@@ -97,9 +91,9 @@ class RequestResource extends JsonResource
     public function forAdmin(array $adminPermissions): array
     {
         $this->setPermissions($adminPermissions);
-        
+
         $data = $this->toArray(request());
-        
+
         // Add admin-specific fields
         $data['admin_actions'] = [
             'can_manage_offers' => $adminPermissions['can_manage_offers'] ?? false,
@@ -116,9 +110,9 @@ class RequestResource extends JsonResource
     public function forUser(array $userPermissions): array
     {
         $this->setPermissions($userPermissions);
-        
+
         $data = $this->toArray(request());
-        
+
         // Add user-specific fields
         $data['user_actions'] = [
             'can_accept_offer' => $userPermissions['can_accept_offer'] ?? false,
@@ -154,13 +148,13 @@ class RequestResource extends JsonResource
     public function forApi(): array
     {
         $data = $this->toArray(request());
-        
+
         // Add API-specific metadata
         $data['meta'] = [
             'has_offers' => $this->offers->count() > 0,
             'has_active_offer' => $this->active_offer !== null,
-            'subscriber_count' => $this->whenLoaded('subscribers', 
-                fn() => $this->subscribers->count(), 
+            'subscriber_count' => $this->whenLoaded('subscribers',
+                fn() => $this->subscribers->count(),
                 0
             ),
         ];

@@ -144,7 +144,7 @@ export default function SubscriptionsIndex({ subscriptions }: SubscriptionsIndex
                                                     {subscription.request?.detail.capacity_development_title || `Request #${subscription.request_id}`}
                                                 </Text>
                                                 <Text className="text-sm text-gray-500">
-                                                    by {subscription.request?.requester_name || 'Unknown'}
+                                                    by {subscription.request?.user.name || 'Unknown'}
                                                 </Text>
                                             </div>
                                         </TableCell>

@@ -10,14 +10,6 @@ use Illuminate\Http\Request;
 
 abstract class BaseOpportunitiesController extends Controller
 {
-    /**
-     * Detect if current route is an admin route
-     */
-    protected function isAdminRoute(): bool
-    {
-        return str_starts_with(request()->route()->getName() ?? '', 'admin.');
-    }
-
 
     /**
      * Get the context based on route name

@@ -172,8 +172,7 @@ export interface RequestPermissions {
 export interface OCDRequest {
     id: number;
     type: string;
-    submissionDate: string;
-    requester_name?: string;
+    submission_date: string;
     status: OCDRequestStatus,
     detail: {
         id: string;
@@ -223,7 +222,7 @@ export interface OCDRequest {
     offers?: RequestOfferList
     active_offer?: RequestOffer;
     permissions: RequestPermissions;
-};
+}
 
 export type OCDRequestList = OCDRequest[];
 

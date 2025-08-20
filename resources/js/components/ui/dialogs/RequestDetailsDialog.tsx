@@ -36,7 +36,7 @@ export function RequestDetailsDialog({
                             {request.detail.capacity_development_title}
                         </h3>
                         <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                            <span>Submitted: {new Date(request.submissionDate).toLocaleDateString()}</span>
+                            <span>Submitted: {new Date(request.submission_date).toLocaleDateString()}</span>
                             <span>Status: {request.status?.status_label}</span>
                             <span>By: {request.user?.name}</span>
                         </div>
