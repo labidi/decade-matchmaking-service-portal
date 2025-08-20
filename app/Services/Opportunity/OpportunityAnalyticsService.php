@@ -2,7 +2,7 @@
 
 namespace App\Services\Opportunity;
 
-use App\Enums\Opportunity\OpportunityStatus;
+use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
 use App\Models\User;
 use Carbon\Carbon;
@@ -30,9 +30,9 @@ class OpportunityAnalyticsService
     {
         return [
             'total_opportunities' => Opportunity::count(),
-            'active_opportunities' => Opportunity::where('status', OpportunityStatus::ACTIVE)->count(),
-            'pending_opportunities' => Opportunity::where('status', OpportunityStatus::PENDING_REVIEW)->count(),
-            'closed_opportunities' => Opportunity::where('status', OpportunityStatus::CLOSED)->count(),
+            'active_opportunities' => Opportunity::where('status', Status::ACTIVE)->count(),
+            'pending_opportunities' => Opportunity::where('status', Status::PENDING_REVIEW)->count(),
+            'closed_opportunities' => Opportunity::where('status', Status::CLOSED)->count(),
             'total_partners' => Opportunity::distinct('user_id')->count(),
         ];
     }
@@ -96,9 +96,9 @@ class OpportunityAnalyticsService
         $result = [];
         foreach ($statusCounts as $status => $count) {
             $label = match($status) {
-                OpportunityStatus::PENDING_REVIEW->value => 'Pending Review',
-                OpportunityStatus::ACTIVE->value => 'Active',
-                OpportunityStatus::CLOSED->value => 'Closed',
+                Status::PENDING_REVIEW->value => 'Pending Review',
+                Status::ACTIVE->value => 'Active',
+                Status::CLOSED->value => 'Closed',
                 default => 'Unknown'
             };
             $result[$label] = $count;
@@ -124,7 +124,7 @@ class OpportunityAnalyticsService
             ];
         }
 
-        $activeOpportunities = $userOpportunities->where('status', OpportunityStatus::ACTIVE);
+        $activeOpportunities = $userOpportunities->where('status', Status::ACTIVE);
         $activeRate = ($activeOpportunities->count() / $totalOpportunities) * 100;
 
         // Calculate average time to activation for active opportunities
@@ -149,7 +149,7 @@ class OpportunityAnalyticsService
         $startDate = Carbon::now()->subDays($days);
 
         return Opportunity::where('created_at', '>=', $startDate)
-            ->where('status', OpportunityStatus::ACTIVE)
+            ->where('status', Status::ACTIVE)
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get()

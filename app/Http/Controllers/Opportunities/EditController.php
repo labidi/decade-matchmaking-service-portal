@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Opportunities;
 
+use App\Enums\Common\Country;
+use App\Enums\Common\Ocean;
+use App\Enums\Common\Region;
 use App\Enums\Common\TargetAudience;
 use App\Enums\Common\YesNo;
-use App\Enums\Country;
-use App\Enums\Opportunity\Ocean;
-use App\Enums\Opportunity\OpportunityType;
-use App\Enums\Region;
+use App\Enums\Opportunity\Type;
 use App\Http\Controllers\Controller;
 use App\Services\OpportunityService;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +41,7 @@ class EditController extends Controller
                 'regions' => Region::getOptions(),
                 'oceans' => Ocean::getOptions(),
                 'targetAudiences' => TargetAudience::getOptions(),
-                'opportunityTypes' => OpportunityType::getOptions(),
+                'opportunityTypes' => Type::getOptions(),
                 'yes_no' => YesNo::getOptions()
             ],
             'opportunity' => $opportunity->toArray(),

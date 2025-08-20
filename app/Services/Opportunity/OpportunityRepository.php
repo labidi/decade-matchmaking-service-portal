@@ -2,7 +2,7 @@
 
 namespace App\Services\Opportunity;
 
-use App\Enums\Opportunity\OpportunityStatus;
+use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -16,7 +16,7 @@ class OpportunityRepository
     {
         $opportunity = new Opportunity($data);
         $opportunity->user_id = $user->id;
-        $opportunity->status = OpportunityStatus::PENDING_REVIEW;
+        $opportunity->status = Status::PENDING_REVIEW;
         $opportunity->save();
 
         return $opportunity;
@@ -45,7 +45,7 @@ class OpportunityRepository
      */
     public function getPublicOpportunities(): Collection
     {
-        return Opportunity::where('status', OpportunityStatus::ACTIVE)
+        return Opportunity::where('status', Status::ACTIVE)
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -75,9 +75,9 @@ class OpportunityRepository
 
         return [
             'total' => $opportunities->count(),
-            'active' => $opportunities->where('status', OpportunityStatus::ACTIVE)->count(),
-            'pending' => $opportunities->where('status', OpportunityStatus::PENDING_REVIEW)->count(),
-            'closed' => $opportunities->where('status', OpportunityStatus::CLOSED)->count(),
+            'active' => $opportunities->where('status', Status::ACTIVE)->count(),
+            'pending' => $opportunities->where('status', Status::PENDING_REVIEW)->count(),
+            'closed' => $opportunities->where('status', Status::CLOSED)->count(),
         ];
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Opportunities;
 
+use App\Enums\Common\Country;
+use App\Enums\Common\Ocean;
+use App\Enums\Common\Region;
 use App\Enums\Common\TargetAudience;
 use App\Enums\Common\YesNo;
-use App\Enums\Country;
-use App\Enums\Opportunity\Ocean;
-use App\Enums\Opportunity\OpportunityType;
-use App\Enums\Region;
+use App\Enums\Opportunity\Type;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,7 +23,7 @@ class FormController extends BaseOpportunitiesController
                 'regions' => Region::getOptions(),
                 'oceans' => Ocean::getOptions(),
                 'target_audience' => TargetAudience::getOptions(),
-                'opportunity_types' => OpportunityType::getOptions(),
+                'opportunity_types' => Type::getOptions(),
                 'yes_no' => YesNo::getOptions(),
             ],
             'breadcrumbs' => [

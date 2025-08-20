@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\Opportunity\OpportunityStatus;
+use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
 use App\Models\User;
 use App\Services\Opportunity\EnhancerService;
@@ -109,7 +109,7 @@ class OpportunityService
         array $sortFilters = []
     ): LengthAwarePaginator {
         $query = $this->getBaseOpportunitiesQuery($searchFilters);
-        $query->where('status', OpportunityStatus::ACTIVE);
+        $query->where('status', Status::ACTIVE);
         $query = $this->paginationService->applySorting($query, $sortFilters);
         $opportunities = $this->paginationService->paginate($query, ['per_page' => 10])->withQueryString();
         $opportunities->getCollection()->transform(function ($opportunity) {
@@ -142,7 +142,7 @@ class OpportunityService
             throw new Exception('Opportunity not found', 404);
         }
         // Validate status
-        if (!in_array($statusCode, array_column(OpportunityStatus::cases(), 'value'))) {
+        if (!in_array($statusCode, array_column(Status::cases(), 'value'))) {
             throw new Exception('Invalid status code', 422);
         }
         // Check if user can update this opportunity
@@ -176,7 +176,7 @@ class OpportunityService
         }
 
         // Check if can be deleted (only pending review)
-        if ($opportunity->status !== OpportunityStatus::PENDING_REVIEW) {
+        if ($opportunity->status !== Status::PENDING_REVIEW) {
             throw new Exception('Only pending review opportunities can be deleted', 422);
         }
 
@@ -241,7 +241,7 @@ class OpportunityService
         // Public opportunities filter (exclude user's own opportunities)
         if (!empty($filters['public'])) {
             $query->where('user_id', '!=', $user->id)
-                ->where('status', OpportunityStatus::ACTIVE);
+                ->where('status', Status::ACTIVE);
         }
 
         return $query->orderBy('created_at', 'desc')->get();

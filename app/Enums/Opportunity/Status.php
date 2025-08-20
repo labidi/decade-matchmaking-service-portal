@@ -2,7 +2,7 @@
 
 namespace App\Enums\Opportunity;
 
-enum OpportunityStatus: int
+enum Status: int
 {
     case ACTIVE = 1;
     case CLOSED = 2;

@@ -2,7 +2,7 @@
 
 namespace App\Enums\Opportunity;
 
-enum OpportunityType: string
+enum Type: string
 {
     case TRAINING = 'training-workshop';
     case ONBOARDING_EXPEDITIONS = 'onboarding-expeditions';

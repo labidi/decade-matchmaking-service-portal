@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Opportunities;
 
-use App\Enums\Opportunity\OpportunityStatus;
+use App\Enums\Opportunity\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Opportunity;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -63,8 +63,8 @@ abstract class BaseOpportunitiesController extends Controller
         $isOwner = $user && $opportunity->user_id === $user->id;
         return [
             'canEdit' => $isOwner,
-            'canDelete' => $isOwner && $opportunity->status === OpportunityStatus::PENDING_REVIEW,
-            'canApply' => $opportunity->status === OpportunityStatus::ACTIVE && (bool) $opportunity->url,
+            'canDelete' => $isOwner && $opportunity->status === Status::PENDING_REVIEW,
+            'canApply' => $opportunity->status === Status::ACTIVE && (bool) $opportunity->url,
             'isOwner' => $isOwner,
         ];
     }
