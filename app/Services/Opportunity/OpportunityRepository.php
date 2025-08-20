@@ -6,15 +6,9 @@ use App\Enums\OpportunityStatus;
 use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OpportunityRepository
 {
-    public function __construct(
-        private readonly OpportunityQueryBuilder $queryBuilder
-    ) {
-    }
-
     /**
      * Create a new opportunity
      */
@@ -47,20 +41,6 @@ class OpportunityRepository
     }
 
     /**
-     * Get paginated opportunities submitted by a specific user
-     */
-    public function getUserOpportunitiesPaginated(User $user, array $searchFilters, array $sortFilters): LengthAwarePaginator
-    {
-        $query = $this->queryBuilder->buildBaseQuery();
-        $query = $this->queryBuilder->filterByOwnership($query, $user, true);
-        $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
-        $query = $this->queryBuilder->applySorting($query, $sortFilters);
-        $query = $this->queryBuilder->withRelations($query);
-        
-        return $this->queryBuilder->applyPagination($query, $sortFilters);
-    }
-
-    /**
      * Get public opportunities (active status only)
      */
     public function getPublicOpportunities(): Collection
@@ -68,20 +48,6 @@ class OpportunityRepository
         return Opportunity::where('status', OpportunityStatus::ACTIVE)
             ->orderBy('created_at', 'desc')
             ->get();
-    }
-
-    /**
-     * Get paginated public opportunities (active status only)
-     */
-    public function getPublicOpportunitiesPaginated(array $searchFilters, array $sortFilters): LengthAwarePaginator
-    {
-        $query = $this->queryBuilder->buildBaseQuery();
-        $query = $this->queryBuilder->filterByActiveStatus($query);
-        $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
-        $query = $this->queryBuilder->applySorting($query, $sortFilters);
-        $query = $this->queryBuilder->withRelations($query);
-        
-        return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
     /**
@@ -98,16 +64,6 @@ class OpportunityRepository
     public function delete(Opportunity $opportunity): bool
     {
         return $opportunity->delete();
-    }
-
-    /**
-     * Search opportunities with filters
-     */
-    public function searchWithFilters(array $filters, User $user): Collection
-    {
-        $query = $this->queryBuilder->buildBaseQuery();
-        $query = $this->queryBuilder->applyFilters($query, $filters, $user);
-        return $query->orderBy('created_at', 'desc')->get();
     }
 
     /**

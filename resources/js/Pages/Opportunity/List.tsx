@@ -1,17 +1,20 @@
-import React, {useState} from 'react';
-import {Head, Link, usePage} from '@inertiajs/react';
-import {OCDOpportunity, OCDOpportunitiesList, OCDOpportunitiesListPageActions, PaginationLinkProps} from '@/types';
+import React from 'react';
+import {Head, Link} from '@inertiajs/react';
+import {PageProps, OpportunitiesList, PaginationLinkProps} from '@/types';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {OpportunitiesDataTable} from '@/components/ui/data-table/opportunities/opportunities-data-table';
 import {partnerColumns} from '@/components/ui/data-table/opportunities/column-configs';
-import {buildOpportunityActions} from '@/components/ui/data-table/opportunities/opportunities-actions-column';
-import {OpportunityStatusDialog} from '@/components/ui/dialogs/OpportunityStatusDialog';
-import {router} from '@inertiajs/react';
+import { useOpportunityActions } from '@/hooks/useOpportunityActions';
+import { OpportunityStatusDialog } from '@/components/ui/dialogs/OpportunityStatusDialog';
 
+export type OpportunitiesListPageActions = {
+    canExportCSV?: boolean;
+    canSubmitNew?: boolean;
+}
 
 interface OpportunitiesPagination {
     current_page: number;
-    data: OCDOpportunitiesList;
+    data: OpportunitiesList;
     first_page_url: string;
     from: number;
     last_page: number;
@@ -25,9 +28,9 @@ interface OpportunitiesPagination {
     total: number;
 }
 
-interface OpportunitiesListPageProps {
+interface OpportunitiesListPageProps extends PageProps<{
     opportunities: OpportunitiesPagination;
-    pageActions: OCDOpportunitiesListPageActions;
+    pageActions: OpportunitiesListPageActions;
     currentSort: {
         field: string;
         order: string;
@@ -38,60 +41,25 @@ interface OpportunitiesListPageProps {
         types?: { value: string; label: string }[];
         statuses?: { value: string; label: string }[];
     }
+}> {
 }
 
-export default function OpportunitiesList({
-                                              opportunities,
-                                              pageActions,
-                                              currentSort,
-                                              routeName,
-                                              currentSearch = {},
-                                              searchFieldsOptions
-                                          }: Readonly<OpportunitiesListPageProps>) {
-    const page = usePage();
-    const {auth} = page.props;
+export default function OpportunitiesListPage({
+                                                  opportunities,
+                                                  pageActions,
+                                                  currentSort,
+                                                  routeName,
+                                                  currentSearch = {},
+                                                  searchFieldsOptions,
+                                                  auth
+                                              }: Readonly<OpportunitiesListPageProps>) {
 
-    // Dialog state management
-    const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
-    const [selectedOpportunity, setSelectedOpportunity] = useState<OCDOpportunity | null>(null);
-
-    const handleUpdateStatus = (opportunity: OCDOpportunity) => {
-        setSelectedOpportunity(opportunity);
-        setIsStatusDialogOpen(true);
-    };
-
-    const handleDelete = (opportunity: OCDOpportunity) => {
-        if (!confirm('Are you sure you want to delete this opportunity?')) {
-            return;
-        }
-
-        router.delete(route('partner.opportunity.destroy', {id: opportunity.id}), {
-            onSuccess: () => {
-                // Opportunity will be removed from list automatically by Inertia
-            },
-            onError: (errors) => {
-                console.error('Failed to delete opportunity:', errors);
-                alert('Failed to delete opportunity. Please try again.');
-            }
-        });
-    };
-
-    const handleCloseDialog = () => {
-        setIsStatusDialogOpen(false);
-        setSelectedOpportunity(null);
-    };
-    // Build actions for each opportunity - partners can edit their own opportunities
-    const getActionsForOpportunity = (opportunity: OCDOpportunity) => {
-        return buildOpportunityActions(
-            opportunity,
-            handleUpdateStatus,
-            handleDelete,
-            true, // showViewDetails
-            pageActions.canChangeStatus, // canUpdateStatus
-            pageActions.canDelete && opportunity.can_edit // canDelete - only if they own it
-        );
-    };
-
+    const {
+        isStatusDialogOpen,
+        selectedOpportunity,
+        closeStatusDialog,
+        getActionsForOpportunity,
+    } = useOpportunityActions();
     return (
         <FrontendLayout>
             <Head title="My Opportunities"/>
@@ -151,11 +119,10 @@ export default function OpportunitiesList({
                 showSearch={true}
                 showActions={true}
             />
-
-            {/* Status Update Dialog */}
+            
             <OpportunityStatusDialog
                 isOpen={isStatusDialogOpen}
-                onClose={handleCloseDialog}
+                onClose={closeStatusDialog}
                 opportunity={selectedOpportunity}
             />
         </FrontendLayout>

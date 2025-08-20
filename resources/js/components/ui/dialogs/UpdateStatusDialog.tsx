@@ -4,13 +4,13 @@ import { Dialog, DialogBody, DialogDescription, DialogTitle } from '@/components
 import { Button } from '@/components/ui/button';
 import { Field, Label } from '@/components/ui/fieldset';
 import { Listbox, ListboxLabel, ListboxOption } from '@/components/ui/listbox';
-import { OCDRequest, RequestStatus } from '@/types';
+import { OCDRequest, OCDRequestStatus } from '@/types';
 
 interface UpdateStatusDialogProps {
     isOpen: boolean;
     onClose: () => void;
     request: OCDRequest | null;
-    availableStatuses: RequestStatus[];
+    availableStatuses: OCDRequestStatus[];
 }
 
 export function UpdateStatusDialog({
@@ -19,7 +19,7 @@ export function UpdateStatusDialog({
     request,
     availableStatuses
 }: Readonly<UpdateStatusDialogProps>) {
-    const [selectedStatus, setSelectedStatus] = useState<RequestStatus | null>(null);
+    const [selectedStatus, setSelectedStatus] = useState<OCDRequestStatus | null>(null);
 
     const { data, setData, post, processing, errors, reset } = useForm({
         status_code: '',
@@ -65,7 +65,7 @@ export function UpdateStatusDialog({
         <Dialog open={isOpen} onClose={handleClose}>
             <DialogTitle>Update Request Status</DialogTitle>
             <DialogDescription>
-                Update the status for request: <strong>{request.title}</strong>
+                Update the status for request: <strong>{request.detail.capacity_development_title}</strong>
             </DialogDescription>
             <DialogBody>
                 <form onSubmit={handleSubmit} className="space-y-6">

@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum OpportunityType: string
 {
-    case TRAINING = 'training';
+    case TRAINING = 'training-workshop';
     case ONBOARDING_EXPEDITIONS = 'onboarding-expeditions';
     case FELLOWSHIPS = 'fellowships';
     case INTERNSHIPS_JOBS = 'internships-jobs';
@@ -21,7 +21,7 @@ enum OpportunityType: string
     public function label(): string
     {
         return match ($this) {
-            self::TRAINING => 'Training',
+            self::TRAINING => 'Training/Workshop',
             self::ONBOARDING_EXPEDITIONS => 'Onboarding Expeditions, Research & Training',
             self::FELLOWSHIPS => 'Fellowships',
             self::INTERNSHIPS_JOBS => 'Internships/Jobs',

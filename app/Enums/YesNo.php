@@ -9,7 +9,10 @@ enum YesNo: string
 
     public function label(): string
     {
-        return $this->value;
+        return match ($this) {
+            self::YES => 'Yes',
+            self::NO => 'No',
+        };
     }
 
     public static function getOptions(): array

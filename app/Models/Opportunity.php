@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
@@ -18,13 +19,20 @@ class Opportunity extends Model
     protected $primaryKey = 'id';
 
     public $timestamps = true;
-    protected $appends = ['status_label', 'type_label', 'implementation_location_label', 'target_audience_label'];
 
     protected $casts = [
-        'status' => OpportunityStatus::class,
-        'target_audience' => 'array',
+
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'type'=>OpportunityType::class,
+            'status' => OpportunityStatus::class,
+            'implementation_location' => 'array',
+            'target_audience' => AsEnumArrayObject::of(TargetAudience::class),
+        ];
+    }
 
     public const STATUS_LABELS = [
         OpportunityStatus::ACTIVE->value => 'Active',
@@ -55,52 +63,4 @@ class Opportunity extends Model
         return $this->belongsTo(User::class);
     }
 
-    protected function statusLabel(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => self::STATUS_LABELS[$this->status->value] ?? '',
-        );
-    }
-
-    protected function typeLabel(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => OpportunityType::getLabelByValue($this->type),
-        );
-    }
-
-    /**
-     * Get the formatted implementation location label
-     */
-    protected function implementationLocationLabel(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-                if (!$this->implementation_location || !$this->coverage_activity) {
-                    return '';
-                }
-
-                return LocationData::getImplementationLocationLabel(
-                    $this->implementation_location,
-                    $this->coverage_activity
-                );
-            }
-        );
-    }
-
-    /**
-     * Get the formatted target audience label
-     */
-    protected function targetAudienceLabel(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-                if (!$this->target_audience) {
-                    return '';
-                }
-
-                return TargetAudience::getLabelByValue($this->target_audience);
-            }
-        );
-    }
 }

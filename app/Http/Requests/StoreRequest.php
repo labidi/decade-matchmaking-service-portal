@@ -29,8 +29,8 @@ class StoreRequest extends FormRequest
                 Rule::enum(YesNo::class)
             ],
             'unique_related_decade_action_id' => [
-                Rule::requiredIf(
-                    fn() => $this->input("is_related_decade_action") === 'Yes'
+                Rule::excludeIf(
+                    fn() => $this->input("is_related_decade_action") === YesNo::NO->value
                 ),
                 'string'
             ],

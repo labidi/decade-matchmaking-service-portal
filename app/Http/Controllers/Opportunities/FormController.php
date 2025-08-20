@@ -22,7 +22,7 @@ class FormController extends BaseOpportunitiesController
                 'countries' => Country::getOptions(),
                 'regions' => Region::getOptions(),
                 'oceans' => Ocean::getOptions(),
-                'target_audiences' => TargetAudience::getOptions(),
+                'target_audience' => TargetAudience::getOptions(),
                 'opportunity_types' => OpportunityType::getOptions(),
                 'yes_no' => YesNo::getOptions(),
             ],

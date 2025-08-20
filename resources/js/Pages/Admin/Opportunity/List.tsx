@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import {Head, router} from '@inertiajs/react';
-import {OCDOpportunity, OCDOpportunitiesList, PaginationLinkProps} from '@/types';
+import React from 'react';
+import { Head } from '@inertiajs/react';
+import { OpportunitiesList, PaginationLinkProps } from '@/types';
 
-import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
-import {OpportunitiesDataTable} from "@/components/ui/data-table/opportunities/opportunities-data-table";
+import { SidebarLayout } from '@/components/ui/layouts/sidebar-layout'
+import { OpportunitiesDataTable } from "@/components/ui/data-table/opportunities/opportunities-data-table";
 import { OpportunityStatusDialog } from '@/components/ui/dialogs/OpportunityStatusDialog';
-import {adminColumns} from "@/components/ui/data-table/opportunities/column-configs";
-import {Heading} from "@/components/ui/heading";
-import { buildOpportunityActions } from '@/components/ui/data-table/opportunities/opportunities-actions-column';
+import { adminColumns } from "@/components/ui/data-table/opportunities/column-configs";
+import { Heading } from "@/components/ui/heading";
+import { useOpportunityActions } from '@/hooks/useOpportunityActions';
 
 interface OpportunitiesPagination {
     current_page: number;
-    data: OCDOpportunitiesList,
+    data: OpportunitiesList,
     first_page_url: string;
     from: number;
     last_page: number;
@@ -32,58 +32,19 @@ interface OpportunitiesListPageProps {
         order: string;
     };
     currentSearch?: Record<string, string>;
-    canUpdateStatus?: boolean;
-    canDelete?: boolean;
 }
 
 export default function OpportunityListPage({
     opportunities,
     currentSort,
     currentSearch,
-    canUpdateStatus = true, // Admins can update status by default
-    canDelete = true // Admins can delete by default
 }: Readonly<OpportunitiesListPageProps>) {
-    // Single dialog state for the entire page
-    const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
-    const [selectedOpportunity, setSelectedOpportunity] = useState<OCDOpportunity | null>(null);
-
-    const handleUpdateStatus = (opportunity: OCDOpportunity) => {
-        setSelectedOpportunity(opportunity);
-        setIsStatusDialogOpen(true);
-    };
-
-    const handleDelete = (opportunity: OCDOpportunity) => {
-        if (!confirm('Are you sure you want to delete this opportunity?')) {
-            return;
-        }
-
-        router.delete(route('partner.opportunity.destroy', {id: opportunity.id}), {
-            onSuccess: () => {
-                // Opportunity will be removed from list automatically by Inertia
-            },
-            onError: (errors) => {
-                console.error('Failed to delete opportunity:', errors);
-                alert('Failed to delete opportunity. Please try again.');
-            }
-        });
-    };
-
-    const handleCloseDialog = () => {
-        setIsStatusDialogOpen(false);
-        setSelectedOpportunity(null);
-    };
-
-    // Build actions for each opportunity - following the same pattern as requests
-    const getActionsForOpportunity = (opportunity: OCDOpportunity) => {
-        return buildOpportunityActions(
-            opportunity,
-            handleUpdateStatus,
-            handleDelete,
-            true, // showViewDetails
-            canUpdateStatus, // canUpdateStatus
-            canDelete // canDelete
-        );
-    };
+    const {
+        isStatusDialogOpen,
+        selectedOpportunity,
+        closeStatusDialog,
+        getActionsForOpportunity,
+    } = useOpportunityActions();
 
     return (
         <SidebarLayout>
@@ -134,7 +95,7 @@ export default function OpportunityListPage({
             {/* Single Status Update Dialog for the entire page */}
             <OpportunityStatusDialog
                 isOpen={isStatusDialogOpen}
-                onClose={handleCloseDialog}
+                onClose={closeStatusDialog}
                 opportunity={selectedOpportunity}
             />
         </SidebarLayout>

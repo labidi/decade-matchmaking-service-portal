@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 
 class Request extends Model
@@ -155,5 +156,17 @@ class Request extends Model
 
         // Only administrators can update status
         return $user->hasRole('administrator');
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(\App\Models\RequestSubscription::class);
+    }
+
+    public function subscribers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'request_subscriptions')
+            ->withPivot(['subscribed_by_admin', 'admin_user_id'])
+            ->withTimestamps();
     }
 }

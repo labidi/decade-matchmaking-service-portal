@@ -2,13 +2,13 @@ import {Head} from '@inertiajs/react';
 import React from 'react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {UIOpportunityForm} from '@/Forms/UIOpportunityForm';
-import {OCDOpportunity, FormOptions} from '@/types';
+import {Opportunity, FormOptions} from '@/types';
 import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {useOpportunityForm} from '@/hooks/useOpportunityForm';
 import {Button} from '@/components/ui/button';
 
 interface CreateOpportunityProps {
-    opportunity?: OCDOpportunity;
+    opportunity?: Opportunity;
     formOptions?: FormOptions;
 }
 

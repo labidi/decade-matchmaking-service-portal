@@ -39,15 +39,10 @@ export default function RequestsList({
                                          currentSearch = {}
                                      }: Readonly<RequestsListPageProps>) {
 
-    // Action functions for RequestsDataTable
-    const handleUpdateStatus = (request: OCDRequest) => {
-        // Navigate to the request edit page for status updates
-        router.visit(route('request.edit', {id: request.id}));
-    };
 
     const handleSeeActiveOffer = (request: OCDRequest) => {
         // Navigate to request details page to see the active offer
-        router.visit(route('request.show', {id: request.id}));
+
     };
 
     // Dynamic actions based on request permissions
@@ -71,17 +66,6 @@ export default function RequestsList({
                 onClick: () => router.visit(route('request.edit', {id: request.id}))
             });
         }
-
-        // See Active Offer - available if request has active offer and user can view
-        if (request.active_offer && request.can_view) {
-            actions.push({
-                key: 'see-active-offer',
-                label: 'See Active Offer',
-                onClick: () => handleSeeActiveOffer(request),
-                divider: actions.length > 0
-            });
-        }
-
         return actions;
     };
 

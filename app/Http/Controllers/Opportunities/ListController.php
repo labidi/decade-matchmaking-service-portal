@@ -12,145 +12,133 @@ use Inertia\Response;
 
 class ListController extends BaseOpportunitiesController
 {
-    public function __construct(private OpportunityService $opportunityService)
+    public function __construct(private readonly OpportunityService $opportunityService)
     {
+    }
+
+    /**
+     * Get context-specific configuration
+     */
+    private function getContextConfiguration(string $context): array
+    {
+        return match ($context) {
+            'admin' => [
+                'component' => 'Admin/Opportunity/List',
+                'title' => 'Opportunities',
+                'searchFields' => ['user', 'title'],
+                'searchFieldsOptions' => [
+                    'types' => Opportunity::getTypeOptions(),
+                    'statuses' => OpportunityStatus::getOptions(),
+                ],
+                'currentSearchFields' => ['user', 'title'],
+                'routeName' => 'admin.opportunity.list',
+                'breadcrumbs' => [
+                    ['name' => 'Admin', 'url' => route('admin.dashboard.index')],
+                    ['name' => 'Opportunities', 'url' => route('admin.opportunity.list')],
+                ],
+            ],
+            'user_own' => [
+                'component' => 'Opportunity/List',
+                'title' => 'Opportunities',
+                'banner' => [
+                    'title' => 'List of My submitted Opportunities',
+                    'description' => 'Manage your submitted opportunities here.'
+                ],
+                'searchFields' => ['title', 'type', 'status'],
+                'searchFieldsOptions' => [
+                    'types' => OpportunityType::getOptions(),
+                    'statuses' => OpportunityStatus::getOptions(),
+                ],
+                'currentSearchFields' => ['type', 'status','title'],
+                'routeName' => 'opportunity.me.list',
+                'breadcrumbs' => [
+                    ['name' => 'Home', 'url' => route('user.home')],
+                    ['name' => 'Opportunities', 'url' => route('opportunity.me.list')],
+                ],
+                'pageActions'=> [
+                    'canSubmitNew'=> true,
+                ]
+            ],
+            'public' => [
+                'component' => 'Opportunity/List',
+                'title' => 'Opportunities',
+                'banner' => [
+                    'title' => 'List of Opportunities',
+                    'description' => 'Browse and view opportunities submitted by CDF partners here.'
+                ],
+                'searchFields' => ['title', 'type'],
+                'searchFieldsOptions' => [
+                    'types' => OpportunityType::getOptions(),
+                    'statuses' => OpportunityStatus::getOptions(),
+                ],
+                'currentSearchFields' => ['title', 'type'],
+                'routeName' => 'opportunity.list',
+                'breadcrumbs' => [
+                    ['name' => 'Home', 'url' => route('user.home')],
+                    ['name' => 'Opportunities', 'url' => route('opportunity.list')],
+                ]
+            ],
+        };
+    }
+
+    /**
+     * Get opportunities based on context
+     */
+    private function getOpportunitiesForContext(string $context, $user, array $searchFilters, array $sortFilters)
+    {
+        return match ($context) {
+            'admin' => $this->opportunityService->getAllOpportunitiesPaginated($searchFilters, $sortFilters),
+            'user_own' => $this->opportunityService->getUserOpportunitiesPaginated($user, $searchFilters, $sortFilters),
+            'public' => $this->opportunityService->getActiveOpportunitiesPaginated($searchFilters, $sortFilters),
+            default => $this->opportunityService->getActiveOpportunitiesPaginated($searchFilters, $sortFilters),
+        };
+    }
+
+    /**
+     * Build current search array based on context
+     */
+    private function buildCurrentSearch(array $searchFilters, array $fields): array
+    {
+        $currentSearch = [];
+        foreach ($fields as $field) {
+            $currentSearch[$field] = $searchFilters[$field] ?? '';
+        }
+        return $currentSearch;
     }
 
     public function __invoke(Request $httpRequest): Response
     {
         $context = $this->getRouteContext();
+        $config = $this->getContextConfiguration($context);
 
-        return match ($context) {
-            'admin' => $this->adminOpportunities($httpRequest),
-            'user_own' => $this->myOpportunities($httpRequest),
-            'public' => $this->publicOpportunities($httpRequest),
-            default => $this->publicOpportunities($httpRequest),
-        };
-    }
-
-    /**
-     * Handle admin opportunities listing
-     */
-    private function adminOpportunities(Request $httpRequest): Response
-    {
-        $searchFilters = $this->buildSearchFilters($httpRequest, ['user', 'title', 'type', 'status', 'location', 'closing_date']);
+        $searchFilters = $this->buildSearchFilters($httpRequest, $config['searchFields']);
         $sortFilters = $this->buildSortFilters($httpRequest);
 
-        // Admin can see all opportunities - could be implemented later
-        $opportunities = $this->opportunityService->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
-        $this->appendPagination($opportunities, $httpRequest, ['sort', 'order', 'user', 'title', 'type', 'status', 'location', 'closing_date']);
+        // Call appropriate service method based on context
+        $opportunities = $this->getOpportunitiesForContext(
+            $context,
+            $httpRequest->user(),
+            $searchFilters,
+            $sortFilters
+        );
 
-        return Inertia::render('Admin/Opportunity/List', [
+        return Inertia::render($config['component'], [
             'opportunities' => $opportunities,
-            'title' => 'Opportunities (Admin)',
-            'banner' => $this->buildBanner('Manage Opportunities', 'Admin view of all opportunities in the system.'),
-            'searchFieldsOptions' => [
-                'types' => Opportunity::getTypeOptions(),
-                'statuses' => OpportunityStatus::getOptions(),
-            ],
+            'title' => $config['title'],
+            'banner' => isset($config['banner']) ? $this->buildBanner(
+                $config['banner']['title'],
+                $config['banner']['description']
+            ) : null,
+            'searchFieldsOptions' => $config['searchFieldsOptions'],
             'currentSort' => [
                 'field' => $sortFilters['field'],
                 'order' => $sortFilters['order'],
             ],
-            'routeName' => 'admin.opportunity.list',
-            'currentSearch' => $searchFilters,
-            'breadcrumbs' => [
-                ['name' => 'Admin', 'url' => route('admin.dashboard.index')],
-                ['name' => 'Opportunities', 'url' => route('admin.opportunity.list')],
-            ],
-            'pageActions' => [
-                'canAddNew' => true,
-                'canChangeStatus' => true,
-                'canDelete' => true,
-                'canEdit' => true,
-                'canSubmitNew' => true,
-                'canApply' => false,
-            ],
+            'routeName' => $config['routeName'],
+            'currentSearch' => $this->buildCurrentSearch($searchFilters, $config['currentSearchFields']),
+            'breadcrumbs' => $config['breadcrumbs'],
+            'pageActions'=> $config['pageActions'] ?? []
         ]);
     }
 
-    /**
-     * Handle user's own opportunities listing (from OpportunitiesController::mySubmittedList)
-     */
-    private function myOpportunities(Request $httpRequest): Response
-    {
-        $searchFilters = $this->buildSearchFilters($httpRequest, ['title', 'type', 'status']);
-        $sortFilters = $this->buildSortFilters($httpRequest);
-
-        $opportunities = $this->opportunityService->getUserOpportunitiesPaginated($httpRequest->user(), $searchFilters, $sortFilters);
-        $this->appendPagination($opportunities, $httpRequest, ['sort', 'order', 'user', 'title', 'type', 'status', 'location']);
-
-        return Inertia::render('Opportunity/List', [
-            'opportunities' => $opportunities,
-            'title' => 'Opportunities',
-            'routeName' => 'opportunity.me.list',
-            'banner' => $this->buildBanner('List of My submitted Opportunities', 'Manage your submitted opportunities here.'),
-            'currentSort' => [
-                'field' => $sortFilters['field'],
-                'order' => $sortFilters['order'],
-            ],
-            'searchFieldsOptions' => [
-                'types' => OpportunityType::getOptions(),
-                'statuses' => OpportunityStatus::getOptions(),
-            ],
-            'currentSearch' => [
-                'type' => $searchFilters['type'] ?? '',
-                'status' => $searchFilters['status'] ?? '',
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.me.list')],
-            ],
-            'pageActions' => [
-                'canAddNew' => true,
-                'canChangeStatus' => false,
-                'canDelete' => true,
-                'canSubmitNew' => true,
-                'canApply' => false,
-            ],
-        ]);
-    }
-
-    /**
-     * Handle public opportunities listing (original functionality)
-     */
-    private function publicOpportunities(Request $httpRequest): Response
-    {
-        $searchFilters = $this->buildSearchFilters($httpRequest, ['title', 'type']);
-        $sortFilters = $this->buildSortFilters($httpRequest);
-
-        $opportunities = $this->opportunityService->getPublicOpportunitiesPaginated($searchFilters, $sortFilters);
-        $this->appendPagination($opportunities, $httpRequest, ['sort', 'order', 'user', 'title', 'type', 'location', 'closing_date']);
-
-        return Inertia::render('Opportunity/List', [
-            'opportunities' => $opportunities,
-            'title' => 'Opportunities',
-            'banner' => $this->buildBanner('List of Opportunities', 'Browse and view opportunities submitted by CDF partners here.'),
-            'searchFieldsOptions' => [
-                'types' => OpportunityType::getOptions(),
-                'statuses' => OpportunityStatus::getOptions(),
-            ],
-            'currentSort' => [
-                'field' => $sortFilters['field'],
-                'order' => $sortFilters['order'],
-            ],
-            'routeName' => 'opportunity.list',
-            'currentSearch' => [
-                'title' => $searchFilters['title'] ?? '',
-                'type' => $searchFilters['type'] ?? '',
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.list')],
-            ],
-            'pageActions' => [
-                'canAddNew' => false,
-                'canChangeStatus' => false,
-                'canDelete' => false,
-                'canEdit' => false,
-                'canSubmitNew' => false,
-                'canApply' => true,
-            ],
-        ]);
-    }
 }

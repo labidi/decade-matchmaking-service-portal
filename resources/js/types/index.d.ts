@@ -41,6 +41,27 @@ export interface User {
     is_admin: boolean;
 }
 
+export interface RequestSubscription {
+    id: number;
+    user_id: number;
+    request_id: number;
+    subscribed_by_admin: boolean;
+    admin_user_id?: number;
+    created_at: string;
+    updated_at: string;
+    user?: User;
+    request?: OCDRequest;
+    admin_user?: User;
+}
+
+export interface SubscriptionStats {
+    total_subscriptions: number;
+    admin_created_subscriptions: number;
+    user_created_subscriptions: number;
+    unique_subscribers: number;
+    unique_subscribed_requests: number;
+}
+
 export interface Role {
     id: number;
     name: string;
@@ -137,16 +158,11 @@ export interface OCDRequestStatus {
     created_at: string;
     updated_at: string;
 }
-
-export interface RequestStatus {
-    id: number;
-    status_code: string;
-    status_label: string;
-}
 export interface OCDRequest {
     id: number;
     type: string;
     submissionDate: string;
+    requester_name?: string;
     status: OCDRequestStatus,
     title: string;
     can_edit: boolean;
@@ -183,7 +199,6 @@ export interface OCDRequest {
         risks: string;
         personnel_expertise: string;
         direct_beneficiaries: string;
-        direct_beneficiaries: string;
         direct_beneficiaries_number: string;
         expected_outcomes: string;
         success_metrics: string;
@@ -205,8 +220,12 @@ export interface OCDRequest {
 
 export type OCDRequestList = OCDRequest[];
 
+export interface OpportunityStatus {
+    label: string;
+    code: string;
+}
 
-export interface OCDOpportunity {
+export interface Opportunity {
     id: string;
     title: string;
     type: string;
@@ -214,23 +233,20 @@ export interface OCDOpportunity {
     closing_date: string;
     coverage_activity: string;
     implementation_location: string;
-    implementation_location_label: string;
-    target_audience: string;
-    target_audience_label: string;
+    target_audience: Array<{ value: string; label: string }>;
     target_audience_other: string;
     summary: string;
     url: string;
     created_at: string;
     updated_at: string;
     user_id: string;
-    status: number;
-    status_label: string;
+    status:  { value: string; label: string };
     can_edit: boolean;
     keywords: string;
     user?: User;
 }
 
-export type OCDOpportunitiesList = OCDOpportunity[];
+export type OpportunitiesList = Opportunity[];
 
 export type OCDRequestGrid = {
     actions: {
@@ -246,18 +262,6 @@ export type OCDRequestGrid = {
         canPreview?: boolean
     }
 }
-
-export type OCDOpportunitiesListPageActions = {
-    canEdit?: boolean;
-    canDelete?: boolean;
-    canView?: boolean;
-    canChangeStatus?: boolean;
-    canCreate?: boolean;
-    canExpressInterest?: boolean;
-    canExportPdf?: boolean;
-    canSubmitNew?: boolean;
-}
-
 export interface OfferProps {
     OcdRequest: OCDRequest;
 }

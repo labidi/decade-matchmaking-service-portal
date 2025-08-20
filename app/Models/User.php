@@ -9,8 +9,10 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Request;
 use App\Models\Notification;
+use App\Models\RequestSubscription;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable
@@ -92,6 +94,18 @@ class User extends Authenticatable
     public function notificationPreferences(): HasMany
     {
         return $this->hasMany(UserNotificationPreference::class);
+    }
+
+    public function requestSubscriptions(): HasMany
+    {
+        return $this->hasMany(RequestSubscription::class);
+    }
+
+    public function subscribedRequests(): BelongsToMany
+    {
+        return $this->belongsToMany(Request::class, 'request_subscriptions')
+            ->withPivot(['subscribed_by_admin', 'admin_user_id'])
+            ->withTimestamps();
     }
 
     /**
