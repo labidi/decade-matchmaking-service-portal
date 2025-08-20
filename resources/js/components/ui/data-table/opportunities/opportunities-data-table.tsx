@@ -1,11 +1,9 @@
 import React from 'react';
 import {ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/16/solid';
-import {OCDOpportunity, OCDOpportunitiesList, PaginationLinkProps, UIField} from "@/types";
+import {Opportunity, OpportunitiesList, PaginationLinkProps, UIField} from "@/types";
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
-import {Badge} from '@/components/ui/badge'
 import {router} from '@inertiajs/react';
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
-import {formatDate} from '@/utils/date-formatter';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
 import { DropdownActions, Action } from '@/components/ui/data-table/common/dropdown-actions';
 
@@ -27,13 +25,13 @@ interface TableColumn {
     label: string;
     sortable?: boolean;
     sortField?: SortField;
-    render: (opportunity: OCDOpportunity) => React.ReactNode;
+    render: (opportunity: Opportunity) => React.ReactNode;
     className?: string;
     headerClassName?: string;
 }
 
 interface OpportunitiesDataTableProps {
-    opportunities: OCDOpportunitiesList;
+    opportunities: OpportunitiesList;
     currentSort: {
         field: string;
         order: string;
@@ -41,36 +39,12 @@ interface OpportunitiesDataTableProps {
     currentSearch?: Record<string, string>;
     pagination?: PaginationData;
     searchFields?: UIField[];
-    columns?: TableColumn[];
+    columns: TableColumn[];
     routeName?: string;
-    getActionsForOpportunity: (opportunity: OCDOpportunity) => Action[];
+    getActionsForOpportunity: (opportunity: Opportunity) => Action[];
     showSearch?: boolean;
     showActions?: boolean;
 }
-
-
-const statusBadgeRenderer = (status: number, statusLabel: string) => {
-    let color: "teal" | "cyan" | "amber" | "green" | "blue" | "red" | "orange" | "yellow" | "lime" | "emerald" | "sky" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
-    switch (status) {
-        case 1: // ACTIVE
-            color = 'green';
-            break;
-        case 2: // CLOSED
-            color = 'zinc';
-            break;
-        case 3: // REJECTED
-            color = 'red';
-            break;
-        case 4: // PENDING_REVIEW
-            color = 'amber';
-            break;
-        default:
-            color = 'zinc';
-    }
-    return (
-        <Badge color={color}>{statusLabel}</Badge>
-    );
-};
 
 export function OpportunitiesDataTable({
     opportunities,
@@ -96,73 +70,6 @@ export function OpportunitiesDataTable({
         });
     };
 
-    // Default columns for admin interface
-    const defaultColumns: TableColumn[] = [
-        {
-            key: 'id',
-            label: 'ID',
-            sortable: true,
-            sortField: 'id',
-            render: (opportunity) => (
-                <span className="font-medium">{opportunity.id}</span>
-            )
-        },
-        {
-            key: 'title',
-            label: 'Title',
-            sortable: true,
-            sortField: 'title',
-            render: (opportunity) => (
-                <span className="font-medium">{opportunity.title}</span>
-            )
-        },
-        {
-            key: 'type',
-            label: 'Type',
-            sortable: true,
-            sortField: 'type',
-            render: (opportunity) => (
-                <span>{opportunity.type_label || opportunity.type}</span>
-            )
-        },
-        {
-            key: 'closing_date',
-            label: 'Closing Date',
-            sortable: true,
-            sortField: 'closing_date',
-            render: (opportunity) => (
-                <span className="text-zinc-500">
-                    {opportunity.closing_date ? formatDate(opportunity.closing_date) : 'N/A'}
-                </span>
-            )
-        },
-        {
-            key: 'user',
-            label: 'Submitted By',
-            render: (opportunity) => (
-                <span>{opportunity.user?.name ?? 'N/A'}</span>
-            )
-        },
-        {
-            key: 'created_at',
-            label: 'Submitted At',
-            sortable: true,
-            sortField: 'created_at',
-            render: (opportunity) => (
-                <span className="text-zinc-500">{formatDate(opportunity.created_at)}</span>
-            )
-        },
-        {
-            key: 'status',
-            label: 'Status',
-            sortable: true,
-            sortField: 'status',
-            render: (opportunity) => statusBadgeRenderer(opportunity.status, opportunity.status_label)
-        }
-    ];
-
-    const activeColumns = columns || defaultColumns;
-
     // Helper Functions
     const getSortIcon = (field: SortField) => {
         if (currentSort.field !== field) {
@@ -173,7 +80,7 @@ export function OpportunitiesDataTable({
             : <ChevronDownIcon className="size-4"/>;
     };
 
-    const totalColumns = activeColumns.length + (showActions ? 1 : 0);
+    const totalColumns = columns.length + (showActions ? 1 : 0);
 
     return (
         <>
@@ -189,7 +96,7 @@ export function OpportunitiesDataTable({
             <Table>
                 <TableHead className="text-lg">
                     <TableRow>
-                        {activeColumns.map((column) => (
+                        {columns.map((column) => (
                             <TableHeader key={column.key} className={column.headerClassName}>
                                 {column.sortable && column.sortField ? (
                                     <button
@@ -220,7 +127,7 @@ export function OpportunitiesDataTable({
                     ) : (
                         opportunities.map((opportunity) => (
                             <TableRow key={opportunity.id}>
-                                {activeColumns.map((column) => (
+                                {columns.map((column) => (
                                     <TableCell key={column.key} className={column.className}>
                                         {column.render(opportunity)}
                                     </TableCell>

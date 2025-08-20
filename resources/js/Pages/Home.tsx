@@ -102,6 +102,14 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
                                 text="Manage training and workshop requests that you matched with as a Partner "
                             />
                         )}
+                        {auth.user && (
+                            <CardLink
+                                link={route('request.me.matched-requests')}
+                                className={LinkRequestCardClassName}
+                                title="My Subscribed requests"
+                                text="Manage and keep track of the requests you have subscribed to for updates and notifications."
+                            />
+                        )}
                     </div>
                     <SectionTitle>Opportunity section</SectionTitle>
 

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\OpportunityStatus;
 use App\Models\Opportunity;
 use App\Models\User;
+use App\Services\Opportunity\EnhancerService;
 use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
 use App\Services\PaginationService;
@@ -36,14 +37,6 @@ class OpportunityService
     }
 
     /**
-     * Get opportunities submitted by a specific user
-     */
-    public function getUserOpportunities(User $user): Collection
-    {
-        return $this->repository->getByUser($user);
-    }
-
-    /**
      * Get paginated opportunities submitted by a specific user
      */
     public function getUserOpportunitiesPaginated(
@@ -54,7 +47,13 @@ class OpportunityService
         $query = $this->getBaseOpportunitiesQuery($searchFilters)
             ->where('user_id', $user->id);
         $query = $this->paginationService->applySorting($query, $sortFilters);
-        return $this->paginationService->paginate($query, ['per_page' => 10]);
+
+        $opportunities = $this->paginationService->paginate($query, ['per_page' => 10])->withQueryString();
+        $opportunities->getCollection()->transform(function ($opportunity) {
+            // Enhance opportunity data if needed
+            return EnhancerService::enhanceOpportunity($opportunity);
+        });
+        return $opportunities;
     }
 
 
@@ -95,7 +94,12 @@ class OpportunityService
     ): LengthAwarePaginator {
         $query = $this->getBaseOpportunitiesQuery($searchFilters);
         $query = $this->paginationService->applySorting($query, $sortFilters);
-        return $this->paginationService->paginate($query, ['per_page' => 10]);
+        $opportunities = $this->paginationService->paginate($query, ['per_page' => 10])->withQueryString();
+        $opportunities->getCollection()->transform(function ($opportunity) {
+            // Enhance opportunity data if needed
+            return EnhancerService::enhanceOpportunity($opportunity);
+        });
+        return $opportunities;
     }
 
     /**
@@ -108,28 +112,23 @@ class OpportunityService
         $query = $this->getBaseOpportunitiesQuery($searchFilters);
         $query->where('status', OpportunityStatus::ACTIVE);
         $query = $this->paginationService->applySorting($query, $sortFilters);
-        return $this->paginationService->paginate($query, ['per_page' => 10]);
+        $opportunities = $this->paginationService->paginate($query, ['per_page' => 10])->withQueryString();
+        $opportunities->getCollection()->transform(function ($opportunity) {
+            // Enhance opportunity data if needed
+            return EnhancerService::enhanceOpportunity($opportunity);
+        });
+        return $opportunities;
     }
 
     /**
      * Find opportunity by ID with authorization check
      */
-    public function findOpportunity(int $id, ?User $user = null): ?Opportunity
+    public function findOpportunity(int $id): ?Opportunity
     {
         $opportunity = $this->repository->findById($id);
-
         if (!$opportunity) {
             return null;
         }
-
-        // If user is provided, check if they can access this opportunity
-        if ($user && $opportunity->user_id !== $user->id) {
-            // For now, allow access to public opportunities
-            if ($opportunity->status !== OpportunityStatus::ACTIVE) {
-                return null;
-            }
-        }
-
         return $opportunity;
     }
 

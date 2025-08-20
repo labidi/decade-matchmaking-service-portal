@@ -1,31 +1,8 @@
 import React from 'react';
-import { OCDOpportunity } from '@/types';
-import { Badge } from '@/components/ui/badge';
+import { Opportunity } from '@/types';
 import { formatDate } from '@/utils/date-formatter';
+import { opportunityStatusBadgeRenderer } from '@/utils/status-badge-renderer';
 
-// Status badge renderer utility for opportunities
-export const statusBadgeRenderer = (status: number, statusLabel: string) => {
-    let color: "teal" | "cyan" | "amber" | "green" | "blue" | "red" | "orange" | "yellow" | "lime" | "emerald" | "sky" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
-
-    switch (status) {
-        case 1: // ACTIVE
-            color = 'green';
-            break;
-        case 2: // CLOSED
-            color = 'zinc';
-            break;
-        case 3: // REJECTED
-            color = 'red';
-            break;
-        case 4: // PENDING_REVIEW
-            color = 'amber';
-            break;
-        default:
-            color = 'zinc';
-    }
-
-    return <Badge color={color}>{statusLabel}</Badge>;
-};
 
 // Column configuration for Admin interface
 export const adminColumns = [
@@ -34,7 +11,7 @@ export const adminColumns = [
         label: 'ID',
         sortable: true,
         sortField: 'id' as const,
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <span className="font-medium">#{opportunity.id}</span>
         )
     },
@@ -43,7 +20,7 @@ export const adminColumns = [
         label: 'Title',
         sortable: true,
         sortField: 'title' as const,
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <div className="max-w-xs">
                 <span className="truncate font-medium">{opportunity.title}</span>
             </div>
@@ -54,16 +31,16 @@ export const adminColumns = [
         label: 'Type',
         sortable: true,
         sortField: 'type' as const,
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                {opportunity.type_label || opportunity.type}
+                {opportunity.type}
             </span>
         )
     },
     {
         key: 'user',
         label: 'Submitted By',
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <div className="flex flex-col">
                 <span className="font-medium">{opportunity.user?.name ?? 'N/A'}</span>
                 <span className="text-xs text-gray-500">{opportunity.user?.email ?? ''}</span>
@@ -75,7 +52,7 @@ export const adminColumns = [
         label: 'Closing Date',
         sortable: true,
         sortField: 'closing_date' as const,
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <span className="text-zinc-500">
                 {opportunity.closing_date ? formatDate(opportunity.closing_date) : 'N/A'}
             </span>
@@ -86,7 +63,7 @@ export const adminColumns = [
         label: 'Status',
         sortable: true,
         sortField: 'status' as const,
-        render: (opportunity: OCDOpportunity) => statusBadgeRenderer(opportunity.status, opportunity.status_label)
+        render: (opportunity: Opportunity) => opportunityStatusBadgeRenderer(opportunity)
     }
 ];
 
@@ -95,7 +72,7 @@ export const partnerColumns = [
     {
         key: 'title',
         label: 'Opportunity Title',
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <div>
                 <div className="font-medium">{opportunity.title}</div>
                 <div className="text-sm text-gray-500 truncate max-w-md">
@@ -107,7 +84,7 @@ export const partnerColumns = [
     {
         key: 'type',
         label: 'Type',
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                 {opportunity.type_label || opportunity.type}
             </span>
@@ -116,7 +93,7 @@ export const partnerColumns = [
     {
         key: 'closing_date',
         label: 'Closing Date',
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <div>
                 <div>{opportunity.closing_date ?
                     formatDate(opportunity.closing_date, 'en-US', {
@@ -138,7 +115,7 @@ export const partnerColumns = [
         label: 'Published',
         sortable: true,
         sortField: 'created_at' as const,
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <div>
                 <div>{formatDate(opportunity.created_at, 'en-US', {
                     year: 'numeric',
@@ -155,90 +132,9 @@ export const partnerColumns = [
     {
         key: 'status',
         label: 'Status',
-        render: (opportunity: OCDOpportunity) => (
+        render: (opportunity: Opportunity) => (
             <div className="flex flex-col items-start">
-                {statusBadgeRenderer(opportunity.status, opportunity.status_label)}
-            </div>
-        )
-    }
-];
-
-// Column configuration for Public interface (for browsing opportunities)
-export const publicColumns = [
-    {
-        key: 'title',
-        label: 'Opportunity',
-        render: (opportunity: OCDOpportunity) => (
-            <div>
-                <div className="font-medium text-blue-600 hover:text-blue-800">
-                    {opportunity.title}
-                </div>
-                <div className="text-sm text-gray-600 mt-1">
-                    <span>{opportunity.user?.name ?? 'Organization'}</span>
-                </div>
-            </div>
-        )
-    },
-    {
-        key: 'type',
-        label: 'Type',
-        render: (opportunity: OCDOpportunity) => (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                {opportunity.type_label || opportunity.type}
-            </span>
-        )
-    },
-    {
-        key: 'implementation_location',
-        label: 'Location',
-        render: (opportunity: OCDOpportunity) => (
-            <div className="text-sm">
-                {opportunity.implementation_location ? (
-                    <span>{opportunity.implementation_location}</span>
-                ) : (
-                    <span className="text-gray-500">Location not specified</span>
-                )}
-            </div>
-        )
-    },
-    {
-        key: 'closing_date',
-        label: 'Application Deadline',
-        render: (opportunity: OCDOpportunity) => (
-            <div className="text-sm">
-                {opportunity.closing_date ? (
-                    <div>
-                        <div className="font-medium">
-                            {formatDate(opportunity.closing_date, 'en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                            })}
-                        </div>
-                        <div className={`text-xs ${
-                            new Date(opportunity.closing_date) > new Date()
-                                ? 'text-green-600'
-                                : 'text-red-600'
-                        }`}>
-                            {new Date(opportunity.closing_date) > new Date() ? 'Open' : 'Closed'}
-                        </div>
-                    </div>
-                ) : (
-                    <span className="text-gray-500">No deadline</span>
-                )}
-            </div>
-        )
-    },
-    {
-        key: 'target_audience',
-        label: 'Target Audience',
-        render: (opportunity: OCDOpportunity) => (
-            <div className="text-sm">
-                {opportunity.target_audience ? (
-                    <div className="font-medium">{opportunity.target_audience}</div>
-                ) : (
-                    <span className="text-gray-500">Not specified</span>
-                )}
+                {opportunityStatusBadgeRenderer(opportunity)}
             </div>
         )
     }

@@ -4,7 +4,7 @@ import { Dialog, DialogBody, DialogDescription, DialogTitle } from '@/components
 import { Button } from '@/components/ui/button';
 import { Field, Label } from '@/components/ui/fieldset';
 import { Listbox, ListboxLabel, ListboxOption } from '@/components/ui/listbox';
-import { OCDOpportunity } from '@/types';
+import { Opportunity } from '@/types';
 
 interface OpportunityStatus {
     value: string;
@@ -14,7 +14,7 @@ interface OpportunityStatus {
 interface OpportunityStatusDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    opportunity: OCDOpportunity | null;
+    opportunity: Opportunity | null;
 }
 
 // Available opportunity statuses based on the existing implementation
@@ -86,7 +86,7 @@ export function OpportunityStatusDialog({
                     <Field>
                         <Label>Current Status</Label>
                         <div className="mt-1 p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm">
-                            {currentStatus?.label || opportunity.status_label || 'Unknown'}
+                            {opportunity.status.label}
                         </div>
                     </Field>
 

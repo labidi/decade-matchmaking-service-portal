@@ -1,9 +1,9 @@
 import {useForm} from '@inertiajs/react';
 import {useEffect, useState} from 'react';
 import {UIOpportunityForm} from '@/Forms/UIOpportunityForm';
-import {OCDOpportunity, FormOptions} from '@/types';
+import {Opportunity, FormOptions} from '@/types';
 
-export function useOpportunityForm(opportunity?: OCDOpportunity, formOptions?: FormOptions) {
+export function useOpportunityForm(opportunity?: Opportunity, formOptions?: FormOptions) {
     const form = useForm({
         id: opportunity?.id || '',
         title: opportunity?.title || '',
@@ -26,7 +26,7 @@ export function useOpportunityForm(opportunity?: OCDOpportunity, formOptions?: F
     // Handle implementation location options based on coverage activity
     useEffect(() => {
         if (!formOptions) return;
-        
+
         switch (form.data.coverage_activity) {
             case 'country':
                 setImplementationOptions(formOptions.countries || []);
@@ -54,7 +54,7 @@ export function useOpportunityForm(opportunity?: OCDOpportunity, formOptions?: F
         if (e) e.preventDefault();
         form.clearErrors();
         setErrorSteps([]);
-        
+
         form.post(route('opportunity.store'), {
             preserveScroll: true,
             onSuccess: () => {
@@ -69,7 +69,7 @@ export function useOpportunityForm(opportunity?: OCDOpportunity, formOptions?: F
                     }
                 });
                 setErrorSteps(stepsWithError);
-                
+
                 // Jump to first step with error
                 if (stepsWithError.length > 0) {
                     setCurrentStep(stepsWithError[0]);
@@ -85,7 +85,7 @@ export function useOpportunityForm(opportunity?: OCDOpportunity, formOptions?: F
     // Get form options for specific fields
     const getFieldOptions = (fieldName: string) => {
         if (!formOptions) return [];
-        
+
         switch (fieldName) {
             case 'implementation_location':
                 return implementationOptions;

@@ -1,41 +1,8 @@
 import React from 'react';
 import { OCDRequest } from '@/types';
-import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/utils/date-formatter';
+import { requestStatusBadgeRenderer } from '@/utils/status-badge-renderer';
 
-// Status badge renderer utility
-export const statusBadgeRenderer = (status: OCDRequest['status']) => {
-    let color: "teal" | "cyan" | "amber" | "green" | "blue" | "red" | "orange" | "yellow" | "lime" | "emerald" | "sky" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
-
-    switch (status.status_code) {
-        case 'draft':
-            color = 'zinc';
-            break;
-        case 'under_review':
-            color = 'amber';
-            break;
-        case 'validated':
-            color = 'green';
-            break;
-        case 'offer_made':
-            color = 'blue';
-            break;
-        case 'in_implementation':
-            color = 'blue';
-            break;
-        case 'rejected':
-        case 'unmatched':
-            color = 'red';
-            break;
-        case 'closed':
-            color = "teal";
-            break;
-        default:
-            color = 'zinc';
-    }
-
-    return <Badge color={color}>{status.status_label}</Badge>;
-};
 
 // Column configuration for Admin interface
 export const adminColumns = [
@@ -83,7 +50,7 @@ export const adminColumns = [
         label: 'Status',
         sortable: true,
         sortField: 'status_id' as const,
-        render: (request: OCDRequest) => statusBadgeRenderer(request.status)
+        render: (request: OCDRequest) => requestStatusBadgeRenderer(request.status)
     }
 ];
 
@@ -125,7 +92,7 @@ export const userColumns = [
         label: 'Status',
         render: (request: OCDRequest) => (
             <div className="flex flex-col items-start">
-                {statusBadgeRenderer(request.status)}
+                {requestStatusBadgeRenderer(request.status)}
             </div>
         )
     },

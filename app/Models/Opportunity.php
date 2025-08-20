@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
@@ -18,14 +19,20 @@ class Opportunity extends Model
     protected $primaryKey = 'id';
 
     public $timestamps = true;
-//    protected $appends = ['status_label', 'type_label'];
 
     protected $casts = [
-        'status' => OpportunityStatus::class,
-        'target_audience' => 'array',
-        'implementation_location' => 'array',
+
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'type'=>OpportunityType::class,
+            'status' => OpportunityStatus::class,
+            'implementation_location' => 'array',
+            'target_audience' => AsEnumArrayObject::of(TargetAudience::class),
+        ];
+    }
 
     public const STATUS_LABELS = [
         OpportunityStatus::ACTIVE->value => 'Active',

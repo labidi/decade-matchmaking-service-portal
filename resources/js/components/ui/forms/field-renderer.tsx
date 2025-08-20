@@ -294,7 +294,7 @@ export default function FieldRenderer({
 
             return (
                 <Field key={name} className="mt-8">
-                    {field.label && <Label className="capitalize" >{field.label}</Label>}
+                    {field.label && <Label className="capitalize">{field.label}</Label>}
                     {field.description && <Description className="capitalize">
                         {field.description}
                     </Description>}

@@ -24,13 +24,6 @@ abstract class BaseOpportunitiesController extends Controller
         return str_starts_with(request()->route()->getName() ?? '', 'admin.');
     }
 
-    /**
-     * Detect if current route is a user's own opportunities route
-     */
-    protected function isUserOwnOpportunitiesRoute(): bool
-    {
-        return str_contains(request()->route()->getName() ?? '', '.me.');
-    }
 
     /**
      * Get the context based on route name
@@ -69,11 +62,6 @@ abstract class BaseOpportunitiesController extends Controller
             'order' => $request->get('order', $defaultOrder),
             'per_page' => (int) $request->get('per_page', $perPage),
         ];
-    }
-
-    protected function appendPagination($paginator, Request $request, array $keys): void
-    {
-        $paginator->appends($request->only($keys));
     }
 
     protected function userPermissions(Opportunity $opportunity, ?Authenticatable $user): array

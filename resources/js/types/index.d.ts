@@ -220,8 +220,12 @@ export interface OCDRequest {
 
 export type OCDRequestList = OCDRequest[];
 
+export interface OpportunityStatus {
+    label: string;
+    code: string;
+}
 
-export interface OCDOpportunity {
+export interface Opportunity {
     id: string;
     title: string;
     type: string;
@@ -229,20 +233,20 @@ export interface OCDOpportunity {
     closing_date: string;
     coverage_activity: string;
     implementation_location: string;
-    target_audience: string;
+    target_audience: Array<{ value: string; label: string }>;
     target_audience_other: string;
     summary: string;
     url: string;
     created_at: string;
     updated_at: string;
     user_id: string;
-    status: number;
+    status:  { value: string; label: string };
     can_edit: boolean;
     keywords: string;
     user?: User;
 }
 
-export type OCDOpportunitiesList = OCDOpportunity[];
+export type OpportunitiesList = Opportunity[];
 
 export type OCDRequestGrid = {
     actions: {
@@ -258,18 +262,6 @@ export type OCDRequestGrid = {
         canPreview?: boolean
     }
 }
-
-export type OCDOpportunitiesListPageActions = {
-    canEdit?: boolean;
-    canDelete?: boolean;
-    canView?: boolean;
-    canChangeStatus?: boolean;
-    canCreate?: boolean;
-    canExpressInterest?: boolean;
-    canExportPdf?: boolean;
-    canSubmitNew?: boolean;
-}
-
 export interface OfferProps {
     OcdRequest: OCDRequest;
 }

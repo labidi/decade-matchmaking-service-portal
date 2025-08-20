@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import {Head} from '@inertiajs/react';
-import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus} from '@/types';
-import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
-import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
-import {adminColumns} from "@/components/ui/data-table/requests/column-configs";
-import {Heading} from "@/components/ui/heading";
-import { buildRequestActions } from '@/components/ui/data-table/requests/requests-actions-columns';
+import React from 'react';
+import { Head } from '@inertiajs/react';
+import { OCDRequestList, PaginationLinkProps, OCDRequestStatus } from '@/types';
+import { SidebarLayout } from '@/components/ui/layouts/sidebar-layout'
+import { RequestsDataTable } from "@/components/ui/data-table/requests/requests-data-table";
+import { adminColumns } from "@/components/ui/data-table/requests/column-configs";
+import { Heading } from "@/components/ui/heading";
+import { useRequestActions } from '@/hooks/useRequestActions';
 import { UpdateStatusDialog } from '@/components/ui/dialogs/UpdateStatusDialog';
 
 
@@ -36,25 +36,16 @@ interface RequestsListPageProps {
 }
 
 export default function RequestListPage({requests, currentSort, currentSearch = {}, availableStatuses}: Readonly<RequestsListPageProps>) {
-    // Dialog state management for UpdateStatusDialog
-    const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
-    const [selectedRequest, setSelectedRequest] = useState<OCDRequest | null>(null);
-
-    // Handle status update dialog opening
-    const handleUpdateStatus = (request: OCDRequest) => {
-        setSelectedRequest(request);
-        setIsStatusDialogOpen(true);
-    };
-
-    // Handle dialog closing
-    const handleCloseDialog = () => {
-        setIsStatusDialogOpen(false);
-        setSelectedRequest(null);
-    };
-
-    // Build actions for each request - now includes status update functionality
-    const getActionsForRequest = (request: OCDRequest) => {
-        return buildRequestActions(request, handleUpdateStatus, true);
+    const {
+        isStatusDialogOpen,
+        selectedRequest,
+        closeStatusDialog,
+        getActionsForRequest,
+    } = useRequestActions();
+    
+    // Wrapper to pass available statuses to each request
+    const getActionsForRequestWithStatuses = (request: any) => {
+        return getActionsForRequest(request, undefined, availableStatuses);
     };
     return (
         <SidebarLayout>
@@ -72,7 +63,7 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     currentSearch={currentSearch}
                     columns={adminColumns}
                     routeName="admin.request.list"
-                    getActionsForRequest={getActionsForRequest}
+                    getActionsForRequest={getActionsForRequestWithStatuses}
                     pagination={{
                         current_page: requests.current_page,
                         last_page: requests.last_page,
@@ -105,7 +96,7 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
             {/* UpdateStatusDialog - Single dialog for all rows */}
             <UpdateStatusDialog
                 isOpen={isStatusDialogOpen}
-                onClose={handleCloseDialog}
+                onClose={closeStatusDialog}
                 request={selectedRequest}
                 availableStatuses={availableStatuses}
             />
