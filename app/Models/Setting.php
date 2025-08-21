@@ -21,6 +21,11 @@ class Setting extends Model
     public const PORTAL_GUIDE = 'portal_guide';
     public const USER_GUIDE = 'user_guide';
     public const PARTNER_GUIDE = 'partner_guide';
+    public const SUCCESSFUL_MATCHES_METRIC = 'successful_matches_metric';
+    public const FULLY_CLOSED_MATCHES_METRIC = 'fully_closed_matches_metric';
+    public const REQUEST_IN_IMPLEMENTATION_METRIC = 'request_in_implementation_metric';
+    public const COMMITTED_FUNDING_METRIC = 'committed_funding_metric';
+    public const OPEN_PARTNER_OPPORTUNITIES_METRIC = 'open_partner_opportunities_metric';
 
     /**
      * Settings that are file uploads
@@ -43,6 +48,11 @@ class Setting extends Model
         self::PORTAL_GUIDE,
         self::USER_GUIDE,
         self::PARTNER_GUIDE,
+        self::SUCCESSFUL_MATCHES_METRIC,
+        self::FULLY_CLOSED_MATCHES_METRIC,
+        self::REQUEST_IN_IMPLEMENTATION_METRIC,
+        self::COMMITTED_FUNDING_METRIC,
+        self::OPEN_PARTNER_OPPORTUNITIES_METRIC,
     ];
 
     public $timestamps = true;
@@ -60,7 +70,7 @@ class Setting extends Model
      */
     public static function getFileValidationRules(string $path): array
     {
-        return match($path) {
+        return match ($path) {
             self::LOGO => [
                 'nullable',
                 'file',
@@ -83,10 +93,10 @@ class Setting extends Model
      */
     public static function getStorageDirectory(string $path): string
     {
-        return match($path) {
+        return match ($path) {
             self::LOGO => 'settings/images',
             self::PORTAL_GUIDE, self::USER_GUIDE, self::PARTNER_GUIDE => 'settings/guides',
             default => 'settings'
         };
     }
-} 
+}

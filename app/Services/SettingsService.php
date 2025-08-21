@@ -159,6 +159,11 @@ class SettingsService
         $rules[Setting::SITE_NAME] = ['nullable', 'string', 'max:255'];
         $rules[Setting::SITE_DESCRIPTION] = ['nullable', 'string', 'max:1000'];
         $rules[Setting::HOMEPAGE_YOUTUBE_VIDEO] = ['nullable', 'string', 'max:500'];
+        $rules[Setting::SUCCESSFUL_MATCHES_METRIC] = ['nullable', 'integer:strict',];
+        $rules[Setting::COMMITTED_FUNDING_METRIC] = ['nullable', 'integer:strict',];
+        $rules[Setting::FULLY_CLOSED_MATCHES_METRIC] = ['nullable', 'integer:strict',];
+        $rules[Setting::REQUEST_IN_IMPLEMENTATION_METRIC] = ['nullable', 'integer:strict',];
+        $rules[Setting::OPEN_PARTNER_OPPORTUNITIES_METRIC] = ['nullable', 'integer:strict',];
 
         return $rules;
     }

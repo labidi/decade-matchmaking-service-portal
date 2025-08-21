@@ -38,8 +38,48 @@ export const UISettingsForm: UIStep[] = [
         }
     },
     {
+        label: 'Metrics',
+        fields: {
+            successful_matches_metric: {
+                id: 'successful_matches_metric',
+                type: 'number',
+                required: false,
+                label: 'Successful Matches Metric',
+                placeholder: 'Enter the number of successful matches',
+            },
+            fully_closed_matches_metric: {
+                id: 'fully_closed_matches_metric',
+                type: 'number',
+                required: false,
+                label: 'Fully Closed Matches Metric',
+                placeholder: 'Enter the number of fully closed matches',
+            },
+            request_in_implementation_metric: {
+                id: 'request_in_implementation_metric',
+                type: 'number',
+                required: false,
+                label: 'Request in Implementation Metric',
+                placeholder: 'Enter the number of requests in implementation',
+            },
+            committed_funding_metric: {
+                id: 'committed_funding_metric',
+                type: 'number',
+                required: false,
+                label: 'Committed Funding Metric',
+                placeholder: 'Enter the amount of committed funding',
+            },
+            open_partner_opportunities_metric: {
+                id: 'open_partner_opportunities_metric',
+                type: 'number',
+                required: false,
+                label: 'Open Partner Opportunities Metric',
+                placeholder: 'Enter the number of open partner opportunities',
+            },
+        }
+    },
+    {
         label: 'Guides',
-        fields:{
+        fields: {
             portal_guide: {
                 id: 'portal_guide',
                 type: 'file',

@@ -4,7 +4,7 @@ import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {Head} from "@inertiajs/react";
 import {Heading} from "@/components/ui/heading";
 import RequestDetails from '@/components/ui/request/show/request-details';
-import { DropdownActions, Action } from '@/components/ui/data-table/common/dropdown-actions';
+import { DropdownActions } from '@/components/ui/data-table/common/dropdown-actions';
 import {useRequestActions} from "@/hooks/useRequestActions";
 import {UpdateStatusDialog} from "@/components/ui/dialogs/UpdateStatusDialog";
 

@@ -52,30 +52,7 @@ export default function FieldRenderer({
                                           className
                                       }: Readonly<FieldRendererProps>) {
 
-    // Field validation
-    const validateField = useCallback((value: any, field: UIField): string | null => {
-        /*  if (field.required && (!value || value.toString().trim() === '')) {
-              return `${field.label || field.id} is required`;
-          }*/
 
-        if (field.pattern && value && !new RegExp(field.pattern).test(value)) {
-            return `${field.label || field.id} format is invalid`;
-        }
-
-        if (field.min && value < field.min) {
-            return `${field.label || field.id} must be at least ${field.min}`;
-        }
-
-        if (field.max && value > field.max) {
-            return `${field.label || field.id} cannot exceed ${field.max}`;
-        }
-
-        if (field.maxLength && value && value.toString().length > field.maxLength) {
-            return `${field.label || field.id} cannot exceed ${field.maxLength} characters`;
-        }
-
-        return null;
-    }, []);
 
     // Accessibility attributes
     const getAriaAttributes = useCallback((field: UIField, error?: string) => ({
@@ -102,17 +79,6 @@ export default function FieldRenderer({
         }
     }, [field.onKeyDown, onKeyDown]);
 
-    // Blur event handling
-    const handleBlur = useCallback((e: React.FocusEvent) => {
-        if (onBlur) {
-            onBlur(e);
-        }
-        // Validate on blur
-        const validationError = validateField(value, field);
-        if (validationError && !error) {
-            // Could trigger validation callback here
-        }
-    }, [onBlur, validateField, value, field, error]);
 
     // Enhanced change handler with validation support
     const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -135,9 +101,8 @@ export default function FieldRenderer({
         autoFocus: field.autoFocus,
         autoComplete: field.autoComplete,
         onKeyDown: handleKeyDown,
-        onBlur: handleBlur,
         ...getAriaAttributes(field, error),
-    }), [field, disabled, handleKeyDown, handleBlur, getAriaAttributes, error]);
+    }), [field, disabled, handleKeyDown, getAriaAttributes, error]);
 
     // Check for custom field type
     const CustomComponent = fieldTypeRegistry.get(field.type);

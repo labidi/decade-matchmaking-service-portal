@@ -23,14 +23,14 @@ export default function RequestDetails({
                     <div className="max-w-screen-xl mx-auto px-5 bg-white min-h-sceen">
                         <div className="grid divide-y divide-neutral-200 mx-auto">
                             {UIRequestForm.map(step => {
-                                const visibleFields = Object.entries(step.fields).filter(([key, field]) => {
+                                const fields = Object.entries(step.fields).filter(([key, field]) => {
                                     if (fieldsToShow.length > 0 && !fieldsToShow.includes(key)) return false;
                                     if (!field.label || field.type === 'hidden') return false;
                                     if (field.show && !field.show(request)) return false;
                                     const value = (request.detail as any)[key];
                                     return !(value === undefined || value === '');
                                 });
-                                if (visibleFields.length === 0) return null;
+                                if (fields.length === 0) return null;
                                 return (
                                     <Disclosure key={step.label} as="div" className="p-6" defaultOpen={false}>
                                         <DisclosureButton
@@ -44,11 +44,13 @@ export default function RequestDetails({
                                         </DisclosureButton>
                                         <DisclosurePanel className="mt-2 text-xl/5 text-firefly-900/80">
                                             <ul className=" group-open:animate-fadeIn list-none">
-                                                {visibleFields.map(([key, field]) => {
+                                                {fields.map(([key, field]) => {
                                                     const value = (request.detail as any)[key];
-                                                    const formatted = Array.isArray(value) ? value.join(', ') : value;
+
+
+                                                    const formatted = Array.isArray(value) ? value.map(u => u.label).join(', ') : value;
                                                     return (
-                                                        <li key={key} className='py-2 text-xl'>
+                                                        <li key={key} className='py-2 text-xl capitalize'>
                                                                 <span
                                                                     className="text-firefly-800">{field.label}: </span>
                                                             <br/>
