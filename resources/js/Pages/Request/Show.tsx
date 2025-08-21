@@ -9,14 +9,12 @@ import {RequestShowActionButtons} from '@/components/ui/request/RequestShowActio
 
 interface ShowRequestProps extends PageProps<{
     request: OCDRequest;
-    activeOffer?: RequestOffer;
 }> {
 }
 
 export default function ShowRequest({
                                         auth,
                                         request,
-                                        activeOffer,
                                     }: Readonly<ShowRequestProps>) {
 
     return (
@@ -28,8 +26,8 @@ export default function ShowRequest({
             <RequestDetails request={request}/>
 
             {/* Display offer details if there's an active offer */}
-            {activeOffer && (
-                <OfferDetailsSection offer={activeOffer}/>
+            {request.active_offer && (
+                <OfferDetailsSection offer={request.active_offer}/>
             )}
 
             {/* Dynamic action buttons based on permissions */}

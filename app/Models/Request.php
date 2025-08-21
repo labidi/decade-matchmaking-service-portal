@@ -25,11 +25,6 @@ class Request extends Model
 
     protected $hidden = ['updated_at'];
 
-    /**
-     * Permission attributes to be appended to model
-     */
-    protected $appends = ['can_edit', 'can_view', 'can_manage_offers', 'can_update_status'];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -63,98 +58,6 @@ class Request extends Model
     {
         return $this->hasOne(Offer::class)
             ->where('status', \App\Enums\Offer\RequestOfferStatus::ACTIVE);
-    }
-
-    /**
-     * Accessor: Get the active offer as an attribute
-     */
-    public function getActiveOfferAttribute()
-    {
-        return $this->activeOffer()->first();
-    }
-
-
-    /**
-     * Get request title (from normalized data if available, fallback to JSON)
-     */
-    public function getTitleAttribute(): string
-    {
-        if ($this->detail) {
-            return $this->detail->capacity_development_title ?? 'N/A';
-        }
-        return 'N/A';
-    }
-
-    /**
-     * Get requester full name (from normalized data if available, fallback to JSON)
-     */
-    public function getRequesterNameAttribute(): string
-    {
-        if ($this->detail) {
-            return $this->detail->first_name . ' ' . $this->detail->last_name;
-        }
-        return 'N/A';
-    }
-
-
-    /**
-     * Check if current user can edit this request
-     */
-    public function getCanEditAttribute(): bool
-    {
-        $user = auth()->user();
-        if (!$user) {
-            return false;
-        }
-        // Only the request owner can edit
-        return $user->id === $this->user_id && $this->status->status_code === Status::DRAFT_STATUS_CODE;
-    }
-
-    /**
-     * Check if current user can view this request
-     */
-    public function getCanViewAttribute(): bool
-    {
-        $user = auth()->user();
-
-        if (!$user) {
-            return false;
-        }
-
-        // Request owner, matched partner, or admin can view
-        return $user->id === $this->user_id
-            || $user->id === $this->matched_partner_id
-            || $user->hasRole('administrator');
-    }
-
-    /**
-     * Check if current user can add offer to this request
-     */
-    public function getCanManageOffersAttribute(): bool
-    {
-        $user = auth()->user();
-
-        if (!$user) {
-            return false;
-        }
-
-        // Only admins can manage offers
-        return $user->hasRole('administrator');
-    }
-
-    /**
-     * Check if current user can update request status
-     */
-    public function getCanUpdateStatusAttribute(): bool
-    {
-        $user = auth()->user();
-
-        if (!$user) {
-            return false;
-        }
-
-        // Only administrators can update status
-        return $user->hasRole('administrator');
     }
 
     public function subscriptions(): HasMany

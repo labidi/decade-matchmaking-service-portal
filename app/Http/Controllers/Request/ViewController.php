@@ -24,13 +24,13 @@ class ViewController extends BaseRequestController
      */
     public function show(Request $request, ?int $id = null): Response
     {
-        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'offers', 'activeOffer.documents'])
+        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'activeOffer.documents'])
             ->findOrFail($id);
         $permissions = $this->permissionService->getPermissions($userRequest, auth()->user());
         $requestResource = RequestResource::withPermissions($userRequest, $permissions);
         $viewData = [
             'title' => $this->service->getRequestTitle($userRequest),
-            'request' => $this->isAdminRoute() ? $requestResource->forAdmin($permissions) : $requestResource->forUser($permissions),
+            'request' => $requestResource
         ];
 
         if ($this->isAdminRoute()) {
@@ -90,7 +90,7 @@ class ViewController extends BaseRequestController
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'request' => RequestResource::withPermissions($ocdRequest, [])->forPublic(),
+            'request' => RequestResource::withPermissions($ocdRequest, []),
             'offer' => $offer,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
