@@ -19,8 +19,8 @@ class RequestPolicy
         }
 
         // Request owner, matched partner, or admin can view
-        return $user->id === $request->user_id
-            || $user->id === $request->matched_partner_id
+        return $user->id === $request->user->id
+            || $user->id === $request->matchedPartner?->id
             || $user->hasRole('administrator');
     }
 
@@ -95,6 +95,7 @@ class RequestPolicy
         // Check if request has an active offer
         $hasActiveOffer = $request->offers()
             ->where('status', RequestOfferStatus::ACTIVE)
+            ->where('is_accepted', false)
             ->exists();
 
         // Can accept if there's an active offer
@@ -114,11 +115,11 @@ class RequestPolicy
         if ($user->id === $request->user_id) {
             return $request->offers()
                 ->where('status', RequestOfferStatus::ACTIVE)
+                ->where('is_accepted', false)
                 ->exists();
         }
 
-        // Admins can always request clarifications
-        return $user->administrator;
+        return false ;
     }
 
     /**

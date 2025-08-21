@@ -22,21 +22,16 @@ export function RequestActions({
         getActionsForRequest,
         availableStatuses: hookStatuses,
     } = useRequestActions();
-    
+
     const actions = getActionsForRequest(
         request,
-        { 
-            canView: request.can_view && showViewDetails,
-            canUpdateStatus: request.can_update_status,
-            canManageOffers: request.can_manage_offers 
-        },
         availableStatuses
     );
-    
+
     return (
         <>
             <DropdownActions actions={actions} />
-            
+
             <UpdateStatusDialog
                 isOpen={isStatusDialogOpen}
                 onClose={closeStatusDialog}

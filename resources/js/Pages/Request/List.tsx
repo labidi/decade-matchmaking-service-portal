@@ -5,6 +5,7 @@ import {OCDRequestList, PaginationLinkProps, OCDRequest} from '@/types';
 import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 import {userColumns} from "@/components/ui/data-table/requests/column-configs";
 import { Action } from '@/components/ui/data-table/common/dropdown-actions';
+import {useRequestActions} from "@/hooks/useRequestActions";
 
 interface RequestsPagination {
     current_page: number;
@@ -40,34 +41,9 @@ export default function RequestsList({
                                      }: Readonly<RequestsListPageProps>) {
 
 
-    const handleSeeActiveOffer = (request: OCDRequest) => {
-        // Navigate to request details page to see the active offer
-
-    };
-
-    // Dynamic actions based on request permissions
-    const getActionsForRequest = (request: OCDRequest): Action[] => {
-        const actions: Action[] = [];
-
-        // View Details - available if user can view
-        if (request.can_view) {
-            actions.push({
-                key: 'view-details',
-                label: 'View Details',
-                onClick: () => router.visit(route('request.show', {id: request.id}))
-            });
-        }
-
-        // Edit - available if user can edit
-        if (request.can_edit) {
-            actions.push({
-                key: 'edit',
-                label: 'Edit',
-                onClick: () => router.visit(route('request.edit', {id: request.id}))
-            });
-        }
-        return actions;
-    };
+    const {
+        getActionsForRequest,
+    } = useRequestActions('user');
 
     return (
         <FrontendLayout>

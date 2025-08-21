@@ -35,16 +35,6 @@ abstract class BaseRequestController extends Controller
     }
 
     /**
-     * Get available statuses for filtering
-     */
-    protected function getAvailableStatuses()
-    {
-        return Status::select('id', 'status_code', 'status_label')
-            ->orderBy('status_label')
-            ->get();
-    }
-
-    /**
      * Build common filters from request parameters
      */
     protected function buildFilters(Request $request): array
@@ -69,14 +59,6 @@ abstract class BaseRequestController extends Controller
                 'search' => ['user' => $searchUser ?? '', 'title' => $searchTitle ?? ''],
             ]
         ];
-    }
-
-    /**
-     * Apply pagination parameters to paginated data
-     */
-    protected function applyPaginationParams($paginatedData, Request $request): void
-    {
-        $paginatedData->appends($request->only(['sort', 'order', 'user', 'title']));
     }
 
     /**
@@ -114,47 +96,6 @@ abstract class BaseRequestController extends Controller
 
         // Default JSON response for non-admin routes
         return response()->json(['error' => $message], $statusCode);
-    }
-
-    /**
-     * Get the appropriate list route for redirects
-     */
-    protected function getListRoute(): string
-    {
-        return $this->isAdminRoute() ? 'admin.request.list' : 'request.me.list';
-    }
-
-    /**
-     * Get the appropriate show route
-     */
-    protected function getShowRoute(int $requestId): string
-    {
-        if ($this->isAdminRoute()) {
-            return route('admin.request.show', ['request' => $requestId]);
-        }
-
-        return route('request.show', ['id' => $requestId]);
-    }
-
-    /**
-     * Get context-appropriate view data for list operations
-     */
-    protected function getListViewData(string $title, $requests, array $filters, array $additional = []): array
-    {
-        $baseData = [
-            'title' => $title,
-            'requests' => $requests,
-            'currentSort' => $filters['current']['sort'],
-            'currentSearch' => $filters['current']['search'],
-            'breadcrumbs' => $this->buildContextualRequestBreadcrumbs('list'),
-        ];
-
-        // Add admin-specific data
-        if ($this->isAdminRoute()) {
-            $baseData['availableStatuses'] = $this->getAvailableStatuses();
-        }
-
-        return array_merge($baseData, $additional);
     }
 
     /**

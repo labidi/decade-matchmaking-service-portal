@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Request;
 
 use App\Http\Resources\RequestResource;
 use App\Models\Request as OCDRequest;
-use App\Services\Request\EnhancerService;
-use App\Services\RequestPermissionService;
+use App\Services\Request\RequestPermissionService;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,24 +18,24 @@ class ViewController extends BaseRequestController
     ) {
         parent::__construct($service);
     }
+
     /**
      * Display the full request details - unified method for both admin and user contexts
      */
     public function show(Request $request, ?int $id = null): Response
     {
-        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'offers','activeOffer.documents'])
+        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'offers', 'activeOffer.documents'])
             ->findOrFail($id);
-
-        $currentUser = $request->user();
+        $permissions = $this->permissionService->getPermissions($userRequest, auth()->user());
+        $requestResource = RequestResource::withPermissions($userRequest, $permissions);
+        $viewData = [
+            'title' => $this->service->getRequestTitle($userRequest),
+            'request' => $this->isAdminRoute() ? $requestResource->forAdmin($permissions) : $requestResource->forUser($permissions),
+        ];
 
         if ($this->isAdminRoute()) {
             // Admin view - with admin permissions
-            $permissions = $this->permissionService->getAdminActions($userRequest, $currentUser);
-            $requestResource = RequestResource::withPermissions($userRequest, $permissions);
-
-            $viewData = [
-                'title' => $this->service->getRequestTitle($userRequest),
-                'request' => $requestResource->forAdmin($permissions),
+            $viewData = array_merge($viewData, [
                 'breadcrumbs' => [
                     ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
                     ['name' => 'Requests', 'url' => route('admin.request.list')],
@@ -45,33 +44,25 @@ class ViewController extends BaseRequestController
                         'url' => route('admin.request.show', ['id' => $userRequest->id])
                     ],
                 ],
-            ];
-            return Inertia::render($this->getViewPrefix() . 'Request/Show', $viewData);
-        }
-
-        // User view - with user permissions and enhanced data
-        $permissions = $this->permissionService->getActionsForRequest($userRequest, $currentUser);
-        $requestResource = RequestResource::withPermissions($userRequest, $permissions);
-        $activeOffer = $this->service->getActiveOfferWithDocuments($id);
-
-        $viewData = [
-            'banner' => [
-                'title' => $this->service->getRequestTitle($userRequest),
-                'description' => 'View my request details here.',
-                'image' => '/assets/img/sidebar.png',
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                [
-                    'name' => 'View Request #' . $userRequest->id,
-                    'url' => route('request.show', ['id' => $userRequest->id])
+                'availableStatuses' => $this->service->getAvailableStatuses(),
+            ]);
+        } else {
+            $viewData = array_merge($viewData, [
+                'banner' => [
+                    'title' => $this->service->getRequestTitle($userRequest),
+                    'description' => 'View my request details here.',
+                    'image' => '/assets/img/sidebar.png',
                 ],
-            ],
-            'request' => $requestResource->forUser($permissions),
-            'activeOffer' => $activeOffer,
-        ];
-
-        return Inertia::render('Request/Show', $viewData);
+                'breadcrumbs' => [
+                    ['name' => 'Home', 'url' => route('user.home')],
+                    [
+                        'name' => 'View Request #' . $userRequest->id,
+                        'url' => route('request.show', ['id' => $userRequest->id])
+                    ],
+                ],
+            ]);
+        }
+        return Inertia::render($this->getViewPrefix() . 'Request/Show', $viewData);
     }
 
     /**

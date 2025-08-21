@@ -56,7 +56,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('request/{id}/accept-offer', [RequestOfferActionsController::class, 'acceptOffer'])->name(
         'request.accept.offer'
     );
-    Route::post('request/{id}/request-clarification', [RequestOfferActionsController::class, 'requestClarification'])->name(
+    Route::post('request/{id}/request-clarification', [RequestOfferActionsController::class, 'requestClarification']
+    )->name(
         'request.clarification'
     );
 });
@@ -70,10 +71,6 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('request/list', [RequestListController::class, 'list'])->name('admin.request.list');
     Route::get('request/{id}/show', [ViewController::class, 'show'])->name('admin.request.show');
-    Route::get('request/{id}/offers/', [ViewController::class, 'show'])->name('admin.request.offers.list');
-    Route::post('request/{id}/update-status', [RequestManagementController::class, 'updateStatus'])->name(
-        'admin.request.update-status'
-    );
     Route::get('request/export/csv', [RequestListController::class, 'exportCsv'])->name('admin.request.export.csv');
 });
 

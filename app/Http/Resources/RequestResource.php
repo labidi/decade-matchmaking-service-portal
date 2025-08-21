@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class RequestResource extends JsonResource
 {
+    public static $wrap = null;
     /**
      * Permissions to include in the response
      */
@@ -34,7 +35,6 @@ class RequestResource extends JsonResource
     {
         $baseData = [
             'id' => $this->id,
-            'status_id' => $this->status_id,
             'user_id' => $this->user_id,
             'matched_partner_id' => $this->matched_partner_id,
             'created_at' => $this->created_at,
@@ -69,20 +69,6 @@ class RequestResource extends JsonResource
     public static function withPermissions($resource, array $permissions): static
     {
         return (new static($resource))->setPermissions($permissions);
-    }
-
-    /**
-     * Create a collection with permissions for each item.
-     */
-    public static function collectionWithPermissions($resources, array $permissionsByRequestId): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        return static::collection($resources)->map(function (RequestResource $resource) use ($permissionsByRequestId) {
-            $requestId = $resource->resource->id;
-            if (isset($permissionsByRequestId[$requestId])) {
-                $resource->setPermissions($permissionsByRequestId[$requestId]);
-            }
-            return $resource;
-        });
     }
 
     /**

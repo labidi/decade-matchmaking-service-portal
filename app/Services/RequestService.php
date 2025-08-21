@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Http\Resources\RequestResource;
 use App\Models\Request;
 use App\Models\Request\Offer;
+use App\Models\Request\Status;
 use App\Models\User;
-use App\Services\Request\RequestAnalyticsService;
+use App\Services\Request\RequestPermissionService;
 use App\Services\Request\RequestRepository;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -17,7 +19,7 @@ class RequestService
 {
     public function __construct(
         private readonly RequestRepository $repository,
-        private readonly RequestAnalyticsService $analytics
+        private readonly RequestPermissionService $permissionService
     ) {
     }
 
@@ -63,12 +65,6 @@ class RequestService
     {
         return $this->repository->getAll();
     }
-
-    public function getAllRequestsAvailableForOffers(): Collection
-    {
-        return $this->repository->getAllAvailableForOffers();
-    }
-
 
     /**
      * Find request by ID with authorization
@@ -134,19 +130,11 @@ class RequestService
     }
 
     /**
-     * Search requests with filters
-     */
-    public function searchRequests(array $filters, User $user): Collection
-    {
-        return $this->repository->search($filters);
-    }
-
-    /**
      * Get paginated requests with search and sorting
      */
     public function getPaginatedRequests(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
     {
-        return $this->repository->getPaginated($searchFilters, $sortFilters);
+        return $this->repository->getPaginated($searchFilters, $sortFilters)->withQueryString();
     }
 
 
@@ -157,7 +145,7 @@ class RequestService
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        return $this->repository->getPublicRequests($searchFilters, $sortFilters);
+        return $this->repository->getPublicRequests($searchFilters, $sortFilters)->withQueryString();
     }
 
     /**
@@ -168,7 +156,7 @@ class RequestService
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        return $this->repository->getMatchedRequests($user, $searchFilters, $sortFilters);
+        return $this->repository->getMatchedRequests($user, $searchFilters, $sortFilters)->withQueryString();
     }
 
 
@@ -180,23 +168,7 @@ class RequestService
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        return $this->repository->getUserRequests($user, $searchFilters, $sortFilters);
-    }
-
-    /**
-     * Get request statistics
-     */
-    public function getRequestStats(User $user): array
-    {
-        return $this->analytics->getUserRequestStats($user);
-    }
-
-    /**
-     * Get analytics data
-     */
-    public function getAnalytics(): array
-    {
-        return $this->analytics->getAnalytics();
+        return $this->repository->getUserRequests($user, $searchFilters, $sortFilters)->withQueryString();
     }
 
     /**
@@ -391,6 +363,16 @@ class RequestService
     {
         $status = $this->repository->getStatusByCode($statusCode);
         return $status ? $status->id : null;
+    }
+
+    /**
+     * Get available statuses for filtering
+     */
+    public static function getAvailableStatuses()
+    {
+        return Status::select('id', 'status_code', 'status_label')
+            ->orderBy('status_label')
+            ->get();
     }
 
 }

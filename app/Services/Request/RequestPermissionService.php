@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Request;
 
 use App\Models\Request;
 use App\Models\User;
@@ -17,7 +17,7 @@ class RequestPermissionService
     /**
      * Get all permissions for a request for the current authenticated user.
      */
-    public function getActionsForRequest(Request $request, ?User $user = null): array
+    public function getPermissions(Request $request, ?User $user = null): array
     {
         $user = $user ?? auth()->user();
 
@@ -100,7 +100,7 @@ class RequestPermissionService
     public function hasAnyPermission(Request $request, ?User $user = null): bool
     {
         $permissions = $this->getActionsForRequest($request, $user);
-        
+
         return collect($permissions)->contains(true);
     }
 
@@ -132,7 +132,7 @@ class RequestPermissionService
     public function authorize(string $action, Request $request, ?User $user = null): bool
     {
         $user = $user ?? auth()->user();
-        
+
         return match($action) {
             'view' => $this->policy->view($user, $request),
             'update', 'edit' => $this->policy->update($user, $request),

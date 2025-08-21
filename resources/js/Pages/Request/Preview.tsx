@@ -1,14 +1,13 @@
 import React, {useState} from 'react';
 import {Head, usePage, Link} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import {OCDRequest, OCDRequestGrid, RequestOffer} from '@/types';
+import {OCDRequest, RequestOffer} from '@/types';
 import OfferSection from '@/components/features/request/OfferSection';
 import XHRAlertDialog from '@/components/dialogs/XHRAlertDialog';
 
 
 export default function ShowRequest() {
     const OcdRequest = usePage().props.request as OCDRequest;
-    const RequestPageDetails = usePage().props.requestDetail as OCDRequestGrid;
     const OcdRequestOffer = usePage().props.offer as RequestOffer;
     const [clarificationOpen, setClarificationOpen] = useState(false);
     const [AcceptOfferOpen, setAcceptOfferOpen] = useState(false);
@@ -35,7 +34,7 @@ export default function ShowRequest() {
             {/* Actions */}
             <div className="mt-8 flex space-x-4">
 
-
+{/*
                 {RequestPageDetails.actions.canRequestClarificationForOffer && (
                     <>
                         <XHRAlertDialog
@@ -53,7 +52,7 @@ export default function ShowRequest() {
                             Request clarification from IOC
                         </button>
                     </>
-                )}
+                )}*/}
 
             </div>
 

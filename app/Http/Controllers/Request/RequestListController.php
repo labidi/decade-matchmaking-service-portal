@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Request;
 
+use App\Http\Resources\RequestResource;
+use App\Services\Request\RequestPermissionService;
+use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -10,37 +13,36 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RequestListController extends BaseRequestController
 {
+    public function __construct(
+        private readonly  RequestPermissionService $permissionService,
+        RequestService $service
+    )
+    {
+        parent::__construct($service);
+    }
+
     /**
      * Display requests list - unified method for both admin and user contexts
      */
     public function list(Request $httpRequest): Response
     {
         $filters = $this->buildFilters($httpRequest);
+        // Admin view - all requests
+        $requests = $this->service->getPaginatedRequests($filters['search'], $filters['sort']);
 
-        if ($this->isAdminRoute()) {
-            // Admin view - all requests
-            $requests = $this->service->getPaginatedRequests($filters['search'], $filters['sort']);
-            $this->applyPaginationParams($requests, $httpRequest);
+        $requests->setCollection($requests->getCollection()->transform(function ($request) {
+            $permissions = $this->permissionService->getPermissions($request, auth()->user());
+            return RequestResource::withPermissions($request, $permissions);
+        }));
 
-            $viewData = $this->getListViewData('Requests', $requests, $filters);
-
-            return Inertia::render($this->getViewPrefix() . 'Request/List', $viewData);
-        }
-
-        // User view - their own requests
-        $requests = $this->service->getUserRequests($httpRequest->user(), $filters['search'], $filters['sort']);
-        $this->applyPaginationParams($requests, $httpRequest);
-
-        $viewData = $this->getListViewData('My requests', $requests, $filters, [
-            'banner' => [
-                'title' => 'List of my requests',
-                'description' => 'Manage your requests here.',
-                'image' => '/assets/img/sidebar.png',
-            ],
-            'routeName' => 'request.me.list',
+        return Inertia::render($this->getViewPrefix() . 'Request/List', [
+            'title' => "Requests",
+            'requests' => $requests,
+            'currentSort' => $filters['current']['sort'],
+            'currentSearch' => $filters['current']['search'],
+            'breadcrumbs' => $this->buildContextualRequestBreadcrumbs('list'),
+            'availableStatuses' => $this->service->getAvailableStatuses(),
         ]);
-
-        return Inertia::render('Request/List', $viewData);
     }
 
     /**
@@ -50,7 +52,11 @@ class RequestListController extends BaseRequestController
     {
         $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getUserRequests($httpRequest->user(), $filters['search'], $filters['sort']);
-        $this->applyPaginationParams($requests, $httpRequest);
+
+        $requests->setCollection($requests->getCollection()->transform(function ($request) {
+            $permissions = $this->permissionService->getPermissions($request, auth()->user());
+            return RequestResource::withPermissions($request, $permissions);
+        }));
 
         return Inertia::render('Request/List', [
             'title' => 'My requests',
@@ -77,6 +83,10 @@ class RequestListController extends BaseRequestController
     {
         $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getPublicRequests($filters['search'], $filters['sort']);
+        $requests->setCollection($requests->getCollection()->transform(function ($request) {
+            $permissions = $this->permissionService->getPermissions($request, auth()->user());
+            return RequestResource::withPermissions($request, $permissions);
+        }));
 
         return Inertia::render('Request/List', [
             'title' => 'View Request for Training workshops',
@@ -98,15 +108,7 @@ class RequestListController extends BaseRequestController
                     'name' => 'Requests for Training & workshops',
                     'url' => route('request.list')
                 ],
-            ],
-            'grid.actions' => [
-                'canEdit' => false,
-                'canDelete' => false,
-                'canView' => true,
-                'canCreate' => false,
-                'canExpressInterest' => true,
-                'canPreview' => true,
-            ],
+            ]
         ]);
     }
 
@@ -117,7 +119,10 @@ class RequestListController extends BaseRequestController
     {
         $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getMatchedRequests($httpRequest->user(), $filters['search'], $filters['sort']);
-
+        $requests->setCollection($requests->getCollection()->transform(function ($request) {
+            $permissions = $this->permissionService->getPermissions($request, auth()->user());
+            return RequestResource::withPermissions($request, $permissions);
+        }));
         return Inertia::render('Request/List', [
             'title' => 'View my matched requests',
             'banner' => [
@@ -132,14 +137,7 @@ class RequestListController extends BaseRequestController
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
                 ['name' => 'My matched Requests', 'url' => route('request.list')],
-            ],
-            'grid.actions' => [
-                'canEdit' => false,
-                'canDelete' => false,
-                'canView' => true,
-                'canCreate' => false,
-                'canExpressInterest' => false,
-            ],
+            ]
         ]);
     }
 

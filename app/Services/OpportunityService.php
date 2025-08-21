@@ -7,11 +7,9 @@ use App\Models\Opportunity;
 use App\Models\User;
 use App\Services\Opportunity\EnhancerService;
 use App\Services\Opportunity\OpportunityAnalyticsService;
-use App\Services\Opportunity\OpportunityQueryBuilder;
 use App\Services\Opportunity\OpportunityRepository;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,8 +18,7 @@ class OpportunityService
 {
     public function __construct(
         private readonly OpportunityRepository $repository,
-        private readonly OpportunityAnalyticsService $analytics,
-        private readonly OpportunityQueryBuilder $queryBuilder
+        private readonly OpportunityAnalyticsService $analytics
     ) {
     }
 
@@ -44,11 +41,7 @@ class OpportunityService
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        $query = $this->queryBuilder->buildUserOpportunitiesQuery($user->id);
-        $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
-        $query = $this->queryBuilder->applySorting($query, $sortFilters);
-        
-        $opportunities = $this->queryBuilder->applyPagination($query, $sortFilters);
+        $opportunities = $this->repository->getUserOpportunitiesPaginated($user, $searchFilters, $sortFilters);
         $opportunities->getCollection()->transform(function ($opportunity) {
             // Enhance opportunity data if needed
             return EnhancerService::enhanceOpportunity($opportunity);
@@ -61,11 +54,7 @@ class OpportunityService
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        $query = $this->queryBuilder->buildBaseQuery();
-        $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
-        $query = $this->queryBuilder->applySorting($query, $sortFilters);
-        
-        $opportunities = $this->queryBuilder->applyPagination($query, $sortFilters);
+        $opportunities = $this->repository->getPaginated($searchFilters, $sortFilters);
         $opportunities->getCollection()->transform(function ($opportunity) {
             // Enhance opportunity data if needed
             return EnhancerService::enhanceOpportunity($opportunity);
@@ -80,11 +69,7 @@ class OpportunityService
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        $query = $this->queryBuilder->buildActiveOpportunitiesQuery();
-        $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
-        $query = $this->queryBuilder->applySorting($query, $sortFilters);
-        
-        $opportunities = $this->queryBuilder->applyPagination($query, $sortFilters);
+        $opportunities = $this->repository->getActiveOpportunitiesPaginated($searchFilters, $sortFilters);
         $opportunities->getCollection()->transform(function ($opportunity) {
             // Enhance opportunity data if needed
             return EnhancerService::enhanceOpportunity($opportunity);
@@ -179,14 +164,6 @@ class OpportunityService
      */
     public function searchOpportunities(array $filters, User $user): Collection
     {
-        // Handle public opportunities filter (exclude user's own opportunities)
-        if (!empty($filters['public'])) {
-            $query = $this->queryBuilder->buildPublicOpportunitiesQuery($user->id);
-        } else {
-            $query = $this->queryBuilder->buildBaseQuery();
-        }
-        
-        $query = $this->queryBuilder->applySearchFilters($query, $filters);
-        return $query->orderBy('created_at', 'desc')->get();
+        return $this->repository->search($filters);
     }
 }

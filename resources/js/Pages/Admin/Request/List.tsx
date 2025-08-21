@@ -1,6 +1,6 @@
 import React from 'react';
-import { Head } from '@inertiajs/react';
-import { OCDRequestList, PaginationLinkProps, OCDRequestStatus } from '@/types';
+import {Head} from '@inertiajs/react';
+import {OCDRequestList, PaginationLinkProps, OCDRequestStatus} from '@/types';
 import { SidebarLayout } from '@/components/ui/layouts/sidebar-layout'
 import { RequestsDataTable } from "@/components/ui/data-table/requests/requests-data-table";
 import { adminColumns } from "@/components/ui/data-table/requests/column-configs";
@@ -35,18 +35,16 @@ interface RequestsListPageProps {
     availableStatuses: OCDRequestStatus[];
 }
 
+
 export default function RequestListPage({requests, currentSort, currentSearch = {}, availableStatuses}: Readonly<RequestsListPageProps>) {
     const {
         isStatusDialogOpen,
         selectedRequest,
         closeStatusDialog,
         getActionsForRequest,
-    } = useRequestActions();
-    
-    // Wrapper to pass available statuses to each request
-    const getActionsForRequestWithStatuses = (request: any) => {
-        return getActionsForRequest(request, undefined, availableStatuses);
-    };
+        availableStatuses: dialogStatuses,
+    } = useRequestActions('admin');
+
     return (
         <SidebarLayout>
             <Head title="Requests List"/>
@@ -63,7 +61,7 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     currentSearch={currentSearch}
                     columns={adminColumns}
                     routeName="admin.request.list"
-                    getActionsForRequest={getActionsForRequestWithStatuses}
+                    getActionsForRequest={(request) => getActionsForRequest(request, availableStatuses)}
                     pagination={{
                         current_page: requests.current_page,
                         last_page: requests.last_page,
@@ -92,13 +90,12 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     showActions={true}
                 />
             </div>
-
-            {/* UpdateStatusDialog - Single dialog for all rows */}
+            
             <UpdateStatusDialog
                 isOpen={isStatusDialogOpen}
                 onClose={closeStatusDialog}
                 request={selectedRequest}
-                availableStatuses={availableStatuses}
+                availableStatuses={dialogStatuses.length > 0 ? dialogStatuses : availableStatuses}
             />
         </SidebarLayout>
     );

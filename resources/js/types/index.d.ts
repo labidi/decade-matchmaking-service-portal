@@ -87,12 +87,6 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
-export interface Banner {
-    title: string;
-    description: string;
-    image: string;
-}
-
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
@@ -101,22 +95,10 @@ export type PageProps<
     };
 };
 
-export interface YoutubeEmbed {
-    title: string;
-    src: string;
-}
-
 export interface PortalGuide {
     url: string;
 }
 
-export interface OCDMetrics {
-    number_successful_matches: number;
-    number_fully_closed_matches: number;
-    number_user_requests_in_implementation: number;
-    committed_funding_amount: number;
-    number_of_open_partner_opportunities: number;
-}
 
 export interface Document {
     id: number;
@@ -142,6 +124,7 @@ export interface RequestOffer {
     status_label: string;
     created_at: string;
     updated_at: string;
+    is_accepted: boolean;
     can_edit: boolean;
     can_view: boolean;
     can_delete: boolean;
@@ -173,7 +156,6 @@ export interface OCDRequest {
     id: number;
     type: string;
     submission_date: string;
-    status: OCDRequestStatus,
     detail: {
         id: string;
         is_related_decade_action: 'Yes' | 'No';
@@ -215,13 +197,13 @@ export interface OCDRequest {
         target_languages_other: string;
     }
     created_at: string;
-    matched_partner_id: string | null;
-    status_id: string;
     user_id: string;
+    status: OCDRequestStatus,
     user: User;
     offers?: RequestOfferList
     active_offer?: RequestOffer;
     permissions: RequestPermissions;
+    matched_partner?: User;
 }
 
 export type OCDRequestList = OCDRequest[];
