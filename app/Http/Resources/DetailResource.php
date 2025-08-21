@@ -26,56 +26,56 @@ class DetailResource extends JsonResource
         $requestOwner = $this->resource->request?->user;
         $isOwner = $currentUser && $requestOwner && $currentUser->id === $requestOwner->id;
         $isAdmin = $currentUser && $currentUser->is_admin;
-        
+
         // Determine if user has full access (owner or admin)
         $hasFullAccess = $isOwner || $isAdmin;
 
         // Public attributes - always visible
         $publicAttributes = [
             'capacity_development_title' => $this->capacity_development_title,
-            'related_activity' => $this->related_activity,
-            'delivery_format' => $this->delivery_format,
+            'support_months' => $this->support_months,
             'subthemes' => $this->transformEnumArray($this->subthemes),
             'subthemes_other' => $this->subthemes_other,
+            'related_activity' => $this->related_activity,
             'support_types' => $this->transformEnumArray($this->support_types),
             'support_types_other' => $this->support_types_other,
+            'delivery_format' => $this->delivery_format,
+            'delivery_countries' => $this->transformEnumArray($this->delivery_countries),
             'target_audience' => $this->transformEnumArray($this->target_audience),
             'target_audience_other' => $this->target_audience_other,
-            'target_languages' => $this->transformEnumArray($this->target_languages),
-            'target_languages_other' => $this->target_languages_other,
-            'delivery_countries' => $this->transformEnumArray($this->delivery_countries),
             'gap_description' => $this->gap_description,
-            'support_months' => $this->support_months,
-            'completion_date' => $this->completion_date?->format('Y-m-d'),
-            'expected_outcomes' => $this->expected_outcomes,
-            'success_metrics' => $this->success_metrics,
-            'long_term_impact' => $this->long_term_impact,
-            'project_stage' => $this->project_stage,
-            'project_url' => $this->project_url,
         ];
 
         // Private attributes - only for owner or admin
         if ($hasFullAccess) {
             $privateAttributes = [
-                'is_related_decade_action' => $this->is_related_decade_action,
-                'unique_related_decade_action_id' => $this->unique_related_decade_action_id,
-                'first_name' => $this->first_name,
-                'last_name' => $this->last_name,
-                'email' => $this->email,
-                'has_significant_changes' => $this->has_significant_changes,
-                'changes_description' => $this->changes_description,
-                'change_effect' => $this->change_effect,
-                'request_link_type' => $this->request_link_type,
-                'has_partner' => $this->has_partner,
-                'partner_name' => $this->partner_name,
-                'partner_confirmed' => $this->partner_confirmed,
-                'needs_financial_support' => $this->needs_financial_support,
+                'additional_data' => $this->additional_data,
                 'budget_breakdown' => $this->budget_breakdown,
-                'risks' => $this->risks,
-                'personnel_expertise' => $this->personnel_expertise,
+                'change_effect' => $this->change_effect,
+                'changes_description' => $this->changes_description,
+                'completion_date' => $this->completion_date?->format('Y-m-d'),
                 'direct_beneficiaries' => $this->direct_beneficiaries,
                 'direct_beneficiaries_number' => $this->direct_beneficiaries_number,
-                'additional_data' => $this->additional_data,
+                'email' => $this->email,
+                'expected_outcomes' => $this->expected_outcomes,
+                'first_name' => $this->first_name,
+                'has_partner' => $this->has_partner,
+                'has_significant_changes' => $this->has_significant_changes,
+                'is_related_decade_action' => $this->is_related_decade_action,
+                'last_name' => $this->last_name,
+                'long_term_impact' => $this->long_term_impact,
+                'needs_financial_support' => $this->needs_financial_support,
+                'partner_confirmed' => $this->partner_confirmed,
+                'partner_name' => $this->partner_name,
+                'personnel_expertise' => $this->personnel_expertise,
+                'project_stage' => $this->project_stage,
+                'project_url' => $this->project_url,
+                'request_link_type' => $this->request_link_type,
+                'risks' => $this->risks,
+                'success_metrics' => $this->success_metrics,
+                'target_languages' => $this->transformEnumArray($this->target_languages),
+                'target_languages_other' => $this->target_languages_other,
+                'unique_related_decade_action_id' => $this->unique_related_decade_action_id,
             ];
 
             return array_merge($publicAttributes, $privateAttributes);
@@ -108,7 +108,7 @@ class DetailResource extends JsonResource
                 ];
             }
         }
-        
+
         return $result;
     }
 }
