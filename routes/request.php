@@ -69,6 +69,9 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
+    Route::post('request/{id}/update-status', [RequestManagementController::class, 'updateStatus'])->name(
+        'admin.request.update-status'
+    );
     Route::get('request/list', [RequestListController::class, 'list'])->name('admin.request.list');
     Route::get('request/{id}/show', [ViewController::class, 'show'])->name('admin.request.show');
     Route::get('request/export/csv', [RequestListController::class, 'exportCsv'])->name('admin.request.export.csv');

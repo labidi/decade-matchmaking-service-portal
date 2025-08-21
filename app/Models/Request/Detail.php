@@ -2,7 +2,13 @@
 
 namespace App\Models\Request;
 
+use App\Enums\Common\Country;
+use App\Enums\Common\Language;
+use App\Enums\Common\TargetAudience;
+use App\Enums\Request\SubTheme;
+use App\Enums\Request\SupportType;
 use App\Models\Request;
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -53,62 +59,25 @@ class Detail extends Model
         'additional_data'
     ];
 
-    protected $casts = [
-        'subthemes' => 'array',
-        'support_types' => 'array',
-        'target_audience' => 'array',
-        'target_languages' => 'array',
-        'additional_data' => 'array',
-        'support_months' => 'integer',
-        'direct_beneficiaries_number' => 'integer',
-        'completion_date' => 'datetime:Y-m-d',
-        'delivery_countries' => 'array',
-    ];
+
+    protected function casts(): array
+    {
+        return [
+            'subthemes' => AsEnumArrayObject::of(SubTheme::class),
+            'support_types' => AsEnumArrayObject::of(SupportType::class),
+            'target_audience' => AsEnumArrayObject::of(TargetAudience::class),
+            'target_languages' => AsEnumArrayObject::of(Language::class),
+            'additional_data' => 'array',
+            'support_months' => 'integer',
+            'direct_beneficiaries_number' => 'integer',
+            'completion_date' => 'datetime:Y-m-d',
+            'delivery_countries' => AsEnumArrayObject::of(Country::class),
+        ];
+    }
 
     public function request(): BelongsTo
     {
         return $this->belongsTo(Request::class);
     }
 
-
-
-    /**
-     * Get full name of the requester
-     */
-    public function getFullNameAttribute(): string
-    {
-        return trim($this->first_name . ' ' . $this->last_name);
-    }
-
-    /**
-     * Scope for searching by full-text search
-     */
-    public function scopeSearch($query, string $searchTerm)
-    {
-        return $query->whereFullText(['capacity_development_title', 'gap_description', 'expected_outcomes'], $searchTerm);
-    }
-
-    /**
-     * Scope for filtering by activity type
-     */
-    public function scopeByActivityType($query, string $activityType)
-    {
-        return $query->where('related_activity', $activityType);
-    }
-
-    /**
-     * Scope for filtering by delivery format
-     */
-    public function scopeByDeliveryFormat($query, string $deliveryFormat)
-    {
-        return $query->where('delivery_format', $deliveryFormat);
-    }
-
-    /**
-     * Scope for filtering by financial support need
-     */
-    public function scopeNeedsFinancialSupport($query, bool $needsSupport = true)
-    {
-        return $query->where('needs_financial_support', $needsSupport ? 'Yes' : 'No');
-    }
 }
