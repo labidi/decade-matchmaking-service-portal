@@ -4,7 +4,6 @@ import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus, UIFie
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {Badge} from '@/components/ui/badge'
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
-import {formatDate} from '@/utils/date-formatter';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
 import { DropdownActions, Action } from '@/components/ui/data-table/common/dropdown-actions';

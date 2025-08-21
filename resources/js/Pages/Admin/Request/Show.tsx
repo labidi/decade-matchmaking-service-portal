@@ -4,8 +4,9 @@ import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {Head} from "@inertiajs/react";
 import {Heading} from "@/components/ui/heading";
 import RequestDetails from '@/components/ui/request/show/request-details';
-import { RequestActions } from '@/components/ui/data-table/requests/requests-actions-columns';
-
+import { DropdownActions, Action } from '@/components/ui/data-table/common/dropdown-actions';
+import {useRequestActions} from "@/hooks/useRequestActions";
+import {UpdateStatusDialog} from "@/components/ui/dialogs/UpdateStatusDialog";
 
 interface RequestShowPageProps {
     request: OCDRequest;
@@ -13,6 +14,13 @@ interface RequestShowPageProps {
 }
 
 export default function RequestShowPage({request, availableStatuses = []}: Readonly<RequestShowPageProps>) {
+    const {
+        isStatusDialogOpen,
+        selectedRequest,
+        closeStatusDialog,
+        getActionsForRequest,
+        availableStatuses: dialogStatuses,
+    } = useRequestActions('admin');
     return (
         <SidebarLayout>
             <Head title="Request Details"/>
@@ -24,10 +32,8 @@ export default function RequestShowPage({request, availableStatuses = []}: Reado
 
                     {/* Action Dropdown */}
                     <div className="flex-shrink-0">
-                        <RequestActions
-                            request={request}
-                            showViewDetails={false}
-                            availableStatuses={availableStatuses}
+                        <DropdownActions
+                            actions={getActionsForRequest(request)}
                         />
                     </div>
                 </div>
@@ -37,6 +43,13 @@ export default function RequestShowPage({request, availableStatuses = []}: Reado
             {request.detail && (
                 <RequestDetails request={request}/>
             )}
+
+            <UpdateStatusDialog
+                isOpen={isStatusDialogOpen}
+                onClose={closeStatusDialog}
+                request={selectedRequest}
+                availableStatuses={dialogStatuses.length > 0 ? dialogStatuses : availableStatuses}
+            />
         </SidebarLayout>
     )
 }

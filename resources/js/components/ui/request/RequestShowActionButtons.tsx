@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { router } from '@inertiajs/react';
 import { clsx } from 'clsx';
 import {
     CheckIcon,
@@ -10,6 +9,7 @@ import {
     DocumentTextIcon
 } from '@heroicons/react/16/solid';
 import {OCDRequest} from "@/types";
+import {RequestActionService} from '@/services/requestActionService';
 
 export interface RequestShowActionButtonsProps {
     request: OCDRequest;
@@ -29,40 +29,29 @@ export function RequestShowActionButtons({
 }: Readonly<RequestShowActionButtonsProps>) {
 
     const handleAcceptOffer = () => {
-        if (!request.active_offer) return;
-        router.post(route('offer.accept', {
-            id: request.active_offer.id,
-        }));
+        RequestActionService.acceptOffer(request);
     };
 
     const handleRequestClarifications = () => {
-        if (!request.active_offer) return;
-        router.post(route('request.request-clarifications', {
-            request: request.id,
-            offer: request.active_offer.id
-        }));
+        RequestActionService.requestClarifications(request);
     };
 
     const handleEdit = () => {
-        router.visit(route('request.edit', { id: request.id }));
+        RequestActionService.edit(request);
     };
 
     const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this request? This action cannot be undone.')) {
-            router.delete(route('request.destroy', { id: request.id }), {
-                onError: (errors) => {
-                    console.error('Error deleting request:', errors);
-                }
-            });
-        }
+        RequestActionService.delete(request, (errors: any) => {
+            console.error('Error deleting request:', errors);
+        });
     };
 
     const handleExportPdf = () => {
-        window.open(route('request.export-pdf', { id: request.id }), '_blank');
+        RequestActionService.exportPdf(request);
     };
 
     const handleViewOffers = () => {
-        router.visit(route('request.offers', { id: request.id }));
+        RequestActionService.viewOffers(request);
     };
 
     // Collect all available actions based on permissions
@@ -82,7 +71,7 @@ export function RequestShowActionButtons({
         );
     }
 
-    if (request.active_offer && request.permissions.can_request_clarifications) {
+    if (request.permissions.can_request_clarifications) {
         actions.push(
             <Button
                 key="request-clarifications"
@@ -124,6 +113,20 @@ export function RequestShowActionButtons({
         );
     }
 
+    // Always allow PDF export for request owners and admins
+    if (request.permissions.can_view) {
+        actions.push(
+            <Button
+                key="export-pdf"
+                outline
+                onClick={handleExportPdf}
+                className="flex items-center gap-2"
+            >
+                <DocumentTextIcon className="h-4 w-4" data-slot="icon" />
+                Export PDF
+            </Button>
+        );
+    }
 
     if (request.permissions.can_delete) {
         actions.push(

@@ -7,6 +7,7 @@ use App\Services\OfferService;
 use App\Events\OfferAccepted;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,52 +17,18 @@ class AcceptOfferController extends BaseOfferController
     /**
      * Accept an offer
      */
-    public function __invoke(Request $request, int $offerId): JsonResponse
+    public function __invoke(Request $request, int $offerId): RedirectResponse
     {
-        DB::beginTransaction();
-
         try {
             $user = $request->user();
-
-            // Get the offer with all necessary relationships
             $offer = $this->offerService->getOfferById($offerId);
-
-            // Check authorization - only request owner can accept offers for their request
-            if (!$offer->can_accept) {
-                return $this->jsonErrorResponse(
-                    'Unauthorized to accept this offer',
-                    'You can only accept offers for your own requests',
-                    403
-                );
-            }
-
-            // Validate that the offer can be accepted
-            if ($offer->is_accepted) {
-                return $this->jsonErrorResponse(
-                    'Offer already accepted',
-                    'This offer has already been accepted',
-                    400
-                );
-            }
-
-            // Accept the offer using the service
             $acceptedOffer = $this->offerService->acceptOffer($offer, $user);
-
-            // Fire the event
             event(new OfferAccepted($acceptedOffer, $user));
-
-            DB::commit();
-
-            return to_route(url()->previous())->with('success', 'Offer accepted successfully');
-
+            return to_route('request.show')->with('success', 'Offer accepted successfully');
         } catch (Exception $exception) {
-            DB::rollBack();
-
-            return $this->handleException(
-                $exception,
-                'accept offer',
-                ['offer_id' => $offerId]
-            );
+            return to_route('request.show', [
+                'id' => $offer->request->id,
+            ])->with('error', 'Failed to accept offer: ' . $exception->getMessage());
         }
     }
 }

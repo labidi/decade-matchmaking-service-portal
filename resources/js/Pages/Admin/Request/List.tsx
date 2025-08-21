@@ -90,7 +90,6 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     showActions={true}
                 />
             </div>
-            
             <UpdateStatusDialog
                 isOpen={isStatusDialogOpen}
                 onClose={closeStatusDialog}

@@ -1,8 +1,8 @@
 import {useState, useCallback} from 'react';
-import {router} from '@inertiajs/react';
 import {OCDRequest, OCDRequestStatus} from '@/types';
 import {Action} from '@/components/ui/data-table/common/dropdown-actions';
 import {UseRequestActionsReturn} from '@/types/request-actions';
+import {RequestActionService} from '@/services/requestActionService';
 
 
 
@@ -13,34 +13,29 @@ export function useRequestActions(context: 'admin' | 'user' = 'user'): UseReques
     const [isLoading, setIsLoading] = useState(false);
     const [availableStatuses, setAvailableStatuses] = useState<OCDRequestStatus[]>([]);
 
-    // Action handlers
+    // Action handlers using RequestActionService
     const handleViewDetails = useCallback((request: OCDRequest) => {
-        const routeName = context === 'admin' ? 'admin.request.show' : 'request.show';
-        router.visit(route(routeName, {id: request.id}));
+        RequestActionService.viewDetails(request, context);
     }, [context]);
 
     const handleEdit = useCallback((request: OCDRequest) => {
-        router.visit(route('request.edit', {id: request.id}));
-    }, [context]);
+        RequestActionService.edit(request);
+    }, []);
 
     const handleDelete = useCallback((request: OCDRequest) => {
-        if (confirm('Are you sure you want to delete this request?')) {
-            router.delete(route( 'request.destroy', {id: request.id}));
-        }
-    }, [context]);
+        RequestActionService.delete(request);
+    }, []);
 
     const handleManageOffers = useCallback((request: OCDRequest) => {
-        router.visit(route('admin.offer.list', {request: request.id}));
-    }, [context]);
+        RequestActionService.manageOffers(request);
+    }, []);
 
     const handleAcceptOffer = useCallback((request: OCDRequest) => {
-        if (request.active_offer) {
-            router.post(route('request.accept.offer', {id: request.id}));
-        }
+        RequestActionService.acceptOffer(request);
     }, []);
 
     const handleRequestClarifications = useCallback((request: OCDRequest) => {
-        router.post(route('request.clarification', {id: request.id}));
+        RequestActionService.requestClarifications(request);
     }, []);
 
     const handleUpdateStatus = useCallback((request: OCDRequest, statuses: OCDRequestStatus[] = []) => {
@@ -50,11 +45,11 @@ export function useRequestActions(context: 'admin' | 'user' = 'user'): UseReques
     }, []);
 
     const handleAddOffer = useCallback((request: OCDRequest) => {
-        router.visit(route('admin.offer.create', {request_id: request.id}));
+        RequestActionService.addOffer(request);
     }, []);
 
     const handleSeeOffers = useCallback((request: OCDRequest) => {
-        router.visit(route('admin.offer.list', {id: request.id}));
+        RequestActionService.viewOffers(request);
     }, []);
 
     // Dialog actions

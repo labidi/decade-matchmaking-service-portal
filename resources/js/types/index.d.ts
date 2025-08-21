@@ -1,5 +1,3 @@
-import {RequestForm} from "@/components/forms/UIRequestForm";
-
 export interface UIField {
     id: string;
     type: string;
@@ -71,7 +69,6 @@ export interface UserWithRoles extends User {
     roles: Role[];
 }
 
-export type UserWithRolesList = UserWithRoles[];
 
 export interface Auth {
     user: User;
@@ -112,8 +109,6 @@ export interface Document {
     created_at: string;
     updated_at: string;
 }
-
-export type DocumentList = Document[];
 
 export interface RequestOffer {
     id: number;
@@ -208,11 +203,6 @@ export interface OCDRequest {
 
 export type OCDRequestList = OCDRequest[];
 
-export interface OpportunityStatus {
-    label: string;
-    code: string;
-}
-
 export interface Opportunity {
     id: string;
     title: string;
@@ -261,7 +251,6 @@ export interface UserNotificationPreference {
     updated_at: string;
 }
 
-export type UserNotificationPreferenceList = UserNotificationPreference[];
 
 // Common form options interface for consistent structure across forms
 export interface RequestFormOptions {
@@ -299,8 +288,6 @@ export interface NotificationPreferencesPageProps extends PageProps {
     availableOptions: Record<string, Array<{value: string, label: string}>>;
     attributeTypes: Record<string, string>; // e.g., {'subtheme': 'Subtheme', 'coverage_activity': 'Coverage Activity'}
 }
-
-export type OpportunityTypeOptions = Record<string, string>;
 
 export interface Settings {
     site_name: string;
