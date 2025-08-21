@@ -116,16 +116,6 @@ class RequestRepository
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
-    /**
-     * Search requests with filters
-     */
-    public function search(array $filters): Collection
-    {
-        $query = OCDRequest::with(['status', 'detail']);
-        $query = $this->queryBuilder->applySearchFilters($query, $filters);
-
-        return $query->orderBy('created_at', 'desc')->get();
-    }
 
     /**
      * Get status by code

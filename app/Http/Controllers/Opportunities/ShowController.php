@@ -10,7 +10,7 @@ use Inertia\Response;
 
 class ShowController extends BaseOpportunitiesController
 {
-    public function __construct(private OpportunityService $opportunityService)
+    public function __construct(private readonly OpportunityService $opportunityService)
     {
     }
 

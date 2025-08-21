@@ -11,8 +11,8 @@ import {
     UserNotificationPreference
 } from '@/types';
 import { PlusIcon, BellIcon, EnvelopeIcon } from '@heroicons/react/16/solid';
-import PreferencesList from './Components/PreferencesList';
-import AddPreferenceForm from './Components/AddPreferenceForm';
+import PreferencesList from '@/components/features/user/PreferencesList';
+import AddPreferenceForm from '@/components/features/user/AddPreferenceForm';
 
 export default function NotificationPreferences({
     preferences,

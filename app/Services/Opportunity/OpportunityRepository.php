@@ -2,13 +2,18 @@
 
 namespace App\Services\Opportunity;
 
-use App\Enums\OpportunityStatus;
+use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class OpportunityRepository
 {
+    public function __construct(
+        private readonly OpportunityQueryBuilder $queryBuilder
+    ) {
+    }
     /**
      * Create a new opportunity
      */
@@ -16,7 +21,7 @@ class OpportunityRepository
     {
         $opportunity = new Opportunity($data);
         $opportunity->user_id = $user->id;
-        $opportunity->status = OpportunityStatus::PENDING_REVIEW;
+        $opportunity->status = Status::PENDING_REVIEW;
         $opportunity->save();
 
         return $opportunity;
@@ -45,7 +50,7 @@ class OpportunityRepository
      */
     public function getPublicOpportunities(): Collection
     {
-        return Opportunity::where('status', OpportunityStatus::ACTIVE)
+        return Opportunity::where('status', Status::ACTIVE)
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -75,9 +80,57 @@ class OpportunityRepository
 
         return [
             'total' => $opportunities->count(),
-            'active' => $opportunities->where('status', OpportunityStatus::ACTIVE)->count(),
-            'pending' => $opportunities->where('status', OpportunityStatus::PENDING_REVIEW)->count(),
-            'closed' => $opportunities->where('status', OpportunityStatus::CLOSED)->count(),
+            'active' => $opportunities->where('status', Status::ACTIVE)->count(),
+            'pending' => $opportunities->where('status', Status::PENDING_REVIEW)->count(),
+            'closed' => $opportunities->where('status', Status::CLOSED)->count(),
         ];
+    }
+
+    /**
+     * Get paginated opportunities with search and sorting
+     */
+    public function getPaginated(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    {
+        $query = $this->queryBuilder->buildBaseQuery();
+        $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
+        $query = $this->queryBuilder->applySorting($query, $sortFilters);
+        return $this->queryBuilder->applyPagination($query, $sortFilters);
+    }
+
+    /**
+     * Get user's opportunities paginated
+     */
+    public function getUserOpportunitiesPaginated(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        $query = $this->queryBuilder->buildUserOpportunitiesQuery($user->id);
+        $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
+        $query = $this->queryBuilder->applySorting($query, $sortFilters);
+        return $this->queryBuilder->applyPagination($query, $sortFilters);
+    }
+
+    /**
+     * Get active opportunities paginated
+     */
+    public function getActiveOpportunitiesPaginated(
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        $query = $this->queryBuilder->buildActiveOpportunitiesQuery();
+        $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
+        $query = $this->queryBuilder->applySorting($query, $sortFilters);
+        return $this->queryBuilder->applyPagination($query, $sortFilters);
+    }
+
+    /**
+     * Search opportunities with filters
+     */
+    public function search(array $filters): Collection
+    {
+        $query = $this->queryBuilder->buildBaseQuery();
+        $query = $this->queryBuilder->applySearchFilters($query, $filters);
+        return $query->orderBy('created_at', 'desc')->get();
     }
 }

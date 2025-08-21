@@ -1,6 +1,6 @@
 import {useForm} from '@inertiajs/react';
 import {useEffect, useState} from 'react';
-import {UIOpportunityForm} from '@/Forms/UIOpportunityForm';
+import {UIOpportunityForm} from '@/components/forms/UIOpportunityForm';
 import {Opportunity, FormOptions} from '@/types';
 
 export function useOpportunityForm(opportunity?: Opportunity, formOptions?: FormOptions) {

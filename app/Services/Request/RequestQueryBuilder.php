@@ -45,7 +45,7 @@ class RequestQueryBuilder
     public function applySorting(Builder $query, array $sortFilters): Builder
     {
         if (!empty($sortFilters['field']) && !empty($sortFilters['order'])) {
-            if ($sortFilters['field'] === 'user_id') {
+            if ($sortFilters['field'] === 'user') {
                 $query->join('users', 'requests.user_id', '=', 'users.id')
                     ->orderBy('users.name', $sortFilters['order'])
                     ->select('requests.*');
@@ -71,7 +71,7 @@ class RequestQueryBuilder
     public function applyPagination(Builder $query, array $sortFilters): LengthAwarePaginator
     {
         $perPage = $sortFilters['per_page'] ?? 10;
-        return $query->paginate($perPage);
+        return $query->paginate($perPage)->withQueryString();
     }
 
     /**

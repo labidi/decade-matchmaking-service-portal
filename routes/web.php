@@ -1,12 +1,10 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\NotificationsController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\LocationDataController;
-use App\Http\Controllers\Offer\PartnersListController;
 use App\Http\Controllers\UserGuideController;
 use Illuminate\Support\Facades\Route;
 
@@ -59,13 +57,6 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
 Route::prefix('guide')->group(function () {
     Route::get('platform-guide.pdf', [UserGuideController::class, 'download'])->name('user.guide');
 });
-
-// Location data routes
-Route::get('api/location-data', [LocationDataController::class, 'index'])->name('api.location-data');
-Route::get(
-    'api/location-data/implementation/{coverageActivity}',
-    [LocationDataController::class, 'getImplementationLocationOptions']
-)->name('api.location-data.implementation');
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/request.php';

@@ -19,47 +19,20 @@ export interface RequestActionsConfig {
     showUpdateStatus?: boolean;
     /** Whether to show offer-related actions */
     showOfferActions?: boolean;
+    /** Whether to show frontend-specific actions (accept offer, request clarifications, etc.) */
+    showFrontendActions?: boolean;
     /** Custom context for action generation */
     context?: 'list' | 'show' | 'modal';
     /** Additional custom actions to include */
     customActions?: RequestAction[];
 }
 
-export interface RequestActionsProviderProps {
-    request: OCDRequest;
-    config?: RequestActionsConfig;
-    availableStatuses?: OCDRequestStatus[];
-    onStatusUpdate?: (request: OCDRequest) => void;
-    children: (actions: RequestAction[]) => React.ReactNode;
-}
-
-export interface RequestActionButtonsProps {
-    request: OCDRequest;
-    config?: RequestActionsConfig;
-    availableStatuses?: OCDRequestStatus[];
-    onStatusUpdate?: (request: OCDRequest) => void;
-    layout?: 'horizontal' | 'vertical' | 'dropdown';
-    className?: string;
-    buttonSize?: 'sm' | 'md' | 'lg';
-}
-
-// Action types that can be performed on requests
-export type RequestActionType = 
-    | 'view-details'
-    | 'update-status'
-    | 'add-offer'
-    | 'see-offers'
-    | 'edit'
-    | 'delete'
-    | 'duplicate'
-    | 'export';
-
 // Permission context for building actions
 export interface RequestActionContext {
     request: OCDRequest;
     auth: Auth;
     permissions?: {
-        canView?: boolean;
+        can_view?: boolean;
         canUpdateStatus?: boolean;
         canManageOffers?: boolean;
         canEdit?: boolean;
@@ -69,12 +42,6 @@ export interface RequestActionContext {
     };
 }
 
-// Handler function type for each action
-export type RequestActionHandler = (
-    request: OCDRequest,
-    context?: RequestActionContext
-) => void | Promise<void>;
-
 // Hook return type
 export interface UseRequestActionsReturn {
     // State
@@ -82,18 +49,11 @@ export interface UseRequestActionsReturn {
     selectedRequest: OCDRequest | null;
     isLoading: boolean;
     availableStatuses: OCDRequestStatus[];
-    
+
     // Actions
     closeStatusDialog: () => void;
     getActionsForRequest: (
         request: OCDRequest,
-        customPermissions?: RequestActionContext['permissions'],
         customAvailableStatuses?: OCDRequestStatus[]
     ) => Action[];
-    
-    // Direct handlers (optional, for custom usage)
-    handleUpdateStatus: (request: OCDRequest, statuses?: OCDRequestStatus[]) => void;
-    handleViewDetails: (request: OCDRequest) => void;
-    handleAddOffer: (request: OCDRequest) => void;
-    handleSeeOffers: (request: OCDRequest) => void;
 }

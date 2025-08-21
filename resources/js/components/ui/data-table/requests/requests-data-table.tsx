@@ -20,13 +20,11 @@ interface PaginationData {
     total: number;
 }
 
-type SortField = 'id' | 'created_at' | 'status_id' | 'user_id';
-
 interface TableColumn {
     key: string;
     label: string;
     sortable?: boolean;
-    sortField?: SortField;
+    sortField?: string;
     render: (request: OCDRequest) => React.ReactNode;
     className?: string;
     headerClassName?: string;
@@ -41,7 +39,7 @@ interface RequestsDataTableProps {
     currentSearch?: Record<string, string>;
     pagination?: PaginationData;
     searchFields?: UIField[];
-    columns?: TableColumn[];
+    columns: TableColumn[];
     routeName?: string;
     getActionsForRequest: (request: OCDRequest) => Action[];
     showSearch?: boolean;
@@ -94,7 +92,7 @@ export function RequestsDataTable({
                                       showActions = true
                                   }: Readonly<RequestsDataTableProps>) {
 
-    const handleSort = (field: SortField) => {
+    const handleSort = (field: string) => {
         const newOrder = currentSort.field === field && currentSort.order === 'asc' ? 'desc' : 'asc';
         router.get(route(routeName), {
             sort: field,
@@ -105,55 +103,9 @@ export function RequestsDataTable({
         });
     };
 
-    // Default columns for admin interface
-    const defaultColumns: TableColumn[] = [
-        {
-            key: 'id',
-            label: 'ID',
-            sortable: true,
-            sortField: 'id',
-            render: (request) => (
-                <span className="font-medium">{request.id}</span>
-            )
-        },
-        {
-            key: 'title',
-            label: 'Title',
-            render: (request) => (
-                <span>{request.detail.capacity_development_title || 'No Title'}</span>
-            )
-        },
-        {
-            key: 'user',
-            label: 'Submitted By',
-            sortable: true,
-            sortField: 'user_id',
-            render: (request) => (
-                <span>{request.user.name}</span>
-            )
-        },
-        {
-            key: 'created_at',
-            label: 'Submitted At',
-            sortable: true,
-            sortField: 'created_at',
-            render: (request) => (
-                <span className="text-zinc-500">{formatDate(request.created_at)}</span>
-            )
-        },
-        {
-            key: 'status',
-            label: 'Status',
-            sortable: true,
-            sortField: 'status_id',
-            render: (request) => statusBadgeRenderer(request.status)
-        }
-    ];
-
-    const activeColumns = columns || defaultColumns;
 
     // Helper Functions
-    const getSortIcon = (field: SortField) => {
+    const getSortIcon = (field: string) => {
         if (currentSort.field !== field) {
             return <ChevronDownIcon className="size-4 opacity-50"/>;
         }
@@ -161,7 +113,7 @@ export function RequestsDataTable({
             ? <ChevronUpIcon className="size-4"/>
             : <ChevronDownIcon className="size-4"/>;
     };
-    const totalColumns = activeColumns.length + (showActions ? 1 : 0);
+    const totalColumns = columns.length + (showActions ? 1 : 0);
 
     return (
         <>
@@ -177,7 +129,7 @@ export function RequestsDataTable({
             <Table>
                 <TableHead className="text-lg">
                     <TableRow>
-                        {activeColumns.map((column) => (
+                        {columns.map((column) => (
                             <TableHeader key={column.key} className={column.headerClassName}>
                                 {column.sortable && column.sortField ? (
                                     <button
@@ -208,7 +160,7 @@ export function RequestsDataTable({
                     ) : (
                         requests.map((request) => (
                             <TableRow key={request.id}>
-                                {activeColumns.map((column) => (
+                                {columns.map((column) => (
                                     <TableCell key={column.key} className={column.className}>
                                         {column.render(request)}
                                     </TableCell>

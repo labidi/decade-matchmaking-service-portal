@@ -1,6 +1,24 @@
 import {usePage} from '@inertiajs/react';
-import {Banner, YoutubeEmbed, OCDMetrics} from '@/types';
 import YouTube from 'react-youtube';
+
+export interface Banner {
+    title: string;
+    description: string;
+    image: string;
+}
+
+export interface OCDMetrics {
+    number_successful_matches: number;
+    number_fully_closed_matches: number;
+    number_user_requests_in_implementation: number;
+    committed_funding_amount: number;
+    number_of_open_partner_opportunities: number;
+}
+
+export interface YoutubeEmbed {
+    title: string;
+    src: string;
+}
 
 interface BannerSectionProps {
     bannerConfiguration?: Banner;

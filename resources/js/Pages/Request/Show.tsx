@@ -1,51 +1,23 @@
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
+import OfferDetailsSection from '@/components/ui/request/show/offer-details-section';
 import React from 'react';
 import RequestDetails from '@/components/ui/request/show/request-details';
-import OfferDetailsSection from '@/components/ui/request/show/offer-details-section';
-import {Head, router} from '@inertiajs/react';
-import {OCDRequest, OCDRequestGrid, RequestOffer} from '@/types';
+import {Head} from '@inertiajs/react';
 import {Heading} from "@/components/ui/heading";
-import {Button} from '@/components/ui/button';
+import {OCDRequest, PageProps, RequestOffer} from '@/types';
+import {RequestShowActionButtons} from '@/components/ui/request/RequestShowActionButtons';
 
-interface ShowRequestProps {
+interface ShowRequestProps extends PageProps<{
     request: OCDRequest;
-    requestDetail: OCDRequestGrid;
     activeOffer?: RequestOffer;
-    canManageOfferResponse?: boolean;
+}> {
 }
 
-export default function ShowRequest({request, requestDetail, activeOffer, canManageOfferResponse}: Readonly<ShowRequestProps>) {
-    const handleAcceptOffer = () => {
-        if (!activeOffer) return;
-
-        router.post(route('request.accept-offer', {
-            request: request.id,
-            offer: activeOffer.id
-        }), {}, {
-            onSuccess: () => {
-                // Handle success if needed
-            },
-            onError: (errors) => {
-                console.error('Error accepting offer:', errors);
-            }
-        });
-    };
-
-    const handleRequestClarifications = () => {
-        if (!activeOffer) return;
-
-        router.post(route('request.request-clarifications', {
-            request: request.id,
-            offer: activeOffer.id
-        }), {}, {
-            onSuccess: () => {
-                // Handle success if needed
-            },
-            onError: (errors) => {
-                console.error('Error requesting clarifications:', errors);
-            }
-        });
-    };
+export default function ShowRequest({
+                                        auth,
+                                        request,
+                                        activeOffer,
+                                    }: Readonly<ShowRequestProps>) {
 
     return (
         <FrontendLayout>
@@ -57,25 +29,15 @@ export default function ShowRequest({request, requestDetail, activeOffer, canMan
 
             {/* Display offer details if there's an active offer */}
             {activeOffer && (
-                <OfferDetailsSection offer={activeOffer} />
+                <OfferDetailsSection offer={activeOffer}/>
             )}
 
-            {/* Conditional offer response buttons */}
+            {/* Dynamic action buttons based on permissions */}
 
-                <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <Button
-                        color="green"
-                        onClick={handleAcceptOffer}
-                    >
-                        Accept Offer
-                    </Button>
-                    <Button
-                        outline
-                        onClick={handleRequestClarifications}
-                    >
-                        Request clarifications from IOC
-                    </Button>
-                </div>
+            <RequestShowActionButtons
+                request={request}
+                auth={auth}
+            />
 
         </FrontendLayout>
     );

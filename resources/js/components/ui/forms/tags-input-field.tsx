@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import TagsInput from '@/Components/ui/TagsInput';
+import TagsInput from '@/components/ui/TagsInput';
 import {UIField} from '@/types';
 
 interface TagsInputFieldProps {

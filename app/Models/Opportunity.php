@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\Common\TargetAudience;
+use App\Enums\Opportunity\Status;
+use App\Enums\Opportunity\Type;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\User;
-use App\Models\LocationData;
-use App\Enums\TargetAudience;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Enums\OpportunityStatus;
-use App\Enums\OpportunityType;
 
 
 class Opportunity extends Model
@@ -27,23 +24,23 @@ class Opportunity extends Model
     protected function casts(): array
     {
         return [
-            'type'=>OpportunityType::class,
-            'status' => OpportunityStatus::class,
+            'type'=>Type::class,
+            'status' => Status::class,
             'implementation_location' => 'array',
             'target_audience' => AsEnumArrayObject::of(TargetAudience::class),
         ];
     }
 
     public const STATUS_LABELS = [
-        OpportunityStatus::ACTIVE->value => 'Active',
-        OpportunityStatus::CLOSED->value => 'Closed',
-        OpportunityStatus::REJECTED->value => 'Rejected',
-        OpportunityStatus::PENDING_REVIEW->value => 'Pending Review',
+        Status::ACTIVE->value => 'Active',
+        Status::CLOSED->value => 'Closed',
+        Status::REJECTED->value => 'Rejected',
+        Status::PENDING_REVIEW->value => 'Pending Review',
     ];
 
     public static function getTypeOptions(): array
     {
-        return OpportunityType::getOptions();
+        return Type::getOptions();
     }
 
     protected $fillable = [

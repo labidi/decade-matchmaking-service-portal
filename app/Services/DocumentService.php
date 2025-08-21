@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
+use App\Enums\Document\DocumentType;
 use App\Models\Document;
 use App\Models\Request\Offer;
-use App\Enums\DocumentType;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Exception;
 use App\Models\User;
+use Exception;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentService
 {

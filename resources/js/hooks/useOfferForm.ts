@@ -1,6 +1,6 @@
 import {useForm} from '@inertiajs/react';
 import {useEffect, useState} from 'react';
-import {UIOfferForm} from '@/Forms/UIOfferForm';
+import {UIOfferForm} from '@/components/forms/UIOfferForm';
 import {RequestOffer} from '@/types';
 
 interface UseOfferFormProps {

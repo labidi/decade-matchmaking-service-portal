@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\SubTheme;
+use App\Enums\Request\SubTheme;
 use App\Models\UserNotificationPreference;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;

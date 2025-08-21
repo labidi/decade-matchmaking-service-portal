@@ -2,23 +2,25 @@
 
 namespace App\Services;
 
-use App\Enums\DocumentType;
-use App\Models\Request\Offer;
+use App\Enums\Document\DocumentType;
+use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request;
+use App\Models\Request\Offer;
 use App\Models\User;
-use App\Models\Document;
-use App\Enums\RequestOfferStatus;
+use App\Services\Offer\OfferQueryBuilder;
+use App\Services\Offer\OfferRepository;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Services\DocumentService;
 
 class OfferService
 {
-    public function __construct(private readonly DocumentService $documentService)
-    {
+    public function __construct(
+        private readonly DocumentService $documentService,
+        private readonly OfferRepository $repository
+    ) {
     }
 
     /**
@@ -26,33 +28,7 @@ class OfferService
      */
     public function getPaginatedOffers(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
     {
-        $query = Offer::with(['request', 'request.status', 'request.user', 'matchedPartner', 'documents']);
-
-        // Apply search filters
-        if (!empty($searchFilters['description'])) {
-            $query->where('description', 'like', '%' . $searchFilters['description'] . '%');
-        }
-
-        if (!empty($searchFilters['partner'])) {
-            $query->whereHas('matchedPartner', function ($q) use ($searchFilters) {
-                $q->where('name', 'like', '%' . $searchFilters['partner'] . '%');
-            });
-        }
-
-        if (!empty($searchFilters['request'])) {
-            $query->whereHas('request', function ($q) use ($searchFilters) {
-                $q->where('id', '=', $searchFilters['request']);
-            });
-        }
-
-        // Apply sorting
-        $sortField = $sortFilters['sort'] ?? 'created_at';
-        $sortOrder = $sortFilters['order'] ?? 'desc';
-
-        $query->orderBy($sortField, $sortOrder);
-
-        $perPage = $sortFilters['per_page'] ?? 10;
-        return $query->paginate($perPage);
+        return $this->repository->getPaginated($searchFilters, $sortFilters);
     }
 
     /**
@@ -73,7 +49,7 @@ class OfferService
             }
 
             // Create the offer
-            $offer = Offer::create([
+            $offer = $this->repository->create([
                 'request_id' => $data['request_id'],
                 'matched_partner_id' => $data['partner_id'] ?? $user->id,
                 'description' => $data['description'],
@@ -103,7 +79,10 @@ class OfferService
         DB::beginTransaction();
 
         try {
-            $offer = Offer::with(['request', 'matchedPartner'])->findOrFail($offerId);
+            $offer = $this->repository->findById($offerId);
+            if (!$offer) {
+                throw new Exception('Offer not found');
+            }
 
             // Check authorization
             if (!$offer->can_edit) {
@@ -119,7 +98,7 @@ class OfferService
                 $updateData['status'] = $data['status'];
             }
 
-            $offer->update($updateData);
+            $this->repository->update($offer, $updateData);
 
             // Handle document upload if provided
             if (isset($data['document']) && $data['document']) {
@@ -144,7 +123,10 @@ class OfferService
         DB::beginTransaction();
 
         try {
-            $offer = Offer::findOrFail($offerId);
+            $offer = $this->repository->findById($offerId);
+            if (!$offer) {
+                throw new Exception('Offer not found');
+            }
 
             // Check authorization
             if (!$offer->can_delete) {
@@ -157,7 +139,7 @@ class OfferService
             }
 
             // Delete the offer
-            $offer->delete();
+            $this->repository->delete($offer);
             DB::commit();
             return true;
         } catch (Exception $e) {
@@ -222,7 +204,7 @@ class OfferService
      */
     public function changeOfferStatus(Offer $offer, RequestOfferStatus $status): Offer
     {
-        $offer->update(['status' => $status]);
+        $this->repository->update($offer, ['status' => $status]);
         return $offer;
     }
 
@@ -247,7 +229,7 @@ class OfferService
             }
 
             // Update the offer to accepted status
-            $offer->update([
+            $this->repository->update($offer, [
                 'is_accepted' => true,
             ]);
 
@@ -255,5 +237,27 @@ class OfferService
         } catch (Exception $e) {
             throw $e;
         }
+    }
+
+    /**
+     * Get paginated offers made by a specific user (as partner)
+     */
+    public function getUserOffersPaginated(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        return $this->repository->getUserOffers($user, $searchFilters, $sortFilters);
+    }
+
+    /**
+     * Get paginated offers on user's requests
+     */
+    public function getRequestOffersPaginated(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        return $this->repository->getRequestOffers($user, $searchFilters, $sortFilters);
     }
 }

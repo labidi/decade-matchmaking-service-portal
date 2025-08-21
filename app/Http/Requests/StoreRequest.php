@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\SubTheme;
-use App\Enums\SupportType;
-use App\Enums\Language;
-use App\Enums\YesNo;
+use App\Enums\Common\Language;
+use App\Enums\Common\YesNo;
+use App\Enums\Request\SubTheme;
+use App\Enums\Request\SupportType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

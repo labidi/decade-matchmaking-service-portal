@@ -154,6 +154,16 @@ export function OffersDataTable({
             )
         },
         {
+            key: 'is_accepted',
+            label: 'Is Accepted',
+            sortable: false,
+            render: (offer) => (
+                <div>
+                    {(offer.is_accepted ? <span className="text-green-500 font-semibold">Yes</span> : <span className="text-red-500 font-semibold">No</span>)}
+                </div>
+            )
+        },
+        {
             key: 'status',
             label: 'Status',
             sortable: true,

@@ -2,17 +2,15 @@
 
 namespace App\Services;
 
-use App\Enums\OpportunityStatus;
+use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
 use App\Models\User;
 use App\Services\Opportunity\EnhancerService;
 use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
-use App\Services\PaginationService;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -20,8 +18,7 @@ class OpportunityService
 {
     public function __construct(
         private readonly OpportunityRepository $repository,
-        private readonly OpportunityAnalyticsService $analytics,
-        private readonly PaginationService $paginationService
+        private readonly OpportunityAnalyticsService $analytics
     ) {
     }
 
@@ -44,11 +41,7 @@ class OpportunityService
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        $query = $this->getBaseOpportunitiesQuery($searchFilters)
-            ->where('user_id', $user->id);
-        $query = $this->paginationService->applySorting($query, $sortFilters);
-
-        $opportunities = $this->paginationService->paginate($query, ['per_page' => 10])->withQueryString();
+        $opportunities = $this->repository->getUserOpportunitiesPaginated($user, $searchFilters, $sortFilters);
         $opportunities->getCollection()->transform(function ($opportunity) {
             // Enhance opportunity data if needed
             return EnhancerService::enhanceOpportunity($opportunity);
@@ -57,44 +50,11 @@ class OpportunityService
     }
 
 
-    private function getBaseOpportunitiesQuery(array $searchFilters = []): Builder
-    {
-        $query = Opportunity::with(['user']);
-
-        // Apply search filters (like OfferService pattern)
-        if (!empty($searchFilters['title'])) {
-            $query->where('title', 'like', '%' . $searchFilters['title'] . '%');
-        }
-
-        if (!empty($searchFilters['type'])) {
-            $query->where('type', $searchFilters['type']);
-        }
-
-        if (!empty($searchFilters['location'])) {
-            $query->where('implementation_location', 'like', '%' . $searchFilters['location'] . '%');
-        }
-
-        if (!empty($searchFilters['closing_date'])) {
-            $query->whereDate('closing_date', '>=', $searchFilters['closing_date']);
-        }
-
-        if (!empty($searchFilters['user'])) {
-            $query->whereHas('user', function ($q) use ($searchFilters) {
-                $q->where('name', 'like', '%' . $searchFilters['user'] . '%')
-                    ->orWhere('email', 'like', '%' . $searchFilters['user'] . '%');
-            });
-        }
-
-        return $query;
-    }
-
     public function getAllOpportunitiesPaginated(
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        $query = $this->getBaseOpportunitiesQuery($searchFilters);
-        $query = $this->paginationService->applySorting($query, $sortFilters);
-        $opportunities = $this->paginationService->paginate($query, ['per_page' => 10])->withQueryString();
+        $opportunities = $this->repository->getPaginated($searchFilters, $sortFilters);
         $opportunities->getCollection()->transform(function ($opportunity) {
             // Enhance opportunity data if needed
             return EnhancerService::enhanceOpportunity($opportunity);
@@ -109,10 +69,7 @@ class OpportunityService
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        $query = $this->getBaseOpportunitiesQuery($searchFilters);
-        $query->where('status', OpportunityStatus::ACTIVE);
-        $query = $this->paginationService->applySorting($query, $sortFilters);
-        $opportunities = $this->paginationService->paginate($query, ['per_page' => 10])->withQueryString();
+        $opportunities = $this->repository->getActiveOpportunitiesPaginated($searchFilters, $sortFilters);
         $opportunities->getCollection()->transform(function ($opportunity) {
             // Enhance opportunity data if needed
             return EnhancerService::enhanceOpportunity($opportunity);
@@ -143,7 +100,7 @@ class OpportunityService
             throw new Exception('Opportunity not found', 404);
         }
         // Validate status
-        if (!in_array($statusCode, array_column(OpportunityStatus::cases(), 'value'))) {
+        if (!in_array($statusCode, array_column(Status::cases(), 'value'))) {
             throw new Exception('Invalid status code', 422);
         }
         // Check if user can update this opportunity
@@ -177,7 +134,7 @@ class OpportunityService
         }
 
         // Check if can be deleted (only pending review)
-        if ($opportunity->status !== OpportunityStatus::PENDING_REVIEW) {
+        if ($opportunity->status !== Status::PENDING_REVIEW) {
             throw new Exception('Only pending review opportunities can be deleted', 422);
         }
 
@@ -207,44 +164,6 @@ class OpportunityService
      */
     public function searchOpportunities(array $filters, User $user): Collection
     {
-        $query = Opportunity::with(['user']);
-
-        // Apply filters (like OfferService pattern)
-        if (!empty($filters['type'])) {
-            $query->where('type', $filters['type']);
-        }
-
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        if (!empty($filters['location'])) {
-            $query->where('implementation_location', 'like', '%' . $filters['location'] . '%');
-        }
-
-        if (!empty($filters['search'])) {
-            $searchTerm = $filters['search'];
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('title', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('summary', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('keywords', 'like', '%' . $searchTerm . '%');
-            });
-        }
-
-        if (!empty($filters['date_from'])) {
-            $query->whereDate('created_at', '>=', $filters['date_from']);
-        }
-
-        if (!empty($filters['date_to'])) {
-            $query->whereDate('created_at', '<=', $filters['date_to']);
-        }
-
-        // Public opportunities filter (exclude user's own opportunities)
-        if (!empty($filters['public'])) {
-            $query->where('user_id', '!=', $user->id)
-                ->where('status', OpportunityStatus::ACTIVE);
-        }
-
-        return $query->orderBy('created_at', 'desc')->get();
+        return $this->repository->search($filters);
     }
 }

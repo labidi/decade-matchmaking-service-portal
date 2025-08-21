@@ -2,14 +2,14 @@
 
 namespace App\Models\Request;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Document;
 use App\Models\Request;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Enums\RequestOfferStatus;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Offer extends Model
 {

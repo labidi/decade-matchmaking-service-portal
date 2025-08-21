@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Opportunities;
 
-use App\Enums\OpportunityStatus;
-use App\Enums\OpportunityType;
+use App\Enums\Opportunity\Status;
+use App\Enums\Opportunity\Type;
 use App\Models\Opportunity;
 use App\Services\OpportunityService;
 use Illuminate\Http\Request;
@@ -28,7 +28,7 @@ class ListController extends BaseOpportunitiesController
                 'searchFields' => ['user', 'title'],
                 'searchFieldsOptions' => [
                     'types' => Opportunity::getTypeOptions(),
-                    'statuses' => OpportunityStatus::getOptions(),
+                    'statuses' => Status::getOptions(),
                 ],
                 'currentSearchFields' => ['user', 'title'],
                 'routeName' => 'admin.opportunity.list',
@@ -46,8 +46,8 @@ class ListController extends BaseOpportunitiesController
                 ],
                 'searchFields' => ['title', 'type', 'status'],
                 'searchFieldsOptions' => [
-                    'types' => OpportunityType::getOptions(),
-                    'statuses' => OpportunityStatus::getOptions(),
+                    'types' => Type::getOptions(),
+                    'statuses' => Status::getOptions(),
                 ],
                 'currentSearchFields' => ['type', 'status','title'],
                 'routeName' => 'opportunity.me.list',
@@ -68,8 +68,8 @@ class ListController extends BaseOpportunitiesController
                 ],
                 'searchFields' => ['title', 'type'],
                 'searchFieldsOptions' => [
-                    'types' => OpportunityType::getOptions(),
-                    'statuses' => OpportunityStatus::getOptions(),
+                    'types' => Type::getOptions(),
+                    'statuses' => Status::getOptions(),
                 ],
                 'currentSearchFields' => ['title', 'type'],
                 'routeName' => 'opportunity.list',

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
-import AdminMenu from '@/Components/Layout/AdminMenu';
+import AdminMenu from '@/components/layouts/AdminMenu';
 import { Notification } from '@/types';
 import {Heading} from "@/components/ui/heading";
 

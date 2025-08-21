@@ -2,28 +2,14 @@
 
 namespace App\Http\Controllers\Opportunities;
 
+use App\Enums\Opportunity\Status;
 use App\Http\Controllers\Controller;
-use App\Enums\OpportunityStatus;
-use App\Enums\Country;
-use App\Enums\Ocean;
-use App\Enums\OpportunityType;
-use App\Enums\Region;
-use App\Enums\TargetAudience;
-use App\Enums\YesNo;
 use App\Models\Opportunity;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 
 abstract class BaseOpportunitiesController extends Controller
 {
-    /**
-     * Detect if current route is an admin route
-     */
-    protected function isAdminRoute(): bool
-    {
-        return str_starts_with(request()->route()->getName() ?? '', 'admin.');
-    }
-
 
     /**
      * Get the context based on route name
@@ -69,8 +55,8 @@ abstract class BaseOpportunitiesController extends Controller
         $isOwner = $user && $opportunity->user_id === $user->id;
         return [
             'canEdit' => $isOwner,
-            'canDelete' => $isOwner && $opportunity->status === OpportunityStatus::PENDING_REVIEW,
-            'canApply' => $opportunity->status === OpportunityStatus::ACTIVE && (bool) $opportunity->url,
+            'canDelete' => $isOwner && $opportunity->status === Status::PENDING_REVIEW,
+            'canApply' => $opportunity->status === Status::ACTIVE && (bool) $opportunity->url,
             'isOwner' => $isOwner,
         ];
     }

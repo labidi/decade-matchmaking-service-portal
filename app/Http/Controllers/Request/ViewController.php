@@ -2,27 +2,40 @@
 
 namespace App\Http\Controllers\Request;
 
+use App\Http\Resources\RequestResource;
+use App\Models\Request as OCDRequest;
+use App\Services\Request\RequestPermissionService;
+use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\RequestEnhancer;
-use App\Models\Request as OCDRequest;
 
 class ViewController extends BaseRequestController
 {
+    public function __construct(
+        RequestService $service,
+        protected readonly RequestPermissionService $permissionService
+    ) {
+        parent::__construct($service);
+    }
+
     /**
      * Display the full request details - unified method for both admin and user contexts
      */
     public function show(Request $request, ?int $id = null): Response
     {
-        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'offers','activeOffer.documents'])
+        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'offers', 'activeOffer.documents'])
             ->findOrFail($id);
+        $permissions = $this->permissionService->getPermissions($userRequest, auth()->user());
+        $requestResource = RequestResource::withPermissions($userRequest, $permissions);
+        $viewData = [
+            'title' => $this->service->getRequestTitle($userRequest),
+            'request' => $this->isAdminRoute() ? $requestResource->forAdmin($permissions) : $requestResource->forUser($permissions),
+        ];
 
         if ($this->isAdminRoute()) {
-            // Admin view - simplified
-            $viewData = [
-                'title' => $this->service->getRequestTitle($userRequest),
-                'request' => $userRequest,
+            // Admin view - with admin permissions
+            $viewData = array_merge($viewData, [
                 'breadcrumbs' => [
                     ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
                     ['name' => 'Requests', 'url' => route('admin.request.list')],
@@ -31,39 +44,25 @@ class ViewController extends BaseRequestController
                         'url' => route('admin.request.show', ['id' => $userRequest->id])
                     ],
                 ],
-            ];
-            return Inertia::render($this->getViewPrefix() . 'Request/Show', $viewData);
-        }
-
-        // User view - with enhanced data and actions
-        $activeOffer = $this->service->getActiveOfferWithDocuments($id);
-        $actions = $this->service->getRequestActions($userRequest, $request->user());
-
-        // Check if offer action buttons should be shown
-        $showOfferActions = $userRequest->status->status_code === 'offer_made'
-            && $userRequest->user_id === $request->user()->id
-            && $activeOffer !== null;
-
-        $viewData = [
-            'banner' => [
-                'title' => $this->service->getRequestTitle($userRequest),
-                'description' => 'View my request details here.',
-                'image' => '/assets/img/sidebar.png',
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                [
-                    'name' => 'View Request #' . $userRequest->id,
-                    'url' => route('request.show', ['id' => $userRequest->id])
+                'availableStatuses' => $this->service->getAvailableStatuses(),
+            ]);
+        } else {
+            $viewData = array_merge($viewData, [
+                'banner' => [
+                    'title' => $this->service->getRequestTitle($userRequest),
+                    'description' => 'View my request details here.',
+                    'image' => '/assets/img/sidebar.png',
                 ],
-            ],
-            'request' => $userRequest,
-            'activeOffer' => $activeOffer,
-            'requestDetail.actions' => $actions,
-            'showOfferActions' => $showOfferActions,
-        ];
-
-        return Inertia::render('Request/Show', $viewData);
+                'breadcrumbs' => [
+                    ['name' => 'Home', 'url' => route('user.home')],
+                    [
+                        'name' => 'View Request #' . $userRequest->id,
+                        'url' => route('request.show', ['id' => $userRequest->id])
+                    ],
+                ],
+            ]);
+        }
+        return Inertia::render($this->getViewPrefix() . 'Request/Show', $viewData);
     }
 
     /**
@@ -79,6 +78,11 @@ class ViewController extends BaseRequestController
 
         $offer = $this->service->getActiveOffer($requestId);
 
+        // Preview mode disables all actions
+        $previewActions = $this->permissionService->getRequestDetailActions($ocdRequest, $request->user());
+        // Override all permissions to false for preview mode
+        $previewActions = array_map(fn() => false, $previewActions);
+
         return Inertia::render('Request/Preview', [
             'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
             'banner' => [
@@ -86,7 +90,7 @@ class ViewController extends BaseRequestController
                 'description' => 'View my request details here.',
                 'image' => '/assets/img/sidebar.png',
             ],
-            'request' => $ocdRequest,
+            'request' => RequestResource::withPermissions($ocdRequest, [])->forPublic(),
             'offer' => $offer,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('user.home')],
@@ -96,15 +100,7 @@ class ViewController extends BaseRequestController
                     'url' => route('request.show', ['id' => $ocdRequest->id])
                 ],
             ],
-            'requestDetail.actions' => [
-                'canEdit' => false,
-                'canDelete' => false,
-                'canCreate' => false,
-                'canExpressInterest' => false,
-                'canExportPdf' => false,
-                'canAcceptOffer' => false,
-                'canRequestClarificationForOffer' => false
-            ],
+            'requestDetail.actions' => $previewActions,
         ]);
     }
 }

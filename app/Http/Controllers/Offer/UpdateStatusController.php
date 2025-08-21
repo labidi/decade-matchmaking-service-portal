@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Offer;
 
-use App\Enums\RequestOfferStatus;
+use App\Enums\Offer\RequestOfferStatus;
 use App\Http\Requests\UpdateRequestOfferStatus;
 use Exception;
 use Illuminate\Http\RedirectResponse;

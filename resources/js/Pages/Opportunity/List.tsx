@@ -5,7 +5,7 @@ import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {OpportunitiesDataTable} from '@/components/ui/data-table/opportunities/opportunities-data-table';
 import {partnerColumns} from '@/components/ui/data-table/opportunities/column-configs';
 import { useOpportunityActions } from '@/hooks/useOpportunityActions';
-import { OpportunityStatusDialog } from '@/components/ui/dialogs/OpportunityStatusDialog';
+import { OpportunityStatusDialog } from '@/components/features/opportunity';
 
 export type OpportunitiesListPageActions = {
     canExportCSV?: boolean;

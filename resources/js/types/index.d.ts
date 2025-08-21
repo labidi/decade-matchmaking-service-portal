@@ -1,4 +1,4 @@
-import {RequestForm} from "@/Forms/UIRequestForm";
+import {RequestForm} from "@/components/forms/UIRequestForm";
 
 export interface UIField {
     id: string;
@@ -87,12 +87,6 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
-export interface Banner {
-    title: string;
-    description: string;
-    image: string;
-}
-
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
@@ -101,22 +95,10 @@ export type PageProps<
     };
 };
 
-export interface YoutubeEmbed {
-    title: string;
-    src: string;
-}
-
 export interface PortalGuide {
     url: string;
 }
 
-export interface OCDMetrics {
-    number_successful_matches: number;
-    number_fully_closed_matches: number;
-    number_user_requests_in_implementation: number;
-    committed_funding_amount: number;
-    number_of_open_partner_opportunities: number;
-}
 
 export interface Document {
     id: number;
@@ -142,6 +124,7 @@ export interface RequestOffer {
     status_label: string;
     created_at: string;
     updated_at: string;
+    is_accepted: boolean;
     can_edit: boolean;
     can_view: boolean;
     can_delete: boolean;
@@ -158,17 +141,21 @@ export interface OCDRequestStatus {
     created_at: string;
     updated_at: string;
 }
+
+export interface RequestPermissions {
+    can_view?: boolean;
+    can_delete?: boolean;
+    can_edit?: boolean;
+    can_manage_offers?: boolean;
+    can_update_status?: boolean;
+    can_accept_offer?: boolean;
+    can_request_clarifications?: boolean;
+}
+
 export interface OCDRequest {
     id: number;
     type: string;
-    submissionDate: string;
-    requester_name?: string;
-    status: OCDRequestStatus,
-    title: string;
-    can_edit: boolean;
-    can_view: boolean;
-    can_manage_offers: boolean;
-    can_update_status: boolean;
+    submission_date: string;
     detail: {
         id: string;
         is_related_decade_action: 'Yes' | 'No';
@@ -210,13 +197,14 @@ export interface OCDRequest {
         target_languages_other: string;
     }
     created_at: string;
-    matched_partner_id: string | null;
-    status_id: string;
     user_id: string;
+    status: OCDRequestStatus,
     user: User;
     offers?: RequestOfferList
     active_offer?: RequestOffer;
-};
+    permissions: RequestPermissions;
+    matched_partner?: User;
+}
 
 export type OCDRequestList = OCDRequest[];
 
@@ -248,20 +236,6 @@ export interface Opportunity {
 
 export type OpportunitiesList = Opportunity[];
 
-export type OCDRequestGrid = {
-    actions: {
-        canEdit: boolean;
-        canDelete: boolean;
-        canView: boolean;
-        canCreate?: boolean;
-        canExpressInterest?: boolean;
-        canExportPdf?: boolean;
-        canAcceptOffer?: boolean;
-        canRequestClarificationForOffer?: boolean,
-        canChangeStatus?: boolean,
-        canPreview?: boolean
-    }
-}
 export interface OfferProps {
     OcdRequest: OCDRequest;
 }

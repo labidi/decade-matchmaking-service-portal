@@ -1,4 +1,4 @@
-import {UIRequestForm} from '@/Forms/UIRequestForm';
+import {UIRequestForm} from '@/components/forms/UIRequestForm';
 import {Document, OCDRequest} from "@/types";
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/react'
 import {ChevronDownIcon} from '@heroicons/react/20/solid'

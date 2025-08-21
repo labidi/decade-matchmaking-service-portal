@@ -28,7 +28,7 @@ export const adminColumns = [
         key: 'user',
         label: 'Submitted By',
         sortable: true,
-        sortField: 'user_id' as const,
+        sortField: 'user' as const,
         render: (request: OCDRequest) => (
             <div className="flex flex-col">
                 <span className="font-medium">{request.user.name}</span>
@@ -48,8 +48,7 @@ export const adminColumns = [
     {
         key: 'status',
         label: 'Status',
-        sortable: true,
-        sortField: 'status_id' as const,
+        sortable: false,
         render: (request: OCDRequest) => requestStatusBadgeRenderer(request.status)
     }
 ];

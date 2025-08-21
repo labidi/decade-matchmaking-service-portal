@@ -19,13 +19,13 @@ class AcceptOfferController extends BaseOfferController
     public function __invoke(Request $request, int $offerId): JsonResponse
     {
         DB::beginTransaction();
-        
+
         try {
             $user = $request->user();
-            
+
             // Get the offer with all necessary relationships
             $offer = $this->offerService->getOfferById($offerId);
-            
+
             // Check authorization - only request owner can accept offers for their request
             if (!$offer->can_accept) {
                 return $this->jsonErrorResponse(
@@ -46,33 +46,17 @@ class AcceptOfferController extends BaseOfferController
 
             // Accept the offer using the service
             $acceptedOffer = $this->offerService->acceptOffer($offer, $user);
-            
+
             // Fire the event
             event(new OfferAccepted($acceptedOffer, $user));
-            
-            DB::commit();
-            
-            Log::info('Offer accepted successfully', [
-                'offer_id' => $offerId,
-                'request_id' => $offer->request_id,
-                'accepted_by' => $user->id,
-                'partner_id' => $offer->matched_partner_id
-            ]);
 
-            return $this->jsonSuccessResponse(
-                'Offer accepted successfully',
-                [
-                    'offer' => $acceptedOffer->fresh()->load([
-                        'request', 
-                        'matchedPartner', 
-                        'documents'
-                    ])
-                ]
-            );
+            DB::commit();
+
+            return to_route(url()->previous())->with('success', 'Offer accepted successfully');
 
         } catch (Exception $exception) {
             DB::rollBack();
-            
+
             return $this->handleException(
                 $exception,
                 'accept offer',

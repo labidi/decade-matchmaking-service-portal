@@ -4,7 +4,7 @@ import { OpportunitiesList, PaginationLinkProps } from '@/types';
 
 import { SidebarLayout } from '@/components/ui/layouts/sidebar-layout'
 import { OpportunitiesDataTable } from "@/components/ui/data-table/opportunities/opportunities-data-table";
-import { OpportunityStatusDialog } from '@/components/ui/dialogs/OpportunityStatusDialog';
+import { OpportunityStatusDialog } from '@/components/features/opportunity';
 import { adminColumns } from "@/components/ui/data-table/opportunities/column-configs";
 import { Heading } from "@/components/ui/heading";
 import { useOpportunityActions } from '@/hooks/useOpportunityActions';
