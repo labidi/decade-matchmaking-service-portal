@@ -17,10 +17,6 @@ class Opportunity extends Model
 
     public $timestamps = true;
 
-    protected $casts = [
-
-    ];
-
     protected function casts(): array
     {
         return [

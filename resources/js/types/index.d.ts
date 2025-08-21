@@ -1,4 +1,8 @@
-export { OCDRequest, OCDRequestList, RequestOffer, RequestOfferList, RequestPermissions, OCDRequestStatus} from "@/types/request";
+export {
+    OCDRequest, OCDRequestList, RequestOffer, RequestOfferList, RequestPermissions, OCDRequestStatus,
+    RequestSubscription, SubscriptionStats
+} from "@/types/request";
+export {Opportunity, OpportunitiesList} from "@/types/opportunity";
 
 export interface UIField {
     id: string;
@@ -41,13 +45,6 @@ export interface User {
     is_admin: boolean;
 }
 
-export interface SubscriptionStats {
-    total_subscriptions: number;
-    admin_created_subscriptions: number;
-    user_created_subscriptions: number;
-    unique_subscribers: number;
-    unique_subscribed_requests: number;
-}
 
 export interface Role {
     id: number;
@@ -85,7 +82,6 @@ export interface PortalGuide {
     url: string;
 }
 
-
 export interface Document {
     id: number;
     name: string;
@@ -98,12 +94,6 @@ export interface Document {
     created_at: string;
     updated_at: string;
 }
-
-
-
-
-
-
 
 
 export interface OfferProps {
@@ -147,6 +137,7 @@ export interface RequestFormOptions {
     yes_no?: Array<{ value: string; label: string }>;
     project_stage?: Array<{ value: string; label: string }>;
 }
+
 // Common form options interface for consistent structure across forms
 export interface FormOptions {
     delivery_countries?: Array<{ value: string; label: string }>;
@@ -165,7 +156,7 @@ export interface FormOptions {
 
 export interface NotificationPreferencesPageProps extends PageProps {
     preferences: Record<string, UserNotificationPreference[]>; // Grouped by attribute_type
-    availableOptions: Record<string, Array<{value: string, label: string}>>;
+    availableOptions: Record<string, Array<{ value: string, label: string }>>;
     attributeTypes: Record<string, string>; // e.g., {'subtheme': 'Subtheme', 'coverage_activity': 'Coverage Activity'}
 }
 

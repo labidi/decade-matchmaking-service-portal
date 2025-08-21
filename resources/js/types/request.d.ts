@@ -1,4 +1,5 @@
-import { User } from '@/types';
+import {User, Document} from '@/types';
+
 export interface OCDRequestStatus {
     id: string;
     status_label: string;
@@ -104,4 +105,12 @@ export interface RequestSubscription {
     user?: User;
     request?: OCDRequest;
     admin_user?: User;
+}
+
+export interface SubscriptionStats {
+    total_subscriptions: number;
+    admin_created_subscriptions: number;
+    user_created_subscriptions: number;
+    unique_subscribers: number;
+    unique_subscribed_requests: number;
 }

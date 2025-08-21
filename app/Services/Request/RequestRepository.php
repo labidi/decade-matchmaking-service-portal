@@ -130,18 +130,18 @@ class RequestRepository
      */
     public function createOrUpdateDetail(OCDRequest $request, array $data): void
     {
+        $detailData = [];
+        
         foreach ($data as $key => $value) {
             if ($key == 'mode' || $key == 'id') {
-                continue; // Skip is_partner field as it is not stored in detail
+                continue; // Skip mode and id fields as they are not stored in detail
             }
-            if (is_array($value)) {
-                $detailData[$key] = json_encode($value);
-            } elseif (is_null($value)) {
-                $detailData[$key] = null;
-            } else {
-                $detailData[$key] = $value;
-            }
+            
+            // Let Laravel's casting handle the data transformation
+            // No manual JSON encoding needed - the Detail model's $casts property handles this
+            $detailData[$key] = $value;
         }
+        
         if ($request->detail) {
             $request->detail()->update($detailData);
         } else {

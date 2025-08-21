@@ -23,9 +23,9 @@ export function useRequestForm(request?: OCDRequest) {
         project_stage: '',
         project_url: '',
         related_activity: '',
-        subthemes: [] as string[],
+        subthemes: [] ,
         subthemes_other: '',
-        support_types: [] as string[],
+        support_types: [] ,
         support_types_other: '',
         gap_description: '',
         has_partner: '',
@@ -43,9 +43,9 @@ export function useRequestForm(request?: OCDRequest) {
         success_metrics: '',
         long_term_impact: '',
         mode: 'submit' as Mode,
-        target_audience: [] as string[],
+        target_audience: [] ,
         target_audience_other: '',
-        target_languages: [] as string[],
+        target_languages: [] ,
         target_languages_other: '',
         delivery_format: '',
         delivery_countries: [] as string[],
@@ -95,7 +95,37 @@ export function useRequestForm(request?: OCDRequest) {
             form.setData('id', request.id.toString());
             Object.entries(request.detail).forEach(([key, value]) => {
                 if (key in form.data && key !== 'id') {
-                    form.setData(key as FormDataKeys, value || '');
+                    // Handle array fields that come as objects with value/label pairs
+                    if (Array.isArray(value) && ['subthemes', 'support_types', 'target_audience', 'target_languages'].includes(key)) {
+                        // Convert array of objects to array of values
+                        const arrayValues = value.map(item =>
+                            typeof item === 'object' && item !== null && 'value' in item
+                                ? item.value
+                                : item
+                        ).filter(Boolean);
+                        form.setData(key as FormDataKeys, arrayValues);
+                    }
+                    // Handle delivery_countries specifically as it expects string[]
+                    else if (key === 'delivery_countries' && Array.isArray(value)) {
+                        const countryValues = value.map(item =>
+                            typeof item === 'object' && item !== null && 'value' in item
+                                ? item.value
+                                : String(item)
+                        ).filter(Boolean);
+                        form.setData(key as FormDataKeys, countryValues);
+                    }
+                    // Handle primitive values (strings, numbers, booleans)
+                    else if (value !== null && value !== undefined) {
+                        // For non-array form fields, convert to string
+                        // Skip arrays that weren't handled above to avoid type errors
+                        if (!Array.isArray(value)) {
+                            form.setData(key as FormDataKeys, String(value) || '');
+                        }
+                    }
+                    // Fallback for null/undefined values
+                    else {
+                        form.setData(key as FormDataKeys, '');
+                    }
                 }
             });
         }

@@ -44,6 +44,7 @@ class StoreRequest extends FormRequest
                 ),
                 Rule::enum(YesNo::class)
             ],
+            // need to be fixed when no and yes
             'project_stage' => [
                 Rule::excludeIf(
                     fn() => $this->input("is_related_decade_action") === YesNo::YES->value || $this->input(

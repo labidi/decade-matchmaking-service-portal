@@ -93,6 +93,26 @@ class DetailResource extends JsonResource
             return [];
         }
 
+        // Handle string values (shouldn't happen with proper casting, but defensive programming)
+        if (is_string($enumArray)) {
+            // If it's a JSON string, decode it
+            $decoded = json_decode($enumArray, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $enumArray = $decoded;
+            } else {
+                // Single string value
+                return [[
+                    'value' => $enumArray,
+                    'label' => $enumArray,
+                ]];
+            }
+        }
+
+        // Ensure we have an array or iterable
+        if (!is_array($enumArray) && !is_iterable($enumArray)) {
+            return [];
+        }
+
         $result = [];
         foreach ($enumArray as $enum) {
             if ($enum && method_exists($enum, 'label')) {
@@ -101,7 +121,7 @@ class DetailResource extends JsonResource
                     'label' => $enum->label(),
                 ];
             } elseif ($enum) {
-                // Fallback for enums without label method
+                // Fallback for enums without label method or string values
                 $result[] = [
                     'value' => is_string($enum) ? $enum : $enum->value,
                     'label' => is_string($enum) ? $enum : $enum->value,

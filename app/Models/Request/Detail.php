@@ -67,11 +67,11 @@ class Detail extends Model
             'support_types' => AsEnumArrayObject::of(SupportType::class),
             'target_audience' => AsEnumArrayObject::of(TargetAudience::class),
             'target_languages' => AsEnumArrayObject::of(Language::class),
+            'delivery_countries' => AsEnumArrayObject::of(Country::class),
             'additional_data' => 'array',
             'support_months' => 'integer',
             'direct_beneficiaries_number' => 'integer',
             'completion_date' => 'datetime:Y-m-d',
-            'delivery_countries' => AsEnumArrayObject::of(Country::class),
         ];
     }
 
