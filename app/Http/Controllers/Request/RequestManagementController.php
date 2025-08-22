@@ -2,19 +2,26 @@
 
 namespace App\Http\Controllers\Request;
 
+use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Exception;
 
 class RequestManagementController extends BaseRequestController
 {
+    public function __construct(protected readonly RequestService $service)
+    {
+    }
+
     /**
      * Update request status - unified method for both admin and user contexts
      */
     public function updateStatus(Request $request, ?int $id = null)
     {
         try {
-            $validated = $this->validateStatusUpdate($request);
+            $validated = $request->validate([
+                'status_code' => 'required|string|exists:request_statuses,status_code',
+            ]);
 
             $result = $this->service->updateRequestStatus(
                 $id,
@@ -33,8 +40,7 @@ class RequestManagementController extends BaseRequestController
                 'message' => $message,
                 'status' => $result['request']->status
             ]);
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $statusCode = $e->getCode() ?: 500;
 
             if ($this->isAdminRoute()) {
@@ -43,6 +49,31 @@ class RequestManagementController extends BaseRequestController
 
             return response()->json(['error' => $e->getMessage()], $statusCode);
         }
+    }
+
+
+    private function getSuccessResponse(string $message, ?string $redirectRoute = null)
+    {
+        if ($this->isAdminRoute() && $redirectRoute) {
+            return to_route($redirectRoute)->with('success', $message);
+        }
+
+        // Default JSON response for non-admin routes
+        return response()->json(['message' => $message]);
+    }
+
+
+    /**
+     * Get error response based on context
+     */
+    private function getErrorResponse(string $message, int $statusCode = 400, ?string $redirectRoute = null)
+    {
+        if ($this->isAdminRoute() && $redirectRoute) {
+            return to_route($redirectRoute)->with('error', $message);
+        }
+
+        // Default JSON response for non-admin routes
+        return response()->json(['error' => $message], $statusCode);
     }
 
     /**

@@ -31,7 +31,7 @@ class FormController extends BaseOfferController
             $offer = new Offer();
         }
         if ($requestId) {
-            $selectedRequest = $this->requestService->getRequestById($requestId, auth()->user());
+            $selectedRequest = $this->requestService->findRequest($requestId);
             $offer->request_id = $selectedRequest->id;
         }
 

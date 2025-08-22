@@ -35,20 +35,6 @@ class RequestPermissionService
         ];
     }
 
-    /**
-     * Get permissions for multiple requests efficiently.
-     */
-    public function getActionsForRequests(iterable $requests, ?User $user = null): array
-    {
-        $user = $user ?? auth()->user();
-        $permissions = [];
-
-        foreach ($requests as $request) {
-            $permissions[$request->id] = $this->getActionsForRequest($request, $user);
-        }
-
-        return $permissions;
-    }
 
     /**
      * Get specific actions based on context (e.g., for frontend UI).
@@ -57,7 +43,7 @@ class RequestPermissionService
     public function getRequestDetailActions(Request $request, ?User $user = null): array
     {
         $user = $user ?? auth()->user();
-        $permissions = $this->getActionsForRequest($request, $user);
+        $permissions = $this->getPermissions($request, $user);
 
         // Map to frontend-expected action names
         return [
@@ -99,7 +85,7 @@ class RequestPermissionService
      */
     public function hasAnyPermission(Request $request, ?User $user = null): bool
     {
-        $permissions = $this->getActionsForRequest($request, $user);
+        $permissions = $this->getPermissions($request, $user);
 
         return collect($permissions)->contains(true);
     }

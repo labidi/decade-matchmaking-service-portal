@@ -13,10 +13,9 @@ use Inertia\Response;
 class ViewController extends BaseRequestController
 {
     public function __construct(
-        RequestService $service,
+        protected readonly RequestService $service,
         protected readonly RequestPermissionService $permissionService
     ) {
-        parent::__construct($service);
     }
 
     /**
@@ -26,10 +25,12 @@ class ViewController extends BaseRequestController
     {
         $userRequest = OCDRequest::with(['status', 'detail', 'user', 'activeOffer.documents'])
             ->findOrFail($id);
-        $permissions = $this->permissionService->getPermissions($userRequest, auth()->user());
+        $permissions = $this->permissionService->getPermissions($userRequest, $request->user());
         $requestResource = RequestResource::withPermissions($userRequest, $permissions);
         $viewData = [
-            'title' => $this->service->getRequestTitle($userRequest),
+            'title' => $userRequest->detail?->capacity_development_title
+                ? $userRequest->detail->capacity_development_title
+                : 'Request #' . $userRequest->id,
             'request' => $requestResource
         ];
 
@@ -40,7 +41,7 @@ class ViewController extends BaseRequestController
                     ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
                     ['name' => 'Requests', 'url' => route('admin.request.list')],
                     [
-                        'name' => 'View Request #' . $userRequest->id,
+                        'name' => $viewData['title'],
                         'url' => route('admin.request.show', ['id' => $userRequest->id])
                     ],
                 ],
@@ -49,7 +50,7 @@ class ViewController extends BaseRequestController
         } else {
             $viewData = array_merge($viewData, [
                 'banner' => [
-                    'title' => $this->service->getRequestTitle($userRequest),
+                    'title' => $viewData['title'],
                     'description' => 'View my request details here.',
                     'image' => '/assets/img/sidebar.png',
                 ],
@@ -65,42 +66,4 @@ class ViewController extends BaseRequestController
         return Inertia::render($this->getViewPrefix() . 'Request/Show', $viewData);
     }
 
-    /**
-     * Display request preview (read-only mode)
-     */
-    public function preview(Request $request, int $requestId): Response
-    {
-        $ocdRequest = $this->service->findRequest($requestId, $request->user());
-
-        if (!$ocdRequest) {
-            abort(404, 'Request not found');
-        }
-
-        $offer = $this->service->getActiveOffer($requestId);
-
-        // Preview mode disables all actions
-        $previewActions = $this->permissionService->getRequestDetailActions($ocdRequest, $request->user());
-        // Override all permissions to false for preview mode
-        $previewActions = array_map(fn() => false, $previewActions);
-
-        return Inertia::render('Request/Preview', [
-            'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
-            'banner' => [
-                'title' => 'Request : ' . $this->service->getRequestTitle($ocdRequest),
-                'description' => 'View my request details here.',
-                'image' => '/assets/img/sidebar.png',
-            ],
-            'request' => RequestResource::withPermissions($ocdRequest, []),
-            'offer' => $offer,
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Requests', 'url' => route('request.me.list')],
-                [
-                    'name' => 'View Request #' . $ocdRequest->id,
-                    'url' => route('request.show', ['id' => $ocdRequest->id])
-                ],
-            ],
-            'requestDetail.actions' => $previewActions,
-        ]);
-    }
 }

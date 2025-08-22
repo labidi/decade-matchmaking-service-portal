@@ -18,8 +18,7 @@ use Illuminate\Support\Facades\Log;
 class RequestService
 {
     public function __construct(
-        private readonly RequestRepository $repository,
-        private readonly RequestPermissionService $permissionService
+        private readonly RequestRepository $repository
     ) {
     }
 
@@ -69,9 +68,9 @@ class RequestService
     /**
      * Find request by ID with authorization
      */
-    public function findRequest(int $id, ?User $user = null): ?Request
+    public function findRequest(int $id): ?Request
     {
-        return $this->repository->findWithAuthorization($id, $user);
+        return $this->repository->findById($id);
     }
 
     /**
@@ -172,67 +171,6 @@ class RequestService
     }
 
     /**
-     * Get active offer for a request
-     */
-    public function getActiveOffer(int $requestId): ?Offer
-    {
-        return Offer::where('request_id', $requestId)
-            ->where('status', \App\Enums\Offer\RequestOfferStatus::ACTIVE)
-            ->first();
-    }
-
-    /**
-     * Get active offer with documents for a request
-     */
-    public function getActiveOfferWithDocuments(int $requestId): ?Offer
-    {
-        return Offer::where('request_id', $requestId)
-            ->where('status', \App\Enums\Offer\RequestOfferStatus::ACTIVE)
-            ->with(['documents', 'matchedPartner'])
-            ->first();
-    }
-
-    /**
-     * Get request actions based on status and user
-     */
-    public function getRequestActions(Request $request, User $user): array
-    {
-        $actions = [];
-
-        if ($request->user_id === $user->id && $request->status->status_code === 'draft') {
-            $actions['canEdit'] = true;
-            $actions['canDelete'] = true;
-        }
-
-        if ($request->status->status_code === 'offer_made' && $request->user_id === $user->id && $request->activeOffer) {
-            $actions['canAcceptOffer'] = true;
-            $actions['canRequestClarificationForOffer'] = true;
-        }
-        if ($request->status->status_code === 'validated' && $request->user_id !== $user->id) {
-            $actions[] = 'express_interest';
-        }
-
-        $actions['view'] = true;
-        $actions['export'] = true;
-
-        return $actions;
-    }
-
-    /**
-     * Get request for export
-     */
-    public function getRequestForExport(int $requestId, User $user): ?Request
-    {
-        $request = $this->findRequest($requestId, $user);
-
-        if (!$request) {
-            return null;
-        }
-
-        return $request;
-    }
-
-    /**
      * Get request by ID (for admin/system use)
      */
     public function getRequestById(int $id, ?User $user = null): ?Request
@@ -241,34 +179,12 @@ class RequestService
     }
 
     /**
-     * Get request title
-     */
-    public function getRequestTitle(Request $request): string
-    {
-        if ($request->detail && $request->detail->capacity_development_title) {
-            return $request->detail->capacity_development_title;
-        }
-        return 'N/A';
-    }
-
-    /**
-     * Get requester name
-     */
-    public function getRequesterName(Request $request): string
-    {
-        if ($request->detail) {
-            return trim($request->detail->first_name . ' ' . $request->detail->last_name);
-        }
-        return 'N/A';
-    }
-
-    /**
      * Get status ID by code
      */
     private function getStatusId(string $statusCode): ?int
     {
         $status = $this->repository->getStatusByCode($statusCode);
-        return $status ? $status->id : null;
+        return $status?->getAttribute('id');
     }
 
     /**

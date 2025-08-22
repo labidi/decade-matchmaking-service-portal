@@ -13,6 +13,7 @@ use App\Enums\Request\SubTheme;
 use App\Enums\Request\SupportType;
 use App\Http\Requests\StoreRequest;
 use App\Models\Request;
+use App\Services\RequestService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,11 @@ use Inertia\Response;
 
 class RequestFormController extends BaseRequestController
 {
+    public function __construct(
+        private readonly RequestService $service
+    ) {
+    }
+
     /**
      * Show the form for creating a new resource or editing an existing one.
      */
@@ -29,7 +35,7 @@ class RequestFormController extends BaseRequestController
         // Check if this is edit mode (ID provided) or create mode (no ID)
         $isEditMode = !is_null($id);
         if ($isEditMode) {
-            $request = $this->service->findRequest($id, Auth::user());
+            $request = $this->service->findRequest($id);
             // Edit mode - fetch the existing request
             if (!$request) {
                 return to_route('request.me.list')->with('error', 'Request not found.');
@@ -49,7 +55,7 @@ class RequestFormController extends BaseRequestController
             ],
         ];
         if ($isEditMode) {
-            $requestTitle = $this->service->getRequestTitle($request);
+            $requestTitle = $request->detail?->capacity_development_title ?? 'Untitled';
             $data = array_merge($data, [
                 'title' => 'Request : ' . $requestTitle,
                 'banner' => $this->buildBanner(

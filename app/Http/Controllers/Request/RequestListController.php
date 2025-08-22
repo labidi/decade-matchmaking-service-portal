@@ -14,11 +14,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class RequestListController extends BaseRequestController
 {
     public function __construct(
-        private readonly  RequestPermissionService $permissionService,
-        RequestService $service
-    )
-    {
-        parent::__construct($service);
+        private readonly RequestPermissionService $permissionService,
+        private readonly RequestService $service
+    ) {
     }
 
     /**
@@ -40,7 +38,7 @@ class RequestListController extends BaseRequestController
             'requests' => $requests,
             'currentSort' => $filters['current']['sort'],
             'currentSearch' => $filters['current']['search'],
-            'breadcrumbs' => $this->buildContextualRequestBreadcrumbs('list'),
+            'breadcrumbs' => $this->buildRequestBreadcrumbs("list", null, $this->isAdminRoute()),
             'availableStatuses' => $this->service->getAvailableStatuses(),
         ]);
     }
@@ -147,5 +145,30 @@ class RequestListController extends BaseRequestController
     public function exportCsv(ExportService $exportService): StreamedResponse
     {
         return $exportService->exportRequestsCsv();
+    }
+
+
+    private function buildFilters(Request $request): array
+    {
+        $sortField = $request->get('sort', 'created_at');
+        $sortOrder = $request->get('order', 'desc');
+        $searchUser = $request->get('user');
+        $searchTitle = $request->get('title');
+
+        return [
+            'search' => array_filter([
+                'user' => $searchUser,
+                'title' => $searchTitle,
+            ]),
+            'sort' => [
+                'field' => $sortField,
+                'order' => $sortOrder,
+                'per_page' => 10,
+            ],
+            'current' => [
+                'sort' => ['field' => $sortField, 'order' => $sortOrder],
+                'search' => ['user' => $searchUser ?? '', 'title' => $searchTitle ?? ''],
+            ]
+        ];
     }
 }

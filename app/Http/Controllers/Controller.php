@@ -12,6 +12,11 @@ abstract class Controller
         return str_contains(request()->route()->getPrefix(),'admin');
     }
 
+    protected function getViewPrefix(): string
+    {
+        return $this->isAdminRoute() ? 'Admin/' : '';
+    }
+
     protected function buildBanner(string $title, string $description): array
     {
         return [

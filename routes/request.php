@@ -30,7 +30,6 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::delete('request/{id}', [RequestManagementController::class, 'destroy'])->name('user.request.destroy');
 
     // Request viewing and preview
-    Route::get('request/preview/{id}', [ViewController::class, 'preview'])->name('request.preview');
     Route::get('pdf/{id}', ExportRequestPdfController::class)->name('request.pdf');
 
     // Request listings
