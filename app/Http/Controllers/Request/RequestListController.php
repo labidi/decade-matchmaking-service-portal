@@ -38,7 +38,6 @@ class RequestListController extends BaseRequestController
             'requests' => $requests,
             'currentSort' => $filters['current']['sort'],
             'currentSearch' => $filters['current']['search'],
-            'breadcrumbs' => $this->buildRequestBreadcrumbs("list", null, $this->isAdminRoute()),
             'availableStatuses' => $this->service->getAvailableStatuses(),
         ]);
     }
@@ -67,10 +66,6 @@ class RequestListController extends BaseRequestController
             'routeName' => 'request.me.list',
             'currentSort' => $filters['current']['sort'],
             'currentSearch' => $filters['current']['search'],
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'My requests', 'url' => route('request.me.list')],
-            ],
         ]);
     }
 
@@ -97,16 +92,6 @@ class RequestListController extends BaseRequestController
             'currentSort' => $filters['current']['sort'],
             'currentSearch' => $filters['current']['search'],
             'requests' => $requests,
-            'breadcrumbs' => [
-                [
-                    'name' => 'Home',
-                    'url' => route('user.home')
-                ],
-                [
-                    'name' => 'Requests for Training & workshops',
-                    'url' => route('request.list')
-                ],
-            ]
         ]);
     }
 
@@ -132,10 +117,6 @@ class RequestListController extends BaseRequestController
             'currentSort' => $filters['current']['sort'],
             'currentSearch' => $filters['current']['search'],
             'requests' => $requests,
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'My matched Requests', 'url' => route('request.list')],
-            ]
         ]);
     }
 

@@ -18,12 +18,11 @@ class StoreRequest extends FormRequest
 
     public function rules(): array
     {
-        $rules = [];
+        $rules = $this->getBaseValidationRules();
         if ($this->input('mode') === 'draft') {
             return $rules;
         }
-
-        $rules = [
+        return array_merge($rules, [
             'is_related_decade_action' => [
                 'required',
                 Rule::enum(YesNo::class)
@@ -44,12 +43,11 @@ class StoreRequest extends FormRequest
                 ),
                 Rule::enum(YesNo::class)
             ],
-            // need to be fixed when no and yes
             'project_stage' => [
                 Rule::excludeIf(
-                    fn() => $this->input("is_related_decade_action") === YesNo::YES->value || $this->input(
+                    fn() => $this->input("is_related_decade_action") === YesNo::NO->value || $this->input(
                             "request_link_type"
-                        ) === YesNo::YES->value
+                        ) === YesNo::NO->value
                 ),
                 'string'
             ],
@@ -120,7 +118,48 @@ class StoreRequest extends FormRequest
             'expected_outcomes' => ['required', 'string'],
             'success_metrics' => ['required', 'string'],
             'long_term_impact' => ['required', 'string'],
+        ]);
+    }
+
+    private function getBaseValidationRules()
+    {
+        return [
+            'is_related_decade_action' => [],
+            'unique_related_decade_action_id' => [],
+            'first_name' => [],
+            'last_name' => [],
+            'email' => [],
+            'capacity_development_title' => [],
+            'request_link_type' => [],
+            'project_stage' => [],
+            'project_url' => [],
+            'related_activity' => [],
+            'delivery_format' => [],
+            'delivery_countries' => [],
+            'target_audience' => [],
+            'target_audience_other' => [],
+            'target_languages' => [],
+            'target_languages.*' => [],
+            'target_languages_other' => [],
+            'subthemes' => [],
+            'subthemes.*' => [],
+            'support_types' => [],
+            'support_types.*' => [],
+            'gap_description' => [],
+            'has_partner' => [],
+            'partner_name' => [],
+            'partner_confirmed' => [],
+            'needs_financial_support' => [],
+            'budget_breakdown' => [],
+            'support_months' => [],
+            'completion_date' => [],
+            'risks' => [],
+            'personnel_expertise' => [],
+            'direct_beneficiaries' => [],
+            'direct_beneficiaries_number' => [],
+            'expected_outcomes' => [],
+            'success_metrics' => [],
+            'long_term_impact' => [],
         ];
-        return $rules;
     }
 }

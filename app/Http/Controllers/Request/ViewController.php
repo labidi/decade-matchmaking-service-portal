@@ -37,14 +37,6 @@ class ViewController extends BaseRequestController
         if ($this->isAdminRoute()) {
             // Admin view - with admin permissions
             $viewData = array_merge($viewData, [
-                'breadcrumbs' => [
-                    ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
-                    ['name' => 'Requests', 'url' => route('admin.request.list')],
-                    [
-                        'name' => $viewData['title'],
-                        'url' => route('admin.request.show', ['id' => $userRequest->id])
-                    ],
-                ],
                 'availableStatuses' => $this->service->getAvailableStatuses(),
             ]);
         } else {
@@ -53,14 +45,7 @@ class ViewController extends BaseRequestController
                     'title' => $viewData['title'],
                     'description' => 'View my request details here.',
                     'image' => '/assets/img/sidebar.png',
-                ],
-                'breadcrumbs' => [
-                    ['name' => 'Home', 'url' => route('user.home')],
-                    [
-                        'name' => 'View Request #' . $userRequest->id,
-                        'url' => route('request.show', ['id' => $userRequest->id])
-                    ],
-                ],
+                ]
             ]);
         }
         return Inertia::render($this->getViewPrefix() . 'Request/Show', $viewData);

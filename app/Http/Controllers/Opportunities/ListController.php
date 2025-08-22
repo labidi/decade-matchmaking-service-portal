@@ -32,10 +32,6 @@ class ListController extends BaseOpportunitiesController
                 ],
                 'currentSearchFields' => ['user', 'title'],
                 'routeName' => 'admin.opportunity.list',
-                'breadcrumbs' => [
-                    ['name' => 'Admin', 'url' => route('admin.dashboard.index')],
-                    ['name' => 'Opportunities', 'url' => route('admin.opportunity.list')],
-                ],
             ],
             'user_own' => [
                 'component' => 'Opportunity/List',
@@ -51,10 +47,6 @@ class ListController extends BaseOpportunitiesController
                 ],
                 'currentSearchFields' => ['type', 'status','title'],
                 'routeName' => 'opportunity.me.list',
-                'breadcrumbs' => [
-                    ['name' => 'Home', 'url' => route('user.home')],
-                    ['name' => 'Opportunities', 'url' => route('opportunity.me.list')],
-                ],
                 'pageActions'=> [
                     'canSubmitNew'=> true,
                 ]
@@ -73,10 +65,6 @@ class ListController extends BaseOpportunitiesController
                 ],
                 'currentSearchFields' => ['title', 'type'],
                 'routeName' => 'opportunity.list',
-                'breadcrumbs' => [
-                    ['name' => 'Home', 'url' => route('user.home')],
-                    ['name' => 'Opportunities', 'url' => route('opportunity.list')],
-                ]
             ],
         };
     }
@@ -136,7 +124,6 @@ class ListController extends BaseOpportunitiesController
             ],
             'routeName' => $config['routeName'],
             'currentSearch' => $this->buildCurrentSearch($searchFilters, $config['currentSearchFields']),
-            'breadcrumbs' => $config['breadcrumbs'],
             'pageActions'=> $config['pageActions'] ?? []
         ]);
     }

@@ -62,15 +62,7 @@ class RequestFormController extends BaseRequestController
                     'Request : ' . $requestTitle,
                     'Edit my request details here.'
                 ),
-                'request' => $request->toArray(),
-                'breadcrumbs' => [
-                    ['name' => 'Home', 'url' => route('user.home')],
-                    ['name' => 'Requests', 'url' => route('request.me.list')],
-                    [
-                        'name' => 'Edit Request #' . $request->id,
-                        'url' => route('request.edit', ['id' => $request->id])
-                    ],
-                ],
+                'request' => $request->toArray()
             ]);
         } else {
             // Create mode - new request
@@ -80,12 +72,7 @@ class RequestFormController extends BaseRequestController
                     'title' => 'Create a new request',
                     'description' => 'Create a new request to get started.',
                     'image' => '/assets/img/sidebar.png',
-                ],
-                'breadcrumbs' => [
-                    ['name' => 'Home', 'url' => route('user.home')],
-                    ['name' => 'Requests', 'url' => route('request.me.list')],
-                    ['name' => 'Create Request', 'url' => route('request.create')],
-                ],
+                ]
             ]);
         }
 
@@ -98,55 +85,25 @@ class RequestFormController extends BaseRequestController
     public function submit(StoreRequest $request, ?int $id = null): RedirectResponse
     {
         $mode = $request->input('mode', 'submit');
-
         try {
-            if ($mode === 'draft') {
-                return $this->saveRequestAsDraft($request, $id);
-            }
-            return $this->storeRequest($request, $id);
+            $request = $this->service->storeRequest(
+                $request->user(),
+                $request->validated(),
+                $id ? $this->service->findRequest($id) : null,
+                $mode
+            );
+            return match ($mode) {
+                'draft' => to_route('request.edit', ['id' => $request->id])->with(
+                    'success',
+                    'Request draft saved successfully.'
+                ),
+                default => to_route('request.me.list')->with('success', 'Request submitted successfully.'),
+            };
         } catch (Exception $e) {
             if ($id) {
                 return to_route('request.edit', ['id' => $id])->with('error', $e->getMessage());
             }
             return to_route('request.create')->with('error', $e->getMessage());
         }
-    }
-
-    /**
-     * Save request as draft
-     * @throws Exception
-     */
-    private function saveRequestAsDraft(StoreRequest $request, $id = null): RedirectResponse
-    {
-        $userRequest = $id ? Request::find($id) : null;
-        if ($id && !$userRequest) {
-            throw new Exception('Request not found');
-        }
-
-        $userRequest = $this->service->saveDraft($request->user(), $request->all(), $userRequest);
-
-        return to_route('request.edit', ['id' => $userRequest->id])->with([
-            'success' => 'Request draft saved successfully.',
-        ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * @throws Exception
-     */
-    private function storeRequest(StoreRequest $request, $id = null): RedirectResponse
-    {
-        $validated = $request->validated();
-
-        $userRequest = $id ? Request::find($id) : null;
-        if ($id && !$userRequest) {
-            throw new Exception('Request not found');
-        }
-
-        $request = $this->service->storeRequest($request->user(), $validated, $userRequest);
-
-        return to_route('request.me.list')->with([
-            'success' => 'Request submitted successfully.',
-        ]);
     }
 }

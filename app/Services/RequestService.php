@@ -25,31 +25,15 @@ class RequestService
     /**
      * Store a new request or update existing one
      */
-    public function storeRequest(User $user, array $data, ?Request $request = null): Request
+    public function storeRequest(User $user, array $data, ?Request $request = null, $mode = 'submit'): Request
     {
-        $statusId = $this->getStatusId('under_review');
+        $statusId = match ($mode) {
+            'draft' => $this->getStatusId('under_review'),
+            default => $this->getStatusId('draft'),
+        };
         $requestData = [
             'user_id' => $user->id,
             'status_id' => $statusId
-        ];
-        if ($request) {
-            $this->repository->update($request, $requestData);
-        } else {
-            $request = $this->repository->create($requestData);
-        }
-        $this->repository->createOrUpdateDetail($request, $data);
-        return $request->load(['status', 'detail']);
-    }
-
-    /**
-     * Save request as draft
-     */
-    public function saveDraft(User $user, array $data, ?Request $request = null): Request
-    {
-        $statusId = $this->getStatusId('draft');
-        $requestData = [
-            'user_id' => $user->id,
-            'status_id' => $statusId,
         ];
         if ($request) {
             $this->repository->update($request, $requestData);
