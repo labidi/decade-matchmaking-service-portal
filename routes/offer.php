@@ -30,6 +30,3 @@ Route::middleware(['auth'])->group(function () {
     Route::post('offer/{id}/accept', AcceptOfferController::class)->name('offer.accept');
     Route::post('offer/{id}/request-clarification', ClarificationRequestController::class)->name('offer.clarification-request');
 });
-
-//Route::post('request/{request}/offer', StoreController::class)->name('request.offer.store');
-//Route::get('request/{request}/offers', ListController::class)->name('request.offer.list');

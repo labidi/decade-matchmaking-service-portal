@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Admin\NotificationsController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserGuideController;
 use Illuminate\Support\Facades\Route;
@@ -19,13 +21,13 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('subscriptions/unsubscribe', [\App\Http\Controllers\SubscriptionController::class, 'unsubscribe'])->name('user.subscriptions.unsubscribe');
     Route::get('subscriptions/status', [\App\Http\Controllers\SubscriptionController::class, 'status'])->name('user.subscriptions.status');
 
-    Route::post('offer/{id}/document', [\App\Http\Controllers\DocumentsController::class, 'storeOfferDocument'])->name(
+    Route::post('offer/{id}/document', [DocumentsController::class, 'storeOfferDocument'])->name(
         'user.offer.document.store'
     );
-    Route::delete('user/document/{document}', [\App\Http\Controllers\DocumentsController::class, 'destroy'])->name(
+    Route::delete('user/document/{document}', [DocumentsController::class, 'destroy'])->name(
         'user.document.destroy'
     );
-    Route::get('user/document/{document}/download', [\App\Http\Controllers\DocumentsController::class, 'download']
+    Route::get('user/document/{document}/download', [DocumentsController::class, 'download']
     )->name('user.document.download');
 });
 
@@ -36,12 +38,12 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::post('settings/organizations/csv-upload', [SettingsController::class, 'uploadOrganizationsCsv'])->name('admin.settings.organizations.csv-upload');
 
     // Admin subscription management routes
-    Route::get('subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('admin.subscriptions.index');
-    Route::post('subscriptions/subscribe-user', [\App\Http\Controllers\Admin\SubscriptionController::class, 'subscribeUser'])->name('admin.subscriptions.subscribe-user');
-    Route::post('subscriptions/unsubscribe-user', [\App\Http\Controllers\Admin\SubscriptionController::class, 'unsubscribeUser'])->name('admin.subscriptions.unsubscribe-user');
-    Route::get('subscriptions/request/{request}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'requestSubscribers'])->name('admin.subscriptions.request-subscribers');
-    Route::get('subscriptions/user/{user}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'userSubscriptions'])->name('admin.subscriptions.user-subscriptions');
-    Route::post('subscriptions/bulk-unsubscribe', [\App\Http\Controllers\Admin\SubscriptionController::class, 'bulkUnsubscribe'])->name('admin.subscriptions.bulk-unsubscribe');
+    Route::get('subscriptions', [SubscriptionController::class, 'index'])->name('admin.subscriptions.index');
+    Route::post('subscriptions/subscribe-user', [SubscriptionController::class, 'subscribeUser'])->name('admin.subscriptions.subscribe-user');
+    Route::post('subscriptions/unsubscribe-user', [SubscriptionController::class, 'unsubscribeUser'])->name('admin.subscriptions.unsubscribe-user');
+    Route::get('subscriptions/request/{request}', [SubscriptionController::class, 'requestSubscribers'])->name('admin.subscriptions.request-subscribers');
+    Route::get('subscriptions/user/{user}', [SubscriptionController::class, 'userSubscriptions'])->name('admin.subscriptions.user-subscriptions');
+    Route::post('subscriptions/bulk-unsubscribe', [SubscriptionController::class, 'bulkUnsubscribe'])->name('admin.subscriptions.bulk-unsubscribe');
 
     Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
     Route::get('user/list', [UserRoleController::class, 'index'])->name('admin.users.roles.list');
