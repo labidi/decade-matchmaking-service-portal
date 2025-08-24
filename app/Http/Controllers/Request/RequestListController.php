@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Request;
 
 use App\Http\Resources\RequestResource;
-use App\Services\Request\RequestPermissionService;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,24 +13,20 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class RequestListController extends BaseRequestController
 {
     public function __construct(
-        private readonly RequestPermissionService $permissionService,
         private readonly RequestService $service
     ) {
     }
 
     /**
      * Display requests list - unified method for both admin and user contexts
+     * @throws \Throwable
      */
     public function list(Request $httpRequest): Response
     {
         $filters = $this->buildFilters($httpRequest);
         // Admin view - all requests
         $requests = $this->service->getPaginatedRequests($filters['search'], $filters['sort']);
-
-        $requests->setCollection($requests->getCollection()->transform(function ($request) {
-            $permissions = $this->permissionService->getPermissions($request, auth()->user());
-            return RequestResource::withPermissions($request, $permissions);
-        }));
+        $requests->toResourceCollection(RequestResource::class) ;
 
         return Inertia::render($this->getViewPrefix() . 'Request/List', [
             'title' => "Requests",
@@ -44,16 +39,13 @@ class RequestListController extends BaseRequestController
 
     /**
      * Display user's own requests list
+     * @throws \Throwable
      */
     public function myRequests(Request $httpRequest): Response
     {
         $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getUserRequests($httpRequest->user(), $filters['search'], $filters['sort']);
-
-        $requests->setCollection($requests->getCollection()->transform(function ($request) {
-            $permissions = $this->permissionService->getPermissions($request, auth()->user());
-            return RequestResource::withPermissions($request, $permissions);
-        }));
+        $requests->toResourceCollection(RequestResource::class) ;
 
         return Inertia::render('Request/List', [
             'title' => 'My requests',
@@ -71,15 +63,13 @@ class RequestListController extends BaseRequestController
 
     /**
      * Display public requests list (for partners)
+     * @throws \Throwable
      */
     public function publicRequests(Request $httpRequest): Response
     {
         $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getPublicRequests($filters['search'], $filters['sort']);
-        $requests->setCollection($requests->getCollection()->transform(function ($request) {
-            $permissions = $this->permissionService->getPermissions($request, auth()->user());
-            return RequestResource::withPermissions($request, $permissions);
-        }));
+        $requests->toResourceCollection(RequestResource::class) ;
 
         return Inertia::render('Request/List', [
             'title' => 'View Request for Training workshops',
@@ -97,15 +87,13 @@ class RequestListController extends BaseRequestController
 
     /**
      * Display matched requests for user
+     * @throws \Throwable
      */
     public function matchedRequests(Request $httpRequest): Response
     {
         $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getMatchedRequests($httpRequest->user(), $filters['search'], $filters['sort']);
-        $requests->setCollection($requests->getCollection()->transform(function ($request) {
-            $permissions = $this->permissionService->getPermissions($request, auth()->user());
-            return RequestResource::withPermissions($request, $permissions);
-        }));
+        $requests->toResourceCollection(RequestResource::class) ;
         return Inertia::render('Request/List', [
             'title' => 'View my matched requests',
             'banner' => [
@@ -144,7 +132,7 @@ class RequestListController extends BaseRequestController
             'sort' => [
                 'field' => $sortField,
                 'order' => $sortOrder,
-                'per_page' => 10,
+                'per_page' => 2,
             ],
             'current' => [
                 'sort' => ['field' => $sortField, 'order' => $sortOrder],

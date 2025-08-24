@@ -8,6 +8,7 @@ use App\Models\Request\Status;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\AbstractPaginator;
 
 class RequestRepository
 {
@@ -69,7 +70,7 @@ class RequestRepository
     /**
      * Get paginated requests with search and sorting
      */
-    public function getPaginated(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    public function getPaginated(array $searchFilters = [], array $sortFilters = []): AbstractPaginator
     {
         $query = $this->queryBuilder->buildBaseQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
@@ -80,7 +81,7 @@ class RequestRepository
     /**
      * Get public requests for partners
      */
-    public function getPublicRequests(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    public function getPublicRequests(array $searchFilters = [], array $sortFilters = []): AbstractPaginator
     {
         $query = $this->queryBuilder->buildPublicRequestsQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
@@ -131,17 +132,17 @@ class RequestRepository
     public function createOrUpdateDetail(OCDRequest $request, array $data): void
     {
         $detailData = [];
-        
+
         foreach ($data as $key => $value) {
             if ($key == 'mode' || $key == 'id') {
                 continue; // Skip mode and id fields as they are not stored in detail
             }
-            
+
             // Let Laravel's casting handle the data transformation
             // No manual JSON encoding needed - the Detail model's $casts property handles this
             $detailData[$key] = $value;
         }
-        
+
         if ($request->detail) {
             $request->detail()->update($detailData);
         } else {

@@ -71,7 +71,7 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Could you specify the current stage of the initiative?',
                 // Options should be provided via formOptions.project_stage from page props
-                show: data => data.request_link_type === 'yes' && data.is_related_decade_action !== 'yes',
+                show: data => data.request_link_type === 'yes',
             },
             project_url: {
                 id: 'project_url',

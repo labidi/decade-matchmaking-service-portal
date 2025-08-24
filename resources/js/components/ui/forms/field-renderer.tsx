@@ -53,14 +53,12 @@ export default function FieldRenderer({
                                       }: Readonly<FieldRendererProps>) {
 
 
-
     // Accessibility attributes
     const getAriaAttributes = useCallback((field: UIField, error?: string) => ({
         'aria-invalid': !!error,
         'aria-describedby': error ? `${field.id}-error` : undefined,
         'aria-required': field.required,
     }), []);
-
 
 
     // Debounced onChange for search fields
@@ -198,7 +196,6 @@ export default function FieldRenderer({
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </Field>
             );
-
         case 'textarea':
             return (
                 <Field key={name} className="mt-8">
@@ -215,7 +212,6 @@ export default function FieldRenderer({
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </Field>
             );
-
         case 'file':
             const existingDocuments = formData?.existing_documents || [];
             const hasExistingDocuments = Array.isArray(existingDocuments) && existingDocuments.length > 0;
@@ -284,7 +280,6 @@ export default function FieldRenderer({
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </Field>
             );
-
         case 'select':
             return (
                 <SelectField
@@ -370,7 +365,6 @@ export default function FieldRenderer({
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </Field>
             );
-
         case 'checkbox-group':
             return (
                 <Fieldset key={name} className="mt-8">
@@ -399,7 +393,6 @@ export default function FieldRenderer({
                     )}
                 </Fieldset>
             );
-
         case 'csv-upload':
             return (
                 <CSVUpload
@@ -413,7 +406,6 @@ export default function FieldRenderer({
                     disabled={field.disabled || disabled}
                 />
             );
-
         default:
             return null;
     }
