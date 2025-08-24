@@ -389,11 +389,14 @@ export default function FieldRenderer({
                                     onChange={() => handleCheckboxChange(opt.value)}
                                 />
                                 <Label>{opt.label}</Label>
-
                             </CheckboxField>
                         ))}
                     </CheckboxGroup>
-                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                    {error && (
+                        <Field>
+                            <ErrorMessage>{error}</ErrorMessage>
+                        </Field>
+                    )}
                 </Fieldset>
             );
 

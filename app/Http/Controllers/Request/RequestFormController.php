@@ -12,6 +12,7 @@ use App\Enums\Request\RelatedActivity;
 use App\Enums\Request\SubTheme;
 use App\Enums\Request\SupportType;
 use App\Http\Requests\StoreRequest;
+use App\Http\Resources\RequestResource;
 use App\Models\Request;
 use App\Services\RequestService;
 use Exception;
@@ -62,7 +63,7 @@ class RequestFormController extends BaseRequestController
                     'Request : ' . $requestTitle,
                     'Edit my request details here.'
                 ),
-                'request' => $request->toArray()
+                'request' => new RequestResource($request)
             ]);
         } else {
             // Create mode - new request

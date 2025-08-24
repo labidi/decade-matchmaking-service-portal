@@ -63,4 +63,12 @@ class RequestResource extends JsonResource
     {
         return (new static($resource))->setPermissions($permissions);
     }
+
+    /**
+     * Create a new resource instance with permissions.
+     */
+    public static function withoutPermissions($resource, array $permissions): static
+    {
+        return new static($resource);
+    }
 }
