@@ -4,7 +4,7 @@ import {RequestOffer, RequestOfferList, PaginationLinkProps, UIField} from "@/ty
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {Badge} from '@/components/ui/badge'
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
-import {formatDate} from '@/utils/date-formatter';
+import {formatDate, offerStatusBadgeRenderer} from '@/utils';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
 import {DataTableActionsColumn, DataTableAction} from '@/components/ui/data-table/common/data-table-actions-column';
@@ -58,24 +58,6 @@ interface OffersDataTableProps {
 }
 
 // Utility Functions
-const statusBadgeRenderer = (offer: RequestOffer) => {
-    let color: "teal" | "cyan" | "amber" | "green" | "blue" | "red" | "orange" | "yellow" | "lime" | "emerald" | "sky" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
-
-    switch (offer.status.value) {
-        case '1':
-            color = 'green';
-            break;
-        case '2':
-            color = 'red';
-            break;
-        default:
-            color = 'zinc';
-    }
-
-    return (
-        <Badge color={color}>{offer.status.label}</Badge>
-    );
-};
 
 export function OffersDataTable({
                                     offers,
@@ -169,7 +151,7 @@ export function OffersDataTable({
             label: 'Status',
             sortable: true,
             sortField: 'status',
-            render: (offer) => statusBadgeRenderer(offer)
+            render: (offer) => offerStatusBadgeRenderer(offer)
         },
         {
             key: 'created_at',

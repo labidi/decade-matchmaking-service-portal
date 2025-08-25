@@ -28,7 +28,7 @@ export default function ShowRequest({
             <RequestDetails request={request}/>
             {/* Display offer details if there's an active offer */}
             {request.active_offer && (
-                <OfferDetailsSection offer={request.active_offer}/>
+                <OfferDetailsSection offer={request.active_offer} request={request}/>
             )}
             {/* Dynamic action buttons based on permissions */}
             <RequestShowActionButtons

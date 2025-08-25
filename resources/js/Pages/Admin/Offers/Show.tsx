@@ -5,7 +5,7 @@ import {RequestOffer} from '@/types';
 import {Button} from '@/components/ui/button';
 import {Badge} from '@/components/ui/badge';
 import {PencilIcon, TrashIcon, EyeIcon} from '@heroicons/react/16/solid';
-import {formatDate} from '@/utils/date-formatter';
+import {formatDate, offerStatusBadgeRenderer} from '@/utils';
 import {DropdownActions} from "@/components/ui/data-table/common";
 import {useOfferActions} from "@/hooks/useOfferActions";
 
@@ -13,24 +13,6 @@ interface ShowOfferPageProps {
     offer: RequestOffer;
 }
 
-const statusBadgeRenderer = (offer: RequestOffer) => {
-    let color: "teal" | "cyan" | "amber" | "green" | "blue" | "red" | "orange" | "yellow" | "lime" | "emerald" | "sky" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
-
-    switch (offer.status.value) {
-        case '1':
-            color = 'green';
-            break;
-        case '2':
-            color = 'red';
-            break;
-        default:
-            color = 'zinc';
-    }
-
-    return (
-        <Badge color={color}>{offer.status.label}</Badge>
-    );
-};
 
 export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
 
@@ -87,7 +69,7 @@ export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
                                     Status
                                 </dt>
                                 <dd className="mt-1">
-                                    {statusBadgeRenderer(offer)}
+                                    {offerStatusBadgeRenderer(offer)}
                                 </dd>
                             </div>
 

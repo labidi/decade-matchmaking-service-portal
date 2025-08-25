@@ -22,7 +22,7 @@ class ViewController extends BaseRequestController
      */
     public function show(Request $request, ?int $id = null): Response
     {
-        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'activeOffer.documents'])
+        $userRequest = OCDRequest::with(['status', 'detail', 'user', 'activeOffer.documents','activeOffer.matchedPartner'])
             ->findOrFail($id);
         $viewData = [
             'title' => $userRequest->detail?->capacity_development_title

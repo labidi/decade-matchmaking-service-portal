@@ -3,6 +3,8 @@ import {Document, OCDRequest, User} from "@/types/index";
 export interface RequestOfferPermissions {
     can_view: boolean;
     can_edit: boolean;
+    can_enable: boolean;
+    can_disable: boolean;
     can_delete: boolean;
     can_accept: boolean;
     can_reject: boolean;

@@ -44,6 +44,8 @@ class OfferResource extends JsonResource
         $baseData['permissions'] = [
             'can_view' => $request->user()->can('view', [Offer::class, $this->resource]),
             'can_edit' => $request->user()->can('update', [Offer::class, $this->resource]),
+            'can_enable' => $request->user()->can('canEnableOrDisable', [Offer::class, $this->resource]),
+            'can_disable' => $request->user()->can('canEnableOrDisable', [Offer::class, $this->resource]),
             'can_delete' => $request->user()->can('delete', [Offer::class, $this->resource]),
             'can_accept' => $request->user()->can('accept', [Offer::class, $this->resource]),
             'can_reject' => $request->user()->can('reject', [Offer::class, $this->resource]),

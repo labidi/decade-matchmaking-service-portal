@@ -19,14 +19,18 @@ export class OfferActionService {
     }
 
     /**
-     * Reject an offer
+     * Reject an offer (set status to inactive with confirmation)
      */
     static reject(offer: RequestOffer): void {
-        router.post(route('admin.offer.update-status', {
-            id: offer.id
-        }), {
-            status: 'rejected'
-        });
+        const confirmMessage = 'Are you sure you want to reject this offer? It will be set to inactive status.';
+
+        if (confirm(confirmMessage)) {
+            router.post(route('admin.offer.update-status', {
+                id: offer.id
+            }), {
+                status: '2' // INACTIVE status value
+            });
+        }
     }
 
     /**
@@ -104,6 +108,46 @@ export class OfferActionService {
             router.visit(route('admin.request.show', {id: offer.request.id}));
         } else {
             console.warn('No request associated with this offer');
+        }
+    }
+
+    /**
+     * Enable an offer (set status to active)
+     */
+    static enable(offer: RequestOffer, onError?: (errors: any) => void): void {
+        router.post(route('admin.offer.update-status', {
+            id: offer.id
+        }), {
+            status: '1' // ACTIVE status value
+        }, {
+            onError: (errors) => {
+                console.error('Error enabling offer:', errors);
+                if (onError) {
+                    onError(errors);
+                }
+            }
+        });
+    }
+
+    /**
+     * Disable an offer (set status to inactive) with confirmation
+     */
+    static disable(offer: RequestOffer, onError?: (errors: any) => void): void {
+        const confirmMessage = 'Are you sure you want to disable this offer? It will no longer be visible to users.';
+
+        if (confirm(confirmMessage)) {
+            router.post(route('admin.offer.update-status', {
+                id: offer.id
+            }), {
+                status: '2' // INACTIVE status value
+            }, {
+                onError: (errors) => {
+                    console.error('Error disabling offer:', errors);
+                    if (onError) {
+                        onError(errors);
+                    }
+                }
+            });
         }
     }
 }

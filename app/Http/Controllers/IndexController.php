@@ -31,7 +31,13 @@ class IndexController extends Controller
                 'description' => 'A user guide to help you navigate the platform.',
                 'url' => $this->settingsService->getSetting(setting::PORTAL_GUIDE),
             ],
-            'metrics' => config('metrics')
+            'metrics' => [
+                'number_of_open_partner_opportunities' => $this->settingsService->getSetting(setting::OPEN_PARTNER_OPPORTUNITIES_METRIC) ?? 0,
+                'number_successful_matches' =>  $this->settingsService->getSetting(setting::SUCCESSFUL_MATCHES_METRIC) ?? 0,
+                'number_fully_closed_matches' => $this->settingsService->getSetting(setting::FULLY_CLOSED_MATCHES_METRIC) ?? 0,
+                'number_user_requests_in_implementation' => $this->settingsService->getSetting(setting::REQUEST_IN_IMPLEMENTATION_METRIC) ?? 0,
+                'committed_funding_amount' => $this->settingsService->getSetting(setting::COMMITTED_FUNDING_METRIC) ?? 0,
+            ]
         ]);
     }
 }
