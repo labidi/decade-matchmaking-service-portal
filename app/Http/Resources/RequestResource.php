@@ -27,7 +27,9 @@ class RequestResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             // Relationships
-            'active_offer' => $this->whenLoaded('activeOffer'),
+            'active_offer' => $this->whenLoaded(('activeOffer'), function ($offer) {
+                return new OfferResource($offer);
+            }),
             'status' => $this->whenLoaded('status'),
             'user' => $this->whenLoaded('user'),
             'matched_partner' => $this->whenLoaded('matchedPartner'),

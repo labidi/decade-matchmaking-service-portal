@@ -1,16 +1,16 @@
-import {useState, useCallback} from 'react';
+import {useCallback} from 'react';
 import {RequestOffer} from '@/types';
 import {Action} from '@/components/ui/data-table/common/dropdown-actions';
-import {UseOfferActionsReturn} from '@/types/offer-actions';
 import {OfferActionService} from '@/services/offerActionService';
 
+export interface UseOfferActionsReturn {
+    getActionsForOffer: (
+        offer: RequestOffer,
+        customAvailableStatuses?: Array<{ value: string; label: string }>
+    ) => Action[];
+}
 
 export function useOfferActions(context: 'admin' | 'user' = 'admin'): UseOfferActionsReturn {
-    // Dialog state management
-    const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
-    const [selectedOffer, setSelectedOffer] = useState<RequestOffer | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [availableStatuses, setAvailableStatuses] = useState<Array<{ value: string; label: string }>>([]);
 
     // Action handlers using OfferActionService
     const handleViewDetails = useCallback((offer: RequestOffer) => {
@@ -45,21 +45,16 @@ export function useOfferActions(context: 'admin' | 'user' = 'admin'): UseOfferAc
         OfferActionService.viewRequest(offer);
     }, []);
 
-    const handleUpdateStatus = useCallback((offer: RequestOffer, statuses: Array<{ value: string; label: string }> = []) => {
-        setSelectedOffer(offer);
-        setAvailableStatuses(statuses);
-        setIsStatusDialogOpen(true);
-    }, []);
-
     const handleExportPdf = useCallback((offer: RequestOffer) => {
         OfferActionService.exportPdf(offer);
     }, []);
 
-    // Dialog actions
-    const closeStatusDialog = useCallback(() => {
-        setIsStatusDialogOpen(false);
-        setSelectedOffer(null);
-        setAvailableStatuses([]);
+    const handleEnableOffer = useCallback((offer: RequestOffer) => {
+        OfferActionService.enable(offer);
+    }, []);
+
+    const handleDisableOffer = useCallback((offer: RequestOffer) => {
+        OfferActionService.disable(offer);
     }, []);
 
     // Build actions for a specific offer
@@ -88,12 +83,21 @@ export function useOfferActions(context: 'admin' | 'user' = 'admin'): UseOfferAc
         }
 
         // Update Status
-        if (offer.permissions.can_edit) {
+        if (offer.permissions.can_enable) {
             actions.push({
-                key: 'update-status',
-                label: 'Update Status',
-                onClick: () => handleUpdateStatus(offer, customAvailableStatuses || []),
+                key: 'enable-offer',
+                label: 'Enable Offer',
+                onClick: () => handleEnableOffer(offer),
                 divider: actions.length > 0,
+            });
+        }
+
+        // Update Status
+        if (offer.permissions.can_disable) {
+            actions.push({
+                key: 'disable-offer',
+                label: 'Disable Offer',
+                onClick: () => handleDisableOffer(offer),
             });
         }
 
@@ -160,7 +164,8 @@ export function useOfferActions(context: 'admin' | 'user' = 'admin'): UseOfferAc
     }, [
         handleViewDetails,
         handleViewRequest,
-        handleUpdateStatus,
+        handleEnableOffer,
+        handleDisableOffer,
         handleEdit,
         handleAccept,
         handleReject,
@@ -171,13 +176,6 @@ export function useOfferActions(context: 'admin' | 'user' = 'admin'): UseOfferAc
     ]);
 
     return {
-        // State
-        isStatusDialogOpen,
-        selectedOffer,
-        isLoading,
-        availableStatuses,
-        // Actions
-        closeStatusDialog,
         getActionsForOffer,
     };
 }

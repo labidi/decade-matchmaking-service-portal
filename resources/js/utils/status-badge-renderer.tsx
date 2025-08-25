@@ -1,6 +1,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Opportunity, OCDRequest } from '@/types';
+import { Opportunity, OCDRequest, RequestOffer } from '@/types';
+import { OFFER_STATUS_COLORS, DEFAULT_OFFER_STATUS_COLOR } from '@/constants/offer-status';
 
 // Type for Badge colors (matching the Badge component)
 type BadgeColor = "teal" | "cyan" | "amber" | "green" | "blue" | "red" | 
@@ -55,5 +56,11 @@ export const requestStatusBadgeRenderer = (status: OCDRequest['status']) => {
     return <Badge color={color}>{status.status_label}</Badge>;
 };
 
+// Pre-configured renderer for Offers
+export const offerStatusBadgeRenderer = (offer: RequestOffer) => {
+    const color = OFFER_STATUS_COLORS[offer.status.value] || DEFAULT_OFFER_STATUS_COLOR;
+    return <Badge color={color}>{offer.status.label}</Badge>;
+};
+
 // Export color maps for potential reuse
-export { OPPORTUNITY_STATUS_COLORS, REQUEST_STATUS_COLORS };
+export { OPPORTUNITY_STATUS_COLORS, REQUEST_STATUS_COLORS, OFFER_STATUS_COLORS };

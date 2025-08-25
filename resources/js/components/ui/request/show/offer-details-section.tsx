@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
-import { useForm, usePage } from '@inertiajs/react';
-import { RequestOffer, Auth, Document } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Field, Label } from '@/components/ui/fieldset';
-import { Badge } from '@/components/ui/badge';
-import { DocumentArrowUpIcon, TrashIcon } from '@heroicons/react/16/solid';
+import React, {useState} from 'react';
+import {useForm, usePage} from '@inertiajs/react';
+import {RequestOffer, Auth, Document, OCDRequest} from '@/types';
+import {Button} from '@/components/ui/button';
+import {Field, Label} from '@/components/ui/fieldset';
+import {Badge} from '@/components/ui/badge';
+import {DocumentArrowUpIcon, TrashIcon} from '@heroicons/react/16/solid';
 import axios from 'axios';
 import {Heading} from "@/components/ui/heading";
+import {offerStatusBadgeRenderer} from '@/utils';
 
 interface OfferDetailsSectionProps {
+    request: OCDRequest;
     offer: RequestOffer;
 }
 
-export default function OfferDetailsSection({ offer }: Readonly<OfferDetailsSectionProps>) {
-    const { auth } = usePage<{ auth: Auth }>().props;
+
+export default function OfferDetailsSection({offer, request}: Readonly<OfferDetailsSectionProps>) {
+    const {auth} = usePage<{ auth: Auth }>().props;
     const [documents, setDocuments] = useState<Document[]>(offer.documents || []);
 
     const form = useForm<{
@@ -27,7 +30,7 @@ export default function OfferDetailsSection({ offer }: Readonly<OfferDetailsSect
     const handleDocumentUpload = (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.data.file) return;
-        form.post(route('user.offer.document.store', { offer: offer.id }), {
+        form.post(route('user.offer.document.store', {offer: offer.id}), {
             forceFormData: true,
             onSuccess: (response) => {
                 form.reset();
@@ -51,17 +54,6 @@ export default function OfferDetailsSection({ offer }: Readonly<OfferDetailsSect
         }
     };
 
-    const getStatusBadgeColor = (statusLabel: string) => {
-        switch (statusLabel.toLowerCase()) {
-            case 'active':
-                return 'green';
-            case 'inactive':
-                return 'red';
-            default:
-                return 'zinc';
-        }
-    };
-
     return (
         <section id="offer-details" className="my-8">
             <div className="bg-white dark:bg-gray-800">
@@ -77,9 +69,7 @@ export default function OfferDetailsSection({ offer }: Readonly<OfferDetailsSect
                                     Status
                                 </dt>
                                 <dd className="mt-1">
-                                    <Badge color={getStatusBadgeColor(offer.status_label)}>
-                                        {offer.status_label}
-                                    </Badge>
+                                    {offerStatusBadgeRenderer(offer)}
                                 </dd>
                             </div>
 
@@ -123,35 +113,37 @@ export default function OfferDetailsSection({ offer }: Readonly<OfferDetailsSect
                     <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                         Documents
                     </h3>
+                    {request.status.status_label === 'in_implementation' && (
+                        <form onSubmit={handleDocumentUpload}
+                              className="mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                            <div className="flex items-end space-x-4">
+                                <div className="flex-1">
+                                    <Field>
+                                        <Label>Upload Document</Label>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,.doc,.docx,.txt"
+                                            className="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                                            onChange={e => form.setData('file', e.currentTarget.files ? e.currentTarget.files[0] : null)}
+                                        />
+                                    </Field>
+                                    {form.errors.file && (
+                                        <p className="mt-1 text-sm text-red-600">{form.errors.file}</p>
+                                    )}
+                                </div>
 
-                    {/* Document Upload Form */}
-                    <form onSubmit={handleDocumentUpload} className="mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                        <div className="flex items-end space-x-4">
-                            <div className="flex-1">
-                                <Field>
-                                    <Label>Upload Document</Label>
-                                    <input
-                                        type="file"
-                                        accept=".pdf,.doc,.docx,.txt"
-                                        className="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                                        onChange={e => form.setData('file', e.currentTarget.files ? e.currentTarget.files[0] : null)}
-                                    />
-                                </Field>
-                                {form.errors.file && (
-                                    <p className="mt-1 text-sm text-red-600">{form.errors.file}</p>
-                                )}
+                                <Button
+                                    type="submit"
+                                    disabled={form.processing || !form.data.file}
+                                    className="shrink-0"
+                                >
+                                    <DocumentArrowUpIcon data-slot="icon"/>
+                                    {form.processing ? 'Uploading...' : 'Upload'}
+                                </Button>
                             </div>
+                        </form>
+                    )}
 
-                            <Button
-                                type="submit"
-                                disabled={form.processing || !form.data.file}
-                                className="shrink-0"
-                            >
-                                <DocumentArrowUpIcon data-slot="icon" />
-                                {form.processing ? 'Uploading...' : 'Upload'}
-                            </Button>
-                        </div>
-                    </form>
 
                     {/* Documents List */}
                     {documents.length > 0 ? (
@@ -190,7 +182,7 @@ export default function OfferDetailsSection({ offer }: Readonly<OfferDetailsSect
                                                 onClick={() => handleDeleteDocument(document.id)}
                                                 className="text-red-600 hover:text-red-700"
                                             >
-                                                <TrashIcon data-slot="icon" />
+                                                <TrashIcon data-slot="icon"/>
                                             </Button>
                                         )}
                                     </div>

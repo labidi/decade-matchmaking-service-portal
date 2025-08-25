@@ -50,11 +50,23 @@ class OfferPolicy
         if (!$user) {
             return false;
         }
-
+        if ($user->hasRole('administrator')) {
+            return true;
+        }
         // Only the offer creator can edit, and only when active and not accepted
         return $user->id === $offer->matched_partner_id
             && $offer->status === RequestOfferStatus::ACTIVE
             && !$offer->is_accepted;
+    }
+
+    public function canEnableOrDisable(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+        
+        // Only administrators can enable or disable offers
+        return $user->hasRole('administrator');
     }
 
     /**
