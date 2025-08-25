@@ -17,15 +17,10 @@ class UpdateStatusController extends Controller
     {
         try {
             $statusCode = (int)$request->input('status');
-            $result = $this->opportunityService->updateOpportunityStatus($opportunityId, $statusCode, $request->user());
-
-            return response()->json([
-                'message' => 'Status updated successfully',
-                'status' => $result['status'],
-            ]);
+            $this->opportunityService->updateOpportunityStatus($opportunityId, $statusCode, $request->user());
+            return back()->with('success', 'Opportunity status updated successfully.');
         } catch (Exception $e) {
-            $statusCode = $e->getCode() ?: 500;
-            return response()->json(['error' => $e->getMessage()], $statusCode);
+            return back()->with('error', 'Failed to update opportunity status: ' . $e->getMessage());
         }
     }
-} 
+}
