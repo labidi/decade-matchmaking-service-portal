@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Offer;
 
+use App\Http\Resources\OfferResource;
 use App\Services\OfferService;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
@@ -17,10 +18,14 @@ class ListController extends BaseOfferController
         parent::__construct($offerService);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function __invoke(Request $request): Response
     {
         $filters = $this->buildFilters($request);
         $offers = $this->offerService->getPaginatedOffers($filters['search'], $filters['sort']);
+        $offers->toResourceCollection(OfferResource::class);
         $breadcrumbs = $this->buildOfferBreadcrumbs('list');
 
         return Inertia::render('Admin/Offers/List', [

@@ -23,13 +23,12 @@ class ExpressInterestController extends BaseRequestController
      */
     public function __invoke(Request $request, int $requestId)
     {
+        // Validate request existence
         try {
             $ocdRequest = $this->requestService->findRequest($requestId);
             $interestedUser = $request->user();
-
             // Get admin recipients using UserService
             $admins = $this->userService->getAllAdmins();
-
             // Send emails to admins
             foreach ($admins as $admin) {
                 $recipient = [
@@ -37,25 +36,17 @@ class ExpressInterestController extends BaseRequestController
                     'name' => $admin->name,
                     'type' => 'admin'
                 ];
-
                 Mail::to($recipient['email'])->send(new ExpressInterest($ocdRequest, $interestedUser, $recipient));
             }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Your interest has been expressed successfully. The CDF Secretariat will follow up within three business days.'
-            ]);
+            return back()->with(
+                'success',
+                'Your interest has been expressed successfully. The CDF Secretariat will follow up within three business days.'
+            );
         } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to express interest', [
-                'request_id' => $requestId,
-                'user_id' => $request->user()->id,
-                'error' => $e->getMessage()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to express interest. Please try again.'
-            ], 500);
+            return back()->with(
+                'error',
+                'Failed to express interest. Please try again.'
+            );
         }
     }
 }

@@ -150,7 +150,7 @@ class RequestPolicy
         }
 
         // Partners can express interest in validated requests
-        return $user->partner
+        return $user->hasRole('partner')
             && $request->status->status_code === Status::VALIDATED_STATUS_CODE;
     }
 }

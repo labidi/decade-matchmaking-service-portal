@@ -1,10 +1,26 @@
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import React from 'react';
 import {Head} from '@inertiajs/react';
-import {OCDRequest, RequestFormOptions} from '@/types';
+import {OCDRequest} from '@/types';
 import {UIRequestForm} from '@/components/forms/UIRequestForm';
 import FieldRenderer from '@/components/ui/forms/field-renderer';
 import {useRequestForm} from "@/hooks/useRequestForm";
+
+
+interface RequestFormOptions {
+    delivery_countries?: Array<{ value: string; label: string }>;
+    regions?: Array<{ value: string; label: string }>;
+    oceans?: Array<{ value: string; label: string }>;
+    subthemes?: Array<{ value: string; label: string }>;
+    support_types?: Array<{ value: string; label: string }>;
+    target_audience?: Array<{ value: string; label: string }>;
+    target_languages?: Array<{ value: string; label: string }>;
+    delivery_format?: Array<{ value: string; label: string }>;
+    opportunity_types?: Array<{ value: string; label: string }>;
+    related_activity?: Array<{ value: string; label: string }>;
+    yes_no?: Array<{ value: string; label: string }>;
+    project_stage?: Array<{ value: string; label: string }>;
+}
 
 type Mode = 'submit' | 'draft';
 type Id = '';

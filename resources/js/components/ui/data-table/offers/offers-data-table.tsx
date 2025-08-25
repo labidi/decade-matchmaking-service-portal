@@ -58,14 +58,14 @@ interface OffersDataTableProps {
 }
 
 // Utility Functions
-const statusBadgeRenderer = (statusLabel: string) => {
+const statusBadgeRenderer = (offer: RequestOffer) => {
     let color: "teal" | "cyan" | "amber" | "green" | "blue" | "red" | "orange" | "yellow" | "lime" | "emerald" | "sky" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
 
-    switch (statusLabel.toLowerCase()) {
-        case 'active':
+    switch (offer.status.value) {
+        case '1':
             color = 'green';
             break;
-        case 'inactive':
+        case '2':
             color = 'red';
             break;
         default:
@@ -73,7 +73,7 @@ const statusBadgeRenderer = (statusLabel: string) => {
     }
 
     return (
-        <Badge color={color}>{statusLabel}</Badge>
+        <Badge color={color}>{offer.status.label}</Badge>
     );
 };
 
@@ -123,7 +123,7 @@ export function OffersDataTable({
                         {offer.request?.detail?.capacity_development_title || 'No Title'}
                     </span>
                     <span className="text-xs text-zinc-500 block">
-                        ID: {offer.request_id}
+                        ID: {offer.request.id}
                     </span>
                 </div>
             )
@@ -159,7 +159,8 @@ export function OffersDataTable({
             sortable: false,
             render: (offer) => (
                 <div>
-                    {(offer.is_accepted ? <span className="text-green-500 font-semibold">Yes</span> : <span className="text-red-500 font-semibold">No</span>)}
+                    {(offer.is_accepted ? <span className="text-green-500 font-semibold">Yes</span> :
+                        <span className="text-red-500 font-semibold">No</span>)}
                 </div>
             )
         },
@@ -168,7 +169,7 @@ export function OffersDataTable({
             label: 'Status',
             sortable: true,
             sortField: 'status',
-            render: (offer) => statusBadgeRenderer(offer.status_label)
+            render: (offer) => statusBadgeRenderer(offer)
         },
         {
             key: 'created_at',

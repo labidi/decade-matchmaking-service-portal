@@ -1,4 +1,4 @@
-import {User, Document} from '@/types';
+import {User} from '@/types';
 
 export interface OCDRequestStatus {
     id: string;
@@ -16,27 +16,8 @@ export interface RequestPermissions {
     can_update_status?: boolean;
     can_accept_offer?: boolean;
     can_request_clarifications?: boolean;
+    can_express_interest?: boolean;
 }
-
-export interface RequestOffer {
-    id: number;
-    description: string;
-    matched_partner_id: number;
-    request_id: number;
-    status: number;
-    status_label: string;
-    created_at: string;
-    updated_at: string;
-    is_accepted: boolean;
-    can_edit: boolean;
-    can_view: boolean;
-    can_delete: boolean;
-    documents?: Document[];
-    request?: OCDRequest;
-    matched_partner?: User;
-}
-
-export type RequestOfferList = RequestOffer[];
 
 export interface OCDRequest {
     id: number;

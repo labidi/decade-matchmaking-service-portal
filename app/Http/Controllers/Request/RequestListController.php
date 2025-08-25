@@ -24,7 +24,6 @@ class RequestListController extends BaseRequestController
     public function list(Request $httpRequest): Response
     {
         $filters = $this->buildFilters($httpRequest);
-        // Admin view - all requests
         $requests = $this->service->getPaginatedRequests($filters['search'], $filters['sort']);
         $requests->toResourceCollection(RequestResource::class) ;
 

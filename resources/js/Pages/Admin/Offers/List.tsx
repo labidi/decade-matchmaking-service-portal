@@ -6,6 +6,7 @@ import {OffersDataTable} from "@/components/ui/data-table/offers/offers-data-tab
 import {Button} from '@/components/ui/button';
 import {PlusIcon} from '@heroicons/react/16/solid';
 import {Heading} from "@/components/ui/heading";
+import {useOfferActions} from '@/hooks/useOfferActions';
 
 interface OffersPagination {
     current_page: number;
@@ -43,84 +44,10 @@ export default function OffersList({
                                        currentSearch = {},
                                        searchFieldsOptions = {}
                                    }: Readonly<OffersListPageProps>) {
-    // Dynamic actions based on offer permissions
-    const getActionsForOffer = (offer: RequestOffer) => {
-        const actions = [];
-
-        // View Details - available if user can view
-        actions.push({
-            key: 'view-details',
-            label: 'View Details',
-            onClick: () => router.visit(route('admin.offer.show', {id: offer.id}))
-        });
-
-        // Edit - available if user can edit
-        if (offer.can_edit) {
-            actions.push({
-                key: 'edit',
-                label: 'Edit',
-                onClick: () => router.visit(route('admin.offer.edit', {id: offer.id}))
-            });
-        }
-        // Edit - available if user can edit
-        if (offer.status == 2) {
-            actions.push({
-                key: 'update-status',
-                label: 'Enable',
-                onClick: () => router.post(route('admin.offer.update-status', {id: offer.id}), {
-                    status: 1
-                })
-            });
-        }
-
-        // Edit - available if user can edit
-        if (offer.status == 1) {
-            actions.push({
-                key: 'update-status',
-                label: 'Disable',
-                onClick: () => router.post(route('admin.offer.update-status', {id: offer.id}), {
-                    status: 2
-                })
-            });
-        }
-
-        // View Request - available if user can view the offer
-        if (offer.request) {
-            actions.push({
-                key: 'view-request',
-                label: 'View Request',
-                onClick: () => router.visit(route('request.show', {id: offer.request_id})),
-                divider: actions.length > 0
-            });
-        }
-
-
-        // Delete - available if user can delete
-        if (offer.can_delete) {
-            actions.push({
-                key: 'delete',
-                label: 'Delete',
-                onClick: () => handleDeleteOffer(offer),
-                divider: actions.length > 0,
-                className: 'text-red-600 hover:text-red-700'
-            });
-        }
-
-        return actions;
-    };
-
-    const handleDeleteOffer = (offer: RequestOffer) => {
-        if (confirm(`Are you sure you want to delete this offer? This action cannot be undone.`)) {
-            router.delete(route('admin.offer.destroy', {id: offer.id}), {
-                onSuccess: () => {
-                    // Success message will be handled by the backend
-                },
-                onError: (errors) => {
-                    console.error('Failed to delete offer:', errors);
-                }
-            });
-        }
-    };
+    // Use the new offer actions hook
+    const {
+        getActionsForOffer,
+    } = useOfferActions('admin');
 
     return (
         <SidebarLayout>

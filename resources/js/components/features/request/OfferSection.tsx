@@ -1,8 +1,12 @@
 import {useForm} from '@inertiajs/react';
-import {OfferProps} from '@/types';
+import {OCDRequest} from '@/types';
 import AttachmentsSection from '@/components/features/request/AttachmentsSection';
 
-export default function OfferSection({OcdRequest}: OfferProps) {
+export interface OfferProps {
+    OcdRequest: OCDRequest;
+}
+
+export default function OfferSection({OcdRequest}: Readonly<OfferProps>) {
     const form = useForm<{ description: string; partner_id: string; file: File | null }>({
         description: '',
         partner_id: '',
@@ -21,7 +25,7 @@ export default function OfferSection({OcdRequest}: OfferProps) {
                 </div>
             </div>
             <div className="grid grid-cols-1">
-                { OcdRequest.status.status_code == "validated" && (
+                {OcdRequest.status.status_code == "validated" && (
                     <div>
                         <form className="mx-auto bg-white"
                               onSubmit={e => {
@@ -96,7 +100,7 @@ export default function OfferSection({OcdRequest}: OfferProps) {
                         </form>
                     </div>
                 )}
-                {OcdRequest.active_offer && ['in_implementation','validated','offer_made'].includes(OcdRequest.status.status_code) && (
+                {OcdRequest.active_offer && ['in_implementation', 'validated', 'offer_made'].includes(OcdRequest.status.status_code) && (
                     <>
                         <div className='my-5'>
                             <p>{OcdRequest.active_offer.description}</p>

@@ -15,7 +15,7 @@ class DestroyController extends BaseOfferController
     public function __invoke(int $id)
     {
         try {
-            $this->offerService->deleteOffer($id, auth()->user());
+            $this->offerService->deleteOffer($id);
 
             return $this->getSuccessResponse(
                 'Offer deleted successfully',

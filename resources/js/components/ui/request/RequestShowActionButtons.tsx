@@ -56,6 +56,20 @@ export function RequestShowActionButtons({
 
     // Collect all available actions based on permissions
     const actions = [];
+
+    if(request.permissions.can_express_interest){
+        actions.push(
+            <Button
+                key="express-interest"
+                color="blue"
+                onClick={() => RequestActionService.expressInterest(request)}
+                className="flex items-center gap-2"
+            >
+                <CheckIcon className="h-4 w-4" data-slot="icon" />
+                Express Interest
+            </Button>
+        );
+    }
     // Offer-related actions (highest priority)
     if (request.active_offer && request.permissions.can_accept_offer) {
         actions.push(

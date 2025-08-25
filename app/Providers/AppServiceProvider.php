@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\Opportunity;
 use App\Models\Request;
 use App\Models\Request\Offer;
 use App\Observers\RequestObserver;
 use App\Observers\RequestOfferObserver;
+use App\Policies\OfferPolicy;
+use App\Policies\OpportunityPolicy;
 use App\Policies\RequestPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
@@ -27,12 +30,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
-        
+
         // Register the observers
         Request::observe(RequestObserver::class);
         Offer::observe(RequestOfferObserver::class);
-        
+
         // Register policies
         Gate::policy(Request::class, RequestPolicy::class);
+        Gate::policy(Opportunity::class, OpportunityPolicy::class);
+        Gate::policy(Offer::class, OfferPolicy::class);
     }
 }

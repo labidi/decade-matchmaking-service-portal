@@ -31,7 +31,7 @@ class RequestResource extends JsonResource
             'status' => $this->whenLoaded('status'),
             'user' => $this->whenLoaded('user'),
             'matched_partner' => $this->whenLoaded('matchedPartner'),
-            'offers' => $this->whenLoaded('offers'),
+            'offers' => OfferResource::collection($this->whenLoaded('offers')),
             'detail' => new DetailResource($this->whenLoaded('detail')),
             'subscriptions' => $this->whenLoaded('subscriptions'),
             'subscribers' => $this->whenLoaded('subscribers'),
