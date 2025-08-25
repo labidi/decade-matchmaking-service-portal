@@ -5,7 +5,6 @@ import {UseRequestActionsReturn} from '@/types/request-actions';
 import {RequestActionService} from '@/services/requestActionService';
 
 
-
 export function useRequestActions(context: 'admin' | 'user' = 'user'): UseRequestActionsReturn {
     // Dialog state management
     const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
@@ -36,6 +35,10 @@ export function useRequestActions(context: 'admin' | 'user' = 'user'): UseReques
 
     const handleRequestClarifications = useCallback((request: OCDRequest) => {
         RequestActionService.requestClarifications(request);
+    }, []);
+
+    const handleExpressInterest = useCallback((request: OCDRequest) => {
+        RequestActionService.expressInterest(request);
     }, []);
 
     const handleUpdateStatus = useCallback((request: OCDRequest, statuses: OCDRequestStatus[] = []) => {
@@ -129,6 +132,16 @@ export function useRequestActions(context: 'admin' | 'user' = 'user'): UseReques
                 key: 'delete',
                 label: 'Delete Request',
                 onClick: () => handleDelete(request),
+                divider: true,
+            });
+        }
+
+        // Delete Request
+        if (request.permissions.can_express_interest) {
+            actions.push({
+                key: 'express-interest',
+                label: 'Express Interest',
+                onClick: () => handleExpressInterest(request),
                 divider: true,
             });
         }

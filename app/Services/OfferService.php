@@ -12,6 +12,7 @@ use App\Services\Offer\OfferRepository;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -26,7 +27,7 @@ class OfferService
     /**
      * Get paginated offers with search and sorting
      */
-    public function getPaginatedOffers(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    public function getPaginatedOffers(array $searchFilters = [], array $sortFilters = []): AbstractPaginator
     {
         return $this->repository->getPaginated($searchFilters, $sortFilters);
     }
@@ -118,7 +119,7 @@ class OfferService
     /**
      * Delete an offer
      */
-    public function deleteOffer(int $offerId, User $user): bool
+    public function deleteOffer(int $offerId): bool
     {
         DB::beginTransaction();
 
@@ -126,11 +127,6 @@ class OfferService
             $offer = $this->repository->findById($offerId);
             if (!$offer) {
                 throw new Exception('Offer not found');
-            }
-
-            // Check authorization
-            if (!$offer->can_delete) {
-                throw new Exception('Unauthorized to delete this offer');
             }
 
             // Delete associated documents
@@ -159,44 +155,7 @@ class OfferService
         )
             ->findOrFail($offerId);
 
-        if (!$offer->can_view) {
-            throw new Exception('Unauthorized to view this offer');
-        }
-
         return $offer;
-    }
-
-    /**
-     * Get offers for a specific request
-     */
-    public function getOffersForRequest(int $requestId, User $user): Collection
-    {
-        $request = Request::findOrFail($requestId);
-
-        // Check if user can view offers for this request
-        if (!$user->hasRole('administrator') && $user->id !== $request->user_id) {
-            throw new Exception('Unauthorized to view offers for this request');
-        }
-
-        return Offer::with(['matchedPartner', 'documents'])
-            ->where('request_id', $requestId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    /**
-     * Get offers created by a specific partner
-     */
-    public function getOffersByPartner(int $partnerId, User $user): Collection
-    {
-        // Users can only view their own offers unless they're admin
-        if (!$user->hasRole('administrator') && $user->id !== $partnerId) {
-            throw new Exception('Unauthorized to view offers by this partner');
-        }
-        return Offer::with(['request', 'request.status', 'request.user', 'documents'])
-            ->where('matched_partner_id', $partnerId)
-            ->orderBy('created_at', 'desc')
-            ->get();
     }
 
     /**
@@ -239,25 +198,4 @@ class OfferService
         }
     }
 
-    /**
-     * Get paginated offers made by a specific user (as partner)
-     */
-    public function getUserOffersPaginated(
-        User $user,
-        array $searchFilters = [],
-        array $sortFilters = []
-    ): LengthAwarePaginator {
-        return $this->repository->getUserOffers($user, $searchFilters, $sortFilters);
-    }
-
-    /**
-     * Get paginated offers on user's requests
-     */
-    public function getRequestOffersPaginated(
-        User $user,
-        array $searchFilters = [],
-        array $sortFilters = []
-    ): LengthAwarePaginator {
-        return $this->repository->getRequestOffers($user, $searchFilters, $sortFilters);
-    }
 }

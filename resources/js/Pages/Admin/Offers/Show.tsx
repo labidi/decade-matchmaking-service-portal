@@ -6,12 +6,37 @@ import {Button} from '@/components/ui/button';
 import {Badge} from '@/components/ui/badge';
 import {PencilIcon, TrashIcon, EyeIcon} from '@heroicons/react/16/solid';
 import {formatDate} from '@/utils/date-formatter';
+import {DropdownActions} from "@/components/ui/data-table/common";
+import {useOfferActions} from "@/hooks/useOfferActions";
 
 interface ShowOfferPageProps {
     offer: RequestOffer;
 }
 
+const statusBadgeRenderer = (offer: RequestOffer) => {
+    let color: "teal" | "cyan" | "amber" | "green" | "blue" | "red" | "orange" | "yellow" | "lime" | "emerald" | "sky" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
+
+    switch (offer.status.value) {
+        case '1':
+            color = 'green';
+            break;
+        case '2':
+            color = 'red';
+            break;
+        default:
+            color = 'zinc';
+    }
+
+    return (
+        <Badge color={color}>{offer.status.label}</Badge>
+    );
+};
+
 export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
+
+    const {
+        getActionsForOffer,
+    } = useOfferActions('admin');
 
     const handleDeleteOffer = () => {
         if (confirm(`Are you sure you want to delete this offer? This action cannot be undone.`)) {
@@ -26,21 +51,10 @@ export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
         }
     };
 
-    const getStatusBadgeColor = (statusLabel: string) => {
-        switch (statusLabel.toLowerCase()) {
-            case 'active':
-                return 'green';
-            case 'inactive':
-                return 'red';
-            default:
-                return 'zinc';
-        }
-    };
 
     return (
         <SidebarLayout>
             <Head title={`Offer #${offer.id}`}/>
-
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -52,40 +66,10 @@ export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
                             Created {formatDate(offer.created_at)}
                         </p>
                     </div>
-
-                    <div className="flex items-center gap-3">
-                        {/* View Request Button */}
-                        {offer.request && (
-                            <Button
-                                outline
-                                href={route('admin.request.show', {id: offer.request_id})}
-                            >
-                                <EyeIcon data-slot="icon" />
-                                View Request
-                            </Button>
-                        )}
-
-                        {/* Edit Button */}
-                        {offer.can_edit && (
-                            <Button
-                                outline
-                                href={route('admin.offer.edit', {id: offer.id})}
-                            >
-                                <PencilIcon data-slot="icon" />
-                                Edit
-                            </Button>
-                        )}
-
-                        {/* Delete Button */}
-                        {offer.can_delete && (
-                            <Button
-                                onClick={handleDeleteOffer}
-                                outline
-                            >
-                                <TrashIcon data-slot="icon" />
-                                Delete
-                            </Button>
-                        )}
+                    <div className="flex-shrink-0">
+                        <DropdownActions
+                            actions={getActionsForOffer(offer)}
+                        />
                     </div>
                 </div>
 
@@ -103,9 +87,7 @@ export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
                                     Status
                                 </dt>
                                 <dd className="mt-1">
-                                    <Badge color={getStatusBadgeColor(offer.status_label)}>
-                                        {offer.status_label}
-                                    </Badge>
+                                    {statusBadgeRenderer(offer)}
                                 </dd>
                             </div>
 

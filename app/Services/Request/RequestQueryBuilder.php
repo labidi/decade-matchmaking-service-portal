@@ -6,6 +6,7 @@ use App\Models\Request as OCDRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema;
+use \Illuminate\Pagination\AbstractPaginator;
 
 class RequestQueryBuilder
 {
@@ -68,7 +69,7 @@ class RequestQueryBuilder
     /**
      * Apply pagination to query
      */
-    public function applyPagination(Builder $query, array $sortFilters): LengthAwarePaginator
+    public function applyPagination(Builder $query, array $sortFilters): AbstractPaginator
     {
         $perPage = $sortFilters['per_page'] ?? 10;
         return $query->paginate($perPage)->withQueryString();

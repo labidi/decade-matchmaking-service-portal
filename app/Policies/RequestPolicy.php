@@ -80,6 +80,8 @@ class RequestPolicy
 
     /**
      * Determine whether the user can accept offers for the request.
+     *
+     * needs to be moved
      */
     public function acceptOffer(?User $user, Request $request): bool
     {
@@ -104,6 +106,7 @@ class RequestPolicy
 
     /**
      * Determine whether the user can request clarifications for the request.
+     * needs to be moved
      */
     public function requestClarifications(?User $user, Request $request): bool
     {
@@ -119,25 +122,7 @@ class RequestPolicy
                 ->exists();
         }
 
-        return false ;
-    }
-
-    /**
-     * Determine whether the user can withdraw the request.
-     */
-    public function withdraw(?User $user, Request $request): bool
-    {
-        if (!$user) {
-            return false;
-        }
-
-        // Only the request owner can withdraw
-        if ($user->id !== $request->user_id) {
-            return false;
-        }
-
-        // Can withdraw if not in draft status (draft requests should be deleted instead)
-        return $request->status->status_code !== Status::DRAFT_STATUS_CODE;
+        return false;
     }
 
     /**
@@ -165,7 +150,7 @@ class RequestPolicy
         }
 
         // Partners can express interest in validated requests
-        return $user->partner
+        return $user->hasRole('partner')
             && $request->status->status_code === Status::VALIDATED_STATUS_CODE;
     }
 }

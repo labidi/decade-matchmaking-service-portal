@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Common\Country;
 use App\Enums\Common\Language;
+use App\Enums\Common\TargetAudience;
 use App\Enums\Common\YesNo;
 use App\Enums\Request\SubTheme;
 use App\Enums\Request\SupportType;
@@ -45,9 +47,9 @@ class StoreRequest extends FormRequest
             ],
             'project_stage' => [
                 Rule::excludeIf(
-                    fn() => $this->input("is_related_decade_action") === YesNo::NO->value || $this->input(
-                            "request_link_type"
-                        ) === YesNo::NO->value
+                    fn() => $this->input("request_link_type") === YesNo::NO->value || is_null(
+                            $this->input("request_link_type")
+                        )
                 ),
                 'string'
             ],
@@ -63,52 +65,42 @@ class StoreRequest extends FormRequest
             'delivery_countries' => [
                 Rule::requiredIf(
                     fn() => $this->input("request_link_type") !== 'Online'
-                ),
-                'array'
+                )
             ],
+            'delivery_countries.*' => [Rule::enum(Country::class)],
             'target_audience' => [
                 Rule::requiredIf(
                     fn() => $this->input("request_link_type") !== 'Online'
                 ),
                 'array'
             ],
+            'target_audience.*' => [Rule::enum(TargetAudience::class)],
             'target_audience_other' => [
-                Rule::requiredIf(
-                    fn() => $this->input("target_audience") === 'Other (Please Specify)'
-                ),
+                Rule::excludeIf(fn() => !in_array(TargetAudience::OTHER->value, $this->input('target_audience', []))),
+                'string'
             ],
-            'target_languages' => ['required', 'array'],
+            'target_languages' => ['required'],
             'target_languages.*' => [Rule::enum(Language::class)],
             'target_languages_other' => [
                 Rule::excludeIf(fn() => !in_array(Language::OTHER->value, $this->input('target_languages', []))),
                 'string'
             ],
-            'subthemes' => ['required', 'array'],
-            'subthemes.*' => [
-                Rule::in(
-                    array_column(
-                        SubTheme::getOptions(),
-                        'value'
-                    )
-                )
-            ],
+            'subthemes' => ['required'],
+            'subthemes.*' => [Rule::enum(SubTheme::class)],
             'support_types' => ['required', 'array'],
-            'support_types.*' => [
-                Rule::in(
-                    array_column(
-                        SupportType::getOptions(),
-                        'value'
-                    )
-                )
-            ],
+            'support_types.*' => [Rule::enum(SupportType::class)],
             'gap_description' => ['required', 'string'],
-            'has_partner' => [Rule::enum(YesNo::class)],
+            'has_partner.*' => [Rule::enum(YesNo::class)],
             'partner_name' => [
                 Rule::excludeIf(fn() => $this->input("has_partner") === YesNo::NO->value)
             ],
-            'partner_confirmed' => [Rule::requiredIf(fn() => $this->input("has_partner") === 'Yes')],
-            'needs_financial_support' => ['required', Rule::enum(YesNo::class)],
-            'budget_breakdown' => [Rule::requiredIf(fn() => $this->input("needs_financial_support") === 'Yes')],
+            'partner_confirmed' => [Rule::requiredIf(fn() => $this->input("has_partner") === YesNo::YES->value)],
+            'needs_financial_support.*' => ['required', Rule::enum(YesNo::class)],
+            'budget_breakdown' => [
+                Rule::requiredIf(
+                    fn() => $this->input("needs_financial_support") === YesNo::YES->value
+                ),
+            ],
             'support_months' => ['required', 'numeric'],
             'completion_date' => ['required', 'string'],
             'risks' => ['required', 'string'],

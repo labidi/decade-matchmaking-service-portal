@@ -1,7 +1,8 @@
 export {
-    OCDRequest, OCDRequestList, RequestOffer, RequestOfferList, RequestPermissions, OCDRequestStatus,
+    OCDRequest, OCDRequestList, RequestPermissions, OCDRequestStatus,
     RequestSubscription, SubscriptionStats
 } from "@/types/request";
+export {RequestOffer, RequestOfferList, RequestOfferPermissions} from "@/types/offer";
 export {Opportunity, OpportunitiesList} from "@/types/opportunity";
 
 export interface UIField {
@@ -96,10 +97,6 @@ export interface Document {
 }
 
 
-export interface OfferProps {
-    OcdRequest: OCDRequest;
-}
-
 export interface Notification {
     id: number;
     title: string;
@@ -121,22 +118,6 @@ export interface UserNotificationPreference {
     updated_at: string;
 }
 
-
-// Common form options interface for consistent structure across forms
-export interface RequestFormOptions {
-    delivery_countries?: Array<{ value: string; label: string }>;
-    regions?: Array<{ value: string; label: string }>;
-    oceans?: Array<{ value: string; label: string }>;
-    subthemes?: Array<{ value: string; label: string }>;
-    support_types?: Array<{ value: string; label: string }>;
-    target_audience?: Array<{ value: string; label: string }>;
-    target_languages?: Array<{ value: string; label: string }>;
-    delivery_format?: Array<{ value: string; label: string }>;
-    opportunity_types?: Array<{ value: string; label: string }>;
-    related_activity?: Array<{ value: string; label: string }>;
-    yes_no?: Array<{ value: string; label: string }>;
-    project_stage?: Array<{ value: string; label: string }>;
-}
 
 // Common form options interface for consistent structure across forms
 export interface FormOptions {

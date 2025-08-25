@@ -59,8 +59,8 @@ export function useOfferForm({partners, availableRequests, offer, isEditing = fa
 
     type FormDataKeys = keyof typeof form.data;
     useEffect(() => {
-        if (offer?.request_id) {
-            form.setData('request_id', offer.request_id.toString());
+        if (offer?.request.id) {
+            form.setData('request_id', offer.request.id.toString());
         }
         if(offer.id){
           form.setData('id', offer.id.toString());

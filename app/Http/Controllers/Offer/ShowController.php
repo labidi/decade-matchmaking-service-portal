@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Offer;
 
+use App\Http\Resources\OfferResource;
 use App\Services\OfferService;
 use App\Services\RequestService;
 use Inertia\Inertia;
@@ -22,7 +23,7 @@ class ShowController extends BaseOfferController
         $offer = $this->offerService->getOfferById($id);
 
         return Inertia::render('Admin/Offers/Show', [
-            'offer' => $offer,
+            'offer' => $offer->toResource(OfferResource::class),
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
                 ['name' => 'Manage offers', 'url' => route('admin.offer.list')],

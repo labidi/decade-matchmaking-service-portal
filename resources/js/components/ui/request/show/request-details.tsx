@@ -1,21 +1,34 @@
 import {UIRequestForm} from '@/components/forms/UIRequestForm';
-import {Document, OCDRequest} from "@/types";
+import {OCDRequest} from "@/types";
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/react'
 import {ChevronDownIcon} from '@heroicons/react/20/solid'
 
 export interface RequestDetailsSectionProps {
     request: OCDRequest;
-    canEdit?: boolean;
-    documents?: Document[];
-    fieldsToShow?: string[];
 }
 
-export default function RequestDetails({
-                                           request,
-                                           canEdit = false,
-                                           documents = [],
-                                           fieldsToShow = []
-                                       }: Readonly<RequestDetailsSectionProps>) {
+// Helper function to render field values (extracted to reduce nesting)
+const renderFieldValue = (value: any, fieldKey: string) => {
+    if (Array.isArray(value)) {
+        if (value.length === 0) {
+            return <span className="text-firefly-900/80">None specified</span>;
+        }
+
+        return (
+            <ul className="mt-1 ml-4 list-disc list-inside">
+                {value.map((item, index) => (
+                    <li key={`${fieldKey}-${item.label || item}-${index}`} className="text-firefly-900/80 py-1">
+                        {item.label || item}
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+
+    return <span className="text-firefly-900/80">{value ?? 'N/A'}</span>;
+};
+
+export default function RequestDetails({request}: Readonly<RequestDetailsSectionProps>) {
     return (
         <section id="request_details" className='my-8'>
             <div className="grid grid-cols-3 gap-4">
@@ -24,37 +37,34 @@ export default function RequestDetails({
                         <div className="grid divide-y divide-neutral-200 mx-auto">
                             {UIRequestForm.map(step => {
                                 const fields = Object.entries(step.fields).filter(([key, field]) => {
-                                    if (fieldsToShow.length > 0 && !fieldsToShow.includes(key)) return false;
                                     if (!field.label || field.type === 'hidden') return false;
                                     if (field.show && !field.show(request)) return false;
                                     const value = (request.detail as any)[key];
                                     return !(value === undefined || value === '');
                                 });
+
                                 if (fields.length === 0) return null;
+
                                 return (
                                     <Disclosure key={step.label} as="div" className="p-6" defaultOpen={false}>
                                         <DisclosureButton
                                             className="group flex w-full items-center justify-between">
                                             <span
-                                                className="text-xl font-medium  group-data-hover:text-firefly-700">
-                                             {step.label}
+                                                className="text-xl font-medium group-data-hover:text-firefly-700">
+                                                {step.label}
                                             </span>
                                             <ChevronDownIcon
                                                 className="size-5 fill-firefly-700/60 group-data-hover:fill-firefly-600 group-data-open:rotate-180"/>
                                         </DisclosureButton>
                                         <DisclosurePanel className="mt-2 text-xl/5 text-firefly-900/80">
-                                            <ul className=" group-open:animate-fadeIn list-none">
+                                            <ul className="group-open:animate-fadeIn list-none">
                                                 {fields.map(([key, field]) => {
                                                     const value = (request.detail as any)[key];
-
-
-                                                    const formatted = Array.isArray(value) ? value.map(u => u.label).join(', ') : value;
                                                     return (
                                                         <li key={key} className='py-2 text-xl capitalize'>
-                                                                <span
-                                                                    className="text-firefly-800">{field.label}: </span>
+                                                            <span className="text-firefly-800">{field.label}: </span>
                                                             <br/>
-                                                            {formatted ?? 'N/A'}
+                                                            {renderFieldValue(value, key)}
                                                         </li>
                                                     );
                                                 })}

@@ -7,11 +7,11 @@ use App\Models\Request;
 use App\Models\Request\Offer;
 use App\Models\Request\Status;
 use App\Models\User;
-use App\Services\Request\RequestPermissionService;
 use App\Services\Request\RequestRepository;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -115,7 +115,7 @@ class RequestService
     /**
      * Get paginated requests with search and sorting
      */
-    public function getPaginatedRequests(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    public function getPaginatedRequests(array $searchFilters = [], array $sortFilters = []): AbstractPaginator
     {
         return $this->repository->getPaginated($searchFilters, $sortFilters)->withQueryString();
     }
@@ -127,7 +127,7 @@ class RequestService
     public function getPublicRequests(
         array $searchFilters = [],
         array $sortFilters = []
-    ): LengthAwarePaginator {
+    ): AbstractPaginator {
         return $this->repository->getPublicRequests($searchFilters, $sortFilters)->withQueryString();
     }
 
@@ -138,7 +138,7 @@ class RequestService
         User $user,
         array $searchFilters = [],
         array $sortFilters = []
-    ): LengthAwarePaginator {
+    ): AbstractPaginator {
         return $this->repository->getMatchedRequests($user, $searchFilters, $sortFilters)->withQueryString();
     }
 
@@ -150,7 +150,7 @@ class RequestService
         User $user,
         array $searchFilters = [],
         array $sortFilters = []
-    ): LengthAwarePaginator {
+    ): AbstractPaginator {
         return $this->repository->getUserRequests($user, $searchFilters, $sortFilters)->withQueryString();
     }
 

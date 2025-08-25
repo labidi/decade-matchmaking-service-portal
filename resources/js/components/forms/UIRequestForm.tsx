@@ -71,7 +71,7 @@ export const UIRequestForm: UIStep[] = [
                 required: true,
                 label: 'Could you specify the current stage of the initiative?',
                 // Options should be provided via formOptions.project_stage from page props
-                show: data => data.request_link_type === 'yes' && data.is_related_decade_action !== 'yes',
+                show: data => data.request_link_type === 'yes',
             },
             project_url: {
                 id: 'project_url',
@@ -134,7 +134,7 @@ export const UIRequestForm: UIStep[] = [
                   id: 'target_audience_other',
                   type: 'text',
                   required: false,
-                  show: data => data.target_audience?.includes('Other'),
+                  show: data => data.target_audience?.includes('other'),
                   placeholder: 'Please specify the target audience',
               },
               target_languages: {
@@ -149,7 +149,7 @@ export const UIRequestForm: UIStep[] = [
                   type: 'text',
                   required: false,
                   label: 'Please specify the other target language(s)',
-                  show: data => data.target_languages?.includes('Other'),
+                  show: data => data.target_languages?.includes('other'),
               },
               subthemes: {
                   id: 'subthemes',
@@ -164,21 +164,21 @@ export const UIRequestForm: UIStep[] = [
                 id: 'subthemes_other',
                 type: 'textarea',
                 required: true,
-                show: data => data.subthemes?.includes('Other'),
+                show: data => data.subthemes?.includes('other'),
             },
             support_types: {
                 id: 'support_types',
                 type: 'checkbox-group',
                 required: true,
                 label: 'What type of support related to workshops or training are you seeking?',
-                description: "If you require support outside listed options, specify under 'Other options'.",
+                description: "If you require support outside listed options, specify under Other options.",
                 // Options should be provided via formOptions.support_types from page props
             },
             support_types_other: {
                 id: 'support_types_other',
                 type: 'textarea',
                 required: true,
-                show: data => data.support_types?.includes('Other'),
+                show: data => data.support_types?.includes('other'),
             },
             gap_description: {
                 id: 'gap_description',

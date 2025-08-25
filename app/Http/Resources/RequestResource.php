@@ -5,26 +5,15 @@ namespace App\Http\Resources;
 use App\Models\Request as RequestModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @mixin RequestModel
  */
 class RequestResource extends JsonResource
 {
-    public static $wrap = null;
-    /**
-     * Permissions to include in the response
-     */
-    private ?array $permissions = null;
 
-    /**
-     * Set permissions to be included in the response.
-     */
-    public function setPermissions(array $permissions): static
-    {
-        $this->permissions = $permissions;
-        return $this;
-    }
+    public static $wrap = null;
 
     /**
      * Transform the resource into an array.
@@ -42,25 +31,23 @@ class RequestResource extends JsonResource
             'status' => $this->whenLoaded('status'),
             'user' => $this->whenLoaded('user'),
             'matched_partner' => $this->whenLoaded('matchedPartner'),
-            'offers' => $this->whenLoaded('offers'),
+            'offers' => OfferResource::collection($this->whenLoaded('offers')),
             'detail' => new DetailResource($this->whenLoaded('detail')),
             'subscriptions' => $this->whenLoaded('subscriptions'),
             'subscribers' => $this->whenLoaded('subscribers'),
         ];
 
-        // Include permissions if they were set
-        if ($this->permissions !== null) {
-            $baseData['permissions'] = $this->permissions;
-        }
+        $baseData['permissions'] = [
+            'can_view' => $request->user()->can('view', [RequestModel::class, $this->resource]),
+            'can_edit' => $request->user()->can('update', [RequestModel::class, $this->resource]),
+            'can_delete' => $request->user()->can('delete', [RequestModel::class, $this->resource]),
+            'can_manage_offers' => $request->user()->can('manageOffers', [RequestModel::class, $this->resource]),
+            'can_update_status' => $request->user()->can('updateStatus', [RequestModel::class, $this->resource]),
+            'can_export_pdf' => $request->user()->can('exportPdf', [RequestModel::class, $this->resource]),
+            'can_express_interest' => $request->user()->can('expressInterest', [RequestModel::class, $this->resource]),
+        ];
 
         return $baseData;
     }
 
-    /**
-     * Create a new resource instance with permissions.
-     */
-    public static function withPermissions($resource, array $permissions): static
-    {
-        return (new static($resource))->setPermissions($permissions);
-    }
 }

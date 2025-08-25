@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Request;
 
 use App\Http\Resources\RequestResource;
 use App\Models\Request as OCDRequest;
-use App\Services\Request\RequestPermissionService;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,25 +12,23 @@ use Inertia\Response;
 class ViewController extends BaseRequestController
 {
     public function __construct(
-        protected readonly RequestService $service,
-        protected readonly RequestPermissionService $permissionService
+        protected readonly RequestService $service
     ) {
     }
 
     /**
      * Display the full request details - unified method for both admin and user contexts
+     * @throws \Throwable
      */
     public function show(Request $request, ?int $id = null): Response
     {
         $userRequest = OCDRequest::with(['status', 'detail', 'user', 'activeOffer.documents'])
             ->findOrFail($id);
-        $permissions = $this->permissionService->getPermissions($userRequest, $request->user());
-        $requestResource = RequestResource::withPermissions($userRequest, $permissions);
         $viewData = [
             'title' => $userRequest->detail?->capacity_development_title
                 ? $userRequest->detail->capacity_development_title
                 : 'Request #' . $userRequest->id,
-            'request' => $requestResource
+            'request' => $userRequest->toResource(RequestResource::class)
         ];
 
         if ($this->isAdminRoute()) {
