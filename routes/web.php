@@ -14,13 +14,11 @@ Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('user.home');
-
     // User subscription routes
     Route::get('subscriptions', [\App\Http\Controllers\SubscriptionController::class, 'index'])->name('user.subscriptions.index');
     Route::post('subscriptions/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('user.subscriptions.subscribe');
     Route::post('subscriptions/unsubscribe', [\App\Http\Controllers\SubscriptionController::class, 'unsubscribe'])->name('user.subscriptions.unsubscribe');
     Route::get('subscriptions/status', [\App\Http\Controllers\SubscriptionController::class, 'status'])->name('user.subscriptions.status');
-
     Route::post('offer/{id}/document', [DocumentsController::class, 'storeOfferDocument'])->name(
         'user.offer.document.store'
     );

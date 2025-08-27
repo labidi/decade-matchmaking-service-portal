@@ -68,7 +68,7 @@ class RequestListController extends BaseRequestController
     {
         $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getPublicRequests($filters['search'], $filters['sort']);
-        $requests->toResourceCollection(RequestResource::class) ;
+        $requests->toResourceCollection(RequestResource::class);
 
         return Inertia::render('Request/List', [
             'title' => 'View Request for Training workshops',

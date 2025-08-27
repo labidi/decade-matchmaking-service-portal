@@ -9,6 +9,7 @@ import {Text} from '@/components/ui/text'
 import CSVUpload from './csv-upload';
 import SelectField from './SelectField';
 import MultiSelectField from './MultiSelectField';
+import KeywordsField from './KeywordsField';
 
 interface FieldRendererProps {
     name: string;
@@ -404,6 +405,25 @@ export default function FieldRenderer({
                     onChange={onChange}
                     error={error}
                     disabled={field.disabled || disabled}
+                />
+            );
+        case 'keywords':
+            return (
+                <KeywordsField
+                    key={name}
+                    name={name}
+                    label={field.label}
+                    description={field.description}
+                    placeholder={field.placeholder}
+                    value={value ?? ''}
+                    onChange={(newValue) => onChange(name, newValue)}
+                    error={error}
+                    required={field.required}
+                    disabled={field.disabled || disabled}
+                    maxKeywords={field.maxKeywords}
+                    minLength={field.minLength}
+                    maxLength={field.maxLength}
+                    className={field.className ?? className}
                 />
             );
         default:

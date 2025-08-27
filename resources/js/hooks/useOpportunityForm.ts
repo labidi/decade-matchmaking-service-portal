@@ -15,7 +15,7 @@ export function useOpportunityForm(opportunity?: Opportunity, formOptions?: Form
         target_audience_other: opportunity?.target_audience_other || '',
         summary: opportunity?.summary || '',
         url: opportunity?.url || '',
-        key_words: opportunity?.keywords ? opportunity.keywords.split(',') : [],
+        key_words: opportunity?.keywords,
     });
 
     const [currentStep, setCurrentStep] = useState(0);
