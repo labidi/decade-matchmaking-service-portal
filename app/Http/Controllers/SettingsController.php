@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\OrganizationCsvUploadRequest;
 use App\Services\OrganizationImportService;
 use App\Services\SettingsService;
@@ -27,7 +26,6 @@ class SettingsController extends Controller
 
         return Inertia::render('Admin/Portal/Settings', [
             'title' => 'Portal Settings',
-            'breadcrumbs' => $this->buildAdminSectionBreadcrumbs('settings'),
             'settings' => $settings, // Pass current settings to form
         ]);
     }

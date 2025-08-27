@@ -2,9 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use Diglactic\Breadcrumbs\Breadcrumbs;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
+
 
 class HandleInertiaRequests extends Middleware
 {
@@ -42,6 +45,7 @@ class HandleInertiaRequests extends Middleware
                 'warning' => $request->session()->get('warning'),
                 'info' => $request->session()->get('info'),
             ],
+            'breadcrumbs'=> Breadcrumbs::generate(Route::currentRouteName())
         ];
     }
 }

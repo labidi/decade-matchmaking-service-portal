@@ -7,6 +7,8 @@ use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Setting;
+use Diglactic\Breadcrumbs\Breadcrumbs;
+use Illuminate\Support\Facades\Route;
 
 class HomeController extends Controller
 {
@@ -29,9 +31,6 @@ class HomeController extends Controller
                 'title' => 'Welcome back ' . $user->name,
                 'description' => 'Whether you\'re seeking training or offering expertise, this platform makes the connection. It\'s where organizations find support—and partners find purpose. By matching demand with opportunity, it brings the right people and resources together. A transparent marketplace driving collaboration, innovation, and impact.',
                 'image' => '/assets/img/sidebar.png',
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Home'],
             ],
         ]);
     }
