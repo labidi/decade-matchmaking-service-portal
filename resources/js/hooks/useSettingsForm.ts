@@ -1,7 +1,7 @@
 import {useForm} from '@inertiajs/react';
 import {useEffect, useState, useRef} from 'react';
 import {UISettingsForm} from '@/components/forms/UISettingsForm';
-import {Settings, CSVUploadResponse} from '@/types';
+import {Settings} from '@/types';
 
 interface UseSettingsFormProps {
     settings?: Settings;
@@ -13,7 +13,6 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
     const initialFormData = {
         site_name: '',
         site_description: '',
-        logo: null,
         homepage_youtube_video: '',
         organizations_csv: null,
         portal_guide: '',
@@ -34,20 +33,7 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
     const [step, setStep] = useState(1);
     const steps = UISettingsForm.map((s) => s.label);
     const [errorSteps, setErrorSteps] = useState<number[]>([]);
-    const [uploadResponse, setUploadResponse] = useState<CSVUploadResponse | null>(null);
     const [changedFields, setChangedFields] = useState<Set<string>>(new Set());
-
-    // File fields that should display existing values
-    const fileFields = ['logo', 'portal_guide', 'user_guide', 'partner_guide', 'organizations_csv'];
-
-    // Create a mapping of form field names to settings property names
-    const fieldMappings: Record<string, keyof Settings> = {
-        logo: 'site_logo',
-        portal_guide: 'portal_guide',
-        user_guide: 'user_guide',
-        partner_guide: 'partner_guide',
-        organizations_csv: 'organizations_csv'
-    };
 
     const handleNext = () => setStep(prev => Math.min(prev + 1, steps.length));
     const handleBack = () => setStep(prev => Math.max(prev - 1, 1));
@@ -56,7 +42,6 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
         if (e) e.preventDefault();
         form.clearErrors();
         setErrorSteps([]);
-        setUploadResponse(null);
         // Get only changed fields to submit
         const changedData = getChangedFieldsData();
 
@@ -71,28 +56,34 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
             : route('admin.settings.store');
         const submitMethod = isEditing ? 'post' : 'post';
 
+        // Store original data temporarily
+        const originalData = {...form.data};
+        
+        // Temporarily update form data to only include changed fields
+        // This ensures proper error mapping while optimizing the submission
+        form.setData(changedData as any);
+
         form[submitMethod](submitUrl, {
             preserveScroll: false,
-            onSuccess: (response: any) => {
-                // Handle CSV upload response if present
-                if (response?.csv_upload_result) {
-                    setUploadResponse(response.csv_upload_result);
-                }
-
+            onSuccess: () => {
                 // Reset changed fields tracking and update initial values
                 setChangedFields(new Set());
-
-                // Update initial values with the current form data
-                Object.keys(form.data).forEach(key => {
-                    if (!fileFields.includes(key) || key === 'organizations_csv') {
-                        (initialValues.current as any)[key] = (form.data as any)[key];
-                    }
+                
+                // Update initial values with the new values after successful submission
+                Object.keys(changedData).forEach(key => {
+                    (initialValues.current as any)[key] = changedData[key];
                 });
-
+                
                 // Reset CSV file after successful upload
                 form.setData('organizations_csv', null);
+                
+                // Restore the full form data structure for continued editing
+                form.setData(originalData);
             },
-            onError: (errors) => {
+            onError: (errors: any) => {
+                // Restore full form data structure for proper error handling
+                form.setData(originalData);
+                
                 const stepsWithError: number[] = [];
                 Object.keys(errors).forEach(field => {
                     const idx = UISettingsForm.findIndex(step => step.fields[field]);
@@ -110,7 +101,10 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
                 console.error('Settings update failed:', errors);
             },
             onFinish: () => {
-                // Handle completion - cleanup, etc.
+                // Ensure form data structure is restored regardless of success/failure
+                if (Object.keys(form.data).length !== Object.keys(originalData).length) {
+                    form.setData(originalData);
+                }
             }
         });
     };
@@ -157,12 +151,6 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
     // Function to detect if a field has changed
     const hasFieldChanged = (fieldName: string, currentValue: any): boolean => {
         const initialValue = (initialValues.current as any)[fieldName];
-
-        // For file fields, consider them changed if a new file is selected
-        if (fileFields.includes(fieldName)) {
-            return currentValue !== null && currentValue !== initialValue;
-        }
-
         // For regular fields, compare string values
         return currentValue !== initialValue;
     };
@@ -178,22 +166,6 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
         });
 
         return changedData;
-    };
-
-    // Function to get existing file info for display
-    const getExistingFileInfo = (fieldName: string) => {
-        const settingsKey = fieldMappings[fieldName] || fieldName as keyof Settings;
-        const existingValue = settings?.[settingsKey];
-
-        if (!existingValue) return null;
-
-        // If it's a URL, extract filename
-        if (existingValue.includes('/')) {
-            const parts = existingValue.split('/');
-            return parts[parts.length - 1];
-        }
-
-        return existingValue;
     };
 
     // Get current step data for easier access in components
@@ -212,10 +184,7 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
         step,
         steps,
         errorSteps,
-        uploadResponse,
         changedFields,
-        fileFields,
-        fieldMappings,
         handleNext,
         handleBack,
         handleSubmit,
@@ -224,9 +193,7 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
         setStep,
         getCurrentStepFields,
         currentStepHasErrors,
-        getExistingFileInfo,
         hasFieldChanged,
         getChangedFieldsData,
-        setUploadResponse,
     };
 }

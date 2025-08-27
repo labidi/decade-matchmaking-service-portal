@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrganizationCsvUploadRequest;
+use App\Http\Requests\SettingsPostRequest;
 use App\Services\OrganizationImportService;
 use App\Services\SettingsService;
 use App\Traits\HasBreadcrumbs;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -30,15 +32,14 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function update(Request $request)
+    public function update(SettingsPostRequest $request): RedirectResponse
     {
-        // Get dynamic validation rules from service
-        $validationRules = $this->settingsService->getFileValidationRules();
-        $request->validate($validationRules);
-
         try {
-            // Validate settings data against defined constants
-            $validatedData = $this->settingsService->validateSettingsData($request->all());
+            // Get validated data from FormRequest
+            $validatedData = $request->validated();
+            
+            // Additional validation against defined constants
+            $validatedData = $this->settingsService->validateSettingsData($validatedData);
 
             // Handle file uploads for all file-type settings
             foreach ($validatedData as $path => $value) {
