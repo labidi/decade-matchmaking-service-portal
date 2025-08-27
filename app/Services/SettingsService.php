@@ -23,22 +23,15 @@ class SettingsService
                 if ($value === null && Setting::isFileUpload($path)) {
                     continue;
                 }
-
                 $setting = Setting::where('path', $path)->first();
-
                 if ($setting) {
-                    // Update existing setting
                     $setting->update(['value' => $value]);
-                    Log::info('Setting updated', ['path' => $path, 'is_file' => Setting::isFileUpload($path)]);
                 } else {
-                    // Create new setting
                     $setting = Setting::create([
                         'path' => $path,
                         'value' => $value
                     ]);
-                    Log::info('Setting created', ['path' => $path, 'is_file' => Setting::isFileUpload($path)]);
                 }
-
                 $updatedSettings[$path] = $setting;
             }
         });
@@ -144,27 +137,4 @@ class SettingsService
         }
     }
 
-    /**
-     * Get file validation rules for all file upload settings
-     */
-    public function getFileValidationRules(): array
-    {
-        $rules = [];
-
-//        foreach (Setting::FILE_UPLOAD_SETTINGS as $path) {
-//            $rules[$path] = Setting::getFileValidationRules($path);
-//        }
-
-        // Add non-file validation rules
-        $rules[Setting::SITE_NAME] = ['nullable', 'string', 'max:255'];
-        $rules[Setting::SITE_DESCRIPTION] = ['nullable', 'string', 'max:1000'];
-        $rules[Setting::HOMEPAGE_YOUTUBE_VIDEO] = ['nullable', 'string', 'max:500'];
-        $rules[Setting::SUCCESSFUL_MATCHES_METRIC] = ['nullable', 'integer:strict',];
-        $rules[Setting::COMMITTED_FUNDING_METRIC] = ['nullable', 'integer:strict',];
-        $rules[Setting::FULLY_CLOSED_MATCHES_METRIC] = ['nullable', 'integer:strict',];
-        $rules[Setting::REQUEST_IN_IMPLEMENTATION_METRIC] = ['nullable', 'integer:strict',];
-        $rules[Setting::OPEN_PARTNER_OPPORTUNITIES_METRIC] = ['nullable', 'integer:strict',];
-
-        return $rules;
-    }
 }

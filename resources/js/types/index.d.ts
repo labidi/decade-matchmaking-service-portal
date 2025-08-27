@@ -161,14 +161,6 @@ export interface Settings {
     organizations_csv: string;
 }
 
-export interface CSVUploadResponse {
-    success: boolean;
-    message: string;
-    imported_count?: number;
-    errors?: string[];
-}
-
-
 export interface PaginationLinkProps {
     active: boolean;
     label: string;
