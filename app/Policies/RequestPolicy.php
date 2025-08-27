@@ -17,7 +17,9 @@ class RequestPolicy
         if (!$user) {
             return false;
         }
-
+        if ($user->hasRole('partner')) {
+            return true;
+        }
         // Request owner, matched partner, or admin can view
         return $user->id === $request->user->id
             || $user->id === $request->matchedPartner?->id

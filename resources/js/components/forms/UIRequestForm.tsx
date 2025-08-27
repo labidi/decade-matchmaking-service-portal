@@ -1,9 +1,4 @@
-import {UIField} from '@/types';
-
-export interface UIStep {
-    label: string;
-    fields: Record<string, UIField>;
-}
+import {UIStep} from '@/types';
 
 export const UIRequestForm: UIStep[] = [
     {

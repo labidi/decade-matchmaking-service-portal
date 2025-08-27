@@ -1,34 +1,4 @@
-export interface Opportunity {
-    id: string;
-    title: string;
-    type: string;
-    closing_date: string;
-    coverage_activity: string;
-    implementation_location: string;
-    target_audience: string;
-    target_audience_other: string;
-    summary: string;
-    url: string;
-    key_words: string[];
-}
-
-export interface UIField {
-    id: string;
-    type: string;
-    label?: string;
-    description?: string;
-    placeholder?: string;
-    options?: { value: string; label: string }[];
-    required?: boolean;
-    show?: (data: Opportunity) => boolean;
-    multiple?: boolean;
-    maxLength?: number;
-}
-
-export interface UIStep {
-    label: string;
-    fields: Record<string, UIField>;
-}
+import {UIStep} from '@/types';
 
 // Coverage activity options (static as they define the structure of location selection)
 export const coverageActivityOptions = [
@@ -105,10 +75,11 @@ export const UIOpportunityForm: UIStep[] = [
             },
             key_words: {
                 id: 'key_words',
-                type: 'text',
+                type: 'keywords',
                 required: false,
                 label: 'Three key words',
                 description: 'Add comma (,) to separate key words or press enter',
+                maxKeywords:3
             },
         },
     }

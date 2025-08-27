@@ -5,6 +5,10 @@ export {
 export {RequestOffer, RequestOfferList, RequestOfferPermissions} from "@/types/offer";
 export {Opportunity, OpportunitiesList} from "@/types/opportunity";
 
+export interface UIStep {
+    label: string;
+    fields: Record<string, UIField>;
+}
 export interface UIField {
     id: string;
     type: string;
@@ -31,6 +35,9 @@ export interface UIField {
     readOnly?: boolean;
     className?: string;
     onKeyDown?: (e: React.KeyboardEvent) => void;
+    // Keywords field specific properties
+    maxKeywords?: number;
+    minLength?: number;  // Minimum length for individual keywords
 }
 
 export interface User {
