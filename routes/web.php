@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\NotificationsController;
-use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserGuideController;
 use Illuminate\Support\Facades\Route;
 

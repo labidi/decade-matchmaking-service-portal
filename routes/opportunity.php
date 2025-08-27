@@ -8,6 +8,8 @@ use App\Http\Controllers\Opportunities\ShowController as OpportunityShowControll
 use App\Http\Controllers\Opportunities\EditController as OpportunityEditController;
 use App\Http\Controllers\Opportunities\UpdateStatusController as OpportunityUpdateStatusController;
 use App\Http\Controllers\Opportunities\DestroyController as OpportunityDestroyController;
+use Diglactic\Breadcrumbs\Breadcrumbs;
+use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
 // User routes
 Route::middleware(['auth', 'role:user'])->group(function () {
@@ -28,4 +30,9 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 // Admin routes
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('opportunity/list', OpportunityListController::class)->name('admin.opportunity.list');
+});
+
+Breadcrumbs::for('opportunity.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('Create Opportunity', route('opportunity.create'));
 });

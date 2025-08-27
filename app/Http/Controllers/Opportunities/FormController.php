@@ -25,12 +25,7 @@ class FormController extends BaseOpportunitiesController
                 'target_audience' => TargetAudience::getOptions(),
                 'opportunity_types' => Type::getOptions(),
                 'yes_no' => YesNo::getOptions(),
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Home', 'url' => route('user.home')],
-                ['name' => 'Opportunities', 'url' => route('opportunity.me.list')],
-                ['name' => 'Create Opportunity', 'url' => route('opportunity.create')],
-            ],
+            ]
         ]);
     }
 }

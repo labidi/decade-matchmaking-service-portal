@@ -6,7 +6,7 @@ import { Link } from '@/components/ui/link'
 import { Text } from '@/components/ui/text'
 
 export interface BreadcrumbItem {
-  name: string;
+  title: string;
   url?: string;
 }
 
@@ -15,9 +15,10 @@ interface BreadcrumbProps {
   items?: BreadcrumbItem[];
 }
 
-export function Breadcrumb({ className, items }: BreadcrumbProps) {
+export function Breadcrumb({ className, items }: Readonly<BreadcrumbProps>) {
   const defaultItems = (usePage().props.breadcrumbs as BreadcrumbItem[]) || []
-  const breadcrumbItems = items || defaultItems
+    const breadcrumbItems = items || defaultItems
+    console.log('Rendering Breadcrumb with items:', breadcrumbItems);
 
   if (breadcrumbItems.length === 0) return null
 
@@ -44,7 +45,7 @@ export function Breadcrumb({ className, items }: BreadcrumbProps) {
                   'transition-colors duration-200'
                 )}
               >
-                {item.name}
+                {item.title}
               </Link>
             ) : (
               <Text
@@ -54,7 +55,7 @@ export function Breadcrumb({ className, items }: BreadcrumbProps) {
                 )}
                 aria-current="page"
               >
-                {item.name}
+                {item.title}
               </Text>
             )}
           </li>
