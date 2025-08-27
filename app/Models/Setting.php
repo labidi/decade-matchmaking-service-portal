@@ -69,8 +69,7 @@ class Setting extends Model
     public static function getStorageDirectory(string $path): string
     {
         return match ($path) {
-            self::LOGO => 'settings/images',
-            self::PORTAL_GUIDE, self::USER_GUIDE, self::PARTNER_GUIDE => 'settings/guides',
+            self::PORTAL_GUIDE, self::USER_GUIDE, self::PARTNER_GUIDE, SELF::ORGANIZATIONS_CSV => 'settings/guides',
             default => 'settings'
         };
     }

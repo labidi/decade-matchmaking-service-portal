@@ -42,68 +42,53 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
         if (e) e.preventDefault();
         form.clearErrors();
         setErrorSteps([]);
-        // Get only changed fields to submit
+        
         const changedData = getChangedFieldsData();
 
-        // If no fields have changed, show a message and return
         if (Object.keys(changedData).length === 0) {
-            console.log('No changes detected. Skipping form submission.');
             return;
         }
 
         const submitUrl = isEditing
             ? route('admin.settings.update')
             : route('admin.settings.store');
-        const submitMethod = isEditing ? 'post' : 'post';
 
-        // Store original data temporarily
-        const originalData = {...form.data};
+        // Store original form data temporarily
+        const originalFormData = {...form.data};
         
-        // Temporarily update form data to only include changed fields
-        // This ensures proper error mapping while optimizing the submission
+        // Set form data to only changed fields for submission
         form.setData(changedData as any);
-
-        form[submitMethod](submitUrl, {
+        
+        // Direct submission - Inertia handles state preservation
+        form.post(submitUrl, {
             preserveScroll: false,
             onSuccess: () => {
-                // Reset changed fields tracking and update initial values
+                // Simple success handling - Inertia preserves form state automatically
                 setChangedFields(new Set());
                 
                 // Update initial values with the new values after successful submission
                 Object.keys(changedData).forEach(key => {
                     (initialValues.current as any)[key] = changedData[key];
                 });
-                
-                // Reset CSV file after successful upload
-                form.setData('organizations_csv', null);
-                
-                // Restore the full form data structure for continued editing
-                form.setData(originalData);
+
+                // Reset CSV file after successful upload and restore full form structure
+                form.setData({
+                    ...originalFormData,
+                    ...changedData,
+                    organizations_csv: null
+                });
             },
             onError: (errors: any) => {
-                // Restore full form data structure for proper error handling
-                form.setData(originalData);
+                // Restore original form data structure
+                form.setData(originalFormData);
                 
-                const stepsWithError: number[] = [];
-                Object.keys(errors).forEach(field => {
-                    const idx = UISettingsForm.findIndex(step => step.fields[field]);
-                    if (idx !== -1 && !stepsWithError.includes(idx + 1)) {
-                        stepsWithError.push(idx + 1);
-                    }
-                });
+                // Simple error handling - Inertia preserves form state automatically
+                // Just handle error steps
+                const stepsWithError = processFormErrors(errors);
                 setErrorSteps(stepsWithError);
-
-                // Jump to first step with error
+                
                 if (stepsWithError.length > 0) {
                     setStep(stepsWithError[0]);
-                }
-
-                console.error('Settings update failed:', errors);
-            },
-            onFinish: () => {
-                // Ensure form data structure is restored regardless of success/failure
-                if (Object.keys(form.data).length !== Object.keys(originalData).length) {
-                    form.setData(originalData);
                 }
             }
         });
@@ -177,6 +162,18 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
     // Check if current step has any errors
     const currentStepHasErrors = () => {
         return errorSteps.includes(step);
+    };
+
+    // Process form errors to identify which steps have errors
+    const processFormErrors = (errors: any): number[] => {
+        const stepsWithError: number[] = [];
+        Object.keys(errors).forEach(field => {
+            const idx = UISettingsForm.findIndex(step => step.fields[field]);
+            if (idx !== -1 && !stepsWithError.includes(idx + 1)) {
+                stepsWithError.push(idx + 1);
+            }
+        });
+        return stepsWithError;
     };
 
     return {
