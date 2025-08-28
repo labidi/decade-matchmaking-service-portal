@@ -1,9 +1,9 @@
 import {useForm} from '@inertiajs/react';
 import {useEffect, useState} from 'react';
 import {UIOpportunityForm} from '@/components/forms/UIOpportunityForm';
-import {Opportunity, FormOptions} from '@/types';
+import {Opportunity, OpportunityFormOptions} from '@/types';
 
-export function useOpportunityForm(opportunity?: Opportunity, formOptions?: FormOptions) {
+export function useOpportunityForm(opportunity?: Opportunity, formOptions?: OpportunityFormOptions) {
     const form = useForm({
         id: opportunity?.id || '',
         title: opportunity?.title || '',
@@ -15,7 +15,7 @@ export function useOpportunityForm(opportunity?: Opportunity, formOptions?: Form
         target_audience_other: opportunity?.target_audience_other || '',
         summary: opportunity?.summary || '',
         url: opportunity?.url || '',
-        key_words: opportunity?.keywords,
+        key_words: opportunity?.key_words || '',
     });
 
     const [currentStep, setCurrentStep] = useState(0);
@@ -26,29 +26,25 @@ export function useOpportunityForm(opportunity?: Opportunity, formOptions?: Form
     // Handle implementation location options based on coverage activity
     useEffect(() => {
         if (!formOptions) return;
-
         switch (form.data.coverage_activity) {
             case 'country':
                 setImplementationOptions(formOptions.countries || []);
                 break;
-            case 'Regions':
+            case 'regions':
                 setImplementationOptions(formOptions.regions || []);
                 break;
-            case 'Ocean-based':
+            case 'ocean-based':
                 setImplementationOptions(formOptions.oceans || []);
                 break;
-            case 'Global':
+            case 'global':
                 setImplementationOptions([{value: 'Global', label: 'Global'}]);
                 break;
             default:
                 setImplementationOptions([]);
         }
         // Clear implementation location when coverage activity changes
-        form.setData('implementation_location', '');
+        form.setData('implementation_location', [] as any);
     }, [form.data.coverage_activity, formOptions]);
-
-    const handleNext = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
-    const handleBack = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -82,34 +78,14 @@ export function useOpportunityForm(opportunity?: Opportunity, formOptions?: Form
         form.setData(name as keyof typeof form.data, value);
     };
 
-    // Get form options for specific fields
-    const getFieldOptions = (fieldName: string) => {
-        if (!formOptions) return [];
-
-        switch (fieldName) {
-            case 'implementation_location':
-                return implementationOptions;
-            case 'type':
-            case 'opportunity_types':
-                return formOptions.opportunity_types || [];
-            case 'target_audience':
-                return formOptions.target_audience || [];
-            default:
-                return [];
-        }
-    };
-
     return {
         form,
         currentStep,
         steps,
         errorSteps,
         implementationOptions,
-        handleNext,
-        handleBack,
         handleSubmit,
         handleFieldChange,
-        setCurrentStep,
-        getFieldOptions,
+        setCurrentStep
     };
 }

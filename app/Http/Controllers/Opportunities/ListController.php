@@ -12,6 +12,7 @@ use Inertia\Response;
 
 class ListController extends BaseOpportunitiesController
 {
+
     public function __construct(private readonly OpportunityService $opportunityService)
     {
     }

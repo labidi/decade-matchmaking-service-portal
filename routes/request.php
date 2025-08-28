@@ -7,7 +7,6 @@ use App\Http\Controllers\Request\ViewController;
 use App\Http\Controllers\Request\ExportRequestPdfController;
 use App\Http\Controllers\Request\ExpressInterestController;
 use App\Http\Controllers\Request\RequestManagementController;
-use App\Http\Controllers\Request\RequestOfferActionsController;
 use App\Http\Controllers\DocumentsController;
 
 /*
@@ -29,10 +28,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('request/submit/{id?}', [RequestFormController::class, 'submit'])->name('request.submit');
     Route::delete('request/{id}', [RequestManagementController::class, 'destroy'])->name('user.request.destroy');
 
-    // Request viewing and preview
     Route::get('pdf/{id}', ExportRequestPdfController::class)->name('request.pdf');
 
-    // Request listings
     Route::get('request/me/list', [RequestListController::class, 'myRequests'])->name('request.me.list');
     Route::get('request/me/matched-requests', [RequestListController::class, 'matchedRequests'])->name(
         'request.me.matched-requests'
@@ -49,15 +46,6 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     // Request document management
     Route::post('request/{request}/document', [DocumentsController::class, 'store'])->name(
         'user.request.document.store'
-    );
-
-    // Request offer actions
-    Route::post('request/{id}/accept-offer', [RequestOfferActionsController::class, 'acceptOffer'])->name(
-        'request.accept.offer'
-    );
-    Route::post('request/{id}/request-clarification', [RequestOfferActionsController::class, 'requestClarification']
-    )->name(
-        'request.clarification'
     );
 });
 
