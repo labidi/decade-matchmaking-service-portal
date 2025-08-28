@@ -1,25 +1,17 @@
 import React from 'react';
-import { Head, usePage } from '@inertiajs/react';
+import {Head} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import { Opportunity, PageProps } from '@/types';
-import { Heading, Subheading } from '@/components/ui/heading';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Text, TextLink } from '@/components/ui/text';
-import { Divider } from '@/components/ui/divider';
-import { CalendarIcon, GlobeAltIcon, UsersIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/16/solid';
-import { opportunityStatusBadgeRenderer } from '@/utils/status-badge-renderer';
+import {Opportunity, PageProps} from '@/types';
+import {Heading, Subheading} from '@/components/ui/heading';
+import {Badge} from '@/components/ui/badge';
+import {Button} from '@/components/ui/button';
+import {Text, TextLink} from '@/components/ui/text';
+import {Divider} from '@/components/ui/divider';
+import {CalendarIcon, GlobeAltIcon, UsersIcon, ArrowTopRightOnSquareIcon} from '@heroicons/react/16/solid';
+import {opportunityStatusBadgeRenderer} from '@/utils/status-badge-renderer';
 
 interface ShowPageProps extends PageProps {
     opportunity: Opportunity;
-    title: string;
-    userPermissions: {
-        canEdit: boolean;
-        canDelete: boolean;
-        canApply: boolean;
-        isOwner: boolean;
-    };
-    breadcrumbs: Array<{ name: string; url?: string }>;
 }
 
 
@@ -34,22 +26,10 @@ function formatDate(dateString: string): string {
     });
 }
 
-/**
- * Parse keywords string into array, handling empty strings
- */
-function parseKeywords(keywords: string): string[] {
-    if (!keywords || !keywords.trim()) return [];
-    return keywords.split(',').map(keyword => keyword.trim()).filter(Boolean);
-}
-
-export default function Show() {
-    const { opportunity, userPermissions } = usePage<ShowPageProps>().props;
-    const keywordsList = parseKeywords(opportunity.keywords);
-
+export default function Show({opportunity}: Readonly<ShowPageProps>) {
     return (
         <FrontendLayout>
-            <Head title={`Opportunity: ${opportunity.title}`} />
-
+            <Head title={`Opportunity: ${opportunity.title}`}/>
             <div>
                 {/* Header Section */}
                 <div className="space-y-4">
@@ -65,45 +45,53 @@ export default function Show() {
                     </div>
                 </div>
 
-                <Divider soft />
+                <Divider soft/>
 
                 {/* Basic Information Grid */}
                 <section className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                         <div className="space-y-2">
                             <span className="font-medium text-firefly-800 text-lg">Type</span>
-                            <Text>{opportunity.type}</Text>
+                            <Text>{opportunity.type.label}</Text>
                         </div>
 
                         <div className="space-y-2">
                             <div className="flex items-center gap-2">
-                                <CalendarIcon data-slot="icon" className="size-4 text-zinc-500" />
+                                <CalendarIcon data-slot="icon" className="size-4 text-zinc-500"/>
                                 <span className="font-medium text-firefly-800 text-lg">Closing Date</span>
                             </div>
-                            <Text>{formatDate(opportunity.closing_date)}</Text>
+                            <Text>{opportunity.closing_date}</Text>
                         </div>
+
 
                         <div className="space-y-2">
                             <span className="font-medium text-firefly-800 text-lg">Coverage of CD Activity</span>
-                            <Text>{opportunity.coverage_activity}</Text>
+                            <Text>{opportunity.coverage_activity.label}</Text>
                         </div>
+
 
                         <div className="space-y-2">
                             <div className="flex items-center gap-2">
-                                <GlobeAltIcon data-slot="icon" className="size-4 text-zinc-500" />
+                                <GlobeAltIcon data-slot="icon" className="size-4 text-zinc-500"/>
                                 <span className="font-medium text-firefly-800 text-lg">Implementation Location</span>
                             </div>
-                            <Text>{opportunity.implementation_location}</Text>
+                            <Text>
+                                <ul className="list-disc pl-5 list-outside">
+                                    {opportunity.implementation_location.map((implementation_location) =>
+                                        <li>{implementation_location.label}</li>
+                                    )}
+                                </ul>
+                            </Text>
                         </div>
 
                         <div className="space-y-2">
                             <div className="flex items-center gap-2">
-                                <UsersIcon data-slot="icon" className="size-4 text-zinc-500" />
+                                <UsersIcon data-slot="icon" className="size-4 text-zinc-500"/>
                                 <span className="font-medium text-firefly-800 text-lg">Target Audience</span>
                             </div>
                             <Text>
                                 <ul className="list-disc pl-5 list-outside">
-                                    {opportunity.target_audience.map((target_audience)=>
+                                    {opportunity.target_audience.map((target_audience) =>
                                         <li>{target_audience.label}</li>
                                     )}
                                 </ul>
@@ -127,7 +115,7 @@ export default function Show() {
                         <div className="pt-4 border-t border-zinc-950/10 dark:border-white/10">
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
-                                    <ArrowTopRightOnSquareIcon data-slot="icon" className="size-4 text-zinc-500" />
+                                    <ArrowTopRightOnSquareIcon data-slot="icon" className="size-4 text-zinc-500"/>
                                     <span className="font-medium text-firefly-800 text-lg">Application Link</span>
                                 </div>
                                 <TextLink
@@ -143,7 +131,7 @@ export default function Show() {
                     )}
                 </section>
 
-                <Divider soft />
+                <Divider soft/>
 
                 {/* Summary Section */}
                 {opportunity.summary && (
@@ -156,14 +144,14 @@ export default function Show() {
                 )}
 
                 {/* Keywords/Tags Section */}
-                {keywordsList.length > 0 && (
+                {opportunity.key_words.length > 0 && (
                     <>
-                        <Divider soft />
+                        <Divider soft/>
                         <section className="space-y-4">
                             <Subheading level={2}>Keywords</Subheading>
                             <div className="flex flex-wrap gap-2">
-                                {keywordsList.map((keyword, index) => (
-                                    <Badge key={index} color="blue">
+                                {opportunity.key_words.map((keyword) => (
+                                    <Badge color="blue">
                                         {keyword}
                                     </Badge>
                                 ))}
@@ -172,22 +160,11 @@ export default function Show() {
                     </>
                 )}
 
-                <Divider />
+                <Divider soft/>
 
                 {/* Action Buttons */}
                 <section className="flex flex-col sm:flex-row gap-4">
-                    {userPermissions.canApply && opportunity.url && (
-                        <Button
-                            color="dark/white"
-                            href={opportunity.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="sm:w-auto"
-                        >
-                            <ArrowTopRightOnSquareIcon data-slot="icon" />
-                            Apply Now
-                        </Button>
-                    )}
+
                 </section>
             </div>
         </FrontendLayout>

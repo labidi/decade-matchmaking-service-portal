@@ -7,22 +7,29 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Services\OrganizationImportService;
 
 class SettingsService
 {
+    public function __construct(private readonly OrganizationImportService $organizationImportService)
+    {
+    }
+
     /**
      * Update or create settings
      */
     public function updateSettings(array $settingsData): array
     {
         $updatedSettings = [];
+        $csvImportResult = null;
 
-        DB::transaction(function () use ($settingsData, &$updatedSettings) {
+        DB::transaction(function () use ($settingsData, &$updatedSettings, &$csvImportResult) {
             foreach ($settingsData as $path => $value) {
                 // Skip null values for file uploads that weren't changed
                 if ($value === null && Setting::isFileUpload($path)) {
                     continue;
                 }
+
                 $setting = Setting::where('path', $path)->first();
                 if ($setting) {
                     $setting->update(['value' => $value]);
@@ -33,10 +40,23 @@ class SettingsService
                     ]);
                 }
                 $updatedSettings[$path] = $setting;
+
+                // Handle CSV import if organizations_csv is being updated
+                if ($path === Setting::ORGANIZATIONS_CSV && $value) {
+                    try {
+                        $csvImportResult = $this->organizationImportService->import($value);
+                    } catch (\Exception $e) {
+                        // Re-throw the exception to rollback the transaction
+                        throw new \Exception('CSV import failed: ' . $e->getMessage(), 0, $e);
+                    }
+                }
             }
         });
 
-        return $updatedSettings;
+        return [
+            'settings' => $updatedSettings,
+            'csv_import_result' => $csvImportResult
+        ];
     }
 
     /**
@@ -109,15 +129,7 @@ class SettingsService
         $storageDirectory = Setting::getStorageDirectory($path);
         $fileName = time() . '_' . $file->getClientOriginalName();
 
-        $filePath = $file->storeAs($storageDirectory, $fileName, 'public');
-
-        Log::info('File uploaded for setting', [
-            'path' => $path,
-            'file_path' => $filePath,
-            'original_name' => $file->getClientOriginalName()
-        ]);
-
-        return $filePath;
+        return $file->storeAs($storageDirectory, $fileName, 'public');
     }
 
     /**
@@ -132,7 +144,6 @@ class SettingsService
 
             if (Storage::disk('public')->exists($oldFilePath)) {
                 Storage::disk('public')->delete($oldFilePath);
-                Log::info('Old file deleted', ['path' => $path, 'file_path' => $oldFilePath]);
             }
         }
     }

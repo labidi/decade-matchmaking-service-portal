@@ -35,7 +35,6 @@ class ExpressInterest extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         $subject = "Interest Expressed - {$this->request->capacity_development_title}";
-
         return new Envelope(
             subject: $subject,
         );

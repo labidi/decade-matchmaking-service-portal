@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\OrganizationCsvUploadRequest;
 use App\Http\Requests\SettingsPostRequest;
-use App\Services\OrganizationImportService;
 use App\Services\SettingsService;
 use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\RedirectResponse;
@@ -18,7 +16,7 @@ class SettingsController extends Controller
 
     public function __construct(
         private readonly SettingsService $settingsService,
-        private readonly OrganizationImportService $organizationImportService
+
     ) {
     }
 
@@ -37,7 +35,7 @@ class SettingsController extends Controller
         try {
             // Get validated data from FormRequest
             $validatedData = $request->validated();
-            
+
             // Additional validation against defined constants
             $validatedData = $this->settingsService->validateSettingsData($validatedData);
 
@@ -59,57 +57,6 @@ class SettingsController extends Controller
             return redirect()->back()
                 ->with('error', 'Failed to update settings: ' . $e->getMessage())
                 ->withInput();
-        }
-    }
-
-    /**
-     * Handle CSV file upload and import organizations.
-     */
-    public function uploadOrganizationsCsv(OrganizationCsvUploadRequest $request)
-    {
-
-
-        try {
-            $file = $request->file('csv_file');
-
-            if (!$file) {
-                throw new \Exception('No CSV file received');
-            }
-
-            Log::info('CSV file received', [
-                'filename' => $file->getClientOriginalName(),
-                'size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-            ]);
-
-            $stats = $this->organizationImportService->importFromCsv($file);
-
-            Log::info('CSV import completed', [
-                'stats' => $stats,
-            ]);
-
-            $message = $this->organizationImportService->formatImportMessage($stats);
-
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'stats' => [
-                    'imported' => $stats['imported'],
-                    'skipped' => $stats['skipped'],
-                    'errors' => count($stats['errors']),
-                ],
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('CSV upload failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to import CSV file: ' . $e->getMessage(),
-            ], 500);
         }
     }
 }

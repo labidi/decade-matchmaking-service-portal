@@ -3,12 +3,13 @@ export {
     RequestSubscription, SubscriptionStats
 } from "@/types/request";
 export {RequestOffer, RequestOfferList, RequestOfferPermissions} from "@/types/offer";
-export {Opportunity, OpportunitiesList} from "@/types/opportunity";
+export {Opportunity, OpportunitiesList, OpportunityFormOptions} from "@/types/opportunity";
 
 export interface UIStep {
     label: string;
     fields: Record<string, UIField>;
 }
+
 export interface UIField {
     id: string;
     type: string;
@@ -123,23 +124,6 @@ export interface UserNotificationPreference {
     email_notification_enabled: boolean;
     created_at: string;
     updated_at: string;
-}
-
-
-// Common form options interface for consistent structure across forms
-export interface FormOptions {
-    delivery_countries?: Array<{ value: string; label: string }>;
-    countries?: Array<{ value: string; label: string }>;
-    regions?: Array<{ value: string; label: string }>;
-    oceans?: Array<{ value: string; label: string }>;
-    subthemes?: Array<{ value: string; label: string }>;
-    support_types?: Array<{ value: string; label: string }>;
-    target_audience?: Array<{ value: string; label: string }>;
-    delivery_format?: Array<{ value: string; label: string }>;
-    opportunity_types?: Array<{ value: string; label: string }>;
-    related_activity?: Array<{ value: string; label: string }>;
-    yes_no?: Array<{ value: string; label: string }>;
-    project_stage?: Array<{ value: string; label: string }>;
 }
 
 export interface NotificationPreferencesPageProps extends PageProps {
