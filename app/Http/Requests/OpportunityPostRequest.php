@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Common\Language;
+use App\Enums\Common\TargetAudience;
+use App\Enums\Opportunity\Type;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class OpportunityPostRequest extends FormRequest
 {
@@ -22,14 +26,25 @@ class OpportunityPostRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string'],
+            'type' => ['required', Rule::enum(Type::class)],
             'closing_date' => ['required', 'string', 'max:255'],
             'coverage_activity' => ['required'],
             'implementation_location' => ['required'],
-            'target_audience' => ['required'],
+            'target_audience' => ['required', 'array'],
+            'target_audience.*' => [Rule::enum(TargetAudience::class)],
+            'target_audience_other' => [
+                Rule::excludeIf(fn() => !in_array(TargetAudience::OTHER->value, $this->input('target_audience', []))),
+                'string'
+            ],
+            'target_languages' => ['required'],
+            'target_languages.*' => [Rule::enum(Language::class)],
+            'target_languages_other' => [
+                Rule::excludeIf(fn() => !in_array(Language::OTHER->value, $this->input('target_languages', []))),
+                'string'
+            ],
             'summary' => ['required'],
             'url' => ['required'],
-            'key_words' => ['required', 'string', 'max:255'],
+            'key_words' => ['required', 'array', 'max:255'],
         ];
     }
 

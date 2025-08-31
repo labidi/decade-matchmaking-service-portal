@@ -1,5 +1,5 @@
 import {useForm} from '@inertiajs/react';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {UIOpportunityForm} from '@/components/forms/UIOpportunityForm';
 import {Opportunity, OpportunityFormOptions} from '@/types';
 
@@ -7,34 +7,40 @@ export function useOpportunityForm(opportunity?: Opportunity, formOptions?: Oppo
     const form = useForm({
         id: opportunity?.id || '',
         title: opportunity?.title || '',
-        type: opportunity?.type || '',
+        type: opportunity?.type.value || '',
         closing_date: opportunity?.closing_date || '',
-        coverage_activity: opportunity?.coverage_activity || '',
-        implementation_location: opportunity?.implementation_location || '',
-        target_audience: opportunity?.target_audience || '',
+        coverage_activity: opportunity?.coverage_activity.value || '',
+        implementation_location: opportunity?.implementation_location.map((item, index) => item.value) || '',
+        target_audience: opportunity?.target_audience.map((item, index) => item.value) || '',
         target_audience_other: opportunity?.target_audience_other || '',
+        target_languages: opportunity?.target_languages.map((item, index) => item.value) || '',
+        target_target_languages_other: opportunity?.target_audience_other || '',
         summary: opportunity?.summary || '',
         url: opportunity?.url || '',
-        key_words: opportunity?.key_words || '',
+        key_words: opportunity?.key_words.map((item,index)=>item) || '',
     });
 
     const [currentStep, setCurrentStep] = useState(0);
     const steps = UIOpportunityForm.map((s) => s.label);
     const [errorSteps, setErrorSteps] = useState<number[]>([]);
     const [implementationOptions, setImplementationOptions] = useState<{ value: string; label: string }[]>([]);
+    const previousCoverageActivity = useRef(form.data.coverage_activity);
 
     // Handle implementation location options based on coverage activity
     useEffect(() => {
         if (!formOptions) return;
+
+        const coverageActivityChanged = previousCoverageActivity.current !== form.data.coverage_activity;
+
         switch (form.data.coverage_activity) {
             case 'country':
-                setImplementationOptions(formOptions.countries || []);
+                setImplementationOptions(formOptions.countries ?? []);
                 break;
             case 'regions':
-                setImplementationOptions(formOptions.regions || []);
+                setImplementationOptions(formOptions.regions ?? []);
                 break;
             case 'ocean-based':
-                setImplementationOptions(formOptions.oceans || []);
+                setImplementationOptions(formOptions.oceans ?? []);
                 break;
             case 'global':
                 setImplementationOptions([{value: 'Global', label: 'Global'}]);
@@ -42,16 +48,23 @@ export function useOpportunityForm(opportunity?: Opportunity, formOptions?: Oppo
             default:
                 setImplementationOptions([]);
         }
-        // Clear implementation location when coverage activity changes
-        form.setData('implementation_location', [] as any);
+
+        // Clear implementation location when:
+        // 1. In create mode (no opportunity exists), OR
+        // 2. Coverage activity has actually changed in edit mode
+        if (!opportunity || coverageActivityChanged) {
+            form.setData('implementation_location', [] as any);
+        }
+
+        // Update the ref to track the current value
+        previousCoverageActivity.current = form.data.coverage_activity;
     }, [form.data.coverage_activity, formOptions]);
 
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         form.clearErrors();
         setErrorSteps([]);
-
-        form.post(route('opportunity.store'), {
+        form.post(route('opportunity.submit',{'id':opportunity?.id}), {
             preserveScroll: true,
             onSuccess: () => {
                 // Handle success - could redirect or show success message

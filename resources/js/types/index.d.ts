@@ -3,7 +3,7 @@ export {
     RequestSubscription, SubscriptionStats
 } from "@/types/request";
 export {RequestOffer, RequestOfferList, RequestOfferPermissions} from "@/types/offer";
-export {Opportunity, OpportunitiesList, OpportunityFormOptions} from "@/types/opportunity";
+export {Opportunity, OpportunitiesList, OpportunityFormOptions, OpportunitiesPagination} from "@/types/opportunity";
 
 export interface UIStep {
     label: string;
@@ -156,6 +156,13 @@ export interface FlashMessages {
     error?: string;
     warning?: string;
     info?: string;
+}
+
+export interface ActionButton {
+    label: string;
+    href: string;
+    icon?: string;  // Heroicon component name
+    variant?: 'primary' | 'secondary' | 'danger';
 }
 
 export interface PagePropsWithFlash<

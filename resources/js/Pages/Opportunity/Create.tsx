@@ -18,7 +18,8 @@ function getOptionsKeyForOpportunity(fieldKey: string): string | null {
         'implementation_location': 'implementation_location', // This is handled dynamically in the hook
         'type': 'opportunity_types',
         'target_audience': 'target_audience',
-        'coverage_activity': 'coverage_activity'
+        'coverage_activity': 'coverage_activity',
+        'target_languages': 'target_languages'
     };
     return keyMap[fieldKey] || null;
 }

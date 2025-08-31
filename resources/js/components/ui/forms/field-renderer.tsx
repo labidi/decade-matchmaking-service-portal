@@ -254,7 +254,7 @@ export default function FieldRenderer({
                     value={value}
                     onChange={(newValue) => onChange(name, newValue)}
                     options={field.options}
-                    placeholder={field.placeholder || "Select an option..."}
+                    placeholder={field.placeholder ?? "Select an option..."}
                     required={field.required}
                     disabled={field.disabled || disabled}
                     readOnly={field.readOnly}
@@ -379,7 +379,7 @@ export default function FieldRenderer({
                     label={field.label}
                     description={field.description}
                     placeholder={field.placeholder}
-                    value={value ?? ''}
+                    value={value ?? []}
                     onChange={(newValue) => onChange(name, newValue)}
                     error={error}
                     required={field.required}

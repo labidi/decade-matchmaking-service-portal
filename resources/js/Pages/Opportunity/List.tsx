@@ -1,7 +1,7 @@
 import React from 'react';
 import {Head, Link} from '@inertiajs/react';
-import {PageProps, OpportunitiesList, PaginationLinkProps} from '@/types';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
+import {PageProps, OpportunitiesPagination} from '@/types';
 import {OpportunitiesDataTable} from '@/components/ui/data-table/opportunities/opportunities-data-table';
 import {partnerColumns} from '@/components/ui/data-table/opportunities/column-configs';
 import { useOpportunityActions } from '@/hooks/useOpportunityActions';
@@ -10,22 +10,6 @@ import { OpportunityStatusDialog } from '@/components/features/opportunity';
 export type OpportunitiesListPageActions = {
     canExportCSV?: boolean;
     canSubmitNew?: boolean;
-}
-
-interface OpportunitiesPagination {
-    current_page: number;
-    data: OpportunitiesList;
-    first_page_url: string;
-    from: number;
-    last_page: number;
-    last_page_url: string;
-    links: PaginationLinkProps[];
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number;
-    total: number;
 }
 
 interface OpportunitiesListPageProps extends PageProps<{
@@ -119,7 +103,7 @@ export default function OpportunitiesListPage({
                 showSearch={true}
                 showActions={true}
             />
-            
+
             <OpportunityStatusDialog
                 isOpen={isStatusDialogOpen}
                 onClose={closeStatusDialog}

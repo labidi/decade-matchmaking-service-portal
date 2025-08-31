@@ -1,29 +1,13 @@
 import React from 'react';
-import { Head } from '@inertiajs/react';
-import { OpportunitiesList, PaginationLinkProps } from '@/types';
+import {Head} from '@inertiajs/react';
+import {OpportunitiesPagination} from '@/types';
+import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
+import {OpportunitiesDataTable} from "@/components/ui/data-table/opportunities/opportunities-data-table";
+import {OpportunityStatusDialog} from '@/components/features/opportunity';
+import {adminColumns} from "@/components/ui/data-table/opportunities/column-configs";
+import {Heading} from "@/components/ui/heading";
+import {useOpportunityActions} from '@/hooks/useOpportunityActions';
 
-import { SidebarLayout } from '@/components/ui/layouts/sidebar-layout'
-import { OpportunitiesDataTable } from "@/components/ui/data-table/opportunities/opportunities-data-table";
-import { OpportunityStatusDialog } from '@/components/features/opportunity';
-import { adminColumns } from "@/components/ui/data-table/opportunities/column-configs";
-import { Heading } from "@/components/ui/heading";
-import { useOpportunityActions } from '@/hooks/useOpportunityActions';
-
-interface OpportunitiesPagination {
-    current_page: number;
-    data: OpportunitiesList,
-    first_page_url: string;
-    from: number;
-    last_page: number;
-    last_page_url: string;
-    links: PaginationLinkProps[];
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number;
-    total: number;
-}
 
 interface OpportunitiesListPageProps {
     opportunities: OpportunitiesPagination;
@@ -35,10 +19,10 @@ interface OpportunitiesListPageProps {
 }
 
 export default function OpportunityListPage({
-    opportunities,
-    currentSort,
-    currentSearch,
-}: Readonly<OpportunitiesListPageProps>) {
+                                                opportunities,
+                                                currentSort,
+                                                currentSearch,
+                                            }: Readonly<OpportunitiesListPageProps>) {
     const {
         isStatusDialogOpen,
         selectedOpportunity,

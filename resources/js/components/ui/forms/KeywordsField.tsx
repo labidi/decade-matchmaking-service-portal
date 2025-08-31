@@ -9,8 +9,8 @@ interface KeywordsFieldProps {
   label?: string;
   description?: string;
   placeholder?: string;
-  value?: string; // Comma-separated string
-  onChange: (value: string) => void;
+  value?: string[];
+  onChange: (value: string[]) => void;
   error?: string;
   required?: boolean;
   disabled?: boolean;
@@ -25,7 +25,7 @@ export default function KeywordsField({
   label,
   description,
   placeholder = "Type keywords separated by commas or press Enter",
-  value = '',
+  value = [],
   onChange,
   error,
   required = false,
@@ -34,13 +34,13 @@ export default function KeywordsField({
   minLength = 2,
   maxLength = 50,
   className = "mt-8"
-}: KeywordsFieldProps) {
+}: Readonly<KeywordsFieldProps>) {
   const [inputValue, setInputValue] = useState('');
   const [internalError, setInternalError] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Parse comma-separated string to array
-  const keywords = value ? value.split(',').filter(k => k.trim()) : [];
+  const keywords = value ;
 
   // Display error (external error takes priority over internal error)
   const displayError = error || internalError;
@@ -87,7 +87,7 @@ export default function KeywordsField({
     }
 
     const newKeywords = [...keywords, trimmed];
-    onChange(newKeywords.join(','));
+    onChange(newKeywords);
     setInputValue('');
     setInternalError('');
 
@@ -100,7 +100,7 @@ export default function KeywordsField({
   // Remove keyword
   const removeKeyword = useCallback((index: number) => {
     const newKeywords = keywords.filter((_, i) => i !== index);
-    onChange(newKeywords.join(','));
+    onChange(newKeywords);
     setInternalError('');
   }, [keywords, onChange]);
 
@@ -108,7 +108,7 @@ export default function KeywordsField({
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
-
+    console.log('Input changed:', newValue);
     // Clear internal error when user starts typing
     if (internalError) {
       setInternalError('');
@@ -205,21 +205,20 @@ export default function KeywordsField({
       <div className="space-y-3">
         {/* Keywords Display */}
         {keywords.length > 0 && (
-          <div
+          <ul
             className="flex flex-wrap gap-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700"
-            role="list"
             aria-label="Current keywords"
           >
             {keywords.map((keyword, index) => (
-              <div key={`${keyword}-${index}`} role="listitem">
+              <li key={`${keyword}-${index}`}>
                 <KeywordChip
                   keyword={keyword}
                   onRemove={() => removeKeyword(index)}
                   disabled={disabled}
                 />
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
         {/* Input Field */}

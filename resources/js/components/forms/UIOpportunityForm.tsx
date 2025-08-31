@@ -49,7 +49,21 @@ export const UIOpportunityForm: UIStep[] = [
                 type: 'text',
                 required: false,
                 label: 'Please specify the target audience',
-                show: data => data.target_audience?.includes('Other')
+                show: data => data.target_audience?.includes('other')
+            },
+            target_languages: {
+                id: 'target_languages',
+                type: 'multiselect',
+                required: true,
+                label: 'Language of participation',
+                // options will be provided by the parent component from FormOptions
+            },
+            target_languages_other: {
+                id: 'target_languages_other',
+                type: 'text',
+                required: false,
+                label: 'Please specify the Language of participation',
+                show: data => data.target_languages?.includes('other')
             },
             summary: {
                 id: 'summary',

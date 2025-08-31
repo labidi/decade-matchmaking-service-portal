@@ -1,4 +1,4 @@
-import {User} from "@/types/index";
+import {PaginationLinkProps, User} from "@/types/index";
 
 export interface OpportunityPermissions {
     can_view?: boolean;
@@ -21,6 +21,8 @@ export interface Opportunity {
     implementation_location:  Array<{ value: string; label: string }>;
     target_audience: Array<{ value: string; label: string }>;
     target_audience_other: string;
+    target_languages: Array<{ value: string; label: string }>;
+    target_languages_other: string;
     summary: string;
     url: string;
     created_at: string;
@@ -42,4 +44,20 @@ export interface OpportunityFormOptions {
     opportunity_types?: Array<{ value: string; label: string }>;
     coverage_activity?: Array<{ value: string; label: string }>;
     yes_no?: Array<{ value: string; label: string }>;
+}
+
+interface OpportunitiesPagination {
+    current_page: number;
+    data: Opportunity[],
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: PaginationLinkProps[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
 }

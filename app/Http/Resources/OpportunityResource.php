@@ -5,10 +5,13 @@ namespace App\Http\Resources;
 use App\Enums\Common\Country;
 use App\Enums\Common\Ocean;
 use App\Enums\Common\Region;
+use App\Enums\Opportunity\CoverageActivity;
 use App\Models\Opportunity;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
+use Carbon\Carbon;
 
 /**
  * @mixin Opportunity
@@ -31,15 +34,20 @@ class OpportunityResource extends JsonResource
                 'value' => $this->type->value,
                 'label' => $this->type->label(),
             ],
-            'status' => $this->status,
-            'closing_date' => $this->closing_date,
+            'status' => [
+                'value' => $this->status->value,
+                'label' => $this->status->label(),
+            ],
+            'closing_date' => Carbon::parse($this->closing_date)->toDateString(),
             'coverage_activity' => [
                 'value' => $this->coverage_activity->value,
                 'label' => $this->coverage_activity->label(),
             ],
-            'implementation_location' => $this->transformImplementationLocation(),
+            'implementation_location' => $this->transformEnumArray($this->implementation_location),
             'target_audience' => $this->transformEnumArray($this->target_audience),
             'target_audience_other' => $this->target_audience_other,
+            'target_languages' => $this->transformEnumArray($this->target_languages),
+            'target_languages_other' => $this->target_languages_other,
             'summary' => $this->summary,
             'url' => $this->url,
             'created_at' => $this->created_at,
@@ -49,7 +57,6 @@ class OpportunityResource extends JsonResource
             'user' => $this->whenLoaded('user'),
         ];
 
-//        if()
 
         $baseData['permissions'] = [
             'can_view' => $request->user()->can('view', [Opportunity::class, $this->resource]),
@@ -60,52 +67,6 @@ class OpportunityResource extends JsonResource
         ];
 
         return $baseData;
-    }
-
-    /**
-     * Transform implementation location based on coverage activity.
-     *
-     * @return mixed
-     */
-    private function transformImplementationLocation(): mixed
-    {
-        $locations = $this->resource->getImplementationLocationAsArray();
-        
-        // Handle global coverage
-        if ($this->resource->isGlobal()) {
-            return 'Global';
-        }
-
-        // Transform each location to value/label format
-        $transformed = array_map(
-            fn($location) => $this->transformSingleLocation($location),
-            $locations
-        );
-
-        // Return single value if only one location, array otherwise
-        return count($transformed) === 1 ? $transformed[0] : $transformed;
-    }
-
-    /**
-     * Transform a single location enum to value/label format.
-     *
-     * @param mixed $location
-     * @return array<string, string>|string
-     */
-    private function transformSingleLocation(mixed $location): array|string
-    {
-        if (is_string($location)) {
-            return $location;
-        }
-
-        if ($location instanceof Country || $location instanceof Region || $location instanceof Ocean) {
-            return [
-                'value' => $location->value,
-                'label' => $location->label(),
-            ];
-        }
-
-        return is_string($location) ? $location : '';
     }
 
     /**

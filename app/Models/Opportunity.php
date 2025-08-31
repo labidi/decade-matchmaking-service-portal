@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\Casts\DynamicLocationCast;
+use App\Enums\Common\Language;
 use App\Enums\Common\TargetAudience;
 use App\Enums\Opportunity\CoverageActivity;
 use App\Enums\Opportunity\Status;
 use App\Enums\Opportunity\Type;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -27,6 +29,7 @@ class Opportunity extends Model
             'target_audience' => AsEnumArrayObject::of(TargetAudience::class),
             'coverage_activity'=> CoverageActivity::class,
             'implementation_location' => DynamicLocationCast::class,
+            'target_languages'=> AsEnumArrayObject::of(Language::class),
             'closing_date' => 'datetime:Y-m-d',
         ];
     }
@@ -44,6 +47,8 @@ class Opportunity extends Model
         'implementation_location',
         'target_audience',
         'target_audience_other',
+        'target_languages',
+        'target_languages_other',
         'summary',
         'url',
         'key_words'
@@ -63,7 +68,7 @@ class Opportunity extends Model
     public function getImplementationLocationAsArray(): array
     {
         $location = $this->implementation_location;
-        
+
         if ($location === null) {
             return [];
         }
@@ -77,16 +82,6 @@ class Opportunity extends Model
         }
 
         return [$location];
-    }
-
-    /**
-     * Check if opportunity is global.
-     *
-     * @return bool
-     */
-    public function isGlobal(): bool
-    {
-        return $this->coverage_activity === CoverageActivity::GLOBAL;
     }
 
     /**

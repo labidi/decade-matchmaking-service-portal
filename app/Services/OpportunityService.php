@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Enums\Opportunity\Status;
+use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
 use App\Models\User;
-use App\Services\Opportunity\EnhancerService;
 use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
 use Exception;
@@ -13,18 +13,19 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
-class OpportunityService
+readonly class OpportunityService
 {
     public function __construct(
-        private readonly OpportunityRepository $repository,
-        private readonly OpportunityAnalyticsService $analytics
+        private OpportunityRepository $repository,
+        private OpportunityAnalyticsService $analytics
     ) {
     }
 
     /**
      * Create a new opportunity
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function createOpportunity(array $data, User $user): Opportunity
     {
@@ -35,6 +36,7 @@ class OpportunityService
 
     /**
      * Get paginated opportunities submitted by a specific user
+     * @throws Throwable
      */
     public function getUserOpportunitiesPaginated(
         User $user,
@@ -42,38 +44,33 @@ class OpportunityService
         array $sortFilters = []
     ): LengthAwarePaginator {
         $opportunities = $this->repository->getUserOpportunitiesPaginated($user, $searchFilters, $sortFilters);
-        $opportunities->getCollection()->transform(function ($opportunity) {
-            // Enhance opportunity data if needed
-            return EnhancerService::enhanceOpportunity($opportunity);
-        });
+        $opportunities->toResourceCollection(OpportunityResource::class);
         return $opportunities;
     }
 
 
+    /**
+     * @throws Throwable
+     */
     public function getAllOpportunitiesPaginated(
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
         $opportunities = $this->repository->getPaginated($searchFilters, $sortFilters);
-        $opportunities->getCollection()->transform(function ($opportunity) {
-            // Enhance opportunity data if needed
-            return EnhancerService::enhanceOpportunity($opportunity);
-        });
+        $opportunities->toResourceCollection(OpportunityResource::class);
         return $opportunities;
     }
 
     /**
      * Get paginated active opportunities (active status only)
+     * @throws Throwable
      */
     public function getActiveOpportunitiesPaginated(
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
         $opportunities = $this->repository->getActiveOpportunitiesPaginated($searchFilters, $sortFilters);
-        $opportunities->getCollection()->transform(function ($opportunity) {
-            // Enhance opportunity data if needed
-            return EnhancerService::enhanceOpportunity($opportunity);
-        });
+        $opportunities->toResourceCollection(OpportunityResource::class);
         return $opportunities;
     }
 

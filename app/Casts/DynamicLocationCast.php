@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Dynamic cast for implementation_location based on coverage_activity value.
- * 
+ *
  * Handles both single and array values with automatic enum casting.
  */
 class DynamicLocationCast implements CastsAttributes
@@ -34,7 +34,7 @@ class DynamicLocationCast implements CastsAttributes
         }
 
         $coverageActivity = $this->getCoverageActivity($attributes);
-        
+
         if ($coverageActivity === null) {
             return $this->decodeJsonIfNeeded($value);
         }
@@ -58,7 +58,7 @@ class DynamicLocationCast implements CastsAttributes
         }
 
         $coverageActivity = $this->getCoverageActivity($attributes);
-        
+
         if ($coverageActivity === null) {
             return json_encode($value);
         }
@@ -77,12 +77,12 @@ class DynamicLocationCast implements CastsAttributes
     {
         // Handle global coverage
         if ($coverageActivity === CoverageActivity::GLOBAL) {
-            return 'Global';
+            return [CoverageActivity::GLOBAL];
         }
 
         // Decode JSON if necessary
         $decodedValue = $this->decodeJsonIfNeeded($value);
-        
+
         // Handle arrays
         if (is_array($decodedValue)) {
             return array_map(
@@ -172,7 +172,7 @@ class DynamicLocationCast implements CastsAttributes
     private function getCoverageActivity(array $attributes): ?CoverageActivity
     {
         $coverageValue = $attributes['coverage_activity'] ?? null;
-        
+
         if ($coverageValue === null) {
             return null;
         }

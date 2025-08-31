@@ -20,9 +20,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::get('opportunity/me/list', ListController::class)->name('opportunity.me.list');
     Route::get('opportunity/create', [FormController::class, 'form'])->name('opportunity.create');
-    Route::post('opportunity/store', [FormController::class, 'store'])->name('opportunity.store');
-    Route::get('opportunity/edit/{id}', ListController::class)->name('opportunity.edit');
-
+    Route::post('opportunity/submit/{id?}', [FormController::class, 'store'])->name('opportunity.submit');
+    Route::get('opportunity/edit/{id}', [FormController::class,'form'])->name('opportunity.edit');
     Route::patch('opportunity/{id}/status', OpportunityUpdateStatusController::class)->name(
         'partner.opportunity.status'
     );
@@ -40,8 +39,19 @@ Breadcrumbs::for('opportunity.create', function (BreadcrumbTrail $trail) {
     $trail->push('Create Opportunity', route('opportunity.create'));
 });
 
+Breadcrumbs::for('opportunity.me.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('My submitted opportunities',route('opportunity.me.list'));
+});
 
 Breadcrumbs::for('opportunity.show', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');
+    $trail->push('My submitted opportunities',route('opportunity.me.list'));
     $trail->push('Opportunity details',route('opportunity.show',request('id')));
+});
+
+Breadcrumbs::for('opportunity.edit', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('My submitted opportunities',route('opportunity.me.list'));
+    $trail->push('Opportunity details',route('opportunity.edit',request('id')));
 });

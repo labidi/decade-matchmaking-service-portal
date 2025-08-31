@@ -1,10 +1,9 @@
 import React from 'react';
-import {Head, router} from '@inertiajs/react';
+import {Head} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import {OCDRequestList, PaginationLinkProps, OCDRequest} from '@/types';
+import {OCDRequestList, PaginationLinkProps} from '@/types';
 import {RequestsDataTable} from "@/components/ui/data-table/requests/requests-data-table";
 import {userColumns} from "@/components/ui/data-table/requests/column-configs";
-import { Action } from '@/components/ui/data-table/common/dropdown-actions';
 import {useRequestActions} from "@/hooks/useRequestActions";
 
 interface RequestsPagination {
