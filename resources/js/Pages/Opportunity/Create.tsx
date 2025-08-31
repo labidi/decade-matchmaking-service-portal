@@ -80,7 +80,8 @@ export default function CreateOpportunity({opportunity, formOptions}: Readonly<C
                             onClick={() => {
                                 handleSubmit();
                             }}
-                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            color={'firefly'}
+                            className="px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {form.processing ? 'Submitting Opportunity...' : 'Submit Opportunity'}
                         </Button>

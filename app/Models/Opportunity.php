@@ -53,7 +53,9 @@ class Opportunity extends Model
         'target_languages_other',
         'summary',
         'url',
-        'key_words'
+        'key_words',
+        'user_id',
+        'status'
     ];
 
     public function user(): BelongsTo

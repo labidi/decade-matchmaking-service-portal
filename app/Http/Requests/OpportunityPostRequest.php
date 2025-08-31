@@ -27,7 +27,7 @@ class OpportunityPostRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::enum(Type::class)],
-            'closing_date' => ['required', 'string', 'max:255'],
+            'closing_date' => ['required', 'date',Rule::date()->after('today')],
             'coverage_activity' => ['required'],
             'implementation_location' => ['required'],
             'target_audience' => ['required', 'array'],
