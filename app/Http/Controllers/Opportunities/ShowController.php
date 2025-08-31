@@ -42,7 +42,7 @@ class ShowController extends BaseOpportunitiesController
                 'Browse and view opportunities submitted by CDF partners here.'
             ),
             'opportunity' => $opportunity->toResource(OpportunityResource::class),
-            'actions' => $this->buildActions($actions, Auth::user())
+            'actions' => $this->buildActions($actions)
         ]);
     }
 }

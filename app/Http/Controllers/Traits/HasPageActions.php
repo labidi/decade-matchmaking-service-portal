@@ -10,25 +10,9 @@ trait HasPageActions
     /**
      * Build page actions array with permission filtering
      */
-    protected function buildActions(array $actions, ?User $user = null): array
+    protected function buildActions(array $actions): array
     {
-        if (!$user) {
-            $user = Auth::user();
-        }
-
         return collect($actions)
-            ->filter(function ($action) use ($user) {
-                // If no permission specified, include the action
-                if (!isset($action['permission'])) {
-                    return true;
-                }
-                
-                // Simple permission check using user flags and Laravel Gates
-                return $user && (
-                    $user->is_admin || 
-                    $user->can($action['permission'])
-                );
-            })
             ->values()
             ->toArray();
     }

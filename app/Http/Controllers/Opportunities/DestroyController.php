@@ -18,11 +18,9 @@ class DestroyController extends Controller
         try {
             $this->opportunityService->deleteOpportunity($id, $request->user());
 
-            return to_route('admin.opportunity.list')
-                ->with('success', 'Opportunity deleted successfully.');
+            return back()->with('success', 'Opportunity deleted successfully.');
         } catch (Exception $e) {
-            return to_route('admin.opportunity.list')
-                ->with('error', 'Opportunity not deleted. Error was : ' . $e->getMessage());
+            return back()->with('error', 'Opportunity not deleted. Error was : ' . $e->getMessage());
         }
     }
 }

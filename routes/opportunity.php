@@ -36,7 +36,7 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
 
 Breadcrumbs::for('opportunity.create', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');
-    $trail->push('Create Opportunity', route('opportunity.create'));
+    $trail->push('Submit a new Opportunity', route('opportunity.create'));
 });
 
 Breadcrumbs::for('opportunity.me.list', function (BreadcrumbTrail $trail) {
@@ -53,5 +53,5 @@ Breadcrumbs::for('opportunity.show', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('opportunity.edit', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');
     $trail->push('My submitted opportunities',route('opportunity.me.list'));
-    $trail->push('Opportunity details',route('opportunity.edit',request('id')));
+    $trail->push('Edit Opportunity',route('opportunity.edit',request('id')));
 });

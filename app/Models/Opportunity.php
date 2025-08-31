@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class Opportunity extends Model
@@ -24,13 +25,14 @@ class Opportunity extends Model
     protected function casts(): array
     {
         return [
-            'type'=>Type::class,
+            'type' => Type::class,
             'status' => Status::class,
             'target_audience' => AsEnumArrayObject::of(TargetAudience::class),
-            'coverage_activity'=> CoverageActivity::class,
+            'coverage_activity' => CoverageActivity::class,
             'implementation_location' => DynamicLocationCast::class,
-            'target_languages'=> AsEnumArrayObject::of(Language::class),
+            'target_languages' => AsEnumArrayObject::of(Language::class),
             'closing_date' => 'datetime:Y-m-d',
+            'key_words' => 'array'
         ];
     }
 

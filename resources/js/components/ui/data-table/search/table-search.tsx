@@ -125,6 +125,7 @@ export function TableSearch({
                             onClick={handleSearch}
                             disabled={isSearching}
                             className="flex items-center gap-2"
+                            color="firefly"
                         >
                             <MagnifyingGlassIcon className="size-4" />
                             {isSearching ? 'Searching...' : 'Search'}

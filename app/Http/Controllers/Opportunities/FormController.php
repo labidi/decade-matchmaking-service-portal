@@ -59,17 +59,20 @@ class FormController extends BaseOpportunitiesController
     {
         $validatedData = $request->validated();
         try {
-            if($id) {
-                $this->opportunityService->updateOpportunity($id, $validatedData, $request->user());
+            $this->opportunityService->storeOpportunity(
+                $request->user(),
+                $validatedData,
+                $id ? $this->opportunityService->findOpportunity($id) : null
+            );
+            if ($id) {
                 return to_route('opportunity.me.list')->with('success', 'Opportunity updated successfully');
-            }else {
-                $this->opportunityService->createOpportunity($validatedData, $request->user());
+            } else {
                 return to_route('opportunity.me.list')->with('success', 'Opportunity submitted successfully');
             }
         } catch (Throwable $e) {
             return back()->with(
                 'error',
-                'An error occurred while submitting the opportunity. Please try again. :' . $e->getMessage()
+                'An error occurred. Error message :' . $e->getMessage()
             );
         }
     }

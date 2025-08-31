@@ -27,7 +27,7 @@ const FrontendLayout: React.FC<FrontendLayoutProps> = ({children}) => {
                 </div>
                 <div className="container shadow rounded bg-white p-6">
                     {children}
-                    <Divider className={'m-4'}/>
+                    <Divider className={'mt-4 mb-4'}/>
                     { actions && (<ActionsBar actions={actions}/>)}
                 </div>
             </main>

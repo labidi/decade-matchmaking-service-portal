@@ -37,7 +37,7 @@ export default function CreateOpportunity({opportunity, formOptions}: Readonly<C
     return (
         <FrontendLayout>
             <Head title="Create Opportunity"/>
-            <div className="mx-auto bg-white p-6">
+            <div>
                 <form>
                     <input type="hidden" name="id" value={form.data.id}/>
                     {/* Current Step Fields */}

@@ -34,7 +34,7 @@ class RequestListController extends BaseRequestController
         $actions = $this->buildActions([
             $this->createPrimaryAction('New Request', route('request.create')),
             $this->createSecondaryAction('Export CSV', route('admin.request.export.csv'), 'ArrowDownTrayIcon'),
-        ], $httpRequest->user());
+        ]);
 
         return Inertia::render($this->getViewPrefix() . 'Request/List', [
             'title' => "Requests",
@@ -60,7 +60,7 @@ class RequestListController extends BaseRequestController
         $actions = $this->buildActions([
             $this->createPrimaryAction('New Request', route('request.create')),
             $this->createSecondaryAction('View All Public', route('request.list'), 'EyeIcon'),
-        ], $httpRequest->user());
+        ]);
 
         return Inertia::render('Request/List', [
             'title' => 'My requests',

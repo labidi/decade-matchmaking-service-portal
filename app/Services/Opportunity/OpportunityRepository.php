@@ -14,16 +14,14 @@ class OpportunityRepository
         private readonly OpportunityQueryBuilder $queryBuilder
     ) {
     }
+
     /**
      * Create a new opportunity
      */
-    public function create(array $data, User $user): Opportunity
+    public function create(array $data): Opportunity
     {
         $opportunity = new Opportunity($data);
-        $opportunity->user_id = $user->id;
-        $opportunity->status = Status::PENDING_REVIEW;
         $opportunity->save();
-
         return $opportunity;
     }
 

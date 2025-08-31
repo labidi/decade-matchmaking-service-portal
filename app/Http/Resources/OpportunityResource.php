@@ -52,7 +52,7 @@ class OpportunityResource extends JsonResource
             'url' => $this->url,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'key_words' => explode(',', $this->key_words),
+            'key_words' =>$this->key_words,
             // Relationships
             'user' => $this->whenLoaded('user'),
         ];
@@ -63,7 +63,7 @@ class OpportunityResource extends JsonResource
             'can_edit' => $request->user()->can('update', [Opportunity::class, $this->resource]),
             'can_delete' => $request->user()->can('delete', [Opportunity::class, $this->resource]),
             'can_approve' => $request->user()->can('approve', [Opportunity::class, $this->resource]),
-            'can_apply' => $request->user()->can('apply', [Opportunity::class, $this->resource]),
+            'can_reject' => $request->user()->can('reject', [Opportunity::class, $this->resource]),
         ];
 
         return $baseData;

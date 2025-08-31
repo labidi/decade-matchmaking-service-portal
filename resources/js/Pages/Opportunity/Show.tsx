@@ -34,7 +34,7 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                 <div className="mb-8">
                     <div className="px-4 sm:px-0">
                         <h3 className="text-base/7 font-semibold text-gray-900">{opportunity.title}</h3>
-                        <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">{opportunity.summary}</p>
+                        <p className="mt-1 max-w-2xl text-sm/6 text-gray-500 truncate">{opportunity.summary}</p>
                     </div>
                 </div>
 
@@ -62,7 +62,7 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                         </div>
                         <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900">Implementation Location</dt>
-                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.implementation_location.map((item, index) => (
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.implementation_location?.map((item, index) => (
                                 <Badge key={item.value} color="blue" className="mr-1 mb-1">
                                     {item.label}
                                 </Badge>
@@ -70,7 +70,7 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                         </div>
                         <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900">Target Audience</dt>
-                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.target_audience.map((item, index) => (
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.target_audience?.map((item, index) => (
                                 <Badge key={item.value} color="blue" className="mr-1 mb-1">
                                     {item.label}
                                 </Badge>
@@ -83,7 +83,7 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                         </div>
                         <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900">Language of participation</dt>
-                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.target_languages.map((item, index) => (
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.target_languages?.map((item, index) => (
                                 <Badge key={item.value} color="blue" className="mr-1 mb-1">
                                     {item.label}
                                 </Badge>
@@ -112,7 +112,7 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                         <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900">Key words</dt>
                             <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">
-                                {opportunity.key_words.map((item, index) => (
+                                {opportunity.key_words?.map((item, index) => (
                                     <Badge key={item} color="blue" className="mr-1 mb-1">
                                         {item}
                                     </Badge>

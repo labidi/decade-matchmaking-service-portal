@@ -19,19 +19,8 @@ export interface OpportunityActionContext {
 
 // Hook return type
 export interface UseOpportunityActionsReturn {
-    // State
-    isStatusDialogOpen: boolean;
-    selectedOpportunity: Opportunity | null;
-    isLoading: boolean;
-
-    // Actions
-    closeStatusDialog: () => void;
     getActionsForOpportunity: (
         opportunity: Opportunity,
         customPermissions?: OpportunityActionContext['permissions']
     ) => Action[];
-
-    // Direct handlers (optional, for custom usage)
-    handleDelete: (opportunity: Opportunity) => void;
-    handleUpdateStatus: (opportunity: Opportunity) => void;
 }

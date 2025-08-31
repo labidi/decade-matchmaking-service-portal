@@ -27,10 +27,18 @@ readonly class OpportunityService
      * Create a new opportunity
      * @throws Throwable
      */
-    public function createOpportunity(array $data, User $user): Opportunity
+    public function storeOpportunity(User $user, array $data, ?Opportunity $opportunity): Opportunity
     {
-        return DB::transaction(function () use ($data, $user) {
-            return $this->repository->create($data, $user);
+        return DB::transaction(function () use ($data, $user, $opportunity) {
+            if ($opportunity) {
+                $this->repository->update($opportunity, $data);
+                return $opportunity->fresh();
+            }
+            $data += [
+                'status' => Status::PENDING_REVIEW,
+                'user_id' => $user->id
+            ];
+            return $this->repository->create($data);
         });
     }
 

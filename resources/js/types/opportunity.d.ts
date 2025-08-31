@@ -4,11 +4,8 @@ export interface OpportunityPermissions {
     can_view?: boolean;
     can_delete?: boolean;
     can_edit?: boolean;
-    can_manage_offers?: boolean;
-    can_update_status?: boolean;
-    can_accept_offer?: boolean;
-    can_request_clarifications?: boolean;
-    can_express_interest?: boolean;
+    can_approve?: boolean;
+    can_reject?: boolean;
 }
 
 export interface Opportunity {
