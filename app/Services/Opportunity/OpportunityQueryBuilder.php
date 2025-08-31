@@ -3,6 +3,7 @@
 namespace App\Services\Opportunity;
 
 use App\Enums\Opportunity\Status;
+use App\Enums\Opportunity\Type;
 use App\Models\Opportunity;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +20,7 @@ class OpportunityQueryBuilder
         }
 
         if (!empty($searchFilters['type'])) {
-            $query->where('type', $searchFilters['type']);
+            $query->where('type', Type::tryFrom($searchFilters['type'])->value);
         }
 
         if (!empty($searchFilters['location'])) {
@@ -42,7 +43,7 @@ class OpportunityQueryBuilder
         }
 
         if (!empty($searchFilters['status'])) {
-            $query->whereIn('status', $searchFilters['status']);
+            $query->where('status', Status::tryFrom($searchFilters['status'])->value);
         }
 
         if (!empty($searchFilters['date_from'])) {

@@ -163,6 +163,9 @@ export interface ActionButton {
     href: string;
     icon?: string;  // Heroicon component name
     variant?: 'primary' | 'secondary' | 'danger';
+    method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    data?: Record<string, any>;  // Form data for non-GET requests
+    confirm?: string;  // Confirmation message for destructive actions
 }
 
 export interface PagePropsWithFlash<

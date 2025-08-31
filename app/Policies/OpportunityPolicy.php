@@ -21,7 +21,7 @@ class OpportunityPolicy
      */
     public function view(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('partner') && $opportunity->user_id === $user->id || $user->hasRole('administrator');
+        return $user->hasRole('partner') && $opportunity->user->id === $user->id || $user->hasRole('administrator');
     }
 
     /**
@@ -37,7 +37,7 @@ class OpportunityPolicy
      */
     public function update(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('partner') && $opportunity->user_id === $user->id;
+        return $user->hasRole('partner') && $opportunity->user->id === $user->id;
     }
 
     /**
@@ -45,7 +45,7 @@ class OpportunityPolicy
      */
     public function delete(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('administrator') || $opportunity->user_id === $user->id;
+        return $user->hasRole('administrator') || $opportunity->user->id === $user->id;
     }
 
     /**
@@ -54,6 +54,11 @@ class OpportunityPolicy
     public function approve(User $user, Opportunity $opportunity): bool
     {
         return $user->hasRole('administrator');
+    }
+
+    public function extend(User $user, Opportunity $opportunity): bool
+    {
+        return $user->hasRole('partner') && $opportunity->user->id === $user->id;
     }
 
 }

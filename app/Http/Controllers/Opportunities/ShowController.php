@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Opportunities;
 
 use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Resources\OpportunityResource;
+use App\Models\Opportunity;
 use App\Services\Opportunity\EnhancerService;
 use App\Services\OpportunityService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,7 +24,7 @@ class ShowController extends BaseOpportunitiesController
     /**
      * @throws \Throwable
      */
-    public function __invoke(int $id): Response
+    public function __invoke(Request $request, int $id): Response
     {
         $opportunity = $this->opportunityService->findOpportunity($id);
 
@@ -35,6 +38,18 @@ class ShowController extends BaseOpportunitiesController
                 route('opportunity.edit', $opportunity->id),
             )
         ];
+
+        if ($opportunity->closing_date->isNowOrPast() && $request->user()->can(
+                'extend',
+                [Opportunity::class, $opportunity]
+            )) {
+            $actions[] = $this->createDangerAction(
+                'Extend Closing Date',
+                route('opportunity.extend', $opportunity->id),
+                'CalendarIcon',
+                'POST'
+            );
+        }
 
         return Inertia::render('Opportunity/Show', [
             'banner' => $this->buildBanner(

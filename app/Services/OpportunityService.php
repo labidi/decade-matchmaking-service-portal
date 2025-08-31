@@ -117,7 +117,7 @@ readonly class OpportunityService
             'opportunity' => $opportunity->fresh(),
             'status' => [
                 'status_code' => (string)$statusCode,
-                'status_label' => Opportunity::STATUS_LABELS[$statusCode] ?? ''
+                'status_label' => Status::tryFrom($statusCode) ?? ''
             ]
         ];
     }
@@ -170,5 +170,11 @@ readonly class OpportunityService
     public function searchOpportunities(array $filters, User $user): Collection
     {
         return $this->repository->search($filters);
+    }
+
+    public function extendOpportunityClosingDate(Opportunity $opportunity): Opportunity
+    {
+        $this->repository->update($opportunity, ['closing_date' => $opportunity->closing_date->addWeeks(2)]);
+        return $opportunity->fresh();
     }
 }
