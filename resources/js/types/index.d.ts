@@ -181,14 +181,6 @@ export interface NotificationPreferenceTableColumn {
     headerClassName?: string;
 }
 
-// Toggle cell component props
-export interface PreferenceToggleCellProps {
-    preference: UserNotificationPreference;
-    type: NotificationPreferenceToggleType;
-    onToggle: NotificationPreferenceToggleHandler;
-    disabled?: boolean;
-}
-
 // Preference actions dropdown props
 export interface PreferenceActionsDropdownProps {
     preference: UserNotificationPreference;

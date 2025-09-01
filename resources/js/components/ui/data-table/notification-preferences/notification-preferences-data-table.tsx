@@ -15,7 +15,6 @@ interface NotificationPreferencesDataTableProps {
     preferences: NotificationPreferencesPagination | NotificationPreferencesList;
     columns: NotificationPreferenceTableColumn[];
     routeName?: string;
-    onToggle: (preference: UserNotificationPreference, type: 'email_notification_enabled') => void;
     onDeletePreference: (preference: UserNotificationPreference) => void;
     onEditPreference?: (preference: UserNotificationPreference) => void;
     showActions?: boolean;
@@ -26,7 +25,6 @@ export function NotificationPreferencesDataTable({
                                                      preferences,
                                                      columns,
                                                      routeName = 'notification-preferences.index',
-                                                     onToggle,
                                                      onDeletePreference,
                                                      onEditPreference,
                                                      showActions = true,
