@@ -1,11 +1,10 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
+import {Badge} from '@/components/ui/badge';
 import {
     UserNotificationPreference,
     NotificationPreferenceTableColumn,
     NotificationPreferenceToggleType,
 } from '@/types';
-import { PreferenceToggleCell } from './preference-toggle-cell';
 
 const NOTIFICATION_ENTITY_ATTRIBUTES = {
     request: {
@@ -20,15 +19,14 @@ const NOTIFICATION_ENTITY_ATTRIBUTES = {
         category: 'Category'
     }
 } as const;
+
 interface ColumnConfigsProps {
-    onToggle: (preference: UserNotificationPreference, type: NotificationPreferenceToggleType) => void;
     updating?: boolean;
 }
 
 export function getNotificationPreferenceColumns({
-    onToggle,
-    updating = false
-}: ColumnConfigsProps): NotificationPreferenceTableColumn[] {
+                                                     updating = false
+                                                 }: ColumnConfigsProps): NotificationPreferenceTableColumn[] {
     return [
         {
             key: 'entity_type',
@@ -71,14 +69,24 @@ export function getNotificationPreferenceColumns({
             label: 'Email Notifications',
             className: 'text-center',
             headerClassName: 'text-center min-w-[120px]',
-            render: (preference: UserNotificationPreference) => (
-                <PreferenceToggleCell
-                    preference={preference}
-                    type="email_notification_enabled"
-                    onToggle={(preference) => onToggle(preference, "email_notification_enabled")}
-                    disabled={updating}
-                />
-            )
+            render: (preference: UserNotificationPreference) => {
+                return (
+                    <span>
+                        {preference.email_notification_enabled ? (
+                                <Badge
+                                    color="green"
+                                    className="text-xs cursor-pointer">
+                                    Enabled
+                                </Badge>
+                            ) :
+                            <Badge
+                                color="red"
+                                className="text-xs cursor-pointer">
+                                Disabled
+                            </Badge>}
+                    </span>
+                );
+            }
         },
         {
             key: 'created_at',

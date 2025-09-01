@@ -43,7 +43,14 @@ export interface NotificationPreferencesPagination {
 // Simplified page props
 export interface NotificationPreferencesPagePropsWithPagination extends PageProps {
     preferences: NotificationPreferencesPagination;
-    availableOptions: Record<string, Array<{ value: string, label: string }>>;
+    availableOptions: {
+        request?: {
+            subtheme?: Array<{value: string, label: string}>;
+        };
+        opportunity?: {
+            type?: Array<{value: string, label: string}>;
+        };
+    };
     attributeTypes: Record<string, string>;
     entityTypes: Record<NotificationEntityType, string>;
 }

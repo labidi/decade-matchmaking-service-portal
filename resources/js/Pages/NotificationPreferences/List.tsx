@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import React, {useState} from 'react';
+import {Head} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import { Heading } from '@/components/ui/heading';
-import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
+import {Heading} from '@/components/ui/heading';
+import {Text} from '@/components/ui/text';
+import {Button} from '@/components/ui/button';
 import {
     NotificationPreferencesPagePropsWithPagination,
-    UserNotificationPreference,
 } from '@/types';
-import { BellIcon, PlusIcon } from '@heroicons/react/16/solid';
+import {BellIcon, PlusIcon} from '@heroicons/react/16/solid';
 import {
     NotificationPreferencesDataTable,
     getNotificationPreferenceColumns
@@ -16,34 +15,15 @@ import {
 import AddPreferenceDialog from '@/components/features/notification-preferences/AddPreferenceDialog';
 
 export default function List({
-                                                    preferences,
-                                                    availableOptions,
-                                                    attributeTypes,
-                                                    currentFilters,
-                                                    currentSort
-                                                }: NotificationPreferencesPagePropsWithPagination) {
+                                 preferences,
+                                 availableOptions,
+                                 attributeTypes,
+                                 entityTypes
+                             }: NotificationPreferencesPagePropsWithPagination) {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-    const handleToggleNotification = (preference: UserNotificationPreference, type: 'email_notification_enabled') => {
-        // Update preference with the toggled value
-        const updatedPreference = {
-            ...preference,
-            [type]: !preference[type]
-        };
-
-        // Use router to make the PUT request
-        router.put(route('notification.preferences.update', preference.id), updatedPreference, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['preferences'],
-            onError: () => {
-                console.error('Failed to update preference');
-            }
-        });
-    };
 
     // Generate column configuration
     const columns = getNotificationPreferenceColumns({
-        onToggle: handleToggleNotification,
         updating: false
     });
 
@@ -64,14 +44,19 @@ export default function List({
                             that match your interests.
                         </Text>
                     </div>
-                    <Button 
-                        color="indigo" 
+                    <Button
+                        color="indigo"
                         onClick={() => setIsAddDialogOpen(true)}
                         className="shrink-0"
                     >
-                        <PlusIcon data-slot="icon" />
+                        <PlusIcon data-slot="icon"/>
                         Add Preference
                     </Button>
+                    <AddPreferenceDialog
+                        open={isAddDialogOpen}
+                        onClose={() => setIsAddDialogOpen(false)}
+                        availableOptions={availableOptions}
+                    />
                 </div>
 
                 {/* Data Table */}
@@ -80,20 +65,15 @@ export default function List({
                         preferences={preferences.data}
                         columns={columns}
                         routeName="notification-preferences.index"
-                        onToggle={handleToggleNotification}
-                        onDeletePreference={() => {}} // No-op since we removed delete functionality
+                        onDeletePreference={() => {
+                        }} // No-op since we removed delete functionality
                         updating={false}
                         showActions={false} // Disable actions since we removed delete functionality
                     />
                 </div>
             </div>
 
-            {/* Add Preference Dialog */}
-            <AddPreferenceDialog
-                open={isAddDialogOpen}
-                onClose={() => setIsAddDialogOpen(false)}
-                availableOptions={availableOptions}
-            />
+
         </FrontendLayout>
     );
 }

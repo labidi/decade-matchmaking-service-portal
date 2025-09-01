@@ -1,29 +1,40 @@
-import React, { useState } from 'react';
-import { useForm } from '@inertiajs/react';
-import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, Fieldset, Label } from '@/components/ui/fieldset';
-import { Combobox, ComboboxOption, ComboboxLabel } from '@/components/ui/combobox';
-import { Switch, SwitchField } from '@/components/ui/switch';
-import { Text } from '@/components/ui/text';
-import { EnvelopeIcon } from '@heroicons/react/16/solid';
-import { NotificationEntityType } from '@/types/notification-preferences';
+import React, {useState} from 'react';
+import {useForm} from '@inertiajs/react';
+import {Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle} from '@/components/ui/dialog';
+import {Button} from '@/components/ui/button';
+import {Field, FieldGroup, Fieldset, Label} from '@/components/ui/fieldset';
+import {Combobox, ComboboxOption, ComboboxLabel} from '@/components/ui/combobox';
+import {Switch, SwitchField} from '@/components/ui/switch';
+import {Text} from '@/components/ui/text';
+import {EnvelopeIcon} from '@heroicons/react/16/solid';
+import {NotificationEntityType} from '@/types/notification-preferences';
+
 
 interface AddPreferenceDialogProps {
     open: boolean;
     onClose: () => void;
-    availableOptions: Record<string, Array<{value: string, label: string}>>;
+    availableOptions: {
+        request?: {
+            subtheme?: Array<{ value: string, label: string }>;
+        };
+        opportunity?: {
+            type?: Array<{ value: string, label: string }>;
+        };
+    };
 }
 
 export default function AddPreferenceDialog({
-    open,
-    onClose,
-    availableOptions
-}: AddPreferenceDialogProps) {
+                                                open,
+                                                onClose,
+                                                availableOptions
+                                            }: Readonly<AddPreferenceDialogProps>) {
     const [selectedEntityType, setSelectedEntityType] = useState<NotificationEntityType | null>(null);
-    const [selectedAttributeValue, setSelectedAttributeValue] = useState<{value: string, label: string} | undefined>(undefined);
+    const [selectedAttributeValue, setSelectedAttributeValue] = useState<{
+        value: string,
+        label: string
+    } | undefined>(undefined);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const {data, setData, post, processing, errors, reset} = useForm({
         entity_type: 'request',
         attribute_value: '',
         email_notification_enabled: true,
@@ -31,7 +42,6 @@ export default function AddPreferenceDialog({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
         post(route('notification.preferences.store'), {
             onSuccess: () => {
                 reset();
@@ -45,7 +55,7 @@ export default function AddPreferenceDialog({
         });
     };
 
-    const handleEntityTypeChange = (option: {value: NotificationEntityType, label: string}) => {
+    const handleEntityTypeChange = (option: { value: NotificationEntityType, label: string }) => {
         setSelectedEntityType(option.value);
         setSelectedAttributeValue(undefined); // Reset selected value when entity type changes
         setData(prev => ({
@@ -55,7 +65,7 @@ export default function AddPreferenceDialog({
         }));
     };
 
-    const handleAttributeValueChange = (option: {value: string, label: string}) => {
+    const handleAttributeValueChange = (option: { value: string, label: string }) => {
         setSelectedAttributeValue(option);
         setData('attribute_value', option.value);
     };
@@ -69,20 +79,21 @@ export default function AddPreferenceDialog({
 
     // Get available options based on selected entity type
     const currentOptions = selectedEntityType ? (
-        selectedEntityType === 'request' ? availableOptions.request || [] :
-        selectedEntityType === 'opportunity' ? availableOptions.opportunity || [] : []
+        selectedEntityType === 'request' ? availableOptions.request?.subtheme ?? [] :
+            selectedEntityType === 'opportunity' ? availableOptions.opportunity?.type ?? [] : []
     ) : [];
+
 
     // Entity type options
     const entityTypeOptions = [
-        { value: 'request' as NotificationEntityType, label: 'Requests' },
-        { value: 'opportunity' as NotificationEntityType, label: 'Opportunities' },
+        {value: 'request' as NotificationEntityType, label: 'Requests'},
+        {value: 'opportunity' as NotificationEntityType, label: 'Opportunities'},
     ];
 
     // Get label for the current selection step
-    const attributeLabel = selectedEntityType === 'request' ? 'Select Subtheme' : 
-                          selectedEntityType === 'opportunity' ? 'Select Opportunity Type' : 
-                          'Select Preference';
+    const attributeLabel = selectedEntityType === 'request' ? 'Select Subtheme' :
+        selectedEntityType === 'opportunity' ? 'Select Opportunity Type' :
+            'Select Preference';
 
     return (
         <Dialog open={open} onClose={handleClose}>
@@ -100,7 +111,7 @@ export default function AddPreferenceDialog({
                                 <Combobox
                                     value={entityTypeOptions.find(opt => opt.value === selectedEntityType)}
                                     onChange={handleEntityTypeChange}
-                                    displayValue={(value: {value: NotificationEntityType, label: string} | null) => {
+                                    displayValue={(value: { value: NotificationEntityType, label: string } | null) => {
                                         return value?.label ?? '';
                                     }}
                                     placeholder="Select notification type..."
@@ -126,7 +137,7 @@ export default function AddPreferenceDialog({
                                     <Combobox
                                         value={selectedAttributeValue}
                                         onChange={handleAttributeValueChange}
-                                        displayValue={(value: {value: string, label: string} | null) => {
+                                        displayValue={(value: { value: string, label: string } | null) => {
                                             return value?.label ?? '';
                                         }}
                                         placeholder={`Select ${selectedEntityType === 'request' ? 'subtheme' : 'opportunity type'}...`}
@@ -158,9 +169,11 @@ export default function AddPreferenceDialog({
                                     <SwitchField>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <EnvelopeIcon data-slot="icon" className="size-4 text-indigo-600 dark:text-indigo-400" />
+                                                <EnvelopeIcon data-slot="icon"
+                                                              className="size-4 text-indigo-600 dark:text-indigo-400"/>
                                                 <div>
-                                                    <Text className="text-sm font-medium">Enable email notifications</Text>
+                                                    <Text className="text-sm font-medium">Enable email
+                                                        notifications</Text>
                                                     <Text className="text-xs text-zinc-600 dark:text-zinc-400">
                                                         Receive email alerts when matching content is published
                                                     </Text>
