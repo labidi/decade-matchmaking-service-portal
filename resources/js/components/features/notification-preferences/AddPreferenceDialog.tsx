@@ -7,25 +7,24 @@ import { Combobox, ComboboxOption, ComboboxLabel } from '@/components/ui/combobo
 import { Switch, SwitchField } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
 import { EnvelopeIcon } from '@heroicons/react/16/solid';
+import { NotificationEntityType } from '@/types/notification-preferences';
 
 interface AddPreferenceDialogProps {
     open: boolean;
     onClose: () => void;
     availableOptions: Record<string, Array<{value: string, label: string}>>;
-    attributeTypes: Record<string, string>;
 }
 
 export default function AddPreferenceDialog({
     open,
     onClose,
-    availableOptions,
-    attributeTypes
+    availableOptions
 }: AddPreferenceDialogProps) {
-    const [selectedAttributeType, setSelectedAttributeType] = useState<{value: string, label: string} | undefined>(undefined);
+    const [selectedEntityType, setSelectedEntityType] = useState<NotificationEntityType | null>(null);
     const [selectedAttributeValue, setSelectedAttributeValue] = useState<{value: string, label: string} | undefined>(undefined);
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        attribute_type: '',
+        entity_type: 'request',
         attribute_value: '',
         email_notification_enabled: true,
     });
@@ -36,7 +35,7 @@ export default function AddPreferenceDialog({
         post(route('notification.preferences.store'), {
             onSuccess: () => {
                 reset();
-                setSelectedAttributeType(undefined);
+                setSelectedEntityType(null);
                 setSelectedAttributeValue(undefined);
                 onClose();
             },
@@ -46,12 +45,12 @@ export default function AddPreferenceDialog({
         });
     };
 
-    const handleAttributeTypeChange = (option: {value: string, label: string}) => {
-        setSelectedAttributeType(option);
-        setSelectedAttributeValue(undefined); // Reset selected value when type changes
+    const handleEntityTypeChange = (option: {value: NotificationEntityType, label: string}) => {
+        setSelectedEntityType(option.value);
+        setSelectedAttributeValue(undefined); // Reset selected value when entity type changes
         setData(prev => ({
             ...prev,
-            attribute_type: option.value,
+            entity_type: option.value,
             attribute_value: '' // Reset value when type changes
         }));
     };
@@ -63,19 +62,27 @@ export default function AddPreferenceDialog({
 
     const handleClose = () => {
         reset();
-        setSelectedAttributeType(undefined);
+        setSelectedEntityType(null);
         setSelectedAttributeValue(undefined);
         onClose();
     };
 
-    // Get available options for the selected attribute type
-    const currentOptions = selectedAttributeType ? availableOptions[selectedAttributeType.value] || [] : [];
+    // Get available options based on selected entity type
+    const currentOptions = selectedEntityType ? (
+        selectedEntityType === 'request' ? availableOptions.request || [] :
+        selectedEntityType === 'opportunity' ? availableOptions.opportunity || [] : []
+    ) : [];
 
-    // Convert attribute types to options for the first combobox
-    const attributeTypeOptions = Object.entries(attributeTypes).map(([key, label]) => ({
-        value: key,
-        label
-    }));
+    // Entity type options
+    const entityTypeOptions = [
+        { value: 'request' as NotificationEntityType, label: 'Requests' },
+        { value: 'opportunity' as NotificationEntityType, label: 'Opportunities' },
+    ];
+
+    // Get label for the current selection step
+    const attributeLabel = selectedEntityType === 'request' ? 'Select Subtheme' : 
+                          selectedEntityType === 'opportunity' ? 'Select Opportunity Type' : 
+                          'Select Preference';
 
     return (
         <Dialog open={open} onClose={handleClose}>
@@ -87,17 +94,17 @@ export default function AddPreferenceDialog({
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <Fieldset>
                         <FieldGroup>
-                            {/* Attribute Type Selection */}
+                            {/* Entity Type Selection */}
                             <Field>
-                                <Label>Notification Category</Label>
+                                <Label>Notification Type</Label>
                                 <Combobox
-                                    value={selectedAttributeType}
-                                    onChange={handleAttributeTypeChange}
-                                    displayValue={(value: {value: string, label: string} | null) => {
+                                    value={entityTypeOptions.find(opt => opt.value === selectedEntityType)}
+                                    onChange={handleEntityTypeChange}
+                                    displayValue={(value: {value: NotificationEntityType, label: string} | null) => {
                                         return value?.label ?? '';
                                     }}
-                                    placeholder="Select a category..."
-                                    options={attributeTypeOptions}
+                                    placeholder="Select notification type..."
+                                    options={entityTypeOptions}
                                 >
                                     {(option) => (
                                         <ComboboxOption key={option.value} value={option}>
@@ -105,24 +112,24 @@ export default function AddPreferenceDialog({
                                         </ComboboxOption>
                                     )}
                                 </Combobox>
-                                {errors.attribute_type && (
+                                {errors.entity_type && (
                                     <Text className="text-sm text-red-600 dark:text-red-400 mt-1">
-                                        {errors.attribute_type}
+                                        {errors.entity_type}
                                     </Text>
                                 )}
                             </Field>
 
                             {/* Attribute Value Selection */}
-                            {selectedAttributeType && (
+                            {selectedEntityType && (
                                 <Field>
-                                    <Label>Specific Value</Label>
+                                    <Label>{attributeLabel}</Label>
                                     <Combobox
                                         value={selectedAttributeValue}
                                         onChange={handleAttributeValueChange}
                                         displayValue={(value: {value: string, label: string} | null) => {
                                             return value?.label ?? '';
                                         }}
-                                        placeholder={`Select ${attributeTypes[selectedAttributeType.value].toLowerCase()}...`}
+                                        placeholder={`Select ${selectedEntityType === 'request' ? 'subtheme' : 'opportunity type'}...`}
                                         options={currentOptions}
                                     >
                                         {(option) => (
@@ -141,7 +148,7 @@ export default function AddPreferenceDialog({
                         </FieldGroup>
 
                         {/* Email Notification Preference */}
-                        {data.attribute_type && data.attribute_value && (
+                        {selectedEntityType && data.attribute_value && (
                             <FieldGroup>
                                 <div className="space-y-4">
                                     <Text className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
@@ -184,7 +191,7 @@ export default function AddPreferenceDialog({
                         <Button
                             type="submit"
                             color="indigo"
-                            disabled={processing || !data.attribute_type || !data.attribute_value}
+                            disabled={processing || !selectedEntityType || !data.attribute_value}
                         >
                             {processing ? 'Adding...' : 'Add Preference'}
                         </Button>

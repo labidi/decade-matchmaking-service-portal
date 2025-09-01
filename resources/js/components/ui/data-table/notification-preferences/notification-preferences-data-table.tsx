@@ -36,25 +36,6 @@ export function NotificationPreferencesDataTable({
     // Extract data array based on whether we have pagination or not
     const preferencesData = Array.isArray(preferences) ? preferences : preferences.data;
     const pagination = !Array.isArray(preferences) ? preferences : undefined;
-    console.log('Preferences Data:', preferencesData);
-    const getActionsForPreference = (preference: UserNotificationPreference) => {
-        return [
-            ...(onEditPreference ? [{
-                key: 'edit',
-                label: 'Edit Preference',
-                onClick: () => onEditPreference(preference),
-                disabled: updating
-            }] : []),
-            {
-                key: 'delete',
-                label: 'Delete Preference',
-                onClick: () => onDeletePreference(preference),
-                disabled: updating,
-                divider: !!onEditPreference
-            }
-        ];
-    };
-
     const totalColumns = columns.length + (showActions ? 1 : 0);
 
     return (
