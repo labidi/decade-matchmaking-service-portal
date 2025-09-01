@@ -1,13 +1,5 @@
 import {UIStep} from '@/types';
 
-// Coverage activity options (static as they define the structure of location selection)
-export const coverageActivityOptions = [
-    {value: 'country', label: 'Country'},
-    {value: 'Regions', label: 'Regions'},
-    {value: 'Global', label: 'Global'},
-    {value: 'Ocean-based', label: 'Ocean Based'},
-];
-
 export const UIOpportunityForm: UIStep[] = [
     {
         label: 'Basic Info',
@@ -31,12 +23,12 @@ export const UIOpportunityForm: UIStep[] = [
                 type: 'date',
                 required: true,
                 label: 'Application closing date (MM/DD/YY)',
-            }, coverage_activity: {
+            },
+            coverage_activity: {
                 id: 'coverage_activity',
                 type: 'select',
                 required: true,
                 label: 'Coverage of CD Activity',
-                options: coverageActivityOptions,
             },
             implementation_location: {
                 id: 'implementation_location',
@@ -57,7 +49,21 @@ export const UIOpportunityForm: UIStep[] = [
                 type: 'text',
                 required: false,
                 label: 'Please specify the target audience',
-                show: data => data.target_audience?.includes('Other')
+                show: data => data.target_audience?.includes('other')
+            },
+            target_languages: {
+                id: 'target_languages',
+                type: 'multiselect',
+                required: true,
+                label: 'Language of participation',
+                // options will be provided by the parent component from FormOptions
+            },
+            target_languages_other: {
+                id: 'target_languages_other',
+                type: 'text',
+                required: false,
+                label: 'Please specify the Language of participation',
+                show: data => data.target_languages?.includes('other')
             },
             summary: {
                 id: 'summary',
@@ -79,7 +85,7 @@ export const UIOpportunityForm: UIStep[] = [
                 required: false,
                 label: 'Three key words',
                 description: 'Add comma (,) to separate key words or press enter',
-                maxKeywords:3
+                maxKeywords: 3
             },
         },
     }

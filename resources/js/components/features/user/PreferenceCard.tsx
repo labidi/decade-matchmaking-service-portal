@@ -1,16 +1,16 @@
 import React from 'react';
-import { UserNotificationPreference } from '@/types';
+import { UserNotificationPreference, NotificationPreferenceToggleHandler, NotificationPreferenceActionHandler } from '@/types';
 import { Switch, SwitchField } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Badge } from '@/components/ui/badge';
-import { BellIcon, EnvelopeIcon, TrashIcon } from '@heroicons/react/16/solid';
-import { BellSlashIcon, NoSymbolIcon } from '@heroicons/react/24/outline';
+import { EnvelopeIcon, TrashIcon } from '@heroicons/react/16/solid';
+import { NoSymbolIcon } from '@heroicons/react/24/outline';
 
 interface PreferenceCardProps {
     preference: UserNotificationPreference;
-    onToggleNotification: (preference: UserNotificationPreference, type: 'notification_enabled' | 'email_notification_enabled') => void;
-    onDelete: (preference: UserNotificationPreference) => void;
+    onToggleNotification: NotificationPreferenceToggleHandler;
+    onDelete: NotificationPreferenceActionHandler;
     updating?: boolean;
 }
 
@@ -29,14 +29,10 @@ export default function PreferenceCard({
     };
 
     const getStatusBadge = () => {
-        if (preference.notification_enabled && preference.email_notification_enabled) {
-            return <Badge color="green">Both enabled</Badge>;
-        } else if (preference.notification_enabled) {
-            return <Badge color="blue">In-app only</Badge>;
-        } else if (preference.email_notification_enabled) {
-            return <Badge color="amber">Email only</Badge>;
+        if (preference.email_notification_enabled) {
+            return <Badge color="indigo">Email enabled</Badge>;
         } else {
-            return <Badge color="zinc">Disabled</Badge>;
+            return <Badge color="zinc">Email disabled</Badge>;
         }
     };
 
@@ -62,41 +58,20 @@ export default function PreferenceCard({
                 </Button>
             </div>
 
-            {/* Toggle Controls */}
+            {/* Email Notification Control */}
             <div className="space-y-3">
-                {/* In-App Notifications */}
-                <SwitchField>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            {preference.notification_enabled ? (
-                                <BellIcon data-slot="icon" className="size-4 text-blue-600 dark:text-blue-400" />
-                            ) : (
-                                <BellSlashIcon className="size-4 text-zinc-400" />
-                            )}
-                            <Text className="text-sm font-medium">In-app notifications</Text>
-                        </div>
-                        <Switch
-                            color="blue"
-                            checked={preference.notification_enabled}
-                            onChange={() => onToggleNotification(preference, 'notification_enabled')}
-                            disabled={updating}
-                        />
-                    </div>
-                </SwitchField>
-
-                {/* Email Notifications */}
                 <SwitchField>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             {preference.email_notification_enabled ? (
-                                <EnvelopeIcon data-slot="icon" className="size-4 text-amber-600 dark:text-amber-400" />
+                                <EnvelopeIcon data-slot="icon" className="size-4 text-indigo-600 dark:text-indigo-400" />
                             ) : (
                                 <NoSymbolIcon className="size-4 text-zinc-400" />
                             )}
                             <Text className="text-sm font-medium">Email notifications</Text>
                         </div>
                         <Switch
-                            color="amber"
+                            color="indigo"
                             checked={preference.email_notification_enabled}
                             onChange={() => onToggleNotification(preference, 'email_notification_enabled')}
                             disabled={updating}

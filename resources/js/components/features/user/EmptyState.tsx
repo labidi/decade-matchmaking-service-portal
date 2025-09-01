@@ -14,7 +14,7 @@ export default function EmptyState() {
                 </Text>
                 <Text className="text-zinc-600 dark:text-zinc-400 max-w-md mx-auto">
                     You haven't configured any notification preferences yet. Add your first preference 
-                    to start receiving notifications about requests that match your interests.
+                    to start receiving email notifications about requests that match your interests.
                 </Text>
             </div>
             <div className="mt-8 space-y-3">

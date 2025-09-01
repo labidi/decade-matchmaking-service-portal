@@ -3,12 +3,14 @@ export {
     RequestSubscription, SubscriptionStats
 } from "@/types/request";
 export {RequestOffer, RequestOfferList, RequestOfferPermissions} from "@/types/offer";
-export {Opportunity, OpportunitiesList} from "@/types/opportunity";
+export {Opportunity, OpportunitiesList, OpportunityFormOptions, OpportunitiesPagination} from "@/types/opportunity";
+export {UserNotificationPreference, NotificationEntityType, NotificationPreferencesPagePropsWithPagination, NotificationPreferencesList, NotificationPreferencesPagination} from "@/types/notification-preferences";
 
 export interface UIStep {
     label: string;
     fields: Record<string, UIField>;
 }
+
 export interface UIField {
     id: string;
     type: string;
@@ -103,6 +105,17 @@ export interface Document {
     updated_at: string;
 }
 
+export interface Organization {
+    id: number;
+    name: string;
+    description: string;
+    website: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export type OrganizationsList = Organization[];
+
 
 export interface Notification {
     id: number;
@@ -114,39 +127,6 @@ export interface Notification {
 
 export type NotificationList = Notification[];
 
-export interface UserNotificationPreference {
-    id: number;
-    user_id: number;
-    attribute_type: string;
-    attribute_value: string;
-    notification_enabled: boolean;
-    email_notification_enabled: boolean;
-    created_at: string;
-    updated_at: string;
-}
-
-
-// Common form options interface for consistent structure across forms
-export interface FormOptions {
-    delivery_countries?: Array<{ value: string; label: string }>;
-    countries?: Array<{ value: string; label: string }>;
-    regions?: Array<{ value: string; label: string }>;
-    oceans?: Array<{ value: string; label: string }>;
-    subthemes?: Array<{ value: string; label: string }>;
-    support_types?: Array<{ value: string; label: string }>;
-    target_audience?: Array<{ value: string; label: string }>;
-    delivery_format?: Array<{ value: string; label: string }>;
-    opportunity_types?: Array<{ value: string; label: string }>;
-    related_activity?: Array<{ value: string; label: string }>;
-    yes_no?: Array<{ value: string; label: string }>;
-    project_stage?: Array<{ value: string; label: string }>;
-}
-
-export interface NotificationPreferencesPageProps extends PageProps {
-    preferences: Record<string, UserNotificationPreference[]>; // Grouped by attribute_type
-    availableOptions: Record<string, Array<{ value: string, label: string }>>;
-    attributeTypes: Record<string, string>; // e.g., {'subtheme': 'Subtheme', 'coverage_activity': 'Coverage Activity'}
-}
 
 export interface Settings {
     site_name: string;
@@ -161,14 +141,6 @@ export interface Settings {
     organizations_csv: string;
 }
 
-export interface CSVUploadResponse {
-    success: boolean;
-    message: string;
-    imported_count?: number;
-    errors?: string[];
-}
-
-
 export interface PaginationLinkProps {
     active: boolean;
     label: string;
@@ -182,8 +154,186 @@ export interface FlashMessages {
     info?: string;
 }
 
+export interface ActionButton {
+    label: string;
+    href: string;
+    icon?: string;  // Heroicon component name
+    variant?: 'primary' | 'secondary' | 'danger';
+    method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    data?: Record<string, any>;  // Form data for non-GET requests
+    confirm?: string;  // Confirmation message for destructive actions
+}
+
 export interface PagePropsWithFlash<
     T extends Record<string, unknown> = Record<string, unknown>,
 > extends PageProps<T> {
     flash?: FlashMessages;
 }
+
+// Data table interfaces for notification preferences
+export interface NotificationPreferenceTableColumn {
+    key: string;
+    label: string;
+    sortable?: boolean;
+    sortField?: NotificationPreferenceSortField;
+    render: (preference: UserNotificationPreference) => React.ReactNode;
+    className?: string;
+    headerClassName?: string;
+}
+
+// Toggle cell component props
+export interface PreferenceToggleCellProps {
+    preference: UserNotificationPreference;
+    type: NotificationPreferenceToggleType;
+    onToggle: NotificationPreferenceToggleHandler;
+    disabled?: boolean;
+}
+
+// Preference actions dropdown props
+export interface PreferenceActionsDropdownProps {
+    preference: UserNotificationPreference;
+    onEdit?: NotificationPreferenceActionHandler;
+    onDelete: NotificationPreferenceActionHandler;
+    disabled?: boolean;
+}
+
+// Service response interfaces for notification preferences
+export interface NotificationPreferencesServiceResponse {
+    preferences: NotificationPreferencesPagination;
+    availableOptions: Record<string, Array<{ value: string, label: string }>>;
+    attributeTypes: Record<string, string>;
+    entityTypes: Record<NotificationEntityType, string>;
+}
+
+// Form interfaces for notification preferences
+export interface NotificationPreferenceFormData {
+    entity_type: NotificationEntityType;
+    attribute_type: string;
+    attribute_value: string;
+    email_notification_enabled: boolean;
+}
+
+// Filter and search interfaces
+export interface NotificationPreferenceFilters {
+    entity_type?: NotificationEntityType;
+    attribute_type?: string;
+    search?: string;
+    sort?: string;
+    order?: 'asc' | 'desc';
+    page?: number;
+}
+
+// Column configuration props interface
+export interface NotificationPreferenceColumnConfigProps {
+    onToggle: NotificationPreferenceToggleHandler;
+    updating?: boolean;
+}
+
+// Dialog and modal interfaces for notification preferences
+export interface NotificationPreferenceDialogProps {
+    preference?: UserNotificationPreference;
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (data: NotificationPreferenceFormData) => void;
+    availableOptions: Record<string, Array<{ value: string, label: string }>>;
+    attributeTypes: Record<string, string>;
+    entityTypes: Record<NotificationEntityType, string>;
+    mode: 'create' | 'edit';
+}
+
+// Bulk operations interface
+export interface NotificationPreferenceBulkActions {
+    selectedPreferences: UserNotificationPreference[];
+    onBulkDelete: NotificationPreferenceBulkActionHandler;
+    onBulkToggleEmailNotifications: (preferences: UserNotificationPreference[], enabled: boolean) => void;
+}
+
+// Statistics interface for notification preferences
+export interface NotificationPreferenceStats {
+    total_preferences: number;
+    active_notifications: number;
+    active_email_notifications: number;
+    preferences_by_entity_type: Record<NotificationEntityType, number>;
+    preferences_by_attribute_type: Record<string, number>;
+}
+
+// API response interfaces for notification preferences
+export interface NotificationPreferenceApiResponse {
+    success: boolean;
+    message?: string;
+    data?: UserNotificationPreference;
+    errors?: Record<string, string[]>;
+}
+
+export interface NotificationPreferenceBulkApiResponse {
+    success: boolean;
+    message?: string;
+    data?: {
+        updated: number;
+        failed: number;
+        errors?: Array<{
+            id: number;
+            error: string;
+        }>;
+    };
+}
+
+// Validation interfaces for notification preferences
+export interface NotificationPreferenceValidationErrors {
+    entity_type?: string[];
+    attribute_type?: string[];
+    attribute_value?: string[];
+    email_notification_enabled?: string[];
+}
+
+// Hook return types for notification preferences
+export interface UseNotificationPreferencesReturn {
+    preferences: NotificationPreferencesPagination;
+    loading: boolean;
+    error: string | null;
+    refetch: () => void;
+    updatePreference: (id: number, data: Partial<UserNotificationPreference>) => Promise<void>;
+    deletePreference: (id: number) => Promise<void>;
+    createPreference: (data: NotificationPreferenceFormData) => Promise<void>;
+}
+
+// Table state interface for data table components
+export interface NotificationPreferencesTableState {
+    loading: boolean;
+    error: string | null;
+    selectedPreferences: number[];
+    filters: NotificationPreferenceFilters;
+    sort: {
+        field: string;
+        order: 'asc' | 'desc';
+    };
+}
+
+// Utility types for notification preferences
+export type NotificationPreferenceToggleType = 'email_notification_enabled';
+
+export type NotificationPreferenceSortField = 'entity_type' | 'attribute_type' | 'attribute_value' | 'created_at' | 'updated_at';
+
+// Entity attribute mapping utility type
+export type EntityAttributeMapping = {
+    readonly [K in NotificationEntityType]: {
+        readonly [key: string]: string;
+    };
+};
+
+// Type guards for notification preferences
+export interface NotificationPreferenceTypeGuards {
+    isValidEntityType: (value: string) => value is NotificationEntityType;
+    isValidToggleType: (value: string) => value is NotificationPreferenceToggleType;
+    isValidSortField: (value: string) => value is NotificationPreferenceSortField;
+}
+
+// Event handler types for notification preferences
+export type NotificationPreferenceToggleHandler = (
+    preference: UserNotificationPreference,
+    type: NotificationPreferenceToggleType
+) => void;
+
+export type NotificationPreferenceActionHandler = (preference: UserNotificationPreference) => void;
+
+export type NotificationPreferenceBulkActionHandler = (preferences: UserNotificationPreference[]) => void;

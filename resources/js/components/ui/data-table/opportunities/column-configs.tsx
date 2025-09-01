@@ -33,7 +33,7 @@ export const adminColumns = [
         sortField: 'type' as const,
         render: (opportunity: Opportunity) => (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                {opportunity.type}
+                {opportunity.type.label}
             </span>
         )
     },
@@ -86,7 +86,7 @@ export const partnerColumns = [
         label: 'Type',
         render: (opportunity: Opportunity) => (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                {opportunity.type_label || opportunity.type}
+                {opportunity.type.label}
             </span>
         )
     },

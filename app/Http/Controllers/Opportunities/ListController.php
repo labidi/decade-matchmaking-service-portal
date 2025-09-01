@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Opportunities;
 
 use App\Enums\Opportunity\Status;
 use App\Enums\Opportunity\Type;
+use App\Http\Controllers\Traits\HasPageActions;
 use App\Models\Opportunity;
 use App\Services\OpportunityService;
 use Illuminate\Http\Request;
@@ -12,6 +13,8 @@ use Inertia\Response;
 
 class ListController extends BaseOpportunitiesController
 {
+    use HasPageActions;
+
     public function __construct(private readonly OpportunityService $opportunityService)
     {
     }
@@ -45,11 +48,17 @@ class ListController extends BaseOpportunitiesController
                     'types' => Type::getOptions(),
                     'statuses' => Status::getOptions(),
                 ],
-                'currentSearchFields' => ['type', 'status','title'],
+                'currentSearchFields' => ['type', 'status', 'title'],
                 'routeName' => 'opportunity.me.list',
-                'pageActions'=> [
-                    'canSubmitNew'=> true,
-                ]
+                'actions' =>
+                    $this->buildActions([
+                        $this->createPrimaryAction(
+                            'Create New Opportunity',
+                            route('opportunity.create'),
+                            'PlusIcon',
+                            'create opportunity'
+                        ),
+                    ]),
             ],
             'public' => [
                 'component' => 'Opportunity/List',
@@ -71,13 +80,13 @@ class ListController extends BaseOpportunitiesController
 
     /**
      * Get opportunities based on context
+     * @throws \Throwable
      */
     private function getOpportunitiesForContext(string $context, $user, array $searchFilters, array $sortFilters)
     {
         return match ($context) {
             'admin' => $this->opportunityService->getAllOpportunitiesPaginated($searchFilters, $sortFilters),
             'user_own' => $this->opportunityService->getUserOpportunitiesPaginated($user, $searchFilters, $sortFilters),
-            'public' => $this->opportunityService->getActiveOpportunitiesPaginated($searchFilters, $sortFilters),
             default => $this->opportunityService->getActiveOpportunitiesPaginated($searchFilters, $sortFilters),
         };
     }
@@ -94,6 +103,9 @@ class ListController extends BaseOpportunitiesController
         return $currentSearch;
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function __invoke(Request $httpRequest): Response
     {
         $context = $this->getRouteContext();
@@ -124,7 +136,7 @@ class ListController extends BaseOpportunitiesController
             ],
             'routeName' => $config['routeName'],
             'currentSearch' => $this->buildCurrentSearch($searchFilters, $config['currentSearchFields']),
-            'pageActions'=> $config['pageActions'] ?? []
+            'actions' => $config['actions'] ?? [],
         ]);
     }
 

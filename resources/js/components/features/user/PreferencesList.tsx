@@ -1,5 +1,5 @@
 import React from 'react';
-import { UserNotificationPreference } from '@/types';
+import { UserNotificationPreference, NotificationPreferenceToggleHandler, NotificationPreferenceActionHandler } from '@/types';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
 import { Divider } from '@/components/ui/divider';
@@ -9,8 +9,8 @@ import EmptyState from './EmptyState';
 interface PreferencesListProps {
     preferences: Record<string, UserNotificationPreference[]>;
     attributeTypes: Record<string, string>;
-    onToggleNotification: (preference: UserNotificationPreference, type: 'notification_enabled' | 'email_notification_enabled') => void;
-    onDeletePreference: (preference: UserNotificationPreference) => void;
+    onToggleNotification: NotificationPreferenceToggleHandler;
+    onDeletePreference: NotificationPreferenceActionHandler;
     updating?: boolean;
 }
 

@@ -1,36 +1,13 @@
 import React from 'react';
-import {Head, Link} from '@inertiajs/react';
-import {PageProps, OpportunitiesList, PaginationLinkProps} from '@/types';
+import {Head} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
+import {PageProps, OpportunitiesPagination} from '@/types';
 import {OpportunitiesDataTable} from '@/components/ui/data-table/opportunities/opportunities-data-table';
 import {partnerColumns} from '@/components/ui/data-table/opportunities/column-configs';
 import { useOpportunityActions } from '@/hooks/useOpportunityActions';
-import { OpportunityStatusDialog } from '@/components/features/opportunity';
-
-export type OpportunitiesListPageActions = {
-    canExportCSV?: boolean;
-    canSubmitNew?: boolean;
-}
-
-interface OpportunitiesPagination {
-    current_page: number;
-    data: OpportunitiesList;
-    first_page_url: string;
-    from: number;
-    last_page: number;
-    last_page_url: string;
-    links: PaginationLinkProps[];
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number;
-    total: number;
-}
 
 interface OpportunitiesListPageProps extends PageProps<{
     opportunities: OpportunitiesPagination;
-    pageActions: OpportunitiesListPageActions;
     currentSort: {
         field: string;
         order: string;
@@ -46,7 +23,6 @@ interface OpportunitiesListPageProps extends PageProps<{
 
 export default function OpportunitiesListPage({
                                                   opportunities,
-                                                  pageActions,
                                                   currentSort,
                                                   routeName,
                                                   currentSearch = {},
@@ -55,28 +31,11 @@ export default function OpportunitiesListPage({
                                               }: Readonly<OpportunitiesListPageProps>) {
 
     const {
-        isStatusDialogOpen,
-        selectedOpportunity,
-        closeStatusDialog,
         getActionsForOpportunity,
     } = useOpportunityActions();
     return (
         <FrontendLayout>
             <Head title="My Opportunities"/>
-            <div className="flex justify-between items-center mb-6">
-                {auth.user.is_partner && pageActions.canSubmitNew && (
-                    <Link
-                        href={route('opportunity.create')}
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                    >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
-                        </svg>
-                        Submit New Opportunity
-                    </Link>
-                )}
-            </div>
-
             <OpportunitiesDataTable
                 opportunities={opportunities.data}
                 currentSort={currentSort}
@@ -119,12 +78,7 @@ export default function OpportunitiesListPage({
                 showSearch={true}
                 showActions={true}
             />
-            
-            <OpportunityStatusDialog
-                isOpen={isStatusDialogOpen}
-                onClose={closeStatusDialog}
-                opportunity={selectedOpportunity}
-            />
+
         </FrontendLayout>
     )
 }

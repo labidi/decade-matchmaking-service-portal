@@ -1,24 +1,60 @@
-import {User} from "@/types/index";
+import {PaginationLinkProps, User} from "@/types/index";
+
+export interface OpportunityPermissions {
+    can_view?: boolean;
+    can_delete?: boolean;
+    can_edit?: boolean;
+    can_approve?: boolean;
+    can_reject?: boolean;
+}
 
 export interface Opportunity {
     id: string;
     title: string;
-    type: string;
-    type_label: string;
+    type: { value: string; label: string };
+    status:  { value: string; label: string };
     closing_date: string;
-    coverage_activity: string;
-    implementation_location: string;
+    coverage_activity: { value: string; label: string };
+    implementation_location:  Array<{ value: string; label: string }>;
     target_audience: Array<{ value: string; label: string }>;
     target_audience_other: string;
+    target_languages: Array<{ value: string; label: string }>;
+    target_languages_other: string;
     summary: string;
     url: string;
     created_at: string;
     updated_at: string;
     user_id: string;
-    status:  { value: string; label: string };
     can_edit: boolean;
-    keywords: string;
+    key_words: string[];
     user?: User;
+    permissions?: OpportunityPermissions;
 }
 
 export type OpportunitiesList = Opportunity[];
+
+export interface OpportunityFormOptions {
+    countries?: Array<{ value: string; label: string }>;
+    regions?: Array<{ value: string; label: string }>;
+    oceans?: Array<{ value: string; label: string }>;
+    target_audience?: Array<{ value: string; label: string }>;
+    opportunity_types?: Array<{ value: string; label: string }>;
+    coverage_activity?: Array<{ value: string; label: string }>;
+    yes_no?: Array<{ value: string; label: string }>;
+}
+
+interface OpportunitiesPagination {
+    current_page: number;
+    data: Opportunity[],
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: PaginationLinkProps[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+}

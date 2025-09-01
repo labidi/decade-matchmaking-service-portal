@@ -1,25 +1,16 @@
 import React from 'react';
-import { Head, usePage } from '@inertiajs/react';
+import {Head} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import { Opportunity, PageProps } from '@/types';
-import { Heading, Subheading } from '@/components/ui/heading';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Text, TextLink } from '@/components/ui/text';
-import { Divider } from '@/components/ui/divider';
-import { CalendarIcon, GlobeAltIcon, UsersIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/16/solid';
-import { opportunityStatusBadgeRenderer } from '@/utils/status-badge-renderer';
+import {Opportunity, PageProps} from '@/types';
+import {Subheading} from '@/components/ui/heading';
+import {Badge} from '@/components/ui/badge';
+import {Text,} from '@/components/ui/text';
+import {Divider} from '@/components/ui/divider';
+import {UsersIcon} from '@heroicons/react/16/solid';
+
 
 interface ShowPageProps extends PageProps {
     opportunity: Opportunity;
-    title: string;
-    userPermissions: {
-        canEdit: boolean;
-        canDelete: boolean;
-        canApply: boolean;
-        isOwner: boolean;
-    };
-    breadcrumbs: Array<{ name: string; url?: string }>;
 }
 
 
@@ -34,161 +25,102 @@ function formatDate(dateString: string): string {
     });
 }
 
-/**
- * Parse keywords string into array, handling empty strings
- */
-function parseKeywords(keywords: string): string[] {
-    if (!keywords || !keywords.trim()) return [];
-    return keywords.split(',').map(keyword => keyword.trim()).filter(Boolean);
-}
-
-export default function Show() {
-    const { opportunity, userPermissions } = usePage<ShowPageProps>().props;
-    const keywordsList = parseKeywords(opportunity.keywords);
-
+export default function Show({opportunity}: Readonly<ShowPageProps>) {
     return (
         <FrontendLayout>
-            <Head title={`Opportunity: ${opportunity.title}`} />
-
-            <div>
+            <Head title={`Opportunity: ${opportunity.title}`}/>
+            <div className="mx-auto">
                 {/* Header Section */}
-                <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                        <div className="flex-1">
-                            <Heading level={1} className="break-words">
-                                {opportunity.title}
-                            </Heading>
-                        </div>
-                        <div className="flex-shrink-0">
-                            {opportunityStatusBadgeRenderer(opportunity)}
-                        </div>
+                <div className="mb-8">
+                    <div className="px-4 sm:px-0">
+                        <h3 className="text-base/7 font-semibold text-gray-900">{opportunity.title}</h3>
+                        <p className="mt-1 max-w-2xl text-sm/6 text-gray-500 truncate">{opportunity.summary}</p>
                     </div>
                 </div>
 
-                <Divider soft />
-
-                {/* Basic Information Grid */}
-                <section className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                        <div className="space-y-2">
-                            <span className="font-medium text-firefly-800 text-lg">Type</span>
-                            <Text>{opportunity.type}</Text>
+                <div className="mt-6">
+                    <dl className="grid grid-cols-1 sm:grid-cols-2">
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Type</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.type.label}</dd>
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Status</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.status.label}</dd>
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Closing Date</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.closing_date}</dd>
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Status</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.status.label}</dd>
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Coverage of CD Activity</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.coverage_activity.label}</dd>
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Implementation Location</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.implementation_location?.map((item, index) => (
+                                <Badge key={item.value} color="blue" className="mr-1 mb-1">
+                                    {item.label}
+                                </Badge>
+                            ))}</dd>
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Target Audience</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.target_audience?.map((item, index) => (
+                                <Badge key={item.value} color="blue" className="mr-1 mb-1">
+                                    {item.label}
+                                </Badge>
+                            ))}
+                                {opportunity.target_audience_other && (
+                                    <Badge color="blue"
+                                           className="mr-1 mb-1">{opportunity.target_audience_other}</Badge>
+                                )}
+                            </dd>
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Language of participation</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.target_languages?.map((item, index) => (
+                                <Badge key={item.value} color="blue" className="mr-1 mb-1">
+                                    {item.label}
+                                </Badge>
+                            ))}
+                                {opportunity.target_languages_other && (
+                                    <Badge color="blue"
+                                           className="mr-1 mb-1">{opportunity.target_languages_other}</Badge>
+                                )}
+                            </dd>
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-2 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Full summary</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">
+                                {opportunity.summary}
+                            </dd>
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                                <CalendarIcon data-slot="icon" className="size-4 text-zinc-500" />
-                                <span className="font-medium text-firefly-800 text-lg">Closing Date</span>
-                            </div>
-                            <Text>{formatDate(opportunity.closing_date)}</Text>
-                        </div>
-
-                        <div className="space-y-2">
-                            <span className="font-medium text-firefly-800 text-lg">Coverage of CD Activity</span>
-                            <Text>{opportunity.coverage_activity}</Text>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                                <GlobeAltIcon data-slot="icon" className="size-4 text-zinc-500" />
-                                <span className="font-medium text-firefly-800 text-lg">Implementation Location</span>
-                            </div>
-                            <Text>{opportunity.implementation_location}</Text>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                                <UsersIcon data-slot="icon" className="size-4 text-zinc-500" />
-                                <span className="font-medium text-firefly-800 text-lg">Target Audience</span>
-                            </div>
-                            <Text>
-                                <ul className="list-disc pl-5 list-outside">
-                                    {opportunity.target_audience.map((target_audience)=>
-                                        <li>{target_audience.label}</li>
-                                    )}
-                                </ul>
-                            </Text>
-                        </div>
-
-                        <div className="space-y-2">
-                            <span className="font-medium text-firefly-800 text-lg">Created</span>
-                            <Text>{formatDate(opportunity.created_at)}</Text>
-                        </div>
-
-                        {opportunity.updated_at && (
-                            <div className="space-y-2">
-                                <span className="font-medium text-firefly-800 text-lg">Last Updated</span>
-                                <Text>{formatDate(opportunity.updated_at)}</Text>
-                            </div>
-                        )}
-                    </div>
-
-                    {opportunity.url && (
-                        <div className="pt-4 border-t border-zinc-950/10 dark:border-white/10">
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <ArrowTopRightOnSquareIcon data-slot="icon" className="size-4 text-zinc-500" />
-                                    <span className="font-medium text-firefly-800 text-lg">Application Link</span>
-                                </div>
-                                <TextLink
-                                    href={opportunity.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="break-all"
-                                >
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Application site URL</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">
+                                <a href={opportunity.url} target="_blank" rel="noopener noreferrer">
                                     {opportunity.url}
-                                </TextLink>
-                            </div>
+                                </a>
+                            </dd>
                         </div>
-                    )}
-                </section>
-
-                <Divider soft />
-
-                {/* Summary Section */}
-                {opportunity.summary && (
-                    <section className="space-y-4">
-                        <Subheading level={2}>Summary</Subheading>
-                        <Text className="whitespace-pre-wrap leading-relaxed">
-                            {opportunity.summary}
-                        </Text>
-                    </section>
-                )}
-
-                {/* Keywords/Tags Section */}
-                {keywordsList.length > 0 && (
-                    <>
-                        <Divider soft />
-                        <section className="space-y-4">
-                            <Subheading level={2}>Keywords</Subheading>
-                            <div className="flex flex-wrap gap-2">
-                                {keywordsList.map((keyword, index) => (
-                                    <Badge key={index} color="blue">
-                                        {keyword}
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Key words</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">
+                                {opportunity.key_words?.map((item, index) => (
+                                    <Badge key={item} color="blue" className="mr-1 mb-1">
+                                        {item}
                                     </Badge>
                                 ))}
-                            </div>
-                        </section>
-                    </>
-                )}
-
-                <Divider />
-
-                {/* Action Buttons */}
-                <section className="flex flex-col sm:flex-row gap-4">
-                    {userPermissions.canApply && opportunity.url && (
-                        <Button
-                            color="dark/white"
-                            href={opportunity.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="sm:w-auto"
-                        >
-                            <ArrowTopRightOnSquareIcon data-slot="icon" />
-                            Apply Now
-                        </Button>
-                    )}
-                </section>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
             </div>
         </FrontendLayout>
     );

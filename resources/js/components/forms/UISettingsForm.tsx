@@ -20,14 +20,6 @@ export const UISettingsForm: UIStep[] = [
                 label: 'Site Description',
                 placeholder: 'Enter a brief description of the site',
             },
-            logo: {
-                id: 'logo',
-                type: 'file',
-                required: false,
-                label: 'Site Logo',
-                description: 'Upload a logo for the site (PNG, JPG)',
-                accept: 'image/png, image/jpeg',
-            },
             homepage_youtube_video: {
                 id: 'homepage_youtube_video',
                 type: 'textarea',
@@ -111,10 +103,10 @@ export const UISettingsForm: UIStep[] = [
         fields: {
             organizations_csv: {
                 id: 'organizations_csv',
-                type: 'csv-upload',
+                type: 'file',
                 required: false,
                 label: 'Organizations CSV Import',
-                description: 'Upload a CSV file containing organization data. The file should have 3 columns: organization name, description, and website link.',
+                description: 'Upload a CSV file containing organization data. The  file should have 3 columns: organization name, description, and website link.',
                 accept: '.csv,text/csv,application/csv',
             }
         }

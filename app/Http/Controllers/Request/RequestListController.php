@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Request;
 
+use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Resources\RequestResource;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
@@ -12,6 +13,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RequestListController extends BaseRequestController
 {
+    use HasPageActions;
+
     public function __construct(
         private readonly RequestService $service
     ) {
@@ -27,12 +30,19 @@ class RequestListController extends BaseRequestController
         $requests = $this->service->getPaginatedRequests($filters['search'], $filters['sort']);
         $requests->toResourceCollection(RequestResource::class) ;
 
+        // Define actions for admin requests list page
+        $actions = $this->buildActions([
+            $this->createPrimaryAction('New Request', route('request.create')),
+            $this->createSecondaryAction('Export CSV', route('admin.request.export.csv'), 'ArrowDownTrayIcon'),
+        ]);
+
         return Inertia::render($this->getViewPrefix() . 'Request/List', [
             'title' => "Requests",
             'requests' => $requests,
             'currentSort' => $filters['current']['sort'],
             'currentSearch' => $filters['current']['search'],
             'availableStatuses' => $this->service->getAvailableStatuses(),
+            'actions' => $actions,  // Add the actions
         ]);
     }
 
@@ -46,6 +56,12 @@ class RequestListController extends BaseRequestController
         $requests = $this->service->getUserRequests($httpRequest->user(), $filters['search'], $filters['sort']);
         $requests->toResourceCollection(RequestResource::class) ;
 
+        // Define actions for user's own requests page
+        $actions = $this->buildActions([
+            $this->createPrimaryAction('New Request', route('request.create')),
+            $this->createSecondaryAction('View All Public', route('request.list'), 'EyeIcon'),
+        ]);
+
         return Inertia::render('Request/List', [
             'title' => 'My requests',
             'banner' => [
@@ -57,6 +73,7 @@ class RequestListController extends BaseRequestController
             'routeName' => 'request.me.list',
             'currentSort' => $filters['current']['sort'],
             'currentSearch' => $filters['current']['search'],
+            'actions' => $actions,  // Add the actions
         ]);
     }
 

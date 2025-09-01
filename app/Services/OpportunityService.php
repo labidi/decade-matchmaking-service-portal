@@ -3,9 +3,10 @@
 namespace App\Services;
 
 use App\Enums\Opportunity\Status;
+use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
 use App\Models\User;
-use App\Services\Opportunity\EnhancerService;
+use App\Services\NotificationService;
 use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
 use Exception;
@@ -13,28 +14,64 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
-class OpportunityService
+readonly class OpportunityService
 {
     public function __construct(
-        private readonly OpportunityRepository $repository,
-        private readonly OpportunityAnalyticsService $analytics
+        private OpportunityRepository $repository,
+        private OpportunityAnalyticsService $analytics,
+        private NotificationService $notificationService
     ) {
     }
 
     /**
      * Create a new opportunity
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function createOpportunity(array $data, User $user): Opportunity
+    public function storeOpportunity(User $user, array $data, ?Opportunity $opportunity): Opportunity
     {
-        return DB::transaction(function () use ($data, $user) {
-            return $this->repository->create($data, $user);
+        return DB::transaction(function () use ($data, $user, $opportunity) {
+            $isNew = !$opportunity;
+            
+            if ($opportunity) {
+                $this->repository->update($opportunity, $data);
+                $opportunity = $opportunity->fresh();
+            } else {
+                $data += [
+                    'status' => Status::PENDING_REVIEW,
+                    'user_id' => $user->id
+                ];
+                $opportunity = $this->repository->create($data);
+            }
+
+            // Send notifications for new opportunities when they are created
+            if ($isNew) {
+                try {
+                    $this->notificationService->notifyUsersForNewOpportunity($opportunity);
+                    Log::info('Notifications sent for new opportunity', [
+                        'opportunity_id' => $opportunity->id,
+                        'user_id' => $user->id,
+                        'title' => $opportunity->title
+                    ]);
+                } catch (Exception $e) {
+                    Log::error('Failed to send notifications for new opportunity', [
+                        'opportunity_id' => $opportunity->id,
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    // Don't fail the transaction for notification errors
+                }
+            }
+
+            return $opportunity;
         });
     }
 
     /**
      * Get paginated opportunities submitted by a specific user
+     * @throws Throwable
      */
     public function getUserOpportunitiesPaginated(
         User $user,
@@ -42,38 +79,33 @@ class OpportunityService
         array $sortFilters = []
     ): LengthAwarePaginator {
         $opportunities = $this->repository->getUserOpportunitiesPaginated($user, $searchFilters, $sortFilters);
-        $opportunities->getCollection()->transform(function ($opportunity) {
-            // Enhance opportunity data if needed
-            return EnhancerService::enhanceOpportunity($opportunity);
-        });
+        $opportunities->toResourceCollection(OpportunityResource::class);
         return $opportunities;
     }
 
 
+    /**
+     * @throws Throwable
+     */
     public function getAllOpportunitiesPaginated(
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
         $opportunities = $this->repository->getPaginated($searchFilters, $sortFilters);
-        $opportunities->getCollection()->transform(function ($opportunity) {
-            // Enhance opportunity data if needed
-            return EnhancerService::enhanceOpportunity($opportunity);
-        });
+        $opportunities->toResourceCollection(OpportunityResource::class);
         return $opportunities;
     }
 
     /**
      * Get paginated active opportunities (active status only)
+     * @throws Throwable
      */
     public function getActiveOpportunitiesPaginated(
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
         $opportunities = $this->repository->getActiveOpportunitiesPaginated($searchFilters, $sortFilters);
-        $opportunities->getCollection()->transform(function ($opportunity) {
-            // Enhance opportunity data if needed
-            return EnhancerService::enhanceOpportunity($opportunity);
-        });
+        $opportunities->toResourceCollection(OpportunityResource::class);
         return $opportunities;
     }
 
@@ -95,7 +127,7 @@ class OpportunityService
      */
     public function updateOpportunityStatus(int $opportunityId, int $statusCode, User $user): array
     {
-        $opportunity = $this->findOpportunity($opportunityId, $user);
+        $opportunity = $this->findOpportunity($opportunityId);
         if (!$opportunity) {
             throw new Exception('Opportunity not found', 404);
         }
@@ -107,14 +139,43 @@ class OpportunityService
         if ($opportunity->user_id !== $user->id) {
             throw new Exception('Unauthorized to update this opportunity', 403);
         }
-        $this->repository->update($opportunity, ['status' => $statusCode]);
-        return [
-            'opportunity' => $opportunity->fresh(),
-            'status' => [
-                'status_code' => (string)$statusCode,
-                'status_label' => Opportunity::STATUS_LABELS[$statusCode] ?? ''
-            ]
-        ];
+
+        $oldStatus = $opportunity->status;
+        
+        return DB::transaction(function () use ($opportunity, $statusCode, $oldStatus, $user) {
+            $this->repository->update($opportunity, ['status' => $statusCode]);
+            $opportunity = $opportunity->fresh();
+            
+            // Send notifications when opportunity is published/activated
+            if ($oldStatus !== Status::ACTIVE && $statusCode === Status::ACTIVE->value) {
+                try {
+                    $this->notificationService->notifyUsersForNewOpportunity($opportunity);
+                    Log::info('Notifications sent for published opportunity', [
+                        'opportunity_id' => $opportunity->id,
+                        'user_id' => $user->id,
+                        'old_status' => $oldStatus,
+                        'new_status' => $statusCode,
+                        'title' => $opportunity->title
+                    ]);
+                } catch (Exception $e) {
+                    Log::error('Failed to send notifications for published opportunity', [
+                        'opportunity_id' => $opportunity->id,
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    // Don't fail the transaction for notification errors
+                }
+            }
+
+            return [
+                'opportunity' => $opportunity,
+                'status' => [
+                    'status_code' => (string)$statusCode,
+                    'status_label' => Status::tryFrom($statusCode) ?? ''
+                ]
+            ];
+        });
     }
 
     /**
@@ -122,7 +183,7 @@ class OpportunityService
      */
     public function deleteOpportunity(int $opportunityId, User $user): bool
     {
-        $opportunity = $this->findOpportunity($opportunityId, $user);
+        $opportunity = $this->findOpportunity($opportunityId);
 
         if (!$opportunity) {
             throw new Exception('Opportunity not found', 404);
@@ -165,5 +226,11 @@ class OpportunityService
     public function searchOpportunities(array $filters, User $user): Collection
     {
         return $this->repository->search($filters);
+    }
+
+    public function extendOpportunityClosingDate(Opportunity $opportunity): Opportunity
+    {
+        $this->repository->update($opportunity, ['closing_date' => $opportunity->closing_date->addWeeks(2)]);
+        return $opportunity->fresh();
     }
 }

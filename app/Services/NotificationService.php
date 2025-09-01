@@ -3,9 +3,10 @@
 namespace App\Services;
 
 use App\Models\Notification;
+use App\Models\Opportunity;
 use App\Models\Request as OCDRequest;
 use App\Models\User;
-use App\Models\UserNotificationPreference;
+use App\Models\NotificationPreference;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -46,6 +47,153 @@ class NotificationService
     }
 
     /**
+     * Send notifications for a new opportunity based on user preferences
+     */
+    public function notifyUsersForNewOpportunity(Opportunity $opportunity): array
+    {
+        $notificationsSent = [];
+
+        DB::transaction(function () use ($opportunity, &$notificationsSent) {
+            $matchingPreferences = $this->findMatchingPreferencesForOpportunity($opportunity);
+
+            foreach ($matchingPreferences as $preference) {
+                // Skip notification for the opportunity creator
+                if ($preference->user_id === $opportunity->user_id) {
+                    continue;
+                }
+
+                $notification = $this->createNotificationForOpportunity($opportunity, $preference);
+
+                if ($notification) {
+                    $notificationsSent[] = [
+                        'user_id' => $preference->user_id,
+                        'notification_id' => $notification->id,
+                        'attribute_type' => $preference->attribute_type,
+                        'attribute_value' => $preference->attribute_value,
+                    ];
+                }
+            }
+        });
+
+        return $notificationsSent;
+    }
+
+    /**
+     * Find user preferences that match the opportunity attributes
+     */
+    private function findMatchingPreferencesForOpportunity(Opportunity $opportunity): Collection
+    {
+        $matchingPreferences = collect();
+
+        // Extract attributes to check against preferences
+        $attributesToCheck = $this->extractOpportunityAttributes($opportunity);
+
+        foreach ($attributesToCheck as $attributeType => $values) {
+            if (empty($values)) {
+                continue;
+            }
+
+            // Handle both single values and arrays
+            $valuesArray = is_array($values) ? $values : [$values];
+
+            foreach ($valuesArray as $value) {
+                if (empty($value)) {
+                    continue;
+                }
+
+                $preferences = NotificationPreference::forEntity(NotificationPreference::ENTITY_TYPE_OPPORTUNITY)
+                    ->forAttribute($attributeType, $value)
+                    ->with('user')
+                    ->get();
+
+                $matchingPreferences = $matchingPreferences->merge($preferences);
+            }
+        }
+
+        // Remove duplicates based on user_id
+        return $matchingPreferences->unique('user_id');
+    }
+
+    /**
+     * Extract opportunity attributes that can be used for notifications
+     */
+    private function extractOpportunityAttributes(Opportunity $opportunity): array
+    {
+        $attributes = [];
+
+        // Opportunity Type
+        if (!empty($opportunity->type)) {
+            $attributes['type'] = is_array($opportunity->type) ? $opportunity->type['value'] : $opportunity->type;
+        }
+
+        // Coverage Activity
+        if (!empty($opportunity->coverage_activity)) {
+            $attributes['coverage_activity'] = is_array($opportunity->coverage_activity) ? $opportunity->coverage_activity['value'] : $opportunity->coverage_activity;
+        }
+
+        // Implementation Location
+        if (!empty($opportunity->implementation_location)) {
+            if (is_array($opportunity->implementation_location)) {
+                $attributes['implementation_location'] = array_column($opportunity->implementation_location, 'value');
+            } else {
+                $attributes['implementation_location'] = [$opportunity->implementation_location];
+            }
+        }
+
+        // Target Audience
+        if (!empty($opportunity->target_audience)) {
+            if (is_array($opportunity->target_audience)) {
+                $attributes['target_audience'] = array_column($opportunity->target_audience, 'value');
+            } else {
+                $attributes['target_audience'] = [$opportunity->target_audience];
+            }
+        }
+
+        // Key Words
+        if (!empty($opportunity->key_words) && is_array($opportunity->key_words)) {
+            $attributes['key_words'] = $opportunity->key_words;
+        }
+
+        return array_filter($attributes);
+    }
+
+    /**
+     * Create notification for a user based on matching opportunity preference
+     */
+    private function createNotificationForOpportunity(Opportunity $opportunity, NotificationPreference $preference): ?Notification
+    {
+        $title = $this->generateOpportunityNotificationTitle($preference);
+        $description = $this->generateOpportunityNotificationDescription($opportunity, $preference);
+
+        return Notification::create([
+            'user_id' => $preference->user_id,
+            'title' => $title,
+            'description' => $description,
+            'is_read' => false,
+        ]);
+    }
+
+    /**
+     * Generate notification title for opportunity based on preference
+     */
+    private function generateOpportunityNotificationTitle(NotificationPreference $preference): string
+    {
+        $attributeDisplayName = $preference->getAttributeTypeDisplayName();
+        return "New Opportunity Matching Your {$attributeDisplayName} Interest";
+    }
+
+    /**
+     * Generate notification description for opportunity
+     */
+    private function generateOpportunityNotificationDescription(Opportunity $opportunity, NotificationPreference $preference): string
+    {
+        $opportunityTitle = $opportunity->title ?? 'New Opportunity';
+        $attributeDisplayName = $preference->getAttributeTypeDisplayName();
+
+        return "A new opportunity '{$opportunityTitle}' has been published that matches your {$attributeDisplayName} interest in '{$preference->attribute_value}'.";
+    }
+
+    /**
      * Find user preferences that match the request attributes
      */
     private function findMatchingPreferences(OCDRequest $request): Collection
@@ -71,7 +219,7 @@ class NotificationService
                     continue;
                 }
 
-                $preferences = UserNotificationPreference::withNotificationsEnabled()
+                $preferences = NotificationPreference::forEntity(NotificationPreference::ENTITY_TYPE_REQUEST)
                     ->forAttribute($attributeType, $value)
                     ->with('user')
                     ->get();
@@ -171,7 +319,7 @@ class NotificationService
     /**
      * Create notification for a user based on matching preference
      */
-    private function createNotificationForRequest(OCDRequest $request, UserNotificationPreference $preference): ?Notification
+    private function createNotificationForRequest(OCDRequest $request, NotificationPreference $preference): ?Notification
     {
         $title = $this->generateNotificationTitle($preference);
         $description = $this->generateNotificationDescription($request, $preference);
@@ -187,7 +335,7 @@ class NotificationService
     /**
      * Generate notification title based on preference
      */
-    private function generateNotificationTitle(UserNotificationPreference $preference): string
+    private function generateNotificationTitle(NotificationPreference $preference): string
     {
         $attributeDisplayName = $preference->getAttributeTypeDisplayName();
         return "New Request Matching Your {$attributeDisplayName} Interest";
@@ -196,7 +344,7 @@ class NotificationService
     /**
      * Generate notification description
      */
-    private function generateNotificationDescription(OCDRequest $request, UserNotificationPreference $preference): string
+    private function generateNotificationDescription(OCDRequest $request, NotificationPreference $preference): string
     {
         $requestTitle = $request->detail?->title ?? 'New Request';
         $attributeDisplayName = $preference->getAttributeTypeDisplayName();
@@ -207,14 +355,27 @@ class NotificationService
     /**
      * Get user's notification preferences grouped by attribute type
      */
-    public function getUserPreferences(User $user): array
+    public function getUserPreferences(User $user, ?string $entityType = null): array
     {
-        $preferences = UserNotificationPreference::where('user_id', $user->id)
+        $query = NotificationPreference::where('user_id', $user->id);
+
+        if ($entityType !== null) {
+            $query->forEntity($entityType);
+        }
+
+        $preferences = $query->orderBy('entity_type')
             ->orderBy('attribute_type')
             ->orderBy('attribute_value')
             ->get();
 
-        return $preferences->groupBy('attribute_type')->toArray();
+        if ($entityType !== null) {
+            return $preferences->groupBy('attribute_type')->toArray();
+        }
+
+        // If no entity filter, group by entity_type first, then attribute_type
+        return $preferences->groupBy('entity_type')->map(function ($entityPreferences) {
+            return $entityPreferences->groupBy('attribute_type');
+        })->toArray();
     }
 
     /**
@@ -224,17 +385,17 @@ class NotificationService
         User $user,
         string $attributeType,
         string $attributeValue,
-        bool $notificationEnabled = true,
-        bool $emailNotificationEnabled = false
-    ): UserNotificationPreference {
-        return UserNotificationPreference::updateOrCreate(
+        bool $emailNotificationEnabled = false,
+        string $entityType = NotificationPreference::ENTITY_TYPE_REQUEST
+    ): NotificationPreference {
+        return NotificationPreference::updateOrCreate(
             [
                 'user_id' => $user->id,
+                'entity_type' => $entityType,
                 'attribute_type' => $attributeType,
                 'attribute_value' => $attributeValue,
             ],
             [
-                'notification_enabled' => $notificationEnabled,
                 'email_notification_enabled' => $emailNotificationEnabled,
             ]
         );
@@ -243,9 +404,14 @@ class NotificationService
     /**
      * Remove user preference
      */
-    public function removeUserPreference(User $user, string $attributeType, string $attributeValue): bool
-    {
-        return UserNotificationPreference::where('user_id', $user->id)
+    public function removeUserPreference(
+        User $user,
+        string $attributeType,
+        string $attributeValue,
+        string $entityType = NotificationPreference::ENTITY_TYPE_REQUEST
+    ): bool {
+        return NotificationPreference::where('user_id', $user->id)
+            ->where('entity_type', $entityType)
             ->where('attribute_type', $attributeType)
             ->where('attribute_value', $attributeValue)
             ->delete() > 0;
@@ -337,7 +503,7 @@ class NotificationService
     {
         $requestTitle = $request->detail?->capacity_development_title ?? 'Request #' . $request->id;
         $userName = $user->name ?? 'User';
-        
+
         return "User '{$userName}' has accepted the offer for request '{$requestTitle}'. The offer is now confirmed and ready for implementation.";
     }
 
@@ -348,13 +514,13 @@ class NotificationService
     {
         $requestTitle = $request->detail?->capacity_development_title ?? 'Request #' . $request->id;
         $userName = $user->name ?? 'User';
-        
+
         $description = "User '{$userName}' has requested clarification for the offer on request '{$requestTitle}'.";
-        
+
         if ($message) {
             $description .= " Message: '{$message}'";
         }
-        
+
         return $description;
     }
 }

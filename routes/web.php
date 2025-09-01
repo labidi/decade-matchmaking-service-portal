@@ -1,16 +1,18 @@
 <?php
 
 use App\Http\Controllers\Admin\NotificationsController;
-use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrganizationsController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserGuideController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
+Route::get('organizations', [\App\Http\Controllers\OrganizationsController::class, 'index'])->name('organizations.index');
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('user.home');
@@ -62,3 +64,4 @@ require __DIR__ . '/auth.php';
 require __DIR__ . '/request.php';
 require __DIR__ . '/opportunity.php';
 require __DIR__ . '/offer.php';
+require __DIR__ . '/notification-preferences.php';

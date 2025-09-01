@@ -5,7 +5,7 @@ import { Field, FieldGroup, Fieldset, Label } from '@/components/ui/fieldset';
 import { Combobox, ComboboxOption, ComboboxLabel } from '@/components/ui/combobox';
 import { Switch, SwitchField } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
-import { BellIcon, EnvelopeIcon } from '@heroicons/react/16/solid';
+import { EnvelopeIcon } from '@heroicons/react/16/solid';
 
 interface AddPreferenceFormProps {
     availableOptions: Record<string, Array<{value: string, label: string}>>;
@@ -25,14 +25,13 @@ export default function AddPreferenceForm({
     const { data, setData, post, processing, errors, reset } = useForm({
         attribute_type: '',
         attribute_value: '',
-        notification_enabled: true,
-        email_notification_enabled: false,
+        email_notification_enabled: true,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('notification-preferences.store'), {
+        post(route('notification.preferences.store'), {
             onSuccess: () => {
                 reset();
                 onClose();
@@ -124,46 +123,27 @@ export default function AddPreferenceForm({
                     )}
                 </FieldGroup>
 
-                {/* Notification Preferences */}
+                {/* Email Notification Preference */}
                 {data.attribute_type && data.attribute_value && (
                     <FieldGroup>
                         <div className="space-y-4">
                             <Text className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                                Notification Types
+                                Email Notifications
                             </Text>
 
                             <SwitchField>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <BellIcon data-slot="icon" className="size-4 text-blue-600 dark:text-blue-400" />
+                                        <EnvelopeIcon data-slot="icon" className="size-4 text-indigo-600 dark:text-indigo-400" />
                                         <div>
-                                            <Text className="text-sm font-medium">In-app notifications</Text>
+                                            <Text className="text-sm font-medium">Enable email notifications</Text>
                                             <Text className="text-xs text-zinc-600 dark:text-zinc-400">
-                                                Show notifications in the portal interface
+                                                Receive email alerts when matching content is published
                                             </Text>
                                         </div>
                                     </div>
                                     <Switch
-                                        color="blue"
-                                        checked={data.notification_enabled}
-                                        onChange={(checked) => setData('notification_enabled', checked as any)}
-                                    />
-                                </div>
-                            </SwitchField>
-
-                            <SwitchField>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <EnvelopeIcon data-slot="icon" className="size-4 text-amber-600 dark:text-amber-400" />
-                                        <div>
-                                            <Text className="text-sm font-medium">Email notifications</Text>
-                                            <Text className="text-xs text-zinc-600 dark:text-zinc-400">
-                                                Send notifications to your email address
-                                            </Text>
-                                        </div>
-                                    </div>
-                                    <Switch
-                                        color="amber"
+                                        color="indigo"
                                         checked={data.email_notification_enabled}
                                         onChange={(checked) => setData('email_notification_enabled', checked as any)}
                                     />

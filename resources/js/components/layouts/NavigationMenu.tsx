@@ -104,9 +104,16 @@ export default function NavigationMenu() {
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         role="menuitem"
                     >
-                        My Opportunties List
+                        My Opportunities List
                     </Link>
                     )}
+                    <Link
+                        href={route('notification.preferences.index')}
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
+                    >
+                        Notifications settings
+                    </Link>
                     <form method="POST" onSubmit={handleSignOutFormSubmit}>
                         {/* Include CSRF token if needed */}
                         <button

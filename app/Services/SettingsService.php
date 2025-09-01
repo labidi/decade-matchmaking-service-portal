@@ -7,17 +7,23 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Services\OrganizationImportService;
 
 class SettingsService
 {
+    public function __construct(private readonly OrganizationImportService $organizationImportService)
+    {
+    }
+
     /**
      * Update or create settings
      */
     public function updateSettings(array $settingsData): array
     {
         $updatedSettings = [];
+        $csvImportResult = null;
 
-        DB::transaction(function () use ($settingsData, &$updatedSettings) {
+        DB::transaction(function () use ($settingsData, &$updatedSettings, &$csvImportResult) {
             foreach ($settingsData as $path => $value) {
                 // Skip null values for file uploads that weren't changed
                 if ($value === null && Setting::isFileUpload($path)) {
@@ -25,25 +31,32 @@ class SettingsService
                 }
 
                 $setting = Setting::where('path', $path)->first();
-
                 if ($setting) {
-                    // Update existing setting
                     $setting->update(['value' => $value]);
-                    Log::info('Setting updated', ['path' => $path, 'is_file' => Setting::isFileUpload($path)]);
                 } else {
-                    // Create new setting
                     $setting = Setting::create([
                         'path' => $path,
                         'value' => $value
                     ]);
-                    Log::info('Setting created', ['path' => $path, 'is_file' => Setting::isFileUpload($path)]);
                 }
-
                 $updatedSettings[$path] = $setting;
+
+                // Handle CSV import if organizations_csv is being updated
+                if ($path === Setting::ORGANIZATIONS_CSV && $value) {
+                    try {
+                        $csvImportResult = $this->organizationImportService->import($value);
+                    } catch (\Exception $e) {
+                        // Re-throw the exception to rollback the transaction
+                        throw new \Exception('CSV import failed: ' . $e->getMessage(), 0, $e);
+                    }
+                }
             }
         });
 
-        return $updatedSettings;
+        return [
+            'settings' => $updatedSettings,
+            'csv_import_result' => $csvImportResult
+        ];
     }
 
     /**
@@ -116,15 +129,7 @@ class SettingsService
         $storageDirectory = Setting::getStorageDirectory($path);
         $fileName = time() . '_' . $file->getClientOriginalName();
 
-        $filePath = $file->storeAs($storageDirectory, $fileName, 'public');
-
-        Log::info('File uploaded for setting', [
-            'path' => $path,
-            'file_path' => $filePath,
-            'original_name' => $file->getClientOriginalName()
-        ]);
-
-        return $filePath;
+        return $file->storeAs($storageDirectory, $fileName, 'public');
     }
 
     /**
@@ -139,32 +144,8 @@ class SettingsService
 
             if (Storage::disk('public')->exists($oldFilePath)) {
                 Storage::disk('public')->delete($oldFilePath);
-                Log::info('Old file deleted', ['path' => $path, 'file_path' => $oldFilePath]);
             }
         }
     }
 
-    /**
-     * Get file validation rules for all file upload settings
-     */
-    public function getFileValidationRules(): array
-    {
-        $rules = [];
-
-//        foreach (Setting::FILE_UPLOAD_SETTINGS as $path) {
-//            $rules[$path] = Setting::getFileValidationRules($path);
-//        }
-
-        // Add non-file validation rules
-        $rules[Setting::SITE_NAME] = ['nullable', 'string', 'max:255'];
-        $rules[Setting::SITE_DESCRIPTION] = ['nullable', 'string', 'max:1000'];
-        $rules[Setting::HOMEPAGE_YOUTUBE_VIDEO] = ['nullable', 'string', 'max:500'];
-        $rules[Setting::SUCCESSFUL_MATCHES_METRIC] = ['nullable', 'integer:strict',];
-        $rules[Setting::COMMITTED_FUNDING_METRIC] = ['nullable', 'integer:strict',];
-        $rules[Setting::FULLY_CLOSED_MATCHES_METRIC] = ['nullable', 'integer:strict',];
-        $rules[Setting::REQUEST_IN_IMPLEMENTATION_METRIC] = ['nullable', 'integer:strict',];
-        $rules[Setting::OPEN_PARTNER_OPPORTUNITIES_METRIC] = ['nullable', 'integer:strict',];
-
-        return $rules;
-    }
 }

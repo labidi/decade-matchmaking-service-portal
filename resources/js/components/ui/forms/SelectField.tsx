@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Field, Label, Description, ErrorMessage } from '@/components/ui/fieldset';
 import { Combobox, ComboboxInput, ComboboxButton, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 import { ChevronsUpDown } from 'lucide-react';
@@ -78,9 +78,8 @@ export default function SelectField({
                         <ComboboxInput
                             className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
                             displayValue={(value: string | number | null) => {
-                                console.log('Display Value:', value);
                                 const option = options.find(opt => opt.value == value);
-                                return option ? option.label : String(value || '');
+                                return option ? option.label : String(value ?? '');
                             }}
                             onChange={event => setQuery(event.target.value)}
                             placeholder={placeholder}
