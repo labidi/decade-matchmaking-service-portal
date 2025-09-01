@@ -1,24 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
+import { Button } from '@/components/ui/button';
 import {
     NotificationPreferencesPagePropsWithPagination,
     UserNotificationPreference,
 } from '@/types';
-import { BellIcon } from '@heroicons/react/16/solid';
+import { BellIcon, PlusIcon } from '@heroicons/react/16/solid';
 import {
     NotificationPreferencesDataTable,
     getNotificationPreferenceColumns
 } from '@/components/ui/data-table/notification-preferences';
+import AddPreferenceDialog from '@/components/features/notification-preferences/AddPreferenceDialog';
 
 export default function List({
                                                     preferences,
+                                                    availableOptions,
                                                     attributeTypes,
                                                     currentFilters,
                                                     currentSort
                                                 }: NotificationPreferencesPagePropsWithPagination) {
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const handleToggleNotification = (preference: UserNotificationPreference, type: 'email_notification_enabled') => {
         // Update preference with the toggled value
         const updatedPreference = {
@@ -27,7 +31,7 @@ export default function List({
         };
 
         // Use router to make the PUT request
-        router.put(route('notification-preferences.update', preference.id), updatedPreference, {
+        router.put(route('notification.preferences.update', preference.id), updatedPreference, {
             preserveState: true,
             preserveScroll: true,
             only: ['preferences'],
@@ -49,15 +53,25 @@ export default function List({
 
             <div className="space-y-8">
                 {/* Header */}
-                <div>
-                    <Heading level={1} className="flex items-center gap-2">
-                        <BellIcon data-slot="icon" className="size-6"/>
-                        Notification Preferences
-                    </Heading>
-                    <Text className="mt-2 text-zinc-600 dark:text-zinc-400">
-                        Configure when you want to receive email notifications about new requests and opportunities
-                        that match your interests.
-                    </Text>
+                <div className="flex items-start justify-between">
+                    <div>
+                        <Heading level={1} className="flex items-center gap-2">
+                            <BellIcon data-slot="icon" className="size-6"/>
+                            Notification Preferences
+                        </Heading>
+                        <Text className="mt-2 text-zinc-600 dark:text-zinc-400">
+                            Configure when you want to receive email notifications about new requests and opportunities
+                            that match your interests.
+                        </Text>
+                    </div>
+                    <Button 
+                        color="indigo" 
+                        onClick={() => setIsAddDialogOpen(true)}
+                        className="shrink-0"
+                    >
+                        <PlusIcon data-slot="icon" />
+                        Add Preference
+                    </Button>
                 </div>
 
                 {/* Data Table */}
@@ -73,6 +87,13 @@ export default function List({
                     />
                 </div>
             </div>
+
+            {/* Add Preference Dialog */}
+            <AddPreferenceDialog
+                open={isAddDialogOpen}
+                onClose={() => setIsAddDialogOpen(false)}
+                availableOptions={availableOptions}
+            />
         </FrontendLayout>
     );
 }

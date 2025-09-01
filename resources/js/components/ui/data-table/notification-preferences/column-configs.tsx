@@ -47,36 +47,24 @@ export function getNotificationPreferenceColumns({
             )
         },
         {
-            key: 'attribute_type',
-            label: 'Attribute',
+            key: 'preference',
+            label: 'Preference',
             sortable: true,
-            sortField: 'attribute_type',
-            headerClassName: 'min-w-[100px]',
+            sortField: 'attribute_value',
+            className: 'max-w-[250px] truncate',
+            headerClassName: 'min-w-[150px]',
             render: (preference: UserNotificationPreference) => {
-                const entityAttributes = NOTIFICATION_ENTITY_ATTRIBUTES[preference.entity_type as keyof typeof NOTIFICATION_ENTITY_ATTRIBUTES];
-                const displayName = entityAttributes?.[preference.attribute_type as keyof typeof entityAttributes] || preference.attribute_type;
+                // Show human-readable label if available, otherwise use attribute_value
+                const displayValue = preference.attribute_label || preference.attribute_value;
                 return (
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100 text-sm">
-                        {displayName}
+                    <span
+                        className="text-zinc-700 dark:text-zinc-300 text-sm block truncate"
+                        title={displayValue}
+                    >
+                        {displayValue}
                     </span>
                 );
             }
-        },
-        {
-            key: 'attribute_value',
-            label: 'Value',
-            sortable: true,
-            sortField: 'attribute_value',
-            className: 'max-w-[200px] truncate',
-            headerClassName: 'min-w-[120px]',
-            render: (preference: UserNotificationPreference) => (
-                <span
-                    className="text-zinc-700 dark:text-zinc-300 text-sm block truncate"
-                    title={preference.attribute_value}
-                >
-                    {preference.attribute_value}
-                </span>
-            )
         },
         {
             key: 'email_notification_enabled',

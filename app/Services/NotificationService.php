@@ -83,35 +83,17 @@ class NotificationService
      */
     private function findMatchingPreferencesForOpportunity(Opportunity $opportunity): Collection
     {
-        $matchingPreferences = collect();
-
-        // Extract attributes to check against preferences
-        $attributesToCheck = $this->extractOpportunityAttributes($opportunity);
-
-        foreach ($attributesToCheck as $attributeType => $values) {
-            if (empty($values)) {
-                continue;
-            }
-
-            // Handle both single values and arrays
-            $valuesArray = is_array($values) ? $values : [$values];
-
-            foreach ($valuesArray as $value) {
-                if (empty($value)) {
-                    continue;
-                }
-
-                $preferences = NotificationPreference::forEntity(NotificationPreference::ENTITY_TYPE_OPPORTUNITY)
-                    ->forAttribute($attributeType, $value)
-                    ->with('user')
-                    ->get();
-
-                $matchingPreferences = $matchingPreferences->merge($preferences);
-            }
+        // For opportunities, we only care about the 'type' attribute
+        if (empty($opportunity->type)) {
+            return collect();
         }
 
-        // Remove duplicates based on user_id
-        return $matchingPreferences->unique('user_id');
+        return NotificationPreference::forEntity(NotificationPreference::ENTITY_TYPE_OPPORTUNITY)
+            ->forAttribute('type', $opportunity->type->value)
+            ->withEmailNotificationsEnabled()
+            ->with('user')
+            ->get()
+            ->unique('user_id');
     }
 
     /**
@@ -200,36 +182,46 @@ class NotificationService
     {
         $matchingPreferences = collect();
 
-        // Get request data - handle both JSON and normalized storage
-        $requestData = $request->request_data ?? [];
+        // Get subthemes from request (only attribute we care about for requests)
+        $subthemes = $this->getRequestSubthemes($request);
 
-        // Extract attributes to check against preferences
-        $attributesToCheck = $this->extractRequestAttributes($request, $requestData);
-
-        foreach ($attributesToCheck as $attributeType => $values) {
-            if (empty($values)) {
+        foreach ($subthemes as $subtheme) {
+            if (empty($subtheme)) {
                 continue;
             }
 
-            // Handle both single values and arrays
-            $valuesArray = is_array($values) ? $values : [$values];
+            $preferences = NotificationPreference::forEntity(NotificationPreference::ENTITY_TYPE_REQUEST)
+                ->forAttribute('subtheme', $subtheme)
+                ->withEmailNotificationsEnabled()
+                ->with('user')
+                ->get();
 
-            foreach ($valuesArray as $value) {
-                if (empty($value)) {
-                    continue;
-                }
-
-                $preferences = NotificationPreference::forEntity(NotificationPreference::ENTITY_TYPE_REQUEST)
-                    ->forAttribute($attributeType, $value)
-                    ->with('user')
-                    ->get();
-
-                $matchingPreferences = $matchingPreferences->merge($preferences);
-            }
+            $matchingPreferences = $matchingPreferences->merge($preferences);
         }
 
         // Remove duplicates based on user_id
         return $matchingPreferences->unique('user_id');
+    }
+
+    /**
+     * Get subthemes from request
+     */
+    private function getRequestSubthemes(OCDRequest $request): array
+    {
+        // Get request data - handle both JSON and normalized storage
+        $requestData = $request->request_data ?? [];
+
+        // From JSON data
+        if (isset($requestData['subthemes']) && is_array($requestData['subthemes'])) {
+            return $requestData['subthemes'];
+        }
+
+        // From normalized table
+        if ($request->requestDetail && !empty($request->requestDetail->subthemes)) {
+            return json_decode($request->requestDetail->subthemes, true) ?? [];
+        }
+
+        return [];
     }
 
     /**
