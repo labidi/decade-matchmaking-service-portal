@@ -103,6 +103,9 @@ class ListController extends BaseOpportunitiesController
         return $currentSearch;
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function __invoke(Request $httpRequest): Response
     {
         $context = $this->getRouteContext();

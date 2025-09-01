@@ -6,6 +6,7 @@ use App\Enums\Opportunity\Status;
 use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
 use App\Models\User;
+use App\Services\NotificationService;
 use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
 use Exception;
@@ -19,7 +20,8 @@ readonly class OpportunityService
 {
     public function __construct(
         private OpportunityRepository $repository,
-        private OpportunityAnalyticsService $analytics
+        private OpportunityAnalyticsService $analytics,
+        private NotificationService $notificationService
     ) {
     }
 
@@ -30,15 +32,40 @@ readonly class OpportunityService
     public function storeOpportunity(User $user, array $data, ?Opportunity $opportunity): Opportunity
     {
         return DB::transaction(function () use ($data, $user, $opportunity) {
+            $isNew = !$opportunity;
+            
             if ($opportunity) {
                 $this->repository->update($opportunity, $data);
-                return $opportunity->fresh();
+                $opportunity = $opportunity->fresh();
+            } else {
+                $data += [
+                    'status' => Status::PENDING_REVIEW,
+                    'user_id' => $user->id
+                ];
+                $opportunity = $this->repository->create($data);
             }
-            $data += [
-                'status' => Status::PENDING_REVIEW,
-                'user_id' => $user->id
-            ];
-            return $this->repository->create($data);
+
+            // Send notifications for new opportunities when they are created
+            if ($isNew) {
+                try {
+                    $this->notificationService->notifyUsersForNewOpportunity($opportunity);
+                    Log::info('Notifications sent for new opportunity', [
+                        'opportunity_id' => $opportunity->id,
+                        'user_id' => $user->id,
+                        'title' => $opportunity->title
+                    ]);
+                } catch (Exception $e) {
+                    Log::error('Failed to send notifications for new opportunity', [
+                        'opportunity_id' => $opportunity->id,
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    // Don't fail the transaction for notification errors
+                }
+            }
+
+            return $opportunity;
         });
     }
 
@@ -100,7 +127,7 @@ readonly class OpportunityService
      */
     public function updateOpportunityStatus(int $opportunityId, int $statusCode, User $user): array
     {
-        $opportunity = $this->findOpportunity($opportunityId, $user);
+        $opportunity = $this->findOpportunity($opportunityId);
         if (!$opportunity) {
             throw new Exception('Opportunity not found', 404);
         }
@@ -112,14 +139,43 @@ readonly class OpportunityService
         if ($opportunity->user_id !== $user->id) {
             throw new Exception('Unauthorized to update this opportunity', 403);
         }
-        $this->repository->update($opportunity, ['status' => $statusCode]);
-        return [
-            'opportunity' => $opportunity->fresh(),
-            'status' => [
-                'status_code' => (string)$statusCode,
-                'status_label' => Status::tryFrom($statusCode) ?? ''
-            ]
-        ];
+
+        $oldStatus = $opportunity->status;
+        
+        return DB::transaction(function () use ($opportunity, $statusCode, $oldStatus, $user) {
+            $this->repository->update($opportunity, ['status' => $statusCode]);
+            $opportunity = $opportunity->fresh();
+            
+            // Send notifications when opportunity is published/activated
+            if ($oldStatus !== Status::ACTIVE && $statusCode === Status::ACTIVE->value) {
+                try {
+                    $this->notificationService->notifyUsersForNewOpportunity($opportunity);
+                    Log::info('Notifications sent for published opportunity', [
+                        'opportunity_id' => $opportunity->id,
+                        'user_id' => $user->id,
+                        'old_status' => $oldStatus,
+                        'new_status' => $statusCode,
+                        'title' => $opportunity->title
+                    ]);
+                } catch (Exception $e) {
+                    Log::error('Failed to send notifications for published opportunity', [
+                        'opportunity_id' => $opportunity->id,
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    // Don't fail the transaction for notification errors
+                }
+            }
+
+            return [
+                'opportunity' => $opportunity,
+                'status' => [
+                    'status_code' => (string)$statusCode,
+                    'status_label' => Status::tryFrom($statusCode) ?? ''
+                ]
+            ];
+        });
     }
 
     /**
@@ -127,7 +183,7 @@ readonly class OpportunityService
      */
     public function deleteOpportunity(int $opportunityId, User $user): bool
     {
-        $opportunity = $this->findOpportunity($opportunityId, $user);
+        $opportunity = $this->findOpportunity($opportunityId);
 
         if (!$opportunity) {
             throw new Exception('Opportunity not found', 404);

@@ -3,7 +3,6 @@ import {Head} from '@inertiajs/react';
 import {OpportunitiesPagination} from '@/types';
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {OpportunitiesDataTable} from "@/components/ui/data-table/opportunities/opportunities-data-table";
-import {OpportunityStatusDialog} from '@/components/features/opportunity';
 import {adminColumns} from "@/components/ui/data-table/opportunities/column-configs";
 import {Heading} from "@/components/ui/heading";
 import {useOpportunityActions} from '@/hooks/useOpportunityActions';
@@ -24,9 +23,6 @@ export default function OpportunityListPage({
                                                 currentSearch,
                                             }: Readonly<OpportunitiesListPageProps>) {
     const {
-        isStatusDialogOpen,
-        selectedOpportunity,
-        closeStatusDialog,
         getActionsForOpportunity,
     } = useOpportunityActions();
 
@@ -76,12 +72,6 @@ export default function OpportunityListPage({
                 />
             </div>
 
-            {/* Single Status Update Dialog for the entire page */}
-            <OpportunityStatusDialog
-                isOpen={isStatusDialogOpen}
-                onClose={closeStatusDialog}
-                opportunity={selectedOpportunity}
-            />
         </SidebarLayout>
     );
 }

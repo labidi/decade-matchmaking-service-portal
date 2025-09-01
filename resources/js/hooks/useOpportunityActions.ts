@@ -6,7 +6,6 @@ import {
     OpportunityActionContext,
     UseOpportunityActionsReturn
 } from '@/types/opportunity-actions';
-import {buildOpportunityActions} from '@/utils/opportunity-action-builder';
 
 export function useOpportunityActions(): UseOpportunityActionsReturn {
     const {auth} = usePage<{ auth: Auth }>().props;
