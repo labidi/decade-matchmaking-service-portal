@@ -32,7 +32,7 @@ export default function AddPreferenceForm({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('notification-preferences.store'), {
+        post(route('notification.preferences.store'), {
             onSuccess: () => {
                 reset();
                 onClose();

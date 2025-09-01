@@ -62,3 +62,4 @@ require __DIR__ . '/auth.php';
 require __DIR__ . '/request.php';
 require __DIR__ . '/opportunity.php';
 require __DIR__ . '/offer.php';
+require __DIR__ . '/notification-preferences.php';

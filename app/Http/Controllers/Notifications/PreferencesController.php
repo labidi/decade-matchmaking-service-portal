@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Notifications;
 
 use App\Enums\Request\SubTheme;
+use App\Http\Controllers\Controller;
 use App\Models\UserNotificationPreference;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class NotificationPreferencesController extends Controller
+class PreferencesController extends Controller
 {
     public function __construct(
         private readonly NotificationService $notificationService

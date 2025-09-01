@@ -108,7 +108,7 @@ export default function NavigationMenu() {
                     </Link>
                     )}
                     <Link
-                        href={route('opportunity.me.list')}
+                        href={route('notification.preferences.index')}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         role="menuitem"
                     >
