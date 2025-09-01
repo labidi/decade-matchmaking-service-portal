@@ -2,7 +2,7 @@
 
 namespace App\Services\NotificationPreference;
 
-use App\Models\UserNotificationPreference;
+use App\Models\NotificationPreference;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -13,7 +13,7 @@ class NotificationPreferenceQueryBuilder
      */
     public function buildBaseQuery(): Builder
     {
-        return UserNotificationPreference::with(['user']);
+        return NotificationPreference::with(['user']);
     }
 
     /**

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Notifications;
 use App\Enums\Request\SubTheme;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\NotificationPreferenceResource;
-use App\Models\UserNotificationPreference;
+use App\Models\NotificationPreference;
 use App\Services\NotificationService;
 use App\Services\NotificationPreference\NotificationPreferenceService;
 use Illuminate\Http\Request;
@@ -23,13 +23,14 @@ class ListController extends Controller
 
     /**
      * Display user's notification preferences with pagination support
+     * @throws \Throwable
      */
     public function list(Request $request)
     {
         $request->validate([
             'page' => 'integer|min:1',
             'per_page' => 'integer|min:1|max:100',
-            'entity_type' => ['nullable', Rule::in(array_keys(UserNotificationPreference::ENTITY_TYPES))],
+            'entity_type' => ['nullable', Rule::in(array_keys(NotificationPreference::ENTITY_TYPES))],
             'search' => 'nullable|string|max:255',
             'sort_by' => 'nullable|string|in:attribute_type,attribute_value,entity_type,updated_at',
             'sort_direction' => 'nullable|string|in:asc,desc',
@@ -37,29 +38,13 @@ class ListController extends Controller
 
         $user = Auth::user();
 
-        // Prepare filters
-        $searchFilters = array_filter([
-            'search' => $request->get('search'),
-        ]);
-
-        $sortFilters = array_filter([
-            'sort_by' => $request->get('sort_by', 'updated_at'),
-            'sort_direction' => $request->get('sort_direction', 'desc'),
-            'per_page' => $request->get('per_page', 15),
-        ]);
 
         // Get paginated preferences
         $preferences = $this->preferenceService->getUserPreferencesPaginated(
             $user,
-            $request->get('entity_type'),
-            $searchFilters,
-            $sortFilters
+            $request->get('entity_type')
         );
 
-        // Transform to resource collection
-        $preferences->getCollection()->transform(function ($preference) {
-            return new NotificationPreferenceResource($preference);
-        });
 
         // Get available options for each entity type
         $availableOptions = $this->getAvailableOptions();
@@ -67,18 +52,8 @@ class ListController extends Controller
         return Inertia::render('NotificationPreferences/List', [
             'preferences' => $preferences,
             'availableOptions' => $availableOptions,
-            'entityTypes' => UserNotificationPreference::ENTITY_TYPES,
-            'attributeTypes' => UserNotificationPreference::ATTRIBUTE_TYPES, // Backward compatibility
-            'currentFilters' => [
-                'entity_type' => $request->get('entity_type'),
-                'search' => $request->get('search'),
-                'sort_by' => $request->get('sort_by', 'updated_at'),
-                'sort_direction' => $request->get('sort_direction', 'desc'),
-            ],
-            'currentSort' => [
-                'field' => $request->get('sort_by', 'updated_at'),
-                'order' => $request->get('sort_direction', 'desc'),
-            ],
+            'entityTypes' => NotificationPreference::ENTITY_TYPES,
+            'attributeTypes' => NotificationPreference::ATTRIBUTE_TYPES, // Backward compatibility
             'title' => 'Notification Preferences',
             'banner' => [
                 'title' => 'Notification Preferences',
@@ -94,13 +69,13 @@ class ListController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'entity_type' => ['required', Rule::in(array_keys(UserNotificationPreference::ENTITY_TYPES))],
+            'entity_type' => ['required', Rule::in(array_keys(NotificationPreference::ENTITY_TYPES))],
             'attribute_type' => [
                 'required',
                 'string',
                 function ($attribute, $value, $fail) use ($request) {
                     $entityType = $request->get('entity_type');
-                    if (!UserNotificationPreference::isValidAttributeTypeForEntity($value, $entityType)) {
+                    if (!NotificationPreference::isValidAttributeTypeForEntity($value, $entityType)) {
                         $fail("The {$attribute} is not valid for the selected entity type.");
                     }
                 }
@@ -126,7 +101,7 @@ class ListController extends Controller
     /**
      * Update existing preference
      */
-    public function update(Request $request, UserNotificationPreference $preference)
+    public function update(Request $request, NotificationPreference $preference)
     {
         // Ensure user can only update their own preferences
         if ($preference->user_id !== Auth::id()) {
@@ -151,7 +126,7 @@ class ListController extends Controller
     public function destroy(Request $request)
     {
         $request->validate([
-            'entity_type' => ['required', Rule::in(array_keys(UserNotificationPreference::ENTITY_TYPES))],
+            'entity_type' => ['required', Rule::in(array_keys(NotificationPreference::ENTITY_TYPES))],
             'attribute_type' => 'required|string',
             'attribute_value' => 'required|string',
         ]);
@@ -180,21 +155,11 @@ class ListController extends Controller
     private function getAvailableOptions(): array
     {
         return [
-            UserNotificationPreference::ENTITY_TYPE_REQUEST => [
-                'subtheme' => $this->getSubthemeOptions(),
-                'coverage_activity' => $this->getCoverageActivityOptions(),
-                'implementation_location' => $this->getImplementationLocationOptions(),
-                'target_audience' => $this->getTargetAudienceOptions(),
-                'support_type' => $this->getSupportTypeOptions(),
-                'priority_level' => $this->getPriorityLevelOptions(),
-                'funding_amount_range' => $this->getFundingAmountRangeOptions(),
+            NotificationPreference::ENTITY_TYPE_REQUEST => [
+                'subtheme' => SubTheme::getOptions(),
             ],
-            UserNotificationPreference::ENTITY_TYPE_OPPORTUNITY => [
+            NotificationPreference::ENTITY_TYPE_OPPORTUNITY => [
                 'type' => $this->getOpportunityTypeOptions(),
-                'coverage_activity' => $this->getCoverageActivityOptions(),
-                'implementation_location' => $this->getImplementationLocationOptions(),
-                'target_audience' => $this->getTargetAudienceOptions(),
-                'key_words' => $this->getKeyWordsOptions(),
             ],
         ];
     }
@@ -341,7 +306,7 @@ class ListController extends Controller
     public function availableOptions(Request $request)
     {
         $request->validate([
-            'entity_type' => ['required', Rule::in(array_keys(UserNotificationPreference::ENTITY_TYPES))],
+            'entity_type' => ['required', Rule::in(array_keys(NotificationPreference::ENTITY_TYPES))],
         ]);
 
         $entityType = $request->get('entity_type');
@@ -349,7 +314,7 @@ class ListController extends Controller
 
         return response()->json([
             'entity_type' => $entityType,
-            'attribute_types' => UserNotificationPreference::getAttributeTypesForEntity($entityType),
+            'attribute_types' => NotificationPreference::getAttributeTypesForEntity($entityType),
             'options' => $availableOptions[$entityType] ?? [],
         ]);
     }

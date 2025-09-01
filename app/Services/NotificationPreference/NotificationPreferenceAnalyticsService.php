@@ -3,7 +3,7 @@
 namespace App\Services\NotificationPreference;
 
 use App\Models\User;
-use App\Models\UserNotificationPreference;
+use App\Models\NotificationPreference;
 
 class NotificationPreferenceAnalyticsService
 {
@@ -12,20 +12,20 @@ class NotificationPreferenceAnalyticsService
      */
     public function getUserPreferenceStats(User $user): array
     {
-        $totalPreferences = UserNotificationPreference::where('user_id', $user->id)->count();
-        $activeEmails = UserNotificationPreference::where('user_id', $user->id)
+        $totalPreferences = NotificationPreference::where('user_id', $user->id)->count();
+        $activeEmails = NotificationPreference::where('user_id', $user->id)
             ->where('email_notification_enabled', true)
             ->count();
 
         // Entity type breakdown
-        $entityStats = UserNotificationPreference::where('user_id', $user->id)
+        $entityStats = NotificationPreference::where('user_id', $user->id)
             ->selectRaw('entity_type, COUNT(*) as count')
             ->groupBy('entity_type')
             ->pluck('count', 'entity_type')
             ->toArray();
 
         // Attribute type breakdown
-        $attributeStats = UserNotificationPreference::where('user_id', $user->id)
+        $attributeStats = NotificationPreference::where('user_id', $user->id)
             ->selectRaw('attribute_type, COUNT(*) as count, entity_type')
             ->groupBy('entity_type', 'attribute_type')
             ->get()
@@ -49,12 +49,12 @@ class NotificationPreferenceAnalyticsService
      */
     public function getGlobalPreferenceStats(): array
     {
-        $totalUsers = UserNotificationPreference::distinct('user_id')->count();
-        $totalPreferences = UserNotificationPreference::count();
-        $activeEmailPreferences = UserNotificationPreference::where('email_notification_enabled', true)->count();
+        $totalUsers = NotificationPreference::distinct('user_id')->count();
+        $totalPreferences = NotificationPreference::count();
+        $activeEmailPreferences = NotificationPreference::where('email_notification_enabled', true)->count();
 
         // Most popular attributes by entity
-        $popularAttributes = UserNotificationPreference::selectRaw('entity_type, attribute_type, attribute_value, COUNT(*) as count')
+        $popularAttributes = NotificationPreference::selectRaw('entity_type, attribute_type, attribute_value, COUNT(*) as count')
             ->groupBy('entity_type', 'attribute_type', 'attribute_value')
             ->orderByDesc('count')
             ->limit(20)
@@ -62,7 +62,7 @@ class NotificationPreferenceAnalyticsService
             ->groupBy('entity_type');
 
         // Entity distribution
-        $entityDistribution = UserNotificationPreference::selectRaw('entity_type, COUNT(*) as count')
+        $entityDistribution = NotificationPreference::selectRaw('entity_type, COUNT(*) as count')
             ->groupBy('entity_type')
             ->pluck('count', 'entity_type')
             ->toArray();

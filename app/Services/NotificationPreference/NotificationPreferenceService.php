@@ -2,8 +2,9 @@
 
 namespace App\Services\NotificationPreference;
 
+use App\Http\Resources\NotificationPreferenceResource;
 use App\Models\User;
-use App\Models\UserNotificationPreference;
+use App\Models\NotificationPreference;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
@@ -17,6 +18,7 @@ class NotificationPreferenceService
 
     /**
      * Get paginated preferences for a user
+     * @throws \Throwable
      */
     public function getUserPreferencesPaginated(
         User $user,
@@ -24,7 +26,9 @@ class NotificationPreferenceService
         array $searchFilters = [],
         array $sortFilters = []
     ): LengthAwarePaginator {
-        return $this->repository->getUserPreferencesPaginated($user, $entityType, $searchFilters, $sortFilters);
+        $preferences = $this->repository->getUserPreferencesPaginated($user, $entityType, $searchFilters, $sortFilters);
+        $preferences->toResourceCollection(NotificationPreferenceResource::class);
+        return $preferences;
     }
 
     /**
@@ -56,7 +60,7 @@ class NotificationPreferenceService
         string $attributeType,
         string $attributeValue,
         bool $emailEnabled
-    ): UserNotificationPreference {
+    ): NotificationPreference {
         return $this->repository->updateOrCreate([
             'user_id' => $user->id,
             'entity_type' => $entityType,
@@ -87,13 +91,15 @@ class NotificationPreferenceService
         $updated = collect();
 
         foreach ($preferences as $preference) {
-            $updated->push($this->updateUserPreference(
-                $user,
-                $preference['entity_type'],
-                $preference['attribute_type'],
-                $preference['attribute_value'],
-                $preference['email_notification_enabled'] ?? false
-            ));
+            $updated->push(
+                $this->updateUserPreference(
+                    $user,
+                    $preference['entity_type'],
+                    $preference['attribute_type'],
+                    $preference['attribute_value'],
+                    $preference['email_notification_enabled'] ?? false
+                )
+            );
         }
 
         return $updated;
@@ -112,6 +118,6 @@ class NotificationPreferenceService
      */
     public function getAvailableOptionsForEntity(string $entityType): array
     {
-        return UserNotificationPreference::getAttributeTypesForEntity($entityType);
+        return NotificationPreference::getAttributeTypesForEntity($entityType);
     }
 }

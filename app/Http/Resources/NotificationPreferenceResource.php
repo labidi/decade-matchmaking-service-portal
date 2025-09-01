@@ -2,12 +2,13 @@
 
 namespace App\Http\Resources;
 
-use App\Models\UserNotificationPreference;
+use App\Models\NotificationPreference;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class NotificationPreferenceResource extends JsonResource
 {
+    public static $wrap = null;
     /**
      * Transform the resource into an array.
      *
@@ -61,21 +62,4 @@ class NotificationPreferenceResource extends JsonResource
         return $user->id === $this->user_id || $user->is_admin;
     }
 
-    /**
-     * Additional data when collection
-     */
-    public static function collection($resource)
-    {
-        return tap(parent::collection($resource), function ($collection) {
-            $collection->with([
-                'meta' => [
-                    'entity_types' => UserNotificationPreference::ENTITY_TYPES,
-                    'attribute_types' => [
-                        'request' => UserNotificationPreference::REQUEST_ATTRIBUTE_TYPES,
-                        'opportunity' => UserNotificationPreference::OPPORTUNITY_ATTRIBUTE_TYPES,
-                    ],
-                ],
-            ]);
-        });
-    }
 }

@@ -63,7 +63,7 @@ export default function List({
                 {/* Data Table */}
                 <div className="space-y-6">
                     <NotificationPreferencesDataTable
-                        preferences={preferences}
+                        preferences={preferences.data}
                         columns={columns}
                         routeName="notification-preferences.index"
                         onToggle={handleToggleNotification}

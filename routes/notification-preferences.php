@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Notifications\ListController;
 use Illuminate\Support\Facades\Route;
+use Diglactic\Breadcrumbs\Breadcrumbs;
+use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('notification-preferences', [ListController::class, 'list'])
@@ -20,6 +22,13 @@ Route::middleware(['auth', 'role:user'])->group(function () {
         ->name('notification.preferences.available-options');
 });
 
+
+
+
+Breadcrumbs::for('notification.preferences.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('Notifications preferences', route('notification.preferences.index'));
+});
 
 
 

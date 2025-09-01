@@ -6,7 +6,7 @@ use App\Models\Notification;
 use App\Models\Opportunity;
 use App\Models\Request as OCDRequest;
 use App\Models\User;
-use App\Models\UserNotificationPreference;
+use App\Models\NotificationPreference;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -101,7 +101,7 @@ class NotificationService
                     continue;
                 }
 
-                $preferences = UserNotificationPreference::forEntity(UserNotificationPreference::ENTITY_TYPE_OPPORTUNITY)
+                $preferences = NotificationPreference::forEntity(NotificationPreference::ENTITY_TYPE_OPPORTUNITY)
                     ->forAttribute($attributeType, $value)
                     ->with('user')
                     ->get();
@@ -160,7 +160,7 @@ class NotificationService
     /**
      * Create notification for a user based on matching opportunity preference
      */
-    private function createNotificationForOpportunity(Opportunity $opportunity, UserNotificationPreference $preference): ?Notification
+    private function createNotificationForOpportunity(Opportunity $opportunity, NotificationPreference $preference): ?Notification
     {
         $title = $this->generateOpportunityNotificationTitle($preference);
         $description = $this->generateOpportunityNotificationDescription($opportunity, $preference);
@@ -176,7 +176,7 @@ class NotificationService
     /**
      * Generate notification title for opportunity based on preference
      */
-    private function generateOpportunityNotificationTitle(UserNotificationPreference $preference): string
+    private function generateOpportunityNotificationTitle(NotificationPreference $preference): string
     {
         $attributeDisplayName = $preference->getAttributeTypeDisplayName();
         return "New Opportunity Matching Your {$attributeDisplayName} Interest";
@@ -185,7 +185,7 @@ class NotificationService
     /**
      * Generate notification description for opportunity
      */
-    private function generateOpportunityNotificationDescription(Opportunity $opportunity, UserNotificationPreference $preference): string
+    private function generateOpportunityNotificationDescription(Opportunity $opportunity, NotificationPreference $preference): string
     {
         $opportunityTitle = $opportunity->title ?? 'New Opportunity';
         $attributeDisplayName = $preference->getAttributeTypeDisplayName();
@@ -219,7 +219,7 @@ class NotificationService
                     continue;
                 }
 
-                $preferences = UserNotificationPreference::forEntity(UserNotificationPreference::ENTITY_TYPE_REQUEST)
+                $preferences = NotificationPreference::forEntity(NotificationPreference::ENTITY_TYPE_REQUEST)
                     ->forAttribute($attributeType, $value)
                     ->with('user')
                     ->get();
@@ -319,7 +319,7 @@ class NotificationService
     /**
      * Create notification for a user based on matching preference
      */
-    private function createNotificationForRequest(OCDRequest $request, UserNotificationPreference $preference): ?Notification
+    private function createNotificationForRequest(OCDRequest $request, NotificationPreference $preference): ?Notification
     {
         $title = $this->generateNotificationTitle($preference);
         $description = $this->generateNotificationDescription($request, $preference);
@@ -335,7 +335,7 @@ class NotificationService
     /**
      * Generate notification title based on preference
      */
-    private function generateNotificationTitle(UserNotificationPreference $preference): string
+    private function generateNotificationTitle(NotificationPreference $preference): string
     {
         $attributeDisplayName = $preference->getAttributeTypeDisplayName();
         return "New Request Matching Your {$attributeDisplayName} Interest";
@@ -344,7 +344,7 @@ class NotificationService
     /**
      * Generate notification description
      */
-    private function generateNotificationDescription(OCDRequest $request, UserNotificationPreference $preference): string
+    private function generateNotificationDescription(OCDRequest $request, NotificationPreference $preference): string
     {
         $requestTitle = $request->detail?->title ?? 'New Request';
         $attributeDisplayName = $preference->getAttributeTypeDisplayName();
@@ -357,7 +357,7 @@ class NotificationService
      */
     public function getUserPreferences(User $user, ?string $entityType = null): array
     {
-        $query = UserNotificationPreference::where('user_id', $user->id);
+        $query = NotificationPreference::where('user_id', $user->id);
 
         if ($entityType !== null) {
             $query->forEntity($entityType);
@@ -386,9 +386,9 @@ class NotificationService
         string $attributeType,
         string $attributeValue,
         bool $emailNotificationEnabled = false,
-        string $entityType = UserNotificationPreference::ENTITY_TYPE_REQUEST
-    ): UserNotificationPreference {
-        return UserNotificationPreference::updateOrCreate(
+        string $entityType = NotificationPreference::ENTITY_TYPE_REQUEST
+    ): NotificationPreference {
+        return NotificationPreference::updateOrCreate(
             [
                 'user_id' => $user->id,
                 'entity_type' => $entityType,
@@ -408,9 +408,9 @@ class NotificationService
         User $user,
         string $attributeType,
         string $attributeValue,
-        string $entityType = UserNotificationPreference::ENTITY_TYPE_REQUEST
+        string $entityType = NotificationPreference::ENTITY_TYPE_REQUEST
     ): bool {
-        return UserNotificationPreference::where('user_id', $user->id)
+        return NotificationPreference::where('user_id', $user->id)
             ->where('entity_type', $entityType)
             ->where('attribute_type', $attributeType)
             ->where('attribute_value', $attributeValue)

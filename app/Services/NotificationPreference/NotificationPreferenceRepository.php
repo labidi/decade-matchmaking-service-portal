@@ -3,7 +3,7 @@
 namespace App\Services\NotificationPreference;
 
 use App\Models\User;
-use App\Models\UserNotificationPreference;
+use App\Models\NotificationPreference;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class NotificationPreferenceRepository
@@ -16,23 +16,23 @@ class NotificationPreferenceRepository
     /**
      * Create a new preference
      */
-    public function create(array $data): UserNotificationPreference
+    public function create(array $data): NotificationPreference
     {
-        return UserNotificationPreference::create($data);
+        return NotificationPreference::create($data);
     }
 
     /**
      * Find preference by ID
      */
-    public function findById(int $id): ?UserNotificationPreference
+    public function findById(int $id): ?NotificationPreference
     {
-        return UserNotificationPreference::find($id);
+        return NotificationPreference::find($id);
     }
 
     /**
      * Update preference
      */
-    public function update(UserNotificationPreference $preference, array $data): bool
+    public function update(NotificationPreference $preference, array $data): bool
     {
         return $preference->update($data);
     }
@@ -40,7 +40,7 @@ class NotificationPreferenceRepository
     /**
      * Delete preference
      */
-    public function delete(UserNotificationPreference $preference): bool
+    public function delete(NotificationPreference $preference): bool
     {
         return $preference->delete();
     }
@@ -48,9 +48,9 @@ class NotificationPreferenceRepository
     /**
      * Update or create preference
      */
-    public function updateOrCreate(array $attributes, array $values): UserNotificationPreference
+    public function updateOrCreate(array $attributes, array $values): NotificationPreference
     {
-        return UserNotificationPreference::updateOrCreate($attributes, $values);
+        return NotificationPreference::updateOrCreate($attributes, $values);
     }
 
     /**
@@ -62,7 +62,7 @@ class NotificationPreferenceRepository
         string $attributeType,
         string $attributeValue
     ): bool {
-        return UserNotificationPreference::where('user_id', $user->id)
+        return NotificationPreference::where('user_id', $user->id)
             ->where('entity_type', $entityType)
             ->where('attribute_type', $attributeType)
             ->where('attribute_value', $attributeValue)
@@ -92,11 +92,11 @@ class NotificationPreferenceRepository
         array $sortFilters = []
     ): LengthAwarePaginator {
         $query = $this->queryBuilder->buildUserPreferencesQuery($user->id);
-        
+
         if ($entityType !== null) {
             $query->where('entity_type', $entityType);
         }
-        
+
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
         return $this->queryBuilder->applyPagination($query, $sortFilters);
