@@ -34,6 +34,7 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 // Admin routes
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('opportunity/list', ListController::class)->name('admin.opportunity.list');
+    Route::get('opportunity/{id}/show', ShowController::class)->name('admin.opportunity.show');
 });
 
 

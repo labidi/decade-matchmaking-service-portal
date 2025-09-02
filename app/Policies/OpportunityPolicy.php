@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -53,12 +54,23 @@ class OpportunityPolicy
      */
     public function approve(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('administrator');
+        return $user->hasRole('administrator') && $opportunity->status !== Status::ACTIVE ;
     }
 
     public function extend(User $user, Opportunity $opportunity): bool
     {
         return $user->hasRole('partner') && $opportunity->user->id === $user->id;
+    }
+
+
+    public function reject(User $user): bool
+    {
+        return $user->hasRole('administrator');
+    }
+
+    public function apply(User $user, Opportunity $opportunity): bool
+    {
+        return $user->id !== $opportunity->user->id;
     }
 
 }

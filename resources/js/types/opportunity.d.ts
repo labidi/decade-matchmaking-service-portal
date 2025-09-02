@@ -2,20 +2,21 @@ import {PaginationLinkProps, User} from "@/types/index";
 
 export interface OpportunityPermissions {
     can_view?: boolean;
-    can_delete?: boolean;
     can_edit?: boolean;
+    can_delete?: boolean;
     can_approve?: boolean;
     can_reject?: boolean;
+    can_apply?: boolean;
 }
 
 export interface Opportunity {
     id: string;
     title: string;
     type: { value: string; label: string };
-    status:  { value: string; label: string };
+    status: { value: string; label: string };
     closing_date: string;
     coverage_activity: { value: string; label: string };
-    implementation_location:  Array<{ value: string; label: string }>;
+    implementation_location: Array<{ value: string; label: string }>;
     target_audience: Array<{ value: string; label: string }>;
     target_audience_other: string;
     target_languages: Array<{ value: string; label: string }>;
