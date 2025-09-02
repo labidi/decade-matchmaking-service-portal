@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Head} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {Opportunity, PageProps} from '@/types';
@@ -7,6 +7,8 @@ import {Badge} from '@/components/ui/badge';
 import {Text,} from '@/components/ui/text';
 import {Divider} from '@/components/ui/divider';
 import {UsersIcon} from '@heroicons/react/16/solid';
+import { Button } from '@/components/ui/button';
+import ExtendOpportunityDialog from '@/components/dialogs/ExtendOpportunityDialog';
 
 
 interface ShowPageProps extends PageProps {
@@ -26,6 +28,8 @@ function formatDate(dateString: string): string {
 }
 
 export default function Show({opportunity}: Readonly<ShowPageProps>) {
+    const [isExtendDialogOpen, setIsExtendDialogOpen] = useState(false);
+
     return (
         <FrontendLayout>
             <Head title={`Opportunity: ${opportunity.title}`}/>
@@ -48,9 +52,22 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                             <dt className="text-sm/6 font-medium text-gray-900">Status</dt>
                             <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.status.label}</dd>
                         </div>
-                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0 bg-red-50">
                             <dt className="text-sm/6 font-medium text-gray-900">Closing Date</dt>
-                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.closing_date}</dd>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2 flex items-center justify-between">
+                                <span>
+                                    {formatDate(opportunity.closing_date)}
+                                    {opportunity.permissions?.can_extend && (
+                                        <Button
+                                            color="red"
+                                            onClick={() => setIsExtendDialogOpen(true)}
+                                            className="ml-3"
+                                        >
+                                            Extend
+                                        </Button>
+                                    )}
+                                </span>
+                            </dd>
                         </div>
                         <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900">Status</dt>
@@ -122,6 +139,13 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                     </dl>
                 </div>
             </div>
+
+            {/* Extend Dialog */}
+            <ExtendOpportunityDialog
+                isOpen={isExtendDialogOpen}
+                onClose={() => setIsExtendDialogOpen(false)}
+                opportunity={opportunity}
+            />
         </FrontendLayout>
     );
 }

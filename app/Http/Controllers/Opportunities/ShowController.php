@@ -39,18 +39,6 @@ class ShowController extends BaseOpportunitiesController
             )
         ];
 
-        if ($opportunity->closing_date->isNowOrPast() && $request->user()->can(
-                'extend',
-                [Opportunity::class, $opportunity]
-            )) {
-            $actions[] = $this->createDangerAction(
-                'Extend Closing Date',
-                route('opportunity.extend', $opportunity->id),
-                'CalendarIcon',
-                'POST'
-            );
-        }
-
         return Inertia::render('Opportunity/Show', [
             'banner' => $this->buildBanner(
                 'List of Opportunities',

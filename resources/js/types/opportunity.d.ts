@@ -7,6 +7,7 @@ export interface OpportunityPermissions {
     can_approve?: boolean;
     can_reject?: boolean;
     can_apply?: boolean;
+    can_extend?: boolean;
 }
 
 export interface Opportunity {
