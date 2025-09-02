@@ -2,18 +2,18 @@ import {useCallback} from 'react';
 import {router, usePage} from '@inertiajs/react';
 import {Opportunity, Auth} from '@/types';
 import {Action} from '@/components/ui/data-table/common/dropdown-actions';
+import {OpportunityActionService} from "@/services/opportunityActionService";
 import {
     OpportunityActionContext,
     UseOpportunityActionsReturn
 } from '@/types/opportunity-actions';
 
-export function useOpportunityActions(): UseOpportunityActionsReturn {
+export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOpportunityActionsReturn {
     const {auth} = usePage<{ auth: Auth }>().props;
-
 
     // Action handlers
     const handleViewDetails = useCallback((opportunity: Opportunity) => {
-        router.visit(route('opportunity.show', {id: opportunity.id}));
+        OpportunityActionService.view(opportunity, context);
     }, []);
 
     const handleEdit = useCallback((opportunity: Opportunity) => {
@@ -73,6 +73,22 @@ export function useOpportunityActions(): UseOpportunityActionsReturn {
                 label: 'Delete Opportunity',
                 onClick: () => handleDelete(opportunity),
                 divider: actions.length > 0,
+            });
+        }
+
+        if(opportunity.permissions?.can_reject){
+            actions.push({
+                key: 'reject',
+                label: 'Reject Opportunity',
+                onClick: () => handleDelete(opportunity),
+                divider: actions.length > 0,
+            });
+        }
+        if(opportunity.permissions?.can_approve){
+            actions.push({
+                key: 'approve',
+                label: 'Approve Opportunity',
+                onClick: () => handleDelete(opportunity),
             });
         }
         return actions;

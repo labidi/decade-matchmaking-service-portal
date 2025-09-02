@@ -20,10 +20,7 @@ export class OpportunityActionService {
             console.warn('Invalid opportunity: missing ID');
             return;
         }
-
-        // For now, both admin and user use the same route since the routes file shows
-        // only 'opportunity.show' is available. Admin context may be used in future.
-        const routeName = 'opportunity.show';
+        const routeName = context === 'admin' ? 'admin.opportunity.show' : 'opportunity.show';
         router.visit(route(routeName, { id: opportunity.id }));
     }
 

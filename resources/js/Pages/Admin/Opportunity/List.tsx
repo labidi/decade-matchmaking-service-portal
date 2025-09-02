@@ -24,7 +24,7 @@ export default function OpportunityListPage({
                                             }: Readonly<OpportunitiesListPageProps>) {
     const {
         getActionsForOpportunity,
-    } = useOpportunityActions();
+    } = useOpportunityActions('admin');
 
     return (
         <SidebarLayout>
