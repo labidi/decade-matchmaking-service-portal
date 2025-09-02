@@ -228,9 +228,10 @@ readonly class OpportunityService
         return $this->repository->search($filters);
     }
 
-    public function extendOpportunityClosingDate(Opportunity $opportunity): Opportunity
+    public function extendOpportunityClosingDate(Opportunity $opportunity, ?\Carbon\Carbon $newClosingDate = null): Opportunity
     {
-        $this->repository->update($opportunity, ['closing_date' => $opportunity->closing_date->addWeeks(2)]);
+        $closingDate = $newClosingDate ?? $opportunity->closing_date->addWeeks(2);
+        $this->repository->update($opportunity, ['closing_date' => $closingDate]);
         return $opportunity->fresh();
     }
 }

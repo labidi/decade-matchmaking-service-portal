@@ -65,6 +65,7 @@ class OpportunityResource extends JsonResource
             'can_approve' => $request->user()->can('approve', [Opportunity::class, $this->resource]),
             'can_reject' => $request->user()->can('reject', [Opportunity::class, $this->resource]),
             'can_apply' => $request->user()->can('apply', [Opportunity::class, $this->resource]),
+            'can_extend' => $request->user()->can('extend', [Opportunity::class, $this->resource]),
         ];
 
         return $baseData;

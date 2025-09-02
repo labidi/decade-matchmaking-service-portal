@@ -20,7 +20,9 @@ class ExtendController extends Controller
             return back()->with('error', 'You do not have permission to extend this opportunity.');
         }
 
-        $opportunity = $this->opportunityService->extendOpportunityClosingDate($opportunity);
+        $closingDate = $request->has('closing_date') ? \Carbon\Carbon::parse($request->input('closing_date')) : null;
+        $opportunity = $this->opportunityService->extendOpportunityClosingDate($opportunity, $closingDate);
+        
         return back()->with('success', 'Opportunity closing date extended successfully until ' . $opportunity->closing_date->toFormattedDateString() . '.');
     }
 }
