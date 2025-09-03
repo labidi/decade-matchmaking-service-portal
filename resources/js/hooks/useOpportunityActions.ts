@@ -42,6 +42,24 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
         });
     }, []);
 
+    const handleReject = useCallback((opportunity: Opportunity) => {
+        if (!confirm('Are you sure you want to reject this opportunity?')) {
+            return;
+        }
+
+        // setIsLoading(true);
+        router.delete(route('partner.opportunity.destroy', {id: opportunity.id}), {
+            onSuccess: () => {
+                // setIsLoading(false);
+            },
+            onError: (errors) => {
+                console.error('Failed to delete opportunity:', errors);
+                alert('Failed to delete opportunity. Please try again.');
+                // setIsLoading(false);
+            }
+        });
+    }, []);
+
     // Build actions for a specific opportunity
     const getActionsForOpportunity = useCallback((
         opportunity: Opportunity,
@@ -80,7 +98,7 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
             actions.push({
                 key: 'reject',
                 label: 'Reject Opportunity',
-                onClick: () => handleDelete(opportunity),
+                onClick: () => handleReject(opportunity),
                 divider: actions.length > 0,
             });
         }
