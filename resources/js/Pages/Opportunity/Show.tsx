@@ -52,7 +52,7 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                             <dt className="text-sm/6 font-medium text-gray-900">Status</dt>
                             <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.status.label}</dd>
                         </div>
-                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0 bg-red-50">
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0 ">
                             <dt className="text-sm/6 font-medium text-gray-900">Closing Date</dt>
                             <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2 flex items-center justify-between">
                                 <span>
