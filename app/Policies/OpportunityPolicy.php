@@ -54,12 +54,14 @@ class OpportunityPolicy
      */
     public function approve(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('administrator') && $opportunity->status !== Status::ACTIVE ;
+        return $user->hasRole('administrator') && $opportunity->status !== Status::ACTIVE;
     }
 
     public function extend(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('partner') && $opportunity->user->id === $user->id;
+        return $user->hasRole(
+                'partner'
+            ) && $opportunity->user->id === $user->id && $opportunity->closing_date->isNowOrPast();
     }
 
 
