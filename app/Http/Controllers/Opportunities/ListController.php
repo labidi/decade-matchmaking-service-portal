@@ -56,7 +56,6 @@ class ListController extends BaseOpportunitiesController
                             'Create New Opportunity',
                             route('opportunity.create'),
                             'PlusIcon',
-                            'create opportunity'
                         ),
                     ]),
             ],
