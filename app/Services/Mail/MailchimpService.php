@@ -23,28 +23,29 @@ class MailchimpService
 
     private function initializeClient(): void
     {
-        $configuration = Configuration::getDefaultConfiguration()->setApiKey('key', $this->apiKey);
-        $this->client = new ApiClient($configuration);
+        $apiClient =  new ApiClient() ;
+        var_dump($this->apiKey);
+        $this->client =$apiClient->setApiKey('key', $this->apiKey) ;
     }
 
     public function send(array $message): array
     {
         try {
             $response = $this->client->messages->send(['message' => $message]);
-            
+
             $this->logger->info('Mailchimp email sent successfully', [
                 'message_id' => $response[0]['_id'] ?? 'unknown',
                 'status' => $response[0]['status'] ?? 'unknown',
                 'to' => $message['to'][0]['email'] ?? 'unknown',
             ]);
-            
+
             return $response;
         } catch (Exception $e) {
             $this->logger->error('Failed to send email via Mailchimp', [
                 'error' => $e->getMessage(),
                 'to' => $message['to'][0]['email'] ?? 'unknown',
             ]);
-            
+
             throw $e;
         }
     }
@@ -78,7 +79,7 @@ class MailchimpService
         if (isset($symfonyMessage['from'])) {
             $fromEmail = array_keys($symfonyMessage['from'])[0] ?? null;
             $fromName = array_values($symfonyMessage['from'])[0] ?? null;
-            
+
             if ($fromEmail) {
                 $message['from_email'] = $fromEmail;
                 $message['from_name'] = $fromName;
@@ -114,6 +115,7 @@ class MailchimpService
     {
         try {
             $response = $this->client->users->ping();
+            var_dump($response->getMessage());
             return $response['PING'] === 'PONG!';
         } catch (Exception $e) {
             $this->logger->error('Mailchimp ping failed', ['error' => $e->getMessage()]);

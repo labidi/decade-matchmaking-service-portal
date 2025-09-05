@@ -33,7 +33,7 @@ readonly class OpportunityService
     {
         return DB::transaction(function () use ($data, $user, $opportunity) {
             $isNew = !$opportunity;
-            
+
             if ($opportunity) {
                 $this->repository->update($opportunity, $data);
                 $opportunity = $opportunity->fresh();
@@ -135,17 +135,13 @@ readonly class OpportunityService
         if (!in_array($statusCode, array_column(Status::cases(), 'value'))) {
             throw new Exception('Invalid status code', 422);
         }
-        // Check if user can update this opportunity
-        if ($opportunity->user_id !== $user->id) {
-            throw new Exception('Unauthorized to update this opportunity', 403);
-        }
 
         $oldStatus = $opportunity->status;
-        
+
         return DB::transaction(function () use ($opportunity, $statusCode, $oldStatus, $user) {
             $this->repository->update($opportunity, ['status' => $statusCode]);
             $opportunity = $opportunity->fresh();
-            
+
             // Send notifications when opportunity is published/activated
             if ($oldStatus !== Status::ACTIVE && $statusCode === Status::ACTIVE->value) {
                 try {
