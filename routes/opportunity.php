@@ -23,12 +23,12 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
     Route::post('opportunity/submit/{id?}', [FormController::class, 'store'])->name('opportunity.submit');
     Route::get('opportunity/edit/{id}', [FormController::class, 'form'])->name('opportunity.edit');
     Route::patch('opportunity/{id}/status', OpportunityUpdateStatusController::class)->name(
-        'partner.opportunity.status'
+        'opportunity.status'
     );
     Route::post('opportunity/{id}/extend', ExtendController::class)->name(
         'opportunity.extend'
     );
-    Route::delete('opportunity/{id}', OpportunityDestroyController::class)->name('partner.opportunity.destroy');
+    Route::delete('opportunity/{id}', OpportunityDestroyController::class)->name('opportunity.destroy');
 });
 
 // Admin routes

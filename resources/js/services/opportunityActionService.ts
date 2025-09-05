@@ -1,5 +1,5 @@
-import { router } from '@inertiajs/react';
-import { Opportunity } from '@/types';
+import {router} from '@inertiajs/react';
+import {Opportunity} from '@/types';
 
 /**
  * OpportunityActionService - Centralized service for all opportunity-related actions
@@ -21,7 +21,7 @@ export class OpportunityActionService {
             return;
         }
         const routeName = context === 'admin' ? 'admin.opportunity.show' : 'opportunity.show';
-        router.visit(route(routeName, { id: opportunity.id }));
+        router.visit(route(routeName, {id: opportunity.id}));
     }
 
     /**
@@ -35,7 +35,7 @@ export class OpportunityActionService {
             return;
         }
 
-        router.visit(route('opportunity.edit', { id: opportunity.id }));
+        router.visit(route('opportunity.edit', {id: opportunity.id}));
     }
 
     /**
@@ -45,23 +45,20 @@ export class OpportunityActionService {
      * @param onError - Optional error handler callback
      */
     static delete(opportunity: Opportunity, onError?: (errors: any) => void): void {
-        if (!opportunity?.id) {
-            console.warn('Invalid opportunity: missing ID');
-            return;
-        }
+        router.delete(route('opportunity.destroy', {id: opportunity.id}));
+    }
 
-        const confirmMessage = 'Are you sure you want to delete this opportunity? This action cannot be undone.';
-
-        if (confirm(confirmMessage)) {
-            router.delete(route('partner.opportunity.destroy', { id: opportunity.id }), {
-                onError: (errors) => {
-                    console.error('Error deleting opportunity:', errors);
-                    if (onError) {
-                        onError(errors);
-                    }
-                }
-            });
-        }
+    /**
+     * Delete an opportunity with confirmation and error handling
+     *
+     * @param opportunity - The opportunity to update
+     * @param status - The opportunity status to set
+     * @param onError - Optional error handler callback
+     */
+    static updateStatus(opportunity: Opportunity, status: string, onError?: (errors: any) => void): void {
+        router.patch(route('opportunity.status', {id: opportunity.id}), {
+            status: status
+        });
     }
 
     /**
@@ -94,28 +91,6 @@ export class OpportunityActionService {
         router.visit(route(routeName));
     }
 
-    /**
-     * Update opportunity status (requires status dialog management)
-     * This is a specialized action that requires additional state management
-     * and should be handled by the calling component
-     *
-     * @param opportunity - The opportunity to update status for
-     * @param onUpdateStatus - Callback function to handle status update dialog management
-     */
-    static updateStatus(opportunity: Opportunity, onUpdateStatus?: (opportunity: Opportunity) => void): void {
-        if (!opportunity?.id) {
-            console.warn('Invalid opportunity: missing ID');
-            return;
-        }
-
-        if (!onUpdateStatus) {
-            console.warn('No status update handler provided');
-            return;
-        }
-
-        onUpdateStatus(opportunity);
-    }
-
 
     /**
      * Archive an opportunity (admin only)
@@ -134,16 +109,7 @@ export class OpportunityActionService {
         if (confirm(confirmMessage)) {
             // This assumes an archive endpoint will be created
             // For now, we could use the status update with 'archived' status
-            router.patch(route('partner.opportunity.status', { id: opportunity.id }), {
-                status: 'archived'
-            }, {
-                onError: (errors) => {
-                    console.error('Error archiving opportunity:', errors);
-                    if (onError) {
-                        onError(errors);
-                    }
-                }
-            });
+
         }
     }
 

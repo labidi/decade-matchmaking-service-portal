@@ -3,11 +3,12 @@ import {PaginationLinkProps, User} from "@/types/index";
 export interface OpportunityPermissions {
     can_view?: boolean;
     can_edit?: boolean;
+    can_apply?: boolean;
+    can_extend?: boolean;
     can_delete?: boolean;
     can_approve?: boolean;
     can_reject?: boolean;
-    can_apply?: boolean;
-    can_extend?: boolean;
+    can_close?: boolean;
 }
 
 export interface Opportunity {

@@ -7,9 +7,12 @@ import {
     OpportunityActionContext,
     UseOpportunityActionsReturn
 } from '@/types/opportunity-actions';
+import {useConfirmation, useDeleteConfirmation} from '@/components/ui/confirmation';
 
 export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOpportunityActionsReturn {
     const {auth} = usePage<{ auth: Auth }>().props;
+    const { confirm } = useConfirmation();
+    const deleteConfirmation = useDeleteConfirmation();
 
     // Action handlers
     const handleViewDetails = useCallback((opportunity: Opportunity) => {
@@ -20,45 +23,26 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
         router.visit(route('opportunity.edit', {id: opportunity.id}));
     }, []);
 
-    const handleUpdateStatus = useCallback((opportunity: Opportunity) => {
-        console.log('Update status for opportunity:', opportunity);
-    }, []);
 
-    const handleDelete = useCallback((opportunity: Opportunity) => {
-        if (!confirm('Are you sure you want to delete this opportunity?')) {
-            return;
-        }
+    const handleDelete = useCallback(async (opportunity: Opportunity) => {
+        await deleteConfirmation('opportunity', () => {
+                OpportunityActionService.delete(opportunity);
+        });
+    }, [deleteConfirmation]);
 
-        // setIsLoading(true);
-        router.delete(route('partner.opportunity.destroy', {id: opportunity.id}), {
-            onSuccess: () => {
-                // setIsLoading(false);
-            },
-            onError: (errors) => {
-                console.error('Failed to delete opportunity:', errors);
-                alert('Failed to delete opportunity. Please try again.');
-                // setIsLoading(false);
+    const handleUpdateStatus = useCallback(async (opportunity: Opportunity , status:string) => {
+
+        await confirm({
+            title: 'Updating Opportunity status?',
+            message: `This will update order status, do you want to proceed.`,
+            type: 'warning',
+            confirmText: 'confirm',
+            confirmButtonColor: 'orange',
+            onConfirm: () => {
+                OpportunityActionService.updateStatus(opportunity,status);
             }
         });
-    }, []);
-
-    const handleReject = useCallback((opportunity: Opportunity) => {
-        if (!confirm('Are you sure you want to reject this opportunity?')) {
-            return;
-        }
-
-        // setIsLoading(true);
-        router.delete(route('partner.opportunity.destroy', {id: opportunity.id}), {
-            onSuccess: () => {
-                // setIsLoading(false);
-            },
-            onError: (errors) => {
-                console.error('Failed to delete opportunity:', errors);
-                alert('Failed to delete opportunity. Please try again.');
-                // setIsLoading(false);
-            }
-        });
-    }, []);
+    }, [confirm]);
 
     // Build actions for a specific opportunity
     const getActionsForOpportunity = useCallback((
@@ -67,7 +51,7 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
     ): Action[] => {
         const actions: Action[] = [];
 
-        if(opportunity.permissions?.can_view){
+        if (opportunity.permissions?.can_view) {
             actions.push({
                 key: 'view-details',
                 label: 'View details',
@@ -76,7 +60,7 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
             });
         }
 
-        if(opportunity.permissions?.can_edit){
+        if (opportunity.permissions?.can_edit) {
             actions.push({
                 key: 'edit',
                 label: 'Edit details',
@@ -85,7 +69,7 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
             });
         }
 
-        if(opportunity.permissions?.can_delete){
+        if (opportunity.permissions?.can_delete) {
             actions.push({
                 key: 'delete',
                 label: 'Delete Opportunity',
@@ -94,25 +78,32 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
             });
         }
 
-        if(opportunity.permissions?.can_reject){
+        if (opportunity.permissions?.can_reject) {
             actions.push({
                 key: 'reject',
                 label: 'Reject Opportunity',
-                onClick: () => handleReject(opportunity),
+                onClick: () => handleUpdateStatus(opportunity,'3'),
                 divider: actions.length > 0,
             });
         }
-        if(opportunity.permissions?.can_approve){
+        if (opportunity.permissions?.can_approve) {
             actions.push({
                 key: 'approve',
                 label: 'Approve Opportunity',
-                onClick: () => handleDelete(opportunity),
+                onClick: () => handleUpdateStatus(opportunity,'1'),
+                divider: actions.length > 0,
+            });
+        }
+        if (opportunity.permissions?.can_close) {
+            actions.push({
+                key: 'close',
+                label: 'Close Opportunity',
+                onClick: () => handleUpdateStatus(opportunity , '2'),
+                divider: actions.length > 0,
             });
         }
         return actions;
-
-
-    }, [auth, handleViewDetails, handleEdit, handleUpdateStatus, handleDelete]);
+    }, [auth, handleViewDetails, handleEdit, handleDelete, handleUpdateStatus]);
 
     return {
         getActionsForOpportunity,

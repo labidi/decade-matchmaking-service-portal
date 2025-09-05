@@ -2,6 +2,7 @@ import React from 'react';
 import { router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { ActionButton } from '@/types';
+import { useConfirmation } from '@/components/ui/confirmation';
 import * as HeroIcons from '@heroicons/react/16/solid';
 
 interface ActionsBarProps {
@@ -12,7 +13,9 @@ interface ActionsBarProps {
 export function ActionsBar({ actions = [], className = '' }: ActionsBarProps) {
     if (actions.length === 0) return null;
 
-    const handleAction = (action: ActionButton, event?: React.MouseEvent) => {
+    const { confirm } = useConfirmation();
+
+    const handleAction = async (action: ActionButton, event?: React.MouseEvent) => {
         // Prevent default behavior to avoid conflicts
         if (event) {
             event.preventDefault();
@@ -24,8 +27,18 @@ export function ActionsBar({ actions = [], className = '' }: ActionsBarProps) {
         }
 
         // Handle confirmation for destructive actions
-        if (action.confirm && !window.confirm(action.confirm)) {
-            return;
+        if (action.confirm) {
+            const confirmed = await confirm({
+                title: 'Confirm Action',
+                message: action.confirm,
+                type: action.variant === 'danger' ? 'danger' : 'warning',
+                confirmText: 'Confirm',
+                confirmButtonColor: action.variant === 'danger' ? 'red' : 'blue',
+            });
+            
+            if (!confirmed) {
+                return;
+            }
         }
 
         // Use Inertia router for non-GET methods
