@@ -49,14 +49,6 @@ class OpportunityPolicy
         return $user->hasRole('administrator') || $opportunity->user->id === $user->id;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function approve(User $user, Opportunity $opportunity): bool
-    {
-        return $user->hasRole('administrator') && $opportunity->status !== Status::ACTIVE;
-    }
-
     public function extend(User $user, Opportunity $opportunity): bool
     {
         return $user->hasRole(
@@ -65,9 +57,19 @@ class OpportunityPolicy
     }
 
 
-    public function reject(User $user): bool
+    public function reject(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('administrator');
+        return $user->hasRole('administrator') && $opportunity->status !== Status::REJECTED;
+    }
+
+    public function close(User $user, Opportunity $opportunity): bool
+    {
+        return $user->hasRole('administrator') && $opportunity->status !== Status::CLOSED;
+    }
+
+    public function approve(User $user, Opportunity $opportunity): bool
+    {
+        return $user->hasRole('administrator') && $opportunity->status !== Status::ACTIVE;
     }
 
     public function apply(User $user, Opportunity $opportunity): bool
