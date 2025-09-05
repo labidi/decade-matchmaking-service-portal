@@ -23,82 +23,23 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
         router.visit(route('opportunity.edit', {id: opportunity.id}));
     }, []);
 
-    const handleUpdateStatus = useCallback((opportunity: Opportunity) => {
-        console.log('Update status for opportunity:', opportunity);
-    }, []);
 
     const handleDelete = useCallback(async (opportunity: Opportunity) => {
         await deleteConfirmation('opportunity', () => {
-            router.delete(route('partner.opportunity.destroy', {id: opportunity.id}), {
-                onSuccess: () => {
-                    // Opportunity deleted successfully
-                },
-                onError: (errors) => {
-                    console.error('Failed to delete opportunity:', errors);
-                    alert('Failed to delete opportunity. Please try again.');
-                }
-            });
+                OpportunityActionService.delete(opportunity);
         });
     }, [deleteConfirmation]);
 
-    const handleReject = useCallback(async (opportunity: Opportunity) => {
-        await confirm({
-            title: 'Reject Opportunity?',
-            message: `Are you sure you want to reject "${opportunity.title}"? This action will mark the opportunity as rejected and may not be reversible.`,
-            type: 'warning',
-            confirmText: 'Reject',
-            confirmButtonColor: 'orange',
-            onConfirm: () => {
-                router.delete(route('partner.opportunity.destroy', {id: opportunity.id}), {
-                    onSuccess: () => {
-                        // Opportunity rejected successfully
-                    },
-                    onError: (errors) => {
-                        console.error('Failed to reject opportunity:', errors);
-                        alert('Failed to reject opportunity. Please try again.');
-                    }
-                });
-            }
-        });
-    }, [confirm]);
-    const handleClose = useCallback(async (opportunity: Opportunity) => {
-        await confirm({
-            title: 'Close Opportunity?',
-            message: `Are you sure you want to close "${opportunity.title}"? This will prevent new applications and mark it as closed.`,
-            type: 'warning',
-            confirmText: 'Close',
-            confirmButtonColor: 'orange',
-            onConfirm: () => {
-                router.delete(route('partner.opportunity.destroy', {id: opportunity.id}), {
-                    onSuccess: () => {
-                        // Opportunity closed successfully
-                    },
-                    onError: (errors) => {
-                        console.error('Failed to close opportunity:', errors);
-                        alert('Failed to close opportunity. Please try again.');
-                    }
-                });
-            }
-        });
-    }, [confirm]);
+    const handleUpdateStatus = useCallback(async (opportunity: Opportunity , status:string) => {
 
-    const handleApprove = useCallback(async (opportunity: Opportunity) => {
         await confirm({
-            title: 'Approve Opportunity?',
-            message: `Are you sure you want to approve "${opportunity.title}"? This will make it visible to users and allow applications.`,
-            type: 'success',
-            confirmText: 'Approve',
-            confirmButtonColor: 'green',
+            title: 'Updating Opportunity status?',
+            message: `This will update order status, do you want to proceed.`,
+            type: 'warning',
+            confirmText: 'confirm',
+            confirmButtonColor: 'orange',
             onConfirm: () => {
-                router.put(route('admin.opportunity.approve', {id: opportunity.id}), {}, {
-                    onSuccess: () => {
-                        // Opportunity approved successfully
-                    },
-                    onError: (errors) => {
-                        console.error('Failed to approve opportunity:', errors);
-                        alert('Failed to approve opportunity. Please try again.');
-                    }
-                });
+                OpportunityActionService.updateStatus(opportunity,status);
             }
         });
     }, [confirm]);
@@ -141,7 +82,7 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
             actions.push({
                 key: 'reject',
                 label: 'Reject Opportunity',
-                onClick: () => handleReject(opportunity),
+                onClick: () => handleUpdateStatus(opportunity,'3'),
                 divider: actions.length > 0,
             });
         }
@@ -149,7 +90,7 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
             actions.push({
                 key: 'approve',
                 label: 'Approve Opportunity',
-                onClick: () => handleApprove(opportunity),
+                onClick: () => handleUpdateStatus(opportunity,'1'),
                 divider: actions.length > 0,
             });
         }
@@ -157,12 +98,12 @@ export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOp
             actions.push({
                 key: 'close',
                 label: 'Close Opportunity',
-                onClick: () => handleClose(opportunity),
+                onClick: () => handleUpdateStatus(opportunity , '2'),
                 divider: actions.length > 0,
             });
         }
         return actions;
-    }, [auth, handleViewDetails, handleEdit, handleUpdateStatus, handleDelete, handleReject, handleClose, handleApprove]);
+    }, [auth, handleViewDetails, handleEdit, handleDelete, handleUpdateStatus]);
 
     return {
         getActionsForOpportunity,
