@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Opportunity;
 use App\Models\Request;
 use App\Models\Request\Offer;
+use App\Observers\OpportunityObserver;
 use App\Observers\RequestObserver;
 use App\Observers\RequestOfferObserver;
 use App\Policies\OfferPolicy;
@@ -34,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
         // Register the observers
         Request::observe(RequestObserver::class);
         Offer::observe(RequestOfferObserver::class);
+        Opportunity::observe(OpportunityObserver::class);
 
         // Register policies
         Gate::policy(Request::class, RequestPolicy::class);
