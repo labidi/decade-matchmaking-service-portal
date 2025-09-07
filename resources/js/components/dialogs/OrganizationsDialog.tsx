@@ -12,6 +12,7 @@ interface OrganizationsDialogProps {
 
 export default function OrganizationsDialog({ open, onClose }: OrganizationsDialogProps) {
     const [organizations, setOrganizations] = useState<OrganizationsList>([]);
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 

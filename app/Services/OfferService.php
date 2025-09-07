@@ -7,11 +7,8 @@ use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request;
 use App\Models\Request\Offer;
 use App\Models\User;
-use App\Services\Offer\OfferQueryBuilder;
 use App\Services\Offer\OfferRepository;
 use Exception;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,8 +18,7 @@ class OfferService
     public function __construct(
         private readonly DocumentService $documentService,
         private readonly OfferRepository $repository
-    ) {
-    }
+    ) {}
 
     /**
      * Get paginated offers with search and sorting
@@ -41,11 +37,11 @@ class OfferService
             // Validate that user can create offers for this request
             $request = Request::findOrFail($data['request_id']);
 
-            if (!$user->hasRole('administrator') && !$user->hasRole('partner')) {
+            if (! $user->hasRole('administrator') && ! $user->hasRole('partner')) {
                 throw new Exception('Only administrators and partners can create offers');
             }
 
-            if ($user->id === $request->user_id && !$user->hasRole('administrator')) {
+            if ($user->id === $request->user_id && ! $user->hasRole('administrator')) {
                 throw new Exception('Cannot create offer for your own request');
             }
 
@@ -66,6 +62,7 @@ class OfferService
                     $user
                 );
             }
+
             return $offer->load(['request', 'matchedPartner', 'documents']);
         } catch (Exception $e) {
             throw $e;
@@ -81,12 +78,12 @@ class OfferService
 
         try {
             $offer = $this->repository->findById($offerId);
-            if (!$offer) {
+            if (! $offer) {
                 throw new Exception('Offer not found');
             }
 
             // Check authorization
-            if (!$offer->can_edit) {
+            if (! $offer->can_edit) {
                 throw new Exception('Unauthorized to edit this offer');
             }
 
@@ -108,10 +105,11 @@ class OfferService
             }
 
             DB::commit();
+
             return $offer->load(['request', 'matchedPartner', 'documents']);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update offer: ' . $e->getMessage());
+            Log::error('Failed to update offer: '.$e->getMessage());
             throw $e;
         }
     }
@@ -125,7 +123,7 @@ class OfferService
 
         try {
             $offer = $this->repository->findById($offerId);
-            if (!$offer) {
+            if (! $offer) {
                 throw new Exception('Offer not found');
             }
 
@@ -137,10 +135,11 @@ class OfferService
             // Delete the offer
             $this->repository->delete($offer);
             DB::commit();
+
             return true;
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Failed to delete offer: ' . $e->getMessage());
+            Log::error('Failed to delete offer: '.$e->getMessage());
             throw $e;
         }
     }
@@ -164,6 +163,7 @@ class OfferService
     public function changeOfferStatus(Offer $offer, RequestOfferStatus $status): Offer
     {
         $this->repository->update($offer, ['status' => $status]);
+
         return $offer;
     }
 
@@ -197,5 +197,4 @@ class OfferService
             throw $e;
         }
     }
-
 }

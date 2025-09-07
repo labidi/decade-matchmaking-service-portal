@@ -41,5 +41,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Request::class, RequestPolicy::class);
         Gate::policy(Opportunity::class, OpportunityPolicy::class);
         Gate::policy(Offer::class, OfferPolicy::class);
+
+        // Note: Event listeners are automatically discovered in app/Listeners/
+        // with proper handle() methods that type-hint events
     }
+
 }
