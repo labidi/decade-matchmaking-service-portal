@@ -5,10 +5,12 @@ namespace App\Listeners\Opportunity;
 use App\Events\Opportunity\OpportunityStatusChanged;
 use App\Mail\OpportunityStatusUpdated;
 use App\Models\User;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class SendStatusChangeNotifications implements ShouldQueue
 {
@@ -26,11 +28,12 @@ class SendStatusChangeNotifications implements ShouldQueue
 
     /**
      * Handle the event.
+     * @throws Exception
      */
     public function handle(OpportunityStatusChanged $event): void
     {
         $opportunity = $event->opportunity;
-        
+
         try {
             // Always notify opportunity creator about status changes
             if ($opportunity->user && $opportunity->user->email) {
@@ -42,23 +45,23 @@ class SendStatusChangeNotifications implements ShouldQueue
                     ))
                     ->onQueue('mail-priority');
             }
-            
+
             // Notify admins for specific status changes
             if ($this->shouldNotifyAdmins($event)) {
                 $this->notifyAdministrators($event);
             }
-            
+
             Log::info('Opportunity status change notifications sent', [
                 'opportunity_id' => $opportunity->id,
                 'from_status' => $event->getPreviousStatusEnum()?->label(),
-                'to_status' => $event->newStatus->label()
+                'to_status' => $event->newStatus->label(),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to send status change notifications', [
                 'opportunity_id' => $opportunity->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
-            
+
             throw $e;
         }
     }
@@ -80,7 +83,7 @@ class SendStatusChangeNotifications implements ShouldQueue
         $admins = User::where('administrator', true)
             ->whereNotNull('email')
             ->get();
-        
+
         foreach ($admins as $admin) {
             Mail::to($admin->email)
                 ->queue(new OpportunityStatusUpdated(
@@ -96,11 +99,11 @@ class SendStatusChangeNotifications implements ShouldQueue
     /**
      * Handle a job failure.
      */
-    public function failed(OpportunityStatusChanged $event, \Throwable $exception): void
+    public function failed(OpportunityStatusChanged $event, Throwable $exception): void
     {
         Log::critical('Failed to send status change notifications after retries', [
             'opportunity_id' => $event->opportunity->id,
-            'error' => $exception->getMessage()
+            'error' => $exception->getMessage(),
         ]);
     }
 }

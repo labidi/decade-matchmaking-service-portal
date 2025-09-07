@@ -2,19 +2,20 @@
 
 namespace App\Observers;
 
+use App\Enums\Opportunity\Status;
 use App\Events\Opportunity\OpportunityCreated;
 use App\Events\Opportunity\OpportunityStatusChanged;
-use App\Models\Opportunity;
 use App\Models\Notification;
+use App\Models\Opportunity;
 use App\Services\NotificationService;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class OpportunityObserver
 {
     public function __construct(
         private readonly NotificationService $notificationService
-    ) {
-    }
+    ) {}
 
     /**
      * Handle the Opportunity "created" event.
@@ -24,22 +25,22 @@ class OpportunityObserver
         try {
             // Create in-app notification for admins
             $this->createAdminNotification($opportunity, 'created');
-            
+
             // Dispatch event for further processing
             OpportunityCreated::dispatch($opportunity);
-            
+
             // Send notifications based on user preferences
             $notificationsSent = $this->notificationService->notifyUsersForNewOpportunity($opportunity);
-            
+
             Log::info('Opportunity created event processed', [
                 'opportunity_id' => $opportunity->id,
-                'notifications_sent' => count($notificationsSent)
+                'notifications_sent' => count($notificationsSent),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to process opportunity created event', [
                 'opportunity_id' => $opportunity->id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
@@ -52,31 +53,31 @@ class OpportunityObserver
         // Check if status has changed
         if ($opportunity->isDirty('status')) {
             $originalStatus = $opportunity->getOriginal('status');
-            
+
             try {
                 // Create notification for status change
                 $this->createStatusChangeNotification($opportunity, $originalStatus);
-                
+
                 // Dispatch status change event
                 OpportunityStatusChanged::dispatch(
                     $opportunity,
                     $originalStatus,
                     $opportunity->status
                 );
-                
+
                 Log::info('Opportunity status changed', [
                     'opportunity_id' => $opportunity->id,
                     'from_status' => $originalStatus ? $this->getStatusLabel($originalStatus) : null,
-                    'to_status' => $opportunity->status->label()
+                    'to_status' => $opportunity->status->label(),
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to process opportunity status change', [
                     'opportunity_id' => $opportunity->id,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
-        
+
         // Handle closing date extension
         if ($opportunity->isDirty('closing_date')) {
             $this->handleClosingDateChange($opportunity);
@@ -90,7 +91,7 @@ class OpportunityObserver
     {
         Log::info('Opportunity being deleted', [
             'opportunity_id' => $opportunity->id,
-            'title' => $opportunity->title
+            'title' => $opportunity->title,
         ]);
     }
 
@@ -99,11 +100,11 @@ class OpportunityObserver
      */
     private function createAdminNotification(Opportunity $opportunity, string $event): void
     {
-        $title = match($event) {
+        $title = match ($event) {
             'created' => 'New Opportunity Published',
             default => 'Opportunity Event'
         };
-        
+
         Notification::create([
             'user_id' => 3, // Admin user ID
             'title' => $title,
@@ -146,13 +147,13 @@ class OpportunityObserver
     {
         $originalDate = $opportunity->getOriginal('closing_date');
         $newDate = $opportunity->closing_date;
-        
+
         if ($originalDate && $newDate && $newDate->gt($originalDate)) {
             Log::info('Opportunity closing date extended', [
                 'opportunity_id' => $opportunity->id,
                 'original_date' => $originalDate->format('Y-m-d'),
                 'new_date' => $newDate->format('Y-m-d'),
-                'extension_days' => $originalDate->diffInDays($newDate)
+                'extension_days' => $originalDate->diffInDays($newDate),
             ]);
         }
     }
@@ -165,12 +166,12 @@ class OpportunityObserver
         if (is_object($status) && method_exists($status, 'label')) {
             return $status->label();
         }
-        
+
         // Handle case where status might be an integer
         if (is_numeric($status)) {
-            return \App\Enums\Opportunity\Status::getLabelByValue($status) ?? 'Unknown';
+            return Status::getLabelByValue($status) ?? 'Unknown';
         }
-        
+
         return 'Unknown';
     }
 }
