@@ -23,7 +23,7 @@ return [
         | with the Mailchimp Transactional API.
         |
         */
-        'api_key' => env('MAILCHIMP_TRANSACTIONAL_KEY'),
+        'api_key' => env('MAILCHIMP_TRANSACTIONAL_KEY','b2dafc3f08a744a65555679b2bf4ff26-us15'),
 
         /*
         |--------------------------------------------------------------------------

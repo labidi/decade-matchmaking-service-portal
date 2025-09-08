@@ -36,8 +36,14 @@ class ShowController extends BaseOpportunitiesController
             $this->createAction(
                 'Edit Opportunity',
                 route('opportunity.edit', $opportunity->id),
+            ),
+            $this->createAction(
+                'Apply for opportunity',
+                $opportunity->url,
+                'secondary'
             )
         ];
+
 
         return Inertia::render('Opportunity/Show', [
             'banner' => $this->buildBanner(

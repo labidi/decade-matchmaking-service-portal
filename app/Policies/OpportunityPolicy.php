@@ -22,7 +22,7 @@ class OpportunityPolicy
      */
     public function view(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('partner') && $opportunity->user->id === $user->id || $user->hasRole('administrator');
+        return $user->hasRole('partner') && $opportunity->user->id === $user->id || $user->hasRole('administrator') ||  $opportunity->status === Status::ACTIVE;
     }
 
     /**
@@ -74,7 +74,7 @@ class OpportunityPolicy
 
     public function apply(User $user, Opportunity $opportunity): bool
     {
-        return $user->id !== $opportunity->user->id;
+        return $opportunity->status === Status::ACTIVE;
     }
 
 }
