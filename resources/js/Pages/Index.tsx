@@ -30,8 +30,7 @@ export default function Index({portalGuide}: Readonly<IndexPageProps>) {
                             className="p-12 bg-firefly-600 shadow hover:bg-firefly-700 transition-colors cursor-pointer"
                         >
                             <h4 className="text-xl font-semibold mb-2 text-white">
-                                Click to view CDF Partners supporting capacity development through the Matchmaking
-                                Platform.<br/>
+                                Click to view CDF Partners supporting capacity development through Ocean connector.<br/>
                             </h4>
                         </Link>
                         <a target="_blank" href="https://www.oceancd.org/landingpage"
