@@ -6,8 +6,6 @@ use App\Http\Requests\SettingsPostRequest;
 use App\Services\SettingsService;
 use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class SettingsController extends Controller
@@ -17,8 +15,7 @@ class SettingsController extends Controller
     public function __construct(
         private readonly SettingsService $settingsService,
 
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -55,7 +52,7 @@ class SettingsController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to update settings: ' . $e->getMessage())
+                ->with('error', 'Failed to update settings: '.$e->getMessage())
                 ->withInput();
         }
     }
