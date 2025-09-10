@@ -30,7 +30,7 @@ class SendOpportunityCreatedNotifications implements ShouldQueue
     public function handle(OpportunityCreated $event): void
     {
         $opportunity = $event->opportunity;
-        
+
         try {
             // Send confirmation to opportunity creator
             if ($opportunity->user && $opportunity->user->email) {
@@ -38,20 +38,20 @@ class SendOpportunityCreatedNotifications implements ShouldQueue
                     ->queue(new OpportunityPublished($opportunity, 'creator'))
                     ->onQueue('mail-priority');
             }
-            
+
             // Notify administrators
             $this->notifyAdministrators($opportunity);
-            
+
             Log::info('Opportunity created notifications sent', [
                 'opportunity_id' => $opportunity->id,
-                'creator_notified' => (bool) $opportunity->user
+                'creator_notified' => (bool) $opportunity->user,
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to send opportunity created notifications', [
                 'opportunity_id' => $opportunity->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
-            
+
             // Re-throw to trigger retry
             throw $e;
         }
@@ -65,7 +65,7 @@ class SendOpportunityCreatedNotifications implements ShouldQueue
         $admins = User::where('administrator', true)
             ->whereNotNull('email')
             ->get();
-        
+
         foreach ($admins as $admin) {
             Mail::to($admin->email)
                 ->queue(new OpportunityPublished($opportunity, 'admin'))
@@ -80,7 +80,7 @@ class SendOpportunityCreatedNotifications implements ShouldQueue
     {
         Log::critical('Failed to send opportunity created notifications after retries', [
             'opportunity_id' => $event->opportunity->id,
-            'error' => $exception->getMessage()
+            'error' => $exception->getMessage(),
         ]);
     }
 }

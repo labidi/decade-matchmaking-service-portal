@@ -1,5 +1,8 @@
 import {usePage} from '@inertiajs/react';
+import React, { useState } from 'react';
 import YouTube from 'react-youtube';
+import OpportunitiesDialog from '@/components/dialogs/OpportunitiesDialog';
+import { Opportunity } from '@/types';
 
 export interface Banner {
     title: string;
@@ -24,13 +27,16 @@ interface BannerSectionProps {
     bannerConfiguration?: Banner;
     YoutubeEmbed?: YoutubeEmbed;
     metrics?: OCDMetrics;
+    recentOpportunities?: Opportunity[];
 }
 
-export default function BannerSection({bannerConfiguration, YoutubeEmbed, metrics}: Readonly<BannerSectionProps>) {
+export default function BannerSection({bannerConfiguration, YoutubeEmbed, metrics, recentOpportunities}: Readonly<BannerSectionProps>) {
+    const [showOpportunitiesDialog, setShowOpportunitiesDialog] = useState(false);
 
     const pageBannerConfiguration = bannerConfiguration ?? usePage().props.banner as Banner;
     const pageYoutubeEmbed = YoutubeEmbed ?? usePage().props.YoutubeEmbed as YoutubeEmbed;
     const pageMetrics = metrics ?? usePage().props.metrics as OCDMetrics;
+    const pageRecentOpportunities = recentOpportunities ?? usePage().props.recentOpportunities as Opportunity[];
 
     const opts = {
         height: '100%',
@@ -89,14 +95,26 @@ export default function BannerSection({bannerConfiguration, YoutubeEmbed, metric
                             </span>
                             <span className="mt-2 text-2xl">Committed Funding</span>
                         </div>
-                        <div>
+                        <button
+                            onClick={() => setShowOpportunitiesDialog(true)}
+                            className="hover:opacity-80 transition-opacity"
+                            title="View recent partner opportunities"
+                        >
                             <span className="block text-5xl font-bold">
                                 {pageMetrics.number_of_open_partner_opportunities}
                             </span>
                             <span className="mt-2 text-2xl">Open Partner Opportunities</span>
-                        </div>
+                        </button>
                     </div>
                 </div>)}
+
+            {pageRecentOpportunities && (
+                <OpportunitiesDialog
+                    open={showOpportunitiesDialog}
+                    onClose={() => setShowOpportunitiesDialog(false)}
+                    opportunities={pageRecentOpportunities}
+                />
+            )}
         </section>
     );
 }

@@ -3,24 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Services\SettingsService;
+use App\Services\OpportunityService;
+use App\Http\Resources\OpportunityResource;
 use Inertia\Inertia;
 use App\Models\Setting;
 
 class IndexController extends Controller
 {
 
-    public function __construct(private readonly SettingsService $settingsService)
-    {
+    public function __construct(
+        private readonly SettingsService $settingsService,
+        private readonly OpportunityService $opportunityService
+    ) {
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function __invoke()
     {
+        $recentOpportunities = $this->opportunityService->getRecentActiveOpportunities(10);
+
         return Inertia::render('Index', [
             'title' => 'Welcome',
             'description' => "",
             'banner' => [
                 'title' => 'Connect for a Sustainable Ocean',
-                'description' => "Whether you're seeking training or offering expertise, this platform makes the connection. It’s where organizations find support—and partners find purpose. By matching demand with opportunity, it brings the right people and resources together. A transparent marketplace driving collaboration, innovation, and impact.",
+                'description' => "Whether you're seeking training or offering expertise, this platform makes the connection. It's where organizations find support—and partners find purpose. By matching demand with opportunity, it brings the right people and resources together. A transparent marketplace driving collaboration, innovation, and impact.",
                 'image' => '/assets/img/sidebar.png'
             ],
             'YoutubeEmbed' => [
@@ -37,7 +46,8 @@ class IndexController extends Controller
                 'number_fully_closed_matches' => $this->settingsService->getSetting(setting::FULLY_CLOSED_MATCHES_METRIC) ?? 0,
                 'number_user_requests_in_implementation' => $this->settingsService->getSetting(setting::REQUEST_IN_IMPLEMENTATION_METRIC) ?? 0,
                 'committed_funding_amount' => $this->settingsService->getSetting(setting::COMMITTED_FUNDING_METRIC) ?? 0,
-            ]
+            ],
+            'recentOpportunities' => $recentOpportunities->toResourceCollection(OpportunityResource::class),
         ]);
     }
 }

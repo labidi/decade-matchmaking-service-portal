@@ -14,7 +14,7 @@ type HomePageProps = {
 export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>) {
 
     const {auth} = usePage<{ auth: Auth }>().props;
-    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-900 hover:bg-firefly-600 text-white"
+    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-gray-300 hover:bg-gray-300 text-white"
     const LinkOpportunityCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-500 hover:bg-firefly-600 text-white"
 
     return (

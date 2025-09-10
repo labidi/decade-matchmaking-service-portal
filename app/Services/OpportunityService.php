@@ -230,4 +230,16 @@ readonly class OpportunityService
         $this->repository->update($opportunity, ['closing_date' => $closingDate]);
         return $opportunity->fresh();
     }
+
+    /**
+     * Get the most recent active opportunities
+     */
+    public function getRecentActiveOpportunities(int $limit = 10): Collection
+    {
+        return Opportunity::where('status', Status::ACTIVE)
+            ->where('closing_date', '>=', now())
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
 }
