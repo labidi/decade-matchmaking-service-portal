@@ -2,16 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\Common\Country;
-use App\Enums\Common\Ocean;
-use App\Enums\Common\Region;
-use App\Enums\Opportunity\CoverageActivity;
 use App\Models\Opportunity;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Gate;
-use Carbon\Carbon;
 
 /**
  * @mixin Opportunity
@@ -57,7 +51,6 @@ class OpportunityResource extends JsonResource
             'user' => $this->whenLoaded('user'),
         ];
 
-
         $baseData['permissions'] = [
             'can_view' => $request->user()->can('view', [Opportunity::class, $this->resource]),
             'can_edit' => $request->user()->can('update', [Opportunity::class, $this->resource]),
@@ -76,12 +69,12 @@ class OpportunityResource extends JsonResource
     /**
      * Transform an enum array to value/label format.
      *
-     * @param mixed $enumArray
+     * @param  mixed  $enumArray
      * @return array<int, array<string, string>>
      */
     private function transformEnumArray($enumArray): array
     {
-        if (!$enumArray) {
+        if (! $enumArray) {
             return [];
         }
 
