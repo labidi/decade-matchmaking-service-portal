@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import YouTube from 'react-youtube';
 import OpportunitiesDialog from '@/components/dialogs/OpportunitiesDialog';
 import { Opportunity } from '@/types';
+import {CursorArrowRaysIcon} from '@heroicons/react/16/solid';
 
 export interface Banner {
     title: string;
@@ -98,12 +99,14 @@ export default function BannerSection({bannerConfiguration, YoutubeEmbed, metric
                         <button
                             onClick={() => setShowOpportunitiesDialog(true)}
                             className="hover:opacity-80 transition-opacity"
-                            title="View recent partner opportunities"
+                            title="Click here to preview Open Capacity development"
                         >
                             <span className="block text-5xl font-bold">
                                 {pageMetrics.number_of_open_partner_opportunities}
                             </span>
-                            <span className="mt-2 text-2xl">Open Partner Opportunities</span>
+                            <span className="mt-2 text-2xl">
+                                Click here to preview Open Capacity development
+                            </span>
                         </button>
                     </div>
                 </div>)}

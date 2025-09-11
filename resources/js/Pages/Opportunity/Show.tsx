@@ -2,11 +2,7 @@ import React, { useState } from 'react';
 import {Head} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {Opportunity, PageProps} from '@/types';
-import {Subheading} from '@/components/ui/heading';
 import {Badge} from '@/components/ui/badge';
-import {Text,} from '@/components/ui/text';
-import {Divider} from '@/components/ui/divider';
-import {UsersIcon} from '@heroicons/react/16/solid';
 import { Button } from '@/components/ui/button';
 import ExtendOpportunityDialog from '@/components/dialogs/ExtendOpportunityDialog';
 

@@ -52,15 +52,14 @@ class OpportunityResource extends JsonResource
         ];
 
         $baseData['permissions'] = [
-            'can_view' => $request->user()->can('view', [Opportunity::class, $this->resource]),
-            'can_edit' => $request->user()->can('update', [Opportunity::class, $this->resource]),
-            'can_apply' => $request->user()->can('apply', [Opportunity::class, $this->resource]),
-            'can_extend' => $request->user()->can('extend', [Opportunity::class, $this->resource]),
-
-            'can_delete' => $request->user()->can('delete', [Opportunity::class, $this->resource]),
-            'can_approve' => $request->user()->can('approve', [Opportunity::class, $this->resource]),
-            'can_reject' => $request->user()->can('reject', [Opportunity::class, $this->resource]),
-            'can_close' => $request->user()->can('close', [Opportunity::class, $this->resource]),
+            'can_view' => $request->user()?->can('view', [Opportunity::class, $this->resource]) ?? false,
+            'can_edit' => $request->user()?->can('update', [Opportunity::class, $this->resource]) ?? false,
+            'can_apply' => $request->user()?->can('apply', [Opportunity::class, $this->resource]) ?? false,
+            'can_extend' => $request->user()?->can('extend', [Opportunity::class, $this->resource]) ?? false,
+            'can_delete' => $request->user()?->can('delete', [Opportunity::class, $this->resource]) ?? false,
+            'can_approve' => $request->user()?->can('approve', [Opportunity::class, $this->resource]) ?? false,
+            'can_reject' => $request->user()?->can('reject', [Opportunity::class, $this->resource]) ?? false,
+            'can_close' => $request->user()?->can('close', [Opportunity::class, $this->resource]) ?? false,
         ];
 
         return $baseData;

@@ -114,7 +114,7 @@ class RequestListController extends BaseRequestController
             'title' => 'View my matched requests',
             'banner' => [
                 'title' => 'View my matched requests',
-                'description' => 'View and browse my matched Request with CDF partners',
+                'description' => 'View and browse my matched Request.',
                 'image' => '/assets/img/sidebar.png',
             ],
             'routeName' => 'request.me.matched-requests',

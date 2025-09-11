@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class OpportunityPolicy
 {
@@ -22,7 +21,7 @@ class OpportunityPolicy
      */
     public function view(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('partner') && $opportunity->user->id === $user->id || $user->hasRole('administrator') ||  $opportunity->status === Status::ACTIVE;
+        return $user->hasRole('partner') && $opportunity->user->id === $user->id || $user->hasRole('administrator') || $opportunity->status === Status::ACTIVE;
     }
 
     /**
@@ -51,11 +50,8 @@ class OpportunityPolicy
 
     public function extend(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole(
-                'partner'
-            ) && $opportunity->user->id === $user->id && $opportunity->closing_date->isNowOrPast();
+        return $user->hasRole('partner') && $opportunity->user->id === $user->id;
     }
-
 
     public function reject(User $user, Opportunity $opportunity): bool
     {
@@ -76,5 +72,4 @@ class OpportunityPolicy
     {
         return $opportunity->status === Status::ACTIVE;
     }
-
 }
