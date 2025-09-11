@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\OrganizationsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserGuideController;
 use Illuminate\Support\Facades\Route;
@@ -14,8 +13,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 Route::get('organizations', [\App\Http\Controllers\OrganizationsController::class, 'index'])->name('organizations.index');
 
-Route::middleware(['auth', 'role:user'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('user.home');
+});
+
+Route::middleware(['auth', 'role:user'])->group(function () {
+
     // User subscription routes
     Route::get('subscriptions', [\App\Http\Controllers\SubscriptionController::class, 'index'])->name('user.subscriptions.index');
     Route::post('subscriptions/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('user.subscriptions.subscribe');
@@ -60,8 +63,8 @@ Route::prefix('guide')->group(function () {
     Route::get('platform-guide.pdf', [UserGuideController::class, 'download'])->name('user.guide');
 });
 
-require __DIR__ . '/auth.php';
-require __DIR__ . '/request.php';
-require __DIR__ . '/opportunity.php';
-require __DIR__ . '/offer.php';
-require __DIR__ . '/notification-preferences.php';
+require_once __DIR__.'/auth.php';
+require_once __DIR__.'/request.php';
+require_once __DIR__.'/opportunity.php';
+require_once __DIR__.'/offer.php';
+require_once __DIR__.'/notification-preferences.php';

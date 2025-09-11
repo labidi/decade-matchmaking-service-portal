@@ -14,7 +14,8 @@ type HomePageProps = {
 export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>) {
 
     const {auth} = usePage<{ auth: Auth }>().props;
-    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-gray-300 hover:bg-gray-300 text-white"
+    const LinkRequestCardClassNameDisabled = "max-w-sm rounded overflow-hidden shadow-lg bg-gray-300 hover:bg-gray-300 text-white"
+    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-900 hover:bg-firefly-600 text-white"
     const LinkOpportunityCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-500 hover:bg-firefly-600 text-white"
 
     return (
@@ -73,17 +74,19 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
                         {auth.user && (
                             <CardLink
                                 link={route('request.create')}
-                                className={LinkRequestCardClassName}
+                                className={(auth.user.is_user) ? LinkRequestCardClassName : LinkRequestCardClassNameDisabled}
                                 title="Submit new Request"
                                 text="Use this feature to submit a new capacity development request for training and workshops "
+                                disabled={!auth.user.is_user}
                             />
                         )}
                         {auth.user && (
                             <CardLink
                                 link={route('request.me.list')}
-                                className={LinkRequestCardClassName}
+                                className={(auth.user.is_user) ? LinkRequestCardClassName : LinkRequestCardClassNameDisabled}
                                 title="List of My Requests"
                                 text="Use this feature to track the progress and current status of your submitted request. "
+                                disabled={!auth.user.is_user}
                             />
                         )}
                         {auth.user && auth.user.is_partner && (
@@ -105,9 +108,10 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
                         {auth.user && (
                             <CardLink
                                 link={route('request.me.matched-requests')}
-                                className={LinkRequestCardClassName}
+                                className={(auth.user.is_user) ? LinkRequestCardClassName : LinkRequestCardClassNameDisabled}
                                 title="My Subscribed requests"
                                 text="Manage and keep track of the requests you have subscribed to for updates and notifications."
+                                disabled={!auth.user.is_user}
                             />
                         )}
                     </div>

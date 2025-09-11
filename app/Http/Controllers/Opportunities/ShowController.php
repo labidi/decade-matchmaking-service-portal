@@ -27,23 +27,27 @@ class ShowController extends BaseOpportunitiesController
     public function __invoke(Request $request, int $id): Response
     {
         $opportunity = $this->opportunityService->findOpportunity($id);
-
-        $actions = [
-            $this->createPrimaryAction(
+        $actions = [];
+        if ($request->user()->can('create', Opportunity::class)) {
+            $actions[] = $this->createPrimaryAction(
                 'Create a new Opportunity',
                 route('opportunity.create')
-            ),
-            $this->createAction(
+            );
+        }
+
+        if($request->user()->can('edit', [Opportunity::class, $opportunity])) {
+            $actions[] = $this->createAction(
                 'Edit Opportunity',
                 route('opportunity.edit', $opportunity->id),
-            ),
-            $this->createAction(
+            );
+        }
+        if($request->user()->can('apply', [Opportunity::class, $opportunity])) {
+            $actions[] = $this->createAction(
                 'Apply for opportunity',
                 $opportunity->url,
                 'secondary'
-            )
-        ];
-
+            );
+        }
 
         return Inertia::render('Opportunity/Show', [
             'banner' => $this->buildBanner(

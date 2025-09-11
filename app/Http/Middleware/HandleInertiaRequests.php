@@ -2,13 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\UserResource;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Illuminate\Http\Request;
-use Inertia\Middleware;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Symfony\Component\HttpFoundation\Response;
-
+use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -31,13 +29,15 @@ class HandleInertiaRequests extends Middleware
      * Define the props that are shared by default.
      *
      * @return array<string, mixed>
+     *
+     * @throws \Throwable
      */
     public function share(Request $request): array
     {
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user()?->toResource(UserResource::class) ?? null,
             ],
             'unread_notifications' => $request->user()?->notifications()->where('is_read', false)->count() ?? 0,
             'flash' => [
@@ -46,7 +46,7 @@ class HandleInertiaRequests extends Middleware
                 'warning' => $request->session()->get('warning'),
                 'info' => $request->session()->get('info'),
             ],
-            'breadcrumbs'=> Breadcrumbs::generate(Route::currentRouteName())
+            'breadcrumbs' => Breadcrumbs::generate(Route::currentRouteName()),
         ];
     }
 }
