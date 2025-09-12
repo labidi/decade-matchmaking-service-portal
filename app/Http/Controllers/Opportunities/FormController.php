@@ -65,9 +65,9 @@ class FormController extends BaseOpportunitiesController
                 $id ? $this->opportunityService->findOpportunity($id) : null
             );
             if ($id) {
-                return to_route('opportunity.me.list')->with('success', 'Opportunity updated successfully');
+                return to_route('me.opportunity.list')->with('success', 'Opportunity updated successfully');
             } else {
-                return to_route('opportunity.me.list')->with('success', 'Opportunity submitted successfully');
+                return to_route('me.opportunity.list')->with('success', 'Opportunity submitted successfully');
             }
         } catch (Throwable $e) {
             return back()->with(

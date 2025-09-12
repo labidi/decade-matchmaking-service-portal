@@ -34,7 +34,8 @@ class ListController extends BaseOpportunitiesController
                     'statuses' => Status::getOptions(),
                 ],
                 'currentSearchFields' => ['user', 'title'],
-                'routeName' => 'admin.opportunity.list',
+                'listRouteName' => 'admin.opportunity.list',
+                'showRouteName' => 'admin.opportunity.show',
             ],
             'user_own' => [
                 'component' => 'Opportunity/List',
@@ -49,7 +50,8 @@ class ListController extends BaseOpportunitiesController
                     'statuses' => Status::getOptions(),
                 ],
                 'currentSearchFields' => ['type', 'status', 'title'],
-                'routeName' => 'opportunity.me.list',
+                'listRouteName' => 'me.opportunity.list',
+                'showRouteName' => 'me.opportunity.show',
                 'actions' =>
                     $this->buildActions([
                         $this->createPrimaryAction(
@@ -73,6 +75,8 @@ class ListController extends BaseOpportunitiesController
                 ],
                 'currentSearchFields' => ['title', 'type'],
                 'routeName' => 'opportunity.list',
+                'listRouteName' => 'opportunity.list',
+                'showRouteName' => 'opportunity.show',
             ],
         };
     }
@@ -133,9 +137,11 @@ class ListController extends BaseOpportunitiesController
                 'field' => $sortFilters['field'],
                 'order' => $sortFilters['order'],
             ],
-            'routeName' => $config['routeName'],
+            'listRouteName' => $config['listRouteName'],
+            'showRouteName' => $config['showRouteName'],
             'currentSearch' => $this->buildCurrentSearch($searchFilters, $config['currentSearchFields']),
             'actions' => $config['actions'] ?? [],
+            'context'=> $this->getRouteContext()
         ]);
     }
 

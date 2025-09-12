@@ -12,13 +12,16 @@ use Illuminate\Support\Facades\Route;
 
 // User routes
 Route::middleware(['auth', 'role:user'])->group(function () {
-    Route::get('opportunity/list', ListController::class)->name('opportunity.list');
     Route::get('opportunity/show/{id}', ShowController::class)->name('opportunity.show');
+    Route::get('opportunity/list', ListController::class)->name('opportunity.list');
 });
 
+Route::middleware(['auth','role:partner'])->prefix('me')->group(function(){
+    Route::get('opportunity/show/{id}', ShowController::class)->name('me.opportunity.show');
+    Route::get('opportunity/list', ListController::class)->name('me.opportunity.list');
+});
 // Partner routes
 Route::middleware(['auth', 'role:partner'])->group(function () {
-    Route::get('opportunity/me/list', ListController::class)->name('opportunity.me.list');
     Route::get('opportunity/create', [FormController::class, 'form'])->name('opportunity.create');
     Route::post('opportunity/submit/{id?}', [FormController::class, 'store'])->name('opportunity.submit');
     Route::get('opportunity/edit/{id}', [FormController::class, 'form'])->name('opportunity.edit');
@@ -43,19 +46,30 @@ Breadcrumbs::for('opportunity.create', function (BreadcrumbTrail $trail) {
     $trail->push('Submit a new Opportunity', route('opportunity.create'));
 });
 
-Breadcrumbs::for('opportunity.me.list', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('me.opportunity.list', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');
-    $trail->push('My submitted opportunities', route('opportunity.me.list'));
+    $trail->push('My submitted opportunities', route('me.opportunity.list'));
+});
+
+Breadcrumbs::for('opportunity.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('View and Apply for Partner Opportunities', route('opportunity.list'));
+});
+
+Breadcrumbs::for('me.opportunity.show', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('My submitted opportunities', route('me.opportunity.list'));
+    $trail->push('My Opportunity details', route('me.opportunity.show', request('id')));
 });
 
 Breadcrumbs::for('opportunity.show', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');
-    $trail->push('My submitted opportunities', route('opportunity.me.list'));
+    $trail->push('View and Apply for Partner Opportunities', route('opportunity.list'));
     $trail->push('Opportunity details', route('opportunity.show', request('id')));
 });
 
 Breadcrumbs::for('opportunity.edit', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');
-    $trail->push('My submitted opportunities', route('opportunity.me.list'));
+    $trail->push('My submitted opportunities', route('me.opportunity.list'));
     $trail->push('Edit Opportunity', route('opportunity.edit', request('id')));
 });

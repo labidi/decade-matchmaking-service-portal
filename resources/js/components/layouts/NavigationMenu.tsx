@@ -1,12 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { usePage, Link, useForm } from '@inertiajs/react';
-import { Auth, User } from '@/types';
+import { Auth, NavigationConfig, NavigationItem } from '@/types';
+import * as HeroIcons from '@heroicons/react/16/solid';
 
 export default function NavigationMenu() {
-    const { auth, unread_notifications } = usePage<{ auth: Auth; unread_notifications: number }>().props;
+    const { auth, navigation } = usePage<{ 
+        auth: Auth; 
+        navigation?: NavigationConfig;
+    }>().props;
+    
     const user = auth.user;
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+    const form = useForm({});
+
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -17,19 +24,82 @@ export default function NavigationMenu() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    if (!user) {
+    if (!user || !navigation?.user) {
         return null;
     }
 
-    const form = useForm({});
+    const getIconComponent = (iconName?: string) => {
+        if (!iconName) return null;
+        return HeroIcons[iconName as keyof typeof HeroIcons] || null;
+    };
 
-    const handleSignOutFormSubmit = (e: React.FormEvent) => {
+    const handleAction = (item: NavigationItem, e: React.FormEvent) => {
         e.preventDefault();
-        form.post(route('sign.out'), {
-            onSuccess: () => {
-                // close dialog or handle success
-            },
-        });
+        if (item.action === 'sign-out') {
+            form.post(route('sign.out'));
+        }
+    };
+
+    const renderBadge = (badge?: NavigationItem['badge']) => {
+        if (!badge) return null;
+        
+        const badgeClasses = {
+            danger: 'bg-red-600 text-white',
+            warning: 'bg-yellow-600 text-white',
+            info: 'bg-blue-600 text-white',
+            primary: 'bg-blue-600 text-white'
+        };
+        
+        const className = badgeClasses[badge.variant ?? 'primary'];
+        
+        return (
+            <span className={`ml-2 rounded-full px-2 text-xs ${className}`}>
+                {badge.value}
+            </span>
+        );
+    };
+
+    const renderNavigationItem = (item: NavigationItem, index: number) => {
+        if (item.divider) {
+            return <hr key={`${item.id}-${index}`} className="border-gray-200 my-1" />;
+        }
+
+        if (!item.visible) {
+            return null;
+        }
+
+        const Icon = getIconComponent(item.icon);
+
+        if (item.action) {
+            return (
+                <form key={item.id} onSubmit={(e) => handleAction(item, e)}>
+                    <button
+                        type="submit"
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center"
+                        role="menuitem"
+                    >
+                        {Icon && <Icon className="w-4 h-4 mr-2" />}
+                        <span>{item.label}</span>
+                        {renderBadge(item.badge)}
+                    </button>
+                </form>
+            );
+        }
+
+        const href = item.route ? route(item.route) : item.href;
+        
+        return (
+            <Link
+                key={item.id}
+                href={href ?? '#'}
+                className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                role="menuitem"
+            >
+                {Icon && <Icon className="w-4 h-4 mr-2" />}
+                <span>{item.label}</span>
+                {renderBadge(item.badge)}
+            </Link>
+        );
     };
 
     return (
@@ -42,7 +112,7 @@ export default function NavigationMenu() {
                 className="inline-flex items-center px-3 py-2 text-white-700 focus:outline-none text-xl"
             >
                 <span className="mr-2">
-                    {user.first_name} {user.last_name}
+                    {navigation.user.displayName}
                 </span>
                 <svg
                     className={`w-4 h-4 transform transition-transform ${open ? 'rotate-180' : ''}`}
@@ -54,16 +124,6 @@ export default function NavigationMenu() {
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
-                {user.is_admin  && (
-                    <Link
-                        href={route('admin.notifications.index')}
-                    >
-                        <span className="ml-2 bg-red-600 text-white rounded-full px-2 text-xs">
-                        {unread_notifications}
-                    </span>
-                    </Link>
-
-                )}
             </button>
 
             {/* Dropdown Menu */}
@@ -73,57 +133,9 @@ export default function NavigationMenu() {
                     role="menu"
                     aria-orientation="vertical"
                 >
-                    <Link
-                        href={route('user.home')}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        role="menuitem"
-                    >
-                        Home
-                    </Link>
-                    {user.is_admin && (
-
-                            <Link
-                                href={route('admin.dashboard.index')}
-                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                role="menuitem"
-                            >
-                                Dashboard
-                            </Link>
-
+                    {navigation.items.map((item, index) => 
+                        renderNavigationItem(item, index)
                     )}
-                    <Link
-                        href={route('request.me.list')}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        role="menuitem"
-                    >
-                        My Requests List
-                    </Link>
-                    {user.is_partner && (
-                    <Link
-                        href={route('opportunity.me.list')}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        role="menuitem"
-                    >
-                        My Opportunities List
-                    </Link>
-                    )}
-                    <Link
-                        href={route('notification.preferences.index')}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        role="menuitem"
-                    >
-                        Notifications settings
-                    </Link>
-                    <form method="POST" onSubmit={handleSignOutFormSubmit}>
-                        {/* Include CSRF token if needed */}
-                        <button
-                            type="submit"
-                            className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                            role="menuitem"
-                        >
-                            Sign Out
-                        </button>
-                    </form>
                 </div>
             )}
         </div>

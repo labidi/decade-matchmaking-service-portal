@@ -9,14 +9,14 @@ import {
 } from '@/types/opportunity-actions';
 import {useConfirmation, useDeleteConfirmation} from '@/components/ui/confirmation';
 
-export function useOpportunityActions(context: 'admin' | 'user' = 'user'): UseOpportunityActionsReturn {
+export function useOpportunityActions(context: string , showRouteName : string): UseOpportunityActionsReturn {
     const {auth} = usePage<{ auth: Auth }>().props;
     const { confirm } = useConfirmation();
     const deleteConfirmation = useDeleteConfirmation();
 
     // Action handlers
     const handleViewDetails = useCallback((opportunity: Opportunity) => {
-        OpportunityActionService.view(opportunity, context);
+        OpportunityActionService.view(opportunity, showRouteName);
     }, []);
 
     const handleEdit = useCallback((opportunity: Opportunity) => {

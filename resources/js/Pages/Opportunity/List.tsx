@@ -4,7 +4,7 @@ import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import {PageProps, OpportunitiesPagination} from '@/types';
 import {OpportunitiesDataTable} from '@/components/ui/data-table/opportunities/opportunities-data-table';
 import {partnerColumns} from '@/components/ui/data-table/opportunities/column-configs';
-import { useOpportunityActions } from '@/hooks/useOpportunityActions';
+import {useOpportunityActions} from '@/hooks/useOpportunityActions';
 
 interface OpportunitiesListPageProps extends PageProps<{
     opportunities: OpportunitiesPagination;
@@ -12,8 +12,10 @@ interface OpportunitiesListPageProps extends PageProps<{
         field: string;
         order: string;
     };
-    routeName: string;
+    listRouteName: string;
+    showRouteName: string;
     currentSearch?: Record<string, string>;
+    context: 'user_own' | 'admin' | 'public';
     searchFieldsOptions?: {
         types?: { value: string; label: string }[];
         statuses?: { value: string; label: string }[];
@@ -24,15 +26,17 @@ interface OpportunitiesListPageProps extends PageProps<{
 export default function OpportunitiesListPage({
                                                   opportunities,
                                                   currentSort,
-                                                  routeName,
+                                                  listRouteName,
+                                                  showRouteName,
                                                   currentSearch = {},
                                                   searchFieldsOptions,
+                                                  context,
                                                   auth
                                               }: Readonly<OpportunitiesListPageProps>) {
 
     const {
         getActionsForOpportunity,
-    } = useOpportunityActions();
+    } = useOpportunityActions(context, showRouteName);
     return (
         <FrontendLayout>
             <Head title="My Opportunities"/>
@@ -41,7 +45,7 @@ export default function OpportunitiesListPage({
                 currentSort={currentSort}
                 currentSearch={currentSearch}
                 columns={partnerColumns}
-                routeName={routeName}
+                routeName={listRouteName}
                 getActionsForOpportunity={getActionsForOpportunity}
                 pagination={{
                     current_page: opportunities.current_page,

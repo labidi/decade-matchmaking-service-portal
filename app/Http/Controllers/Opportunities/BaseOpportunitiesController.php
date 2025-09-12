@@ -22,7 +22,7 @@ abstract class BaseOpportunitiesController extends Controller
             return 'admin';
         }
 
-        if (str_contains($routeName, '.me.')) {
+        if (str_contains($routeName, 'me.')) {
             return 'user_own';
         }
 

@@ -15,16 +15,21 @@ interface OpportunitiesListPageProps {
         order: string;
     };
     currentSearch?: Record<string, string>;
+    context: string,
+    showRouteName: string
+
 }
 
 export default function OpportunityListPage({
                                                 opportunities,
                                                 currentSort,
                                                 currentSearch,
+                                                context,
+                                                showRouteName
                                             }: Readonly<OpportunitiesListPageProps>) {
     const {
         getActionsForOpportunity,
-    } = useOpportunityActions('admin');
+    } = useOpportunityActions(context, showRouteName);
 
     return (
         <SidebarLayout>

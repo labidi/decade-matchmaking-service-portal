@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Resources\UserResource;
+use App\Services\NavigationService;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,11 +35,16 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $navigationService = app(NavigationService::class);
+
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user()?->toResource(UserResource::class) ?? null,
             ],
+            'navigation' => $request->user()
+                ? $navigationService->getNavigationItems($request->user())
+                : null,
             'unread_notifications' => $request->user()?->notifications()->where('is_read', false)->count() ?? 0,
             'flash' => [
                 'success' => $request->session()->get('success'),

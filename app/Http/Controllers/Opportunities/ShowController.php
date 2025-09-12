@@ -28,20 +28,21 @@ class ShowController extends BaseOpportunitiesController
     {
         $opportunity = $this->opportunityService->findOpportunity($id);
         $actions = [];
-        if ($request->user()->can('create', Opportunity::class)) {
+
+        if ($this->getRouteContext() === 'user_own' && $request->user()->can('create', Opportunity::class)) {
             $actions[] = $this->createPrimaryAction(
                 'Create a new Opportunity',
                 route('opportunity.create')
             );
         }
 
-        if($request->user()->can('edit', [Opportunity::class, $opportunity])) {
+        if($this->getRouteContext() === 'user_own' && $request->user()->can('edit', [Opportunity::class, $opportunity])) {
             $actions[] = $this->createAction(
                 'Edit Opportunity',
                 route('opportunity.edit', $opportunity->id),
             );
         }
-        if($request->user()->can('apply', [Opportunity::class, $opportunity])) {
+        if($this->getRouteContext() === 'public' && $request->user()->can('apply', [Opportunity::class, $opportunity])) {
             $actions[] = $this->createAction(
                 'Apply for opportunity',
                 $opportunity->url,

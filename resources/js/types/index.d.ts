@@ -71,12 +71,37 @@ export interface Auth {
     user: User;
 }
 
+export interface NavigationItem {
+    id: string;
+    label: string;
+    href?: string;
+    route?: string;
+    icon?: string;
+    badge?: {
+        value: number | string;
+        variant?: 'primary' | 'danger' | 'warning' | 'info';
+    };
+    action?: 'sign-out';
+    method?: 'GET' | 'POST';
+    visible?: boolean;
+    divider?: boolean;
+}
+
+export interface NavigationConfig {
+    items: NavigationItem[];
+    user: {
+        displayName: string;
+        avatar?: string;
+    } | null;
+}
+
 export interface SharedData {
     name: string;
     auth: Auth;
     ziggy: Config & { location: string };
 
     unread_notifications?: number;
+    navigation?: NavigationConfig;
 
     [key: string]: unknown;
 }

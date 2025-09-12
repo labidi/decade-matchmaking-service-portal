@@ -13,15 +13,10 @@ export class OpportunityActionService {
      * Navigate to opportunity details page
      *
      * @param opportunity - The opportunity to view
-     * @param context - The context for determining which route to use ('admin' for admin view, 'user' for user view)
+     * @param showRouteName - The showRouteName
      */
-    static view(opportunity: Opportunity, context: 'admin' | 'user' = 'user'): void {
-        if (!opportunity?.id) {
-            console.warn('Invalid opportunity: missing ID');
-            return;
-        }
-        const routeName = context === 'admin' ? 'admin.opportunity.show' : 'opportunity.show';
-        router.visit(route(routeName, {id: opportunity.id}));
+    static view(opportunity: Opportunity, showRouteName: string): void {
+        router.visit(route(showRouteName, {id: opportunity.id}));
     }
 
     /**
@@ -81,7 +76,7 @@ export class OpportunityActionService {
                 routeName = 'admin.opportunity.list';
                 break;
             case 'partner':
-                routeName = 'opportunity.me.list';
+                routeName = 'me.opportunity.list';
                 break;
             default:
                 routeName = 'opportunity.list';
