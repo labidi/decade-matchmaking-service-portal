@@ -4,7 +4,13 @@ export {
 } from "@/types/request";
 export {RequestOffer, RequestOfferList, RequestOfferPermissions} from "@/types/offer";
 export {Opportunity, OpportunitiesList, OpportunityFormOptions, OpportunitiesPagination} from "@/types/opportunity";
-export {UserNotificationPreference, NotificationEntityType, NotificationPreferencesPagePropsWithPagination, NotificationPreferencesList, NotificationPreferencesPagination} from "@/types/notification-preferences";
+export {
+    UserNotificationPreference,
+    NotificationEntityType,
+    NotificationPreferencesPagePropsWithPagination,
+    NotificationPreferencesList,
+    NotificationPreferencesPagination
+} from "@/types/notification-preferences";
 
 export interface UIStep {
     label: string;
@@ -53,7 +59,7 @@ export interface User {
     email_verified_at?: string;
     is_partner: boolean;
     is_admin: boolean;
-    is_user:boolean;
+    is_user: boolean;
 }
 
 
@@ -330,7 +336,12 @@ export interface NotificationPreferencesTableState {
 // Utility types for notification preferences
 export type NotificationPreferenceToggleType = 'email_notification_enabled';
 
-export type NotificationPreferenceSortField = 'entity_type' | 'attribute_type' | 'attribute_value' | 'created_at' | 'updated_at';
+export type NotificationPreferenceSortField =
+    'entity_type'
+    | 'attribute_type'
+    | 'attribute_value'
+    | 'created_at'
+    | 'updated_at';
 
 // Entity attribute mapping utility type
 export type EntityAttributeMapping = {
@@ -355,3 +366,5 @@ export type NotificationPreferenceToggleHandler = (
 export type NotificationPreferenceActionHandler = (preference: UserNotificationPreference) => void;
 
 export type NotificationPreferenceBulkActionHandler = (preferences: UserNotificationPreference[]) => void;
+
+export type Context = 'admin' | 'user_own' | 'public';

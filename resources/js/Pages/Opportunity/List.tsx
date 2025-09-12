@@ -81,6 +81,7 @@ export default function OpportunitiesListPage({
                 ]}
                 showSearch={true}
                 showActions={true}
+                context={context}
             />
 
         </FrontendLayout>

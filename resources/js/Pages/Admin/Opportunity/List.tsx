@@ -1,6 +1,6 @@
 import React from 'react';
 import {Head} from '@inertiajs/react';
-import {OpportunitiesPagination} from '@/types';
+import {OpportunitiesPagination , Context} from '@/types';
 import {SidebarLayout} from '@/components/ui/layouts/sidebar-layout'
 import {OpportunitiesDataTable} from "@/components/ui/data-table/opportunities/opportunities-data-table";
 import {adminColumns} from "@/components/ui/data-table/opportunities/column-configs";
@@ -15,7 +15,7 @@ interface OpportunitiesListPageProps {
         order: string;
     };
     currentSearch?: Record<string, string>;
-    context: string,
+    context: Context,
     showRouteName: string
 
 }
@@ -74,6 +74,7 @@ export default function OpportunityListPage({
                     ]}
                     showSearch={true}
                     showActions={true}
+                    context={context}
                 />
             </div>
 

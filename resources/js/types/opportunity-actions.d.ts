@@ -1,4 +1,4 @@
-import { Opportunity, Auth } from './index';
+import {Opportunity, Auth, Context} from './index';
 import { Action } from '@/components/ui/data-table/common/dropdown-actions';
 
 // Permission context for building actions
@@ -20,6 +20,7 @@ export interface OpportunityActionContext {
 // Hook return type
 export interface UseOpportunityActionsReturn {
     getActionsForOpportunity: (
+        context : Context,
         opportunity: Opportunity,
         customPermissions?: OpportunityActionContext['permissions']
     ) => Action[];

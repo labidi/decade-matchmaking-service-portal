@@ -1,11 +1,11 @@
 import React from 'react';
 import {ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/16/solid';
-import {Opportunity, OpportunitiesList, PaginationLinkProps, UIField} from "@/types";
+import {Opportunity, OpportunitiesList, PaginationLinkProps, UIField, Context} from "@/types";
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {router} from '@inertiajs/react';
 import {TablePaginationNav} from "@/components/ui/table-pagination-nav";
 import {TableSearch} from '@/components/ui/data-table/search/table-search';
-import { DropdownActions, Action } from '@/components/ui/data-table/common/dropdown-actions';
+import {DropdownActions, Action} from '@/components/ui/data-table/common/dropdown-actions';
 
 interface PaginationData {
     current_page: number;
@@ -41,23 +41,25 @@ interface OpportunitiesDataTableProps {
     searchFields?: UIField[];
     columns: TableColumn[];
     routeName?: string;
-    getActionsForOpportunity: (opportunity: Opportunity) => Action[];
+    getActionsForOpportunity: (context: Context, opportunity: Opportunity) => Action[];
     showSearch?: boolean;
     showActions?: boolean;
+    context: Context;
 }
 
 export function OpportunitiesDataTable({
-    opportunities,
-    currentSort,
-    currentSearch = {},
-    pagination,
-    searchFields = [],
-    columns,
-    routeName = 'admin.opportunity.list',
-    getActionsForOpportunity,
-    showSearch = true,
-    showActions = true
-}: Readonly<OpportunitiesDataTableProps>) {
+                                           opportunities,
+                                           currentSort,
+                                           currentSearch = {},
+                                           pagination,
+                                           searchFields = [],
+                                           columns,
+                                           routeName = 'admin.opportunity.list',
+                                           getActionsForOpportunity,
+                                           showSearch = true,
+                                           showActions = true,
+                                           context
+                                       }: Readonly<OpportunitiesDataTableProps>) {
 
     const handleSort = (field: SortField) => {
         const newOrder = currentSort.field === field && currentSort.order === 'asc' ? 'desc' : 'asc';
@@ -135,7 +137,7 @@ export function OpportunitiesDataTable({
                                 {showActions && (
                                     <TableCell className="text-right">
                                         <DropdownActions
-                                            actions={getActionsForOpportunity(opportunity)}
+                                            actions={getActionsForOpportunity(context, opportunity)}
                                         />
                                     </TableCell>
                                 )}

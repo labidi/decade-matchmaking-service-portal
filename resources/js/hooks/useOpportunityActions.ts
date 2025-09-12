@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 import {router, usePage} from '@inertiajs/react';
-import {Opportunity, Auth} from '@/types';
+import {Opportunity, Auth , Context} from '@/types';
 import {Action} from '@/components/ui/data-table/common/dropdown-actions';
 import {OpportunityActionService} from "@/services/opportunityActionService";
 import {
@@ -9,7 +9,7 @@ import {
 } from '@/types/opportunity-actions';
 import {useConfirmation, useDeleteConfirmation} from '@/components/ui/confirmation';
 
-export function useOpportunityActions(context: string , showRouteName : string): UseOpportunityActionsReturn {
+export function useOpportunityActions(context: Context , showRouteName : string): UseOpportunityActionsReturn {
     const {auth} = usePage<{ auth: Auth }>().props;
     const { confirm } = useConfirmation();
     const deleteConfirmation = useDeleteConfirmation();
@@ -46,6 +46,7 @@ export function useOpportunityActions(context: string , showRouteName : string):
 
     // Build actions for a specific opportunity
     const getActionsForOpportunity = useCallback((
+        context : Context,
         opportunity: Opportunity,
         customPermissions?: OpportunityActionContext['permissions']
     ): Action[] => {
