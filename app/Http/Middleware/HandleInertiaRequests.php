@@ -37,6 +37,12 @@ class HandleInertiaRequests extends Middleware
     {
         $navigationService = app(NavigationService::class);
 
+        $user = $request->user();
+        if($user && !$user->hasAnyRole(['partner','user'])){
+            session()->flash('info','Contact cdf@unesco.org to request a User or Partner role and unlock additional functions.');
+        }
+
+
         return [
             ...parent::share($request),
             'auth' => [

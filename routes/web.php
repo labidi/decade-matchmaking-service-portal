@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 Route::get('organizations', [\App\Http\Controllers\OrganizationsController::class, 'index'])->name('organizations.index');
 
+// Access denied route for direct navigation
+Route::get('/access-denied', function () {
+    return \Inertia\Inertia::render('Auth/AccessDenied', [
+        'requiredRoles' => request('roles', []),
+        'contactEmail' => 'cdf@unesco.org',
+        'attemptedRoute' => request('route'),
+    ]);
+})->name('access.denied')->middleware('auth');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('user.home');
 });

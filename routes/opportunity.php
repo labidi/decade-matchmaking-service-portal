@@ -10,10 +10,12 @@ use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware(['auth'])->group(function (){
+    Route::get('opportunity/list', ListController::class)->name('opportunity.list');
+});
 // User routes
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('opportunity/show/{id}', ShowController::class)->name('opportunity.show');
-    Route::get('opportunity/list', ListController::class)->name('opportunity.list');
 });
 
 Route::middleware(['auth','role:partner'])->prefix('me')->group(function(){
