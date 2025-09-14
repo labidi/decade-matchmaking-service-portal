@@ -1,8 +1,8 @@
 import {usePage} from '@inertiajs/react';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import YouTube from 'react-youtube';
 import OpportunitiesDialog from '@/components/dialogs/OpportunitiesDialog';
-import { Opportunity } from '@/types';
+import {Opportunity} from '@/types';
 import {CursorArrowRaysIcon} from '@heroicons/react/16/solid';
 
 export interface Banner {
@@ -31,7 +31,12 @@ interface BannerSectionProps {
     recentOpportunities?: Opportunity[];
 }
 
-export default function BannerSection({bannerConfiguration, YoutubeEmbed, metrics, recentOpportunities}: Readonly<BannerSectionProps>) {
+export default function BannerSection({
+                                          bannerConfiguration,
+                                          YoutubeEmbed,
+                                          metrics,
+                                          recentOpportunities
+                                      }: Readonly<BannerSectionProps>) {
     const [showOpportunitiesDialog, setShowOpportunitiesDialog] = useState(false);
 
     const pageBannerConfiguration = bannerConfiguration ?? usePage().props.banner as Banner;
@@ -67,26 +72,26 @@ export default function BannerSection({bannerConfiguration, YoutubeEmbed, metric
             )}
             {pageMetrics && (
                 <div className="py-20 px-4">
-                    <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 text-center">
-                        <div>
+                    <dl className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-10 text-white sm:mt-20 sm:grid-cols-2 sm:gap-y-16 lg:mx-0 lg:max-w-none lg:grid-cols-5">
+                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
                             <span className="block text-5xl font-bold">
                                 {pageMetrics.number_successful_matches}
                             </span>
                             <span className="mt-2 text-2xl">Successful Matches</span>
                         </div>
-                        <div>
+                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
                             <span className="block text-5xl font-bold">
                                 {pageMetrics.number_fully_closed_matches}
                             </span>
                             <span className="mt-2 text-2xl">Fully Closed Matches</span>
                         </div>
-                        <div>
+                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
                             <span className="block text-5xl font-bold">
                                 {pageMetrics.number_user_requests_in_implementation}
                             </span>
                             <span className="mt-2 text-2xl">Requests in Implementation</span>
                         </div>
-                        <div>
+                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
                             <span className="block text-5xl font-bold">
                                 {new Intl.NumberFormat('en-US', {
                                     style: 'currency',
@@ -96,28 +101,34 @@ export default function BannerSection({bannerConfiguration, YoutubeEmbed, metric
                             </span>
                             <span className="mt-2 text-2xl">Committed Funding</span>
                         </div>
-                        <button
-                            onClick={() => setShowOpportunitiesDialog(true)}
-                            className="hover:opacity-80 transition-opacity"
-                            title="Click here to preview Open Capacity development"
-                        >
+                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
+                            <button
+                                onClick={() => setShowOpportunitiesDialog(true)}
+                                className="hover:opacity-80 transition-opacity"
+                                title="Click here to preview Open Capacity development"
+                            >
                             <span className="block text-5xl font-bold">
                                 {pageMetrics.number_of_open_partner_opportunities}
                             </span>
-                            <span className="mt-2 text-2xl">
-                                Click here to preview Open Capacity development
+                                <span className="mt-2 text-2xl">
+                               <span aria-hidden="true">→</span>  Click here to preview Open Capacity development
                             </span>
-                        </button>
-                    </div>
-                </div>)}
-
-            {pageRecentOpportunities && (
-                <OpportunitiesDialog
-                    open={showOpportunitiesDialog}
-                    onClose={() => setShowOpportunitiesDialog(false)}
-                    opportunities={pageRecentOpportunities}
-                />
+                            </button>
+                        </div>
+                    </dl>
+                </div>
             )}
+
+            {
+                pageRecentOpportunities && (
+                    <OpportunitiesDialog
+                        open={showOpportunitiesDialog}
+                        onClose={() => setShowOpportunitiesDialog(false)}
+                        opportunities={pageRecentOpportunities}
+                    />
+                )
+            }
         </section>
-    );
+    )
+        ;
 }

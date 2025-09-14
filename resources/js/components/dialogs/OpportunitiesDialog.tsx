@@ -17,34 +17,6 @@ export default function OpportunitiesDialog({ open, onClose, opportunities }: Op
         return new Date(dateString).toLocaleDateString();
     };
 
-    const formatLocation = (locations: Array<{ value: string; label: string }>) => {
-        if (!locations || locations.length === 0) {
-            return 'Not specified';
-        }
-
-        if (locations[0]?.label === 'Global') {
-            return 'Global';
-        }
-
-        if (locations.length === 1) {
-            return locations[0].label;
-        }
-
-        return `${locations[0].label} +${locations.length - 1} more`;
-    };
-
-    const formatTargetAudience = (audiences: Array<{ value: string; label: string }>) => {
-        if (!audiences || audiences.length === 0) {
-            return 'All audiences';
-        }
-
-        if (audiences.length === 1) {
-            return audiences[0].label;
-        }
-
-        return `${audiences[0].label} +${audiences.length - 1} more`;
-    };
-
     const getDaysRemaining = (closingDate: string) => {
         const today = new Date();
         const closing = new Date(closingDate);
@@ -116,10 +88,16 @@ export default function OpportunitiesDialog({ open, onClose, opportunities }: Op
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-sm">
-                                            {formatLocation(opportunity.implementation_location)}
+                                            <ul className="list-disc">
+                                                {opportunity.implementation_location.map((location , index)=> (
+                                                    <li key={location.value}>{location.label}</li>
+                                                ))}
+                                            </ul>
                                         </TableCell>
                                         <TableCell className="text-sm">
-                                            {formatTargetAudience(opportunity.target_audience)}
+                                            {opportunity.target_audience.map((target_audience , index)=> (
+                                                <li key={target_audience.value}>{target_audience.label}</li>
+                                            ))}
                                         </TableCell>
                                         <TableCell>
                                             <Link
