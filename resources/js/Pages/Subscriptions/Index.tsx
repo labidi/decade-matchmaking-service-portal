@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, {useState} from 'react';
+import {router, Head, Link} from '@inertiajs/react';
 import FrontendLayout from '@/components/ui/layouts/frontend-layout';
-import { Heading } from '@/components/ui/heading';
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
-import { Divider } from '@/components/ui/divider';
-import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { RequestSubscription, PageProps } from '@/types';
-import { BellSlashIcon, EyeIcon } from '@heroicons/react/16/solid';
-import { router } from '@inertiajs/react';
+import {Heading} from '@/components/ui/heading';
+import {Button} from '@/components/ui/button';
+import {Text} from '@/components/ui/text';
+import {Divider} from '@/components/ui/divider';
+import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
+import {Badge} from '@/components/ui/badge';
+import {Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle} from '@/components/ui/dialog';
+import {RequestSubscription, PageProps} from '@/types';
+import {BellSlashIcon, EyeIcon} from '@heroicons/react/16/solid';
 
 interface SubscriptionsIndexProps extends PageProps {
     subscriptions: {
@@ -20,7 +19,7 @@ interface SubscriptionsIndexProps extends PageProps {
     };
 }
 
-export default function SubscriptionsIndex({ subscriptions }: SubscriptionsIndexProps) {
+export default function SubscriptionsIndex({subscriptions}: SubscriptionsIndexProps) {
     const [showUnsubscribeDialog, setShowUnsubscribeDialog] = useState(false);
     const [subscriptionToRemove, setSubscriptionToRemove] = useState<RequestSubscription | null>(null);
     const [isUnsubscribing, setIsUnsubscribing] = useState(false);
@@ -43,7 +42,7 @@ export default function SubscriptionsIndex({ subscriptions }: SubscriptionsIndex
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
                 },
-                body: JSON.stringify({ request_id: subscriptionToRemove.request_id }),
+                body: JSON.stringify({request_id: subscriptionToRemove.request_id}),
             });
 
             const data = await response.json();
@@ -94,23 +93,24 @@ export default function SubscriptionsIndex({ subscriptions }: SubscriptionsIndex
 
     return (
         <FrontendLayout>
-            <Head title="My Subscriptions" />
+            <Head title="My Subscriptions"/>
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">
                         <Heading>My Subscriptions</Heading>
                         <Text className="mt-2">
-                            Manage your subscriptions to capacity development requests. You'll receive updates when subscribed requests are modified.
+                            Manage your subscriptions to capacity development requests. You'll receive updates when
+                            subscribed requests are modified.
                         </Text>
                     </div>
                 </div>
 
-                <Divider className="my-6" />
+                <Divider className="my-6"/>
 
                 {subscriptions.data.length === 0 ? (
                     <div className="text-center py-12">
-                        <BellSlashIcon className="mx-auto h-12 w-12 text-gray-400" />
+                        <BellSlashIcon className="mx-auto h-12 w-12 text-gray-400"/>
                         <Heading level={3} className="mt-4 text-gray-900">No subscriptions</Heading>
                         <Text className="mt-2 text-gray-600">
                             You haven't subscribed to any requests yet. Visit request details to subscribe.
@@ -149,7 +149,8 @@ export default function SubscriptionsIndex({ subscriptions }: SubscriptionsIndex
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Badge color={getStatusBadgeColor(subscription.request?.status?.status_code || '')}>
+                                            <Badge
+                                                color={getStatusBadgeColor(subscription.request?.status?.status_code || '')}>
                                                 {subscription.request?.status?.status_label || 'Unknown'}
                                             </Badge>
                                         </TableCell>
@@ -170,7 +171,7 @@ export default function SubscriptionsIndex({ subscriptions }: SubscriptionsIndex
                                                 <Button
                                                     href={route('request.show', subscription.request_id)}
                                                 >
-                                                    <EyeIcon data-slot="icon" />
+                                                    <EyeIcon data-slot="icon"/>
                                                     View
                                                 </Button>
                                                 {!subscription.subscribed_by_admin && (
@@ -178,7 +179,7 @@ export default function SubscriptionsIndex({ subscriptions }: SubscriptionsIndex
                                                         color="red"
                                                         onClick={() => handleUnsubscribe(subscription)}
                                                     >
-                                                        <BellSlashIcon data-slot="icon" />
+                                                        <BellSlashIcon data-slot="icon"/>
                                                         Unsubscribe
                                                     </Button>
                                                 )}
@@ -202,7 +203,8 @@ export default function SubscriptionsIndex({ subscriptions }: SubscriptionsIndex
                 <Dialog open={showUnsubscribeDialog} onClose={() => setShowUnsubscribeDialog(false)}>
                     <DialogTitle>Confirm Unsubscribe</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to unsubscribe from this request? You will no longer receive updates about changes to this request.
+                        Are you sure you want to unsubscribe from this request? You will no longer receive updates about
+                        changes to this request.
                     </DialogDescription>
                     <DialogBody>
                         {subscriptionToRemove && (

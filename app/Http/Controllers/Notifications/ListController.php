@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Notifications;
 use App\Enums\Opportunity\Type;
 use App\Enums\Request\SubTheme;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\NotificationPreferenceResource;
 use App\Models\NotificationPreference;
-use App\Services\NotificationService;
+use App\Models\User;
 use App\Services\NotificationPreferenceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,11 +17,11 @@ class ListController extends Controller
 {
     public function __construct(
         private readonly NotificationPreferenceService $preferenceService
-    ) {
-    }
+    ) {}
 
     /**
      * Display user's notification preferences with pagination support
+     *
      * @throws \Throwable
      */
     public function list(Request $request)
@@ -38,13 +37,11 @@ class ListController extends Controller
 
         $user = Auth::user();
 
-
         // Get paginated preferences
         $preferences = $this->preferenceService->getUserPreferences($user);
 
-
         // Get available options for each entity type
-        $availableOptions = $this->getAvailableOptions();
+        $availableOptions = $this->getAvailableOptions($user);
 
         return Inertia::render('NotificationPreferences/List', [
             'preferences' => $preferences,
@@ -63,16 +60,14 @@ class ListController extends Controller
     /**
      * Get available options for each entity type and attribute type
      */
-    private function getAvailableOptions(): array
+    private function getAvailableOptions(User $user): array
     {
-        return [
-            NotificationPreference::ENTITY_TYPE_REQUEST => [
-                'subtheme' => SubTheme::getOptions(),
-            ],
-            NotificationPreference::ENTITY_TYPE_OPPORTUNITY => [
-                'type' => Type::getOptions(),
-            ],
-        ];
+        $options[NotificationPreference::ENTITY_TYPE_OPPORTUNITY]['type'] = Type::getOptions();
+        if ($user->hasRole('partner')) {
+            $options[NotificationPreference::ENTITY_TYPE_REQUEST]['subtheme'] = SubTheme::getOptions();
+        }
+
+        return $options;
     }
 
     /**
@@ -85,7 +80,7 @@ class ListController extends Controller
         ]);
 
         $entityType = $request->get('entity_type');
-        $availableOptions = $this->getAvailableOptions();
+        $availableOptions = $this->getAvailableOptions($request->user());
 
         return response()->json([
             'entity_type' => $entityType,

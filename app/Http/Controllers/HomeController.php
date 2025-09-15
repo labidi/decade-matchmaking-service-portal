@@ -29,7 +29,7 @@ class HomeController extends Controller
             'partnerGuide' => $this->settingsService->getSetting(Setting::PARTNER_GUIDE),
             'banner' => [
                 'title' => 'Welcome back ' . $user->name,
-                'description' => 'Whether you\'re seeking training or offering expertise, this platform makes the connection. It\'s where organizations find support—and partners find purpose. By matching demand with opportunity, it brings the right people and resources together. A transparent marketplace driving collaboration, innovation, and impact.',
+                'description' => 'The Ocean Decade Capacity Development Platform',
                 'image' => '/assets/img/sidebar.png',
             ],
         ]);

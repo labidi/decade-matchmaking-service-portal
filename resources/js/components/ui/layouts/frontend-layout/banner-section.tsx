@@ -58,7 +58,7 @@ export default function BannerSection({
         <section style={{backgroundImage: `url(${pageBannerConfiguration.image})`}}
                  className="bg-cover bg-center bg-casal-700 py-20 px-4 text-center text-white">
             <div className="max-w-5xl mx-auto">
-                <h2 className="text-5xl font-bold mb-6">Capacity Development Matchmaking Platform</h2>
+                <h2 className="text-5xl font-bold mb-6">Ocean Connector</h2>
                 <p className="text-xl mb-8">
                     {pageBannerConfiguration.description}
                 </p>

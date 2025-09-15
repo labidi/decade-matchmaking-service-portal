@@ -19,7 +19,7 @@ export default function List({
                                  availableOptions,
                                  attributeTypes,
                                  entityTypes
-                             }: NotificationPreferencesPagePropsWithPagination) {
+                             }: Readonly<NotificationPreferencesPagePropsWithPagination>) {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
     // Generate column configuration
