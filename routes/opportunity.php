@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function (){
     Route::get('opportunity/list', ListController::class)->name('opportunity.list');
-});
-// User routes
-Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('opportunity/show/{id}', ShowController::class)->name('opportunity.show');
 });
 

@@ -17,6 +17,7 @@ enum Type: string
     case OCEAN_DATA = 'ocean-data';
     case NETWORKS_COMMUNITY = 'networks-community';
     case OCEAN_LITERACY = 'ocean-literacy';
+    case WEBINAR = 'webinar';
 
     public function label(): string
     {
@@ -34,6 +35,7 @@ enum Type: string
             self::OCEAN_DATA => 'Ocean Data, Information and Documentation',
             self::NETWORKS_COMMUNITY => 'Professional Networks & Community Building',
             self::OCEAN_LITERACY => 'Ocean Literacy, Public Information and Communication',
+            self::WEBINAR => 'Webinar',
         };
     }
 

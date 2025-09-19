@@ -13,4 +13,8 @@ export default defineConfig({
         }),
         react(),
     ],
+    server: {
+        origin: 'http://portal_dev.local:5173',
+        cors: true
+    }
 });

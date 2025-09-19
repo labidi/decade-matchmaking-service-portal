@@ -22,7 +22,7 @@ export const UIOpportunityForm: UIStep[] = [
                 id: 'closing_date',
                 type: 'date',
                 required: true,
-                label: 'Application closing date (MM/DD/YY)',
+                label: 'Application/Registration Closing Date (MM/DD/YY)',
             },
             coverage_activity: {
                 id: 'coverage_activity',

@@ -43,7 +43,7 @@ class ShowController extends BaseOpportunitiesController
             );
         }
         if($this->getRouteContext() === 'public' && $request->user()->can('apply', [Opportunity::class, $opportunity])) {
-            $actions[] = $this->createAction(
+            $actions[] = $this->createPrimaryAction(
                 'Apply for opportunity',
                 $opportunity->url,
                 'secondary'
