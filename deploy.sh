@@ -8,35 +8,9 @@ set -euo pipefail
 #next line is for debugging only, comment in production
 #set -euxo pipefail
 
-useTag=""
-
-helpFunction()
-{
-   echo "use this script to deploy the app, optionally specifying a tag"
-   echo "Usage: $0 -t tag"
-   echo -e "\t-t tag we want to deploy to production"
-   echo -e "\t-h print this help"
-   exit 1 # Exit script after printing help
-}
-
-#get some args
-while getopts "t:h" opt
-do
-   case "$opt" in
-      t ) useTag="$OPTARG" ;;
-      ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
-   esac
-done
-
-# use default values if not set
-if [ -z "$useTag" ]; then
-  useTag='dev'
-  APP_DIR="/var/www/html/decade-matchmaking-service-portal_dev"
-  BRANCH="main"
-else
-  APP_DIR="/var/www/html/decade-matchmaking-service-portal"
-  BRANCH="$useTag"            # adjust if needed
-fi
+# Configuration
+APP_DIR="/var/www/html/decade-matchmaking-service-portal_dev"
+BRANCH="main"
 
 printf "deploying $BRANCH in $APP_DIR \n"
 
@@ -59,18 +33,17 @@ cd "$APP_DIR"
 echo "git fetch --prune '$REMOTE'"
 git fetch --prune "$REMOTE"
 
-if [ -z "$useTag" ]; then
-	LOCAL=$(git rev-parse @)
-	echo "local $LOCAL"
-	UPSTR=$(git rev-parse @{u})
-	echo "upstr $UPSTR"
+# Check for new commits on the target branch
+LOCAL=$(git rev-parse "$BRANCH")
+echo "local $BRANCH: $LOCAL"
+REMOTE_BRANCH=$(git rev-parse "$REMOTE/$BRANCH")
+echo "remote $REMOTE/$BRANCH: $REMOTE_BRANCH"
 
-	if [[ "$LOCAL" == "$UPSTR" ]]; then
-	  echo "[$(date '+%F %T')] No changes detected — exiting."
-	  exit 0
-	else
-	  echo "[$(date '+%F %T')] Changes detected — resetting and pulling…"
-	fi
+if [[ "$LOCAL" == "$REMOTE_BRANCH" ]]; then
+  echo "[$(date '+%F %T')] No changes detected on $REMOTE/$BRANCH — exiting."
+  exit 0
+else
+  echo "[$(date '+%F %T')] Changes detected on $REMOTE/$BRANCH — proceeding with deployment…"
 fi
 
 git checkout "$BRANCH"
@@ -81,12 +54,19 @@ git reset --hard
 git pull --ff-only "$REMOTE" "$BRANCH"
 
 # backend deps & migrations
-if [ -z "$useTag" ]; then
-  $COMPOSER install --prefer-dist --no-interaction --optimize-autoloader
+$COMPOSER install --prefer-dist --no-interaction --optimize-autoloader
+
+# Check if migrations are needed
+echo "Checking for pending migrations..."
+MIGRATION_STATUS=$($PHP artisan migrate:status --pending 2>/dev/null | grep -c "Pending" || echo "0")
+
+if [[ "$MIGRATION_STATUS" -gt 0 ]]; then
+  echo "running migrations..."
+  $PHP artisan migrate -n --force
 else
-  $COMPOSER install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+  echo "skipping migration step"
 fi
-$PHP artisan migrate -n --force
+
 $PHP artisan config:cache
 $PHP artisan route:cache
 $PHP artisan view:cache
