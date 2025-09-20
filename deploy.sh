@@ -11,74 +11,58 @@ set -euo pipefail
 # Configuration
 APP_DIR="/var/www/html/decade-matchmaking-service-portal_dev"
 BRANCH="main"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts"
 
 printf "deploying $BRANCH in $APP_DIR \n"
-
-# --- CONFIG ---
-REMOTE="origin"
-
-PHP="/usr/bin/php"
-COMPOSER="/usr/bin/composer"
-NPM="/usr/bin/npm"
-# --------------
 
 # sanity check
 [[ -d "$APP_DIR/.git" ]] || { echo "Not a git repo: $APP_DIR"; exit 1; }
 
-echo "changing to: $APP_DIR"
+# Make scripts executable
+chmod +x "$SCRIPT_DIR"/*.sh
 
-cd "$APP_DIR"
-
-# fetch latest refs
-echo "git fetch --prune '$REMOTE'"
-git fetch --prune "$REMOTE"
-
-# Check for new commits on the target branch
-LOCAL=$(git rev-parse "$BRANCH")
-echo "local $BRANCH: $LOCAL"
-REMOTE_BRANCH=$(git rev-parse "$REMOTE/$BRANCH")
-echo "remote $REMOTE/$BRANCH: $REMOTE_BRANCH"
-
-if [[ "$LOCAL" == "$REMOTE_BRANCH" ]]; then
-  echo "[$(date '+%F %T')] No changes detected on $REMOTE/$BRANCH — exiting."
-  exit 0
-else
-  echo "[$(date '+%F %T')] Changes detected on $REMOTE/$BRANCH — proceeding with deployment…"
+# Execute git operations
+echo "[$(date '+%F %T')] Running git operations..."
+if ! "$SCRIPT_DIR/git-deploy.sh" "$APP_DIR"; then
+  if [[ $? -eq 1 ]]; then
+    echo "[$(date '+%F %T')] No changes detected — exiting."
+    exit 0
+  else
+    echo "[$(date '+%F %T')] Git operations failed"
+    exit 1
+  fi
 fi
 
-git checkout "$BRANCH"
+# Execute Laravel and NPM operations in parallel
+echo "[$(date '+%F %T')] Running Laravel and NPM operations in parallel..."
 
-# clean + hard reset to ensure pristine working tree
-git reset --hard
-#git clean -fdx
-git pull --ff-only "$REMOTE" "$BRANCH"
+# Start Laravel operations in background
+"$SCRIPT_DIR/laravel-deploy.sh" "$APP_DIR" &
+LARAVEL_PID=$!
 
-# backend deps & migrations
-$COMPOSER install --prefer-dist --no-interaction --optimize-autoloader
+# Start NPM operations in background
+"$SCRIPT_DIR/npm-deploy.sh" "$APP_DIR" &
+NPM_PID=$!
 
-# Check if migrations are needed
-echo "Checking for pending migrations..."
-MIGRATION_STATUS=$($PHP artisan migrate:status --pending 2>/dev/null | grep -c "Pending" || echo "0")
-
-if [[ "$MIGRATION_STATUS" -gt 0 ]]; then
-  echo "running migrations..."
-  $PHP artisan migrate -n --force
-else
-  echo "skipping migration step"
+# Wait for Laravel operations
+echo "Waiting for Laravel operations to complete..."
+wait $LARAVEL_PID
+LARAVEL_EXIT_CODE=$?
+if [[ $LARAVEL_EXIT_CODE -ne 0 ]]; then
+  echo "Laravel operations failed with exit code $LARAVEL_EXIT_CODE"
+  exit $LARAVEL_EXIT_CODE
 fi
+echo "✓ Laravel operations completed"
 
-$PHP artisan config:cache
-$PHP artisan route:cache
-$PHP artisan view:cache
-
-# frontend deps & build
-if [[ -f package-lock.json ]]; then
-  $NPM ci --no-audit --no-fund
-else
-  $NPM install --no-audit --no-fund
+# Wait for NPM operations
+echo "Waiting for NPM operations to complete..."
+wait $NPM_PID
+NPM_EXIT_CODE=$?
+if [[ $NPM_EXIT_CODE -ne 0 ]]; then
+  echo "NPM operations failed with exit code $NPM_EXIT_CODE"
+  exit $NPM_EXIT_CODE
 fi
-
-$NPM run build
+echo "✓ NPM operations completed"
 
 echo "[$(date '+%F %T')] Deploy finished OK"
 
