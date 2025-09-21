@@ -7,7 +7,7 @@ enum Type: string
     case TRAINING = 'training-workshop';
     case ONBOARDING_EXPEDITIONS = 'onboarding-expeditions';
     case FELLOWSHIPS = 'fellowships';
-    case INTERNSHIPS_JOBS = 'internships-jobs';
+    case INTERNSHIPS_JOBS_CONSULTANCIES = 'internships-jobs-consultancies';
     case MENTORSHIPS = 'mentorships';
     case VISITING_LECTURERS = 'visiting-lecturers';
     case TRAVEL_GRANTS = 'travel-grants';
@@ -18,6 +18,8 @@ enum Type: string
     case NETWORKS_COMMUNITY = 'networks-community';
     case OCEAN_LITERACY = 'ocean-literacy';
     case WEBINAR = 'webinar';
+    case ACCESS_EQUIPMENT = 'access-equipment';
+    case CONFERENCE_FORUMS = 'conference-forums';
 
     public function label(): string
     {
@@ -25,17 +27,19 @@ enum Type: string
             self::TRAINING => 'Training/Workshop',
             self::ONBOARDING_EXPEDITIONS => 'Onboarding Expeditions, Research & Training',
             self::FELLOWSHIPS => 'Fellowships',
-            self::INTERNSHIPS_JOBS => 'Internships/Jobs',
+            self::INTERNSHIPS_JOBS_CONSULTANCIES => 'Internship/Jobs/Consultancies',
             self::MENTORSHIPS => 'Mentorships',
             self::VISITING_LECTURERS => 'Visiting Lecturers/Scholars',
             self::TRAVEL_GRANTS => 'Travel Grants',
             self::AWARDS => 'Awards',
-            self::RESEARCH_FUNDING => 'Research Fundings, Grants & Scholarships',
+            self::RESEARCH_FUNDING => 'Fundings/ Grants/ Scolarships',
             self::ACCESS_INFRASTRUCTURE => 'Access to Infrastructure',
             self::OCEAN_DATA => 'Ocean Data, Information and Documentation',
             self::NETWORKS_COMMUNITY => 'Professional Networks & Community Building',
             self::OCEAN_LITERACY => 'Ocean Literacy, Public Information and Communication',
             self::WEBINAR => 'Webinar',
+            self::ACCESS_EQUIPMENT => 'Access to Equipment',
+            self::CONFERENCE_FORUMS => 'Conferences/ Forums',
         };
     }
 

@@ -30,6 +30,7 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
         <FrontendLayout>
             <Head title={`Opportunity: ${opportunity.title}`}/>
             <div className="mx-auto">
+
                 {/* Header Section */}
                 <div className="mb-8">
                     <div className="px-4 sm:px-0">
@@ -40,6 +41,16 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
 
                 <div className="mt-6">
                     <dl className="grid grid-cols-1 sm:grid-cols-2">
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Co Organizers</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">
+                                {opportunity.co_organizers?.map((item, index) => (
+                                    <Badge key={item} color="blue" className="mr-1 mb-1">
+                                        {item}
+                                    </Badge>
+                                ))}
+                            </dd>
+                        </div>
                         <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900">Type</dt>
                             <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.type.label}</dd>
@@ -64,10 +75,6 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                                     )}
                                 </span>
                             </dd>
-                        </div>
-                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
-                            <dt className="text-sm/6 font-medium text-gray-900">Status</dt>
-                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.status.label}</dd>
                         </div>
                         <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900">Coverage of CD Activity</dt>
