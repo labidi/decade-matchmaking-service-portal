@@ -28,10 +28,11 @@ class ListController extends BaseOpportunitiesController
             'admin' => [
                 'component' => 'Admin/Opportunity/List',
                 'title' => 'Opportunities',
-                'searchFields' => ['user', 'title'],
-                'searchFieldsOptions' => [
-                    'types' => Opportunity::getTypeOptions(),
-                    'statuses' => Status::getOptions(),
+                'searchFields' => [
+                    ['name' => 'user', 'label' => 'User', 'type' => 'text'],
+                    ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['name' => 'type', 'label' => 'Type', 'type' => 'select', 'options' => Opportunity::getTypeOptions()],
+                    ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => Status::getOptions()],
                 ],
                 'currentSearchFields' => ['user', 'title'],
                 'listRouteName' => 'admin.opportunity.list',
@@ -44,10 +45,10 @@ class ListController extends BaseOpportunitiesController
                     'title' => 'List of My submitted Opportunities',
                     'description' => 'Manage your submitted opportunities here.'
                 ],
-                'searchFields' => ['title', 'type', 'status'],
-                'searchFieldsOptions' => [
-                    'types' => Type::getOptions(),
-                    'statuses' => Status::getOptions(),
+                'searchFields' => [
+                    ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['name' => 'type', 'label' => 'Type', 'type' => 'select', 'options' => Type::getOptions()],
+                    ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => Status::getOptions()],
                 ],
                 'currentSearchFields' => ['type', 'status', 'title'],
                 'listRouteName' => 'me.opportunity.list',
@@ -68,10 +69,9 @@ class ListController extends BaseOpportunitiesController
                     'title' => 'List of Opportunities',
                     'description' => 'Browse and view opportunities submitted by CDF partners here.'
                 ],
-                'searchFields' => ['title', 'type'],
-                'searchFieldsOptions' => [
-                    'types' => Type::getOptions(),
-                    'statuses' => Status::getOptions(),
+                'searchFields' => [
+                    ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['name' => 'type', 'label' => 'Type', 'type' => 'select', 'options' => Type::getOptions()],
                 ],
                 'currentSearchFields' => ['title', 'type'],
                 'routeName' => 'opportunity.list',
@@ -132,7 +132,7 @@ class ListController extends BaseOpportunitiesController
                 $config['banner']['title'],
                 $config['banner']['description']
             ) : null,
-            'searchFieldsOptions' => $config['searchFieldsOptions'],
+            'searchFields' => $config['searchFields'],
             'currentSort' => [
                 'field' => $sortFilters['field'],
                 'order' => $sortFilters['order'],

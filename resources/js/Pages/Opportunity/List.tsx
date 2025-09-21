@@ -16,10 +16,12 @@ interface OpportunitiesListPageProps extends PageProps<{
     showRouteName: string;
     currentSearch?: Record<string, string>;
     context: 'user_own' | 'admin' | 'public';
-    searchFieldsOptions?: {
-        types?: { value: string; label: string }[];
-        statuses?: { value: string; label: string }[];
-    }
+    searchFields: Array<{
+        name: string;
+        label: string;
+        type: 'text' | 'select';
+        options?: Array<{value: string, label: string}>;
+    }>;
 }> {
 }
 
@@ -29,7 +31,7 @@ export default function OpportunitiesListPage({
                                                   listRouteName,
                                                   showRouteName,
                                                   currentSearch = {},
-                                                  searchFieldsOptions,
+                                                  searchFields,
                                                   context,
                                                   auth
                                               }: Readonly<OpportunitiesListPageProps>) {
@@ -57,28 +59,15 @@ export default function OpportunitiesListPage({
                     to: opportunities.to,
                     total: opportunities.total
                 }}
-                searchFields={[
-                    {
-                        id: 'title',
-                        type: 'text',
-                        label: 'Title',
-                        placeholder: 'Search by opportunity title...'
-                    },
-                    {
-                        id: 'type',
-                        type: 'select',
-                        label: 'Type',
-                        placeholder: 'Filter by type...',
-                        options: searchFieldsOptions?.types || []
-                    },
-                    {
-                        id: 'status',
-                        type: 'select',
-                        label: 'Status',
-                        placeholder: 'Filter by status...',
-                        options: searchFieldsOptions?.statuses || []
-                    }
-                ]}
+                searchFields={searchFields.map(field => ({
+                    id: field.name,
+                    type: field.type,
+                    label: field.label,
+                    placeholder: field.type === 'text'
+                        ? `Search by ${field.label.toLowerCase()}...`
+                        : `Filter by ${field.label.toLowerCase()}...`,
+                    options: field.options || []
+                }))}
                 showSearch={true}
                 showActions={true}
                 context={context}
