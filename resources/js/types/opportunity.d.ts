@@ -13,12 +13,15 @@ export interface OpportunityPermissions {
 
 export interface Opportunity {
     id: string;
+    co_organizers: string[];
     title: string;
     type: { value: string; label: string };
     status: { value: string; label: string };
     closing_date: string;
     coverage_activity: { value: string; label: string };
     implementation_location: Array<{ value: string; label: string }>;
+    thematic_areas: Array<{ value: string; label: string }>;
+    thematic_areas_other: string;
     target_audience: Array<{ value: string; label: string }>;
     target_audience_other: string;
     target_languages: Array<{ value: string; label: string }>;
@@ -43,6 +46,7 @@ export interface OpportunityFormOptions {
     target_audience?: Array<{ value: string; label: string }>;
     opportunity_types?: Array<{ value: string; label: string }>;
     coverage_activity?: Array<{ value: string; label: string }>;
+    thematic_areas?: Array<{ value: string; label: string }>;
     yes_no?: Array<{ value: string; label: string }>;
 }
 

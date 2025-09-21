@@ -23,6 +23,7 @@ class OpportunityResource extends JsonResource
     {
         $baseData = [
             'id' => $this->id,
+            'co_organizers' => $this->co_organizers,
             'title' => $this->title,
             'type' => [
                 'value' => $this->type->value,
@@ -38,6 +39,8 @@ class OpportunityResource extends JsonResource
                 'label' => $this->coverage_activity->label(),
             ],
             'implementation_location' => $this->transformEnumArray($this->implementation_location),
+            'thematic_areas' => $this->transformEnumArray($this->thematic_areas),
+            'thematic_areas_other' => $this->thematic_areas_other,
             'target_audience' => $this->transformEnumArray($this->target_audience),
             'target_audience_other' => $this->target_audience_other,
             'target_languages' => $this->transformEnumArray($this->target_languages),

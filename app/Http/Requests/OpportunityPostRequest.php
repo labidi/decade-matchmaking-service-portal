@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\Common\Language;
 use App\Enums\Common\TargetAudience;
+use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -25,11 +26,18 @@ class OpportunityPostRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'co_organizers' => ['required', 'array'],
             'title' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::enum(Type::class)],
             'closing_date' => ['required', 'date',Rule::date()->after('today')],
             'coverage_activity' => ['required'],
             'implementation_location' => ['required'],
+            'thematic_areas' => ['required', 'array'],
+            'thematic_areas.*' => [Rule::enum(ThematicAreas::class)],
+            'thematic_areas_other' => [
+                Rule::excludeIf(fn() => !in_array(ThematicAreas::OTHER->value, $this->input('thematic_areas', []))),
+                'string'
+            ],
             'target_audience' => ['required', 'array'],
             'target_audience.*' => [Rule::enum(TargetAudience::class)],
             'target_audience_other' => [
@@ -44,7 +52,7 @@ class OpportunityPostRequest extends FormRequest
             ],
             'summary' => ['required'],
             'url' => ['required'],
-            'key_words' => ['required', 'array', 'max:255'],
+            'key_words' => ['required', 'array'],
         ];
     }
 

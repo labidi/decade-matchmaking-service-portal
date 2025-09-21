@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Field, Label, Description, ErrorMessage } from '@/components/ui/fieldset';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';

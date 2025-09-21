@@ -9,6 +9,7 @@ use App\Enums\Common\Region;
 use App\Enums\Common\TargetAudience;
 use App\Enums\Common\YesNo;
 use App\Enums\Opportunity\CoverageActivity;
+use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
 use App\Http\Requests\OpportunityPostRequest;
 use App\Http\Resources\OpportunityResource;
@@ -48,6 +49,7 @@ class FormController extends BaseOpportunitiesController
             'target_audience' => TargetAudience::getOptions(),
             'opportunity_types' => Type::getOptions(),
             'coverage_activity' => CoverageActivity::getOptions(),
+            'thematic_areas' => ThematicAreas::getOptions(),
             'target_languages' => Language::getOptions(),
             'yes_no' => YesNo::getOptions(),
         ];

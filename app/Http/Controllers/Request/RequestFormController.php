@@ -6,7 +6,7 @@ use App\Enums\Common\Country;
 use App\Enums\Common\Language;
 use App\Enums\Common\TargetAudience;
 use App\Enums\Common\YesNo;
-use App\Enums\Opportunity\DeliveryFormat;
+use App\Enums\Request\DeliveryFormat;
 use App\Enums\Request\ProjectStage;
 use App\Enums\Request\RelatedActivity;
 use App\Enums\Request\SubTheme;

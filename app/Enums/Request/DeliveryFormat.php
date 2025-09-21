@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums\Opportunity;
+namespace App\Enums\Request;
 
 enum DeliveryFormat: string
 {

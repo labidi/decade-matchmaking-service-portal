@@ -6,18 +6,21 @@ import {Opportunity, OpportunityFormOptions} from '@/types';
 export function useOpportunityForm(opportunity?: Opportunity, formOptions?: OpportunityFormOptions) {
     const form = useForm({
         id: opportunity?.id || '',
+        co_organizers: opportunity?.co_organizers || '',
         title: opportunity?.title || '',
         type: opportunity?.type?.value || '',
         closing_date: opportunity?.closing_date || '',
         coverage_activity: opportunity?.coverage_activity?.value || '',
         implementation_location: opportunity?.implementation_location.map((item, index) => item.value) || '',
+        thematic_areas: opportunity?.thematic_areas?.map((item, index) => item.value) || [],
+        thematic_areas_other: opportunity?.thematic_areas_other || '',
         target_audience: opportunity?.target_audience?.map((item, index) => item.value) || [],
         target_audience_other: opportunity?.target_audience_other || '',
         target_languages: opportunity?.target_languages?.map((item, index) => item.value) || [],
         target_languages_other: opportunity?.target_audience_other || '',
         summary: opportunity?.summary || '',
         url: opportunity?.url || '',
-        key_words: opportunity?.key_words?.map((item,index)=>item) || '',
+        key_words: opportunity?.key_words?.map((item, index) => item) || '',
     });
 
     const [currentStep, setCurrentStep] = useState(0);
@@ -64,7 +67,7 @@ export function useOpportunityForm(opportunity?: Opportunity, formOptions?: Oppo
         if (e) e.preventDefault();
         form.clearErrors();
         setErrorSteps([]);
-        form.post(route('opportunity.submit',{'id':opportunity?.id}), {
+        form.post(route('opportunity.submit', {'id': opportunity?.id}), {
             preserveScroll: false,
             onSuccess: () => {
                 // Handle success - could redirect or show success message

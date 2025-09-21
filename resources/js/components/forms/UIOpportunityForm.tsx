@@ -4,6 +4,14 @@ export const UIOpportunityForm: UIStep[] = [
     {
         label: 'Basic Info',
         fields: {
+            co_organizers: {
+                id: 'co_organizers',
+                type: 'keywords',
+                required: true,
+                label: 'Institution or programme offering this opportunity\n',
+                description: 'If there are multiple co-organizers, you may list up to 10. If there are more than 10, please use the summary box.',
+                maxKeywords: 10
+            },
             title: {
                 id: 'title',
                 type: 'text',
@@ -16,6 +24,22 @@ export const UIOpportunityForm: UIStep[] = [
                 type: 'select',
                 required: true,
                 label: 'Type of Opportunity',
+                // options should be provided by the parent component from backend
+            },
+            thematic_areas: {
+                id: 'thematic_areas',
+                type: 'multiselect',
+                required: true,
+                label: 'If your area is not listed, select “Other” and use the Three Keywords question to describe it, or to further specify the selected areas.\n' +
+                    'Multiple choice (select all that apply):',
+                // options should be provided by the parent component from backend
+            },
+            thematic_areas_other: {
+                id: 'thematic_areas_other',
+                type: 'text',
+                required: false,
+                label: 'Please specify the areas',
+                show: data => data.thematic_areas?.includes('other')
                 // options should be provided by the parent component from backend
             },
             closing_date: {

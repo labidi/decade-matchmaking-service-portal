@@ -19,7 +19,8 @@ function getOptionsKeyForOpportunity(fieldKey: string): string | null {
         'type': 'opportunity_types',
         'target_audience': 'target_audience',
         'coverage_activity': 'coverage_activity',
-        'target_languages': 'target_languages'
+        'target_languages': 'target_languages',
+        'thematic_areas': 'thematic_areas'
     };
     return keyMap[fieldKey] || null;
 }

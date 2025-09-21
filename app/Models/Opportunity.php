@@ -7,6 +7,7 @@ use App\Enums\Common\Language;
 use App\Enums\Common\TargetAudience;
 use App\Enums\Opportunity\CoverageActivity;
 use App\Enums\Opportunity\Status;
+use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
@@ -31,8 +32,10 @@ class Opportunity extends Model
             'coverage_activity' => CoverageActivity::class,
             'implementation_location' => DynamicLocationCast::class,
             'target_languages' => AsEnumArrayObject::of(Language::class),
+            'thematic_areas' => AsEnumCollection::of(ThematicAreas::class),
             'closing_date' => 'datetime:Y-m-d',
-            'key_words' => 'array'
+            'key_words' => 'array',
+            'co_organizers' => 'array',
         ];
     }
 
@@ -49,11 +52,14 @@ class Opportunity extends Model
         'implementation_location',
         'target_audience',
         'target_audience_other',
+        'thematic_areas',
+        'thematic_areas_other',
         'target_languages',
         'target_languages_other',
         'summary',
         'url',
         'key_words',
+        'co_organizers',
         'user_id',
         'status'
     ];
