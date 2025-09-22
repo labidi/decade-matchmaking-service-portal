@@ -3,6 +3,7 @@
 namespace App\Services\Opportunity;
 
 use App\Enums\Opportunity\Status;
+use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
 use App\Models\Opportunity;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -21,6 +22,10 @@ class OpportunityQueryBuilder
 
         if (!empty($searchFilters['type'])) {
             $query->where('type', Type::tryFrom($searchFilters['type'])->value);
+        }
+
+        if (!empty($searchFilters['thematic_areas'])) {
+            $query->whereJsonContains('thematic_areas', ThematicAreas::tryFrom($searchFilters['thematic_areas'])->value);
         }
 
         if (!empty($searchFilters['location'])) {

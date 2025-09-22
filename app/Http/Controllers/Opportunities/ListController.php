@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Opportunities;
 
 use App\Enums\Opportunity\Status;
+use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
 use App\Http\Controllers\Traits\HasPageActions;
 use App\Models\Opportunity;
@@ -72,8 +73,9 @@ class ListController extends BaseOpportunitiesController
                 'searchFields' => [
                     ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
                     ['name' => 'type', 'label' => 'Type', 'type' => 'select', 'options' => Type::getOptions()],
+                    ['name' => 'thematic_areas', 'label' => 'Thematic areas', 'type' => 'select', 'options' => ThematicAreas::getOptions()],
                 ],
-                'currentSearchFields' => ['title', 'type'],
+                'currentSearchFields' => ['title', 'type','thematic_areas'],
                 'routeName' => 'opportunity.list',
                 'listRouteName' => 'opportunity.list',
                 'showRouteName' => 'opportunity.show',

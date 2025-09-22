@@ -102,6 +102,19 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                             </dd>
                         </div>
                         <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                            <dt className="text-sm/6 font-medium text-gray-900">Thematic areas</dt>
+                            <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.thematic_areas?.map((item, index) => (
+                                <Badge key={item.value} color="blue" className="mr-1 mb-1">
+                                    {item.label}
+                                </Badge>
+                            ))}
+                                {opportunity.thematic_areas_other && (
+                                    <Badge color="blue"
+                                           className="mr-1 mb-1">{opportunity.thematic_areas_other}</Badge>
+                                )}
+                            </dd>
+                        </div>
+                        <div className="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900">Language of participation</dt>
                             <dd className="mt-1 text-sm/6 text-gray-700 sm:mt-2">{opportunity.target_languages?.map((item, index) => (
                                 <Badge key={item.value} color="blue" className="mr-1 mb-1">
