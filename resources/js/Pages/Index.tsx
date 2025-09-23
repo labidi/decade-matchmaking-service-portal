@@ -3,6 +3,7 @@ import FrontendLayout from '@/components/ui/layouts/frontend-layout';
 import PortalGuideSection from "@/components/ui/pages/index/portal-guide-section";
 import {PortalGuide} from '@/types';
 import OrganizationsDialog from '@/components/dialogs/OrganizationsDialog';
+import IOCPlatformsDialog from '@/components/dialogs/IOCPlatformsDialog';
 import React, { useState } from "react";
 
 interface IndexPageProps {
@@ -11,6 +12,7 @@ interface IndexPageProps {
 
 export default function Index({portalGuide}: Readonly<IndexPageProps>) {
     const [showOrganizationsDialog, setShowOrganizationsDialog] = useState(false);
+    const [showIOCPlatformsDialog, setShowIOCPlatformsDialog] = useState(false);
 
     return (
         <FrontendLayout>
@@ -33,13 +35,19 @@ export default function Index({portalGuide}: Readonly<IndexPageProps>) {
                                 Click to view CDF Partners supporting capacity development through Ocean connector.<br/>
                             </h4>
                         </Link>
-                        <a target="_blank" href="https://www.oceancd.org/landingpage"
-                           className="p-12 bg-firefly-600 shadow">
+                        <Link
+                            id="iocplatform"
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setShowIOCPlatformsDialog(true);
+                            }}
+                            className="p-12 bg-firefly-600 shadow hover:bg-firefly-700 transition-colors cursor-pointer"
+                        >
                             <h4 className="text-xl font-semibold text-white mb-2">
-                                Search across Ocean CD Hub for available capacity development opportunities in one
-                                place.<br/>
+                                Click to view IOC Platforms Directory.
                             </h4>
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -47,6 +55,11 @@ export default function Index({portalGuide}: Readonly<IndexPageProps>) {
             <OrganizationsDialog
                 open={showOrganizationsDialog}
                 onClose={() => setShowOrganizationsDialog(false)}
+            />
+
+            <IOCPlatformsDialog
+                open={showIOCPlatformsDialog}
+                onClose={() => setShowIOCPlatformsDialog(false)}
             />
         </FrontendLayout>
     );

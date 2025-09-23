@@ -8,50 +8,66 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Services\OrganizationImportService;
+use App\Services\IOCPlatformImportService;
 
 class SettingsService
 {
-    public function __construct(private readonly OrganizationImportService $organizationImportService)
-    {
+    public function __construct(
+        private readonly OrganizationImportService $organizationImportService,
+        private readonly IOCPlatformImportService $iocPlatformImportService
+    ) {
     }
 
     /**
      * Update or create settings
+     * @throws \Exception
      */
     public function updateSettings(array $settingsData): array
     {
         $updatedSettings = [];
         $csvImportResult = null;
 
-        DB::transaction(function () use ($settingsData, &$updatedSettings, &$csvImportResult) {
+
             foreach ($settingsData as $path => $value) {
                 // Skip null values for file uploads that weren't changed
                 if ($value === null && Setting::isFileUpload($path)) {
                     continue;
                 }
-
                 $setting = Setting::where('path', $path)->first();
-                if ($setting) {
-                    $setting->update(['value' => $value]);
-                } else {
-                    $setting = Setting::create([
-                        'path' => $path,
-                        'value' => $value
-                    ]);
-                }
-                $updatedSettings[$path] = $setting;
 
+                DB::transaction(function () use (&$setting, $path, $value) {
+                    if ($setting) {
+                        $setting->update(['value' => $value]);
+                    } else {
+                        $setting = Setting::create([
+                            'path' => $path,
+                            'value' => $value
+                        ]);
+                    }
+                });
+
+                $updatedSettings[$path] = $setting;
                 // Handle CSV import if organizations_csv is being updated
                 if ($path === Setting::ORGANIZATIONS_CSV && $value) {
                     try {
                         $csvImportResult = $this->organizationImportService->import($value);
                     } catch (\Exception $e) {
                         // Re-throw the exception to rollback the transaction
-                        throw new \Exception('CSV import failed: ' . $e->getMessage(), 0, $e);
+                        throw new \Exception('Organizations CSV import failed: ' . $e->getMessage(), 0, $e);
+                    }
+                }
+
+                // Handle CSV import if ioc_platforms_csv is being updated
+                if ($path === Setting::IOC_PLATFORMS_CSV && $value) {
+                    try {
+                        $csvImportResult = $this->iocPlatformImportService->import($value);
+                    } catch (\Exception $e) {
+                        // Re-throw the exception to rollback the transaction
+                        throw new \Exception('IOC Platforms CSV import failed: ' . $e->getMessage(), 0, $e);
                     }
                 }
             }
-        });
+
 
         return [
             'settings' => $updatedSettings,
