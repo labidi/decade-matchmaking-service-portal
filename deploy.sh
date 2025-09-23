@@ -24,6 +24,7 @@ chmod +x "$SCRIPT_DIR"/*.sh
 # Execute git operations
 echo "[$(date '+%F %T')] Running git operations..."
 if ! "$SCRIPT_DIR/git-deploy.sh" "$APP_DIR"; then
+  echo " script returned this exit code : $?"
   if [[ $? -eq 1 ]]; then
     echo "[$(date '+%F %T')] No changes detected — exiting."
     exit 0
