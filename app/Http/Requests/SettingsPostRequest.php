@@ -62,6 +62,7 @@ class SettingsPostRequest extends FormRequest
             Setting::USER_GUIDE => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
             Setting::PARTNER_GUIDE => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
             Setting::ORGANIZATIONS_CSV => ['nullable', 'file', 'mimes:csv,txt', 'max:10240'],
+            Setting::IOC_PLATFORMS_CSV => ['nullable', 'file', 'mimes:csv,txt', 'max:10240'],
         ];
     }
 
@@ -94,6 +95,7 @@ class SettingsPostRequest extends FormRequest
             'fully_closed_matches_metric' => 'fully closed matches',
             'request_in_implementation_metric' => 'requests in implementation',
             'open_partner_opportunities_metric' => 'open partner opportunities',
+            'ioc_platforms_csv' => 'IOC platforms CSV file',
         ];
     }
 }

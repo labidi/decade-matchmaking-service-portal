@@ -24,6 +24,7 @@ class Setting extends Model
     public const COMMITTED_FUNDING_METRIC = 'committed_funding_metric';
     public const OPEN_PARTNER_OPPORTUNITIES_METRIC = 'open_partner_opportunities_metric';
     public const ORGANIZATIONS_CSV = 'organizations_csv';
+    public const IOC_PLATFORMS_CSV = 'ioc_platforms_csv';
 
     /**
      * Settings that are file uploads
@@ -32,7 +33,8 @@ class Setting extends Model
         self::PORTAL_GUIDE,
         self::USER_GUIDE,
         self::PARTNER_GUIDE,
-        self::ORGANIZATIONS_CSV
+        self::ORGANIZATIONS_CSV,
+        self::IOC_PLATFORMS_CSV
     ];
 
     /**
@@ -46,6 +48,7 @@ class Setting extends Model
         self::USER_GUIDE,
         self::PARTNER_GUIDE,
         self::ORGANIZATIONS_CSV,
+        self::IOC_PLATFORMS_CSV,
         self::SUCCESSFUL_MATCHES_METRIC,
         self::FULLY_CLOSED_MATCHES_METRIC,
         self::REQUEST_IN_IMPLEMENTATION_METRIC,
@@ -69,7 +72,7 @@ class Setting extends Model
     public static function getStorageDirectory(string $path): string
     {
         return match ($path) {
-            self::PORTAL_GUIDE, self::USER_GUIDE, self::PARTNER_GUIDE, SELF::ORGANIZATIONS_CSV => 'settings/guides',
+            self::PORTAL_GUIDE, self::USER_GUIDE, self::PARTNER_GUIDE, SELF::ORGANIZATIONS_CSV, self::IOC_PLATFORMS_CSV => 'settings/guides',
             default => 'settings'
         };
     }

@@ -148,6 +148,18 @@ export interface Organization {
 
 export type OrganizationsList = Organization[];
 
+export interface IOCPlatform {
+    id: number;
+    name: string;
+    description?: string;
+    link?: string;
+    contact?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export type IOCPlatformsList = IOCPlatform[];
+
 
 export interface Notification {
     id: number;
@@ -171,6 +183,7 @@ export interface Settings {
     user_guide: string;
     partner_guide: string;
     organizations_csv: string;
+    ioc_platforms_csv: string;
 }
 
 export interface PaginationLinkProps {

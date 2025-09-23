@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 Route::get('organizations', [\App\Http\Controllers\OrganizationsController::class, 'index'])->name('organizations.index');
+Route::get('ioc-platforms', [\App\Http\Controllers\IOCPlatformsController::class, 'index'])->name('ioc-platforms.index');
 
 // Access denied route for direct navigation
 Route::get('/access-denied', function () {

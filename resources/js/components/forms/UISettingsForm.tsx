@@ -106,7 +106,15 @@ export const UISettingsForm: UIStep[] = [
                 type: 'file',
                 required: false,
                 label: 'Organizations CSV Import',
-                description: 'Upload a CSV file containing organization data. The  file should have 3 columns: organization name, description, and website link.',
+                description: 'Upload a CSV file containing organization data. The file should have 3 columns: organization name, description, and website link.',
+                accept: '.csv,text/csv,application/csv',
+            },
+            ioc_platforms_csv: {
+                id: 'ioc_platforms_csv',
+                type: 'file',
+                required: false,
+                label: 'IOC Platforms CSV Import',
+                description: 'Upload a CSV file containing IOC platform data. The file should have 4 columns: name, description, link, and contact.',
                 accept: '.csv,text/csv,application/csv',
             }
         }
