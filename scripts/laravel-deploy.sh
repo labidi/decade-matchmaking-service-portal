@@ -8,28 +8,38 @@ set -euo pipefail
 PHP="/usr/bin/php"
 COMPOSER="/usr/bin/composer"
 APP_DIR="$1"
+ENVIRONMENT="${2:-dev}"  # Default to 'dev' if not provided
 
 echo "[$(date '+%F %T')] Starting Laravel operations..."
 
 # Change to app directory
 cd "$APP_DIR"
 
-# Merge .env.db with .env.stg
-echo "Merging .env.db with .env.stg..."
-if [[ -f .env.db && -f .env.stg ]]; then
-  cat .env.db >> .env.stg
-  echo "✓ .env.db merged with .env.stg"
+# Determine source env file based on environment
+if [[ "$ENVIRONMENT" == "prod" ]]; then
+    ENV_SOURCE=".env.prod"
 else
-  echo "No .env.db file to merge or .env.stg file missing, skipping merge step"
+    ENV_SOURCE=".env.stg"
 fi
 
-# Replace .env file with staging environment
-echo "Replacing .env with .env.stg..."
-if [[ -f .env.stg ]]; then
-  cp .env.stg .env
-  echo "✓ .env file updated from .env.stg"
+echo "Environment: $ENVIRONMENT (using $ENV_SOURCE)"
+
+# Merge .env.db with environment-specific file
+echo "Merging .env.db with $ENV_SOURCE"
+if [[ -f .env.db && -f "$ENV_SOURCE" ]]; then
+  cat .env.db >> "$ENV_SOURCE"
+  echo "✓ .env.db merged with $ENV_SOURCE"
 else
-  echo "⚠ Warning: .env.stg file not found, keeping current .env"
+  echo "No .env.db file to merge or $ENV_SOURCE file missing, skipping merge step"
+fi
+
+# Replace .env file with environment-specific file
+echo "Replacing .env with $ENV_SOURCE..."
+if [[ -f "$ENV_SOURCE" ]]; then
+  cp "$ENV_SOURCE" .env
+  echo "✓ .env file updated from $ENV_SOURCE"
+else
+  echo "⚠ Warning: $ENV_SOURCE file not found, keeping current .env"
 fi
 
 # Install composer dependencies

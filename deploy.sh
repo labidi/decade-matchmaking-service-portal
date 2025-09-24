@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "[$(date '+%F %T')] Deploy start"
+
 
 #be very strict
 #next line is for production use only
@@ -8,10 +8,50 @@ set -euo pipefail
 #next line is for debugging only, comment in production
 #set -euxo pipefail
 
-# Configuration
-APP_DIR="/var/www/html/decade-matchmaking-service-portal_dev"
+# Parse command line arguments
+ENVIRONMENT="dev"  # Default environment
+
+# Function to show usage
+show_usage() {
+    echo "Usage: $0 [--env <dev|prod>]"
+    echo "  --env: Environment to deploy (dev or prod), default: dev"
+    exit 1
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --env)
+            ENVIRONMENT="$2"
+            if [[ "$ENVIRONMENT" != "dev" && "$ENVIRONMENT" != "prod" ]]; then
+                echo "Error: Environment must be 'dev' or 'prod'"
+                show_usage
+            fi
+            shift 2
+            ;;
+        --help|-h)
+            show_usage
+            ;;
+        *)
+            echo "Error: Unknown argument '$1'"
+            show_usage
+            ;;
+    esac
+done
+
+echo "[$(date '+%F %T')] Deploy start"
+
+# Configuration based on environment
+if [[ "$ENVIRONMENT" == "prod" ]]; then
+    APP_DIR="/home/saddem/workspace/Test_Portal"
+else
+    APP_DIR="/home/saddem/workspace/Test_Portal"
+fi
+
 BRANCH="main"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts"
+
+echo "Environment: $ENVIRONMENT"
 
 printf "deploying $BRANCH in $APP_DIR \n"
 
@@ -29,7 +69,7 @@ echo "[$(date '+%F %T')] Running git operations..."
 echo "[$(date '+%F %T')] Running Laravel and NPM operations in parallel..."
 
 # Start Laravel operations in background
-"$SCRIPT_DIR/laravel-deploy.sh" "$APP_DIR" &
+"$SCRIPT_DIR/laravel-deploy.sh" "$APP_DIR" "$ENVIRONMENT" &
 LARAVEL_PID=$!
 
 # Start NPM operations in background
