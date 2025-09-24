@@ -37,15 +37,9 @@ echo "Installing composer dependencies..."
 $COMPOSER install --prefer-dist --no-interaction --optimize-autoloader
 
 # Check if migrations are needed
-echo "Checking for pending migrations..."
-MIGRATION_STATUS=$($PHP artisan migrate:status --pending 2>/dev/null | grep -c "Pending" || echo "0")
+echo "Applying database migrations if needed..."
+$PHP artisan migrate -n --force
 
-if [[ "$MIGRATION_STATUS" -gt 0 ]]; then
-  echo "running migrations..."
-  $PHP artisan migrate -n --force
-else
-  echo "skipping migration step"
-fi
 
 # Laravel optimization commands
 echo "Running Laravel optimizations..."
