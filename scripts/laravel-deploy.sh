@@ -24,13 +24,13 @@ else
 fi
 
 # Replace .env file with staging environment
-#echo "Replacing .env with .env.stg..."
-#if [[ -f .env.stg ]]; then
-#  cp .env.stg .env
-#  echo "✓ .env file updated from .env.stg"
-#else
-#  echo "⚠ Warning: .env.stg file not found, keeping current .env"
-#fi
+echo "Replacing .env with .env.stg..."
+if [[ -f .env.stg ]]; then
+  cp .env.stg .env
+  echo "✓ .env file updated from .env.stg"
+else
+  echo "⚠ Warning: .env.stg file not found, keeping current .env"
+fi
 
 # Install composer dependencies
 echo "Installing composer dependencies..."
