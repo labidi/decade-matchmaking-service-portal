@@ -23,16 +23,7 @@ chmod +x "$SCRIPT_DIR"/*.sh
 
 # Execute git operations
 echo "[$(date '+%F %T')] Running git operations..."
-if ! "$SCRIPT_DIR/git-deploy.sh" "$APP_DIR"; then
-  echo " script returned this exit code : $?"
-  if [[ $? -eq 1 ]]; then
-    echo "[$(date '+%F %T')] No changes detected — exiting."
-    exit 0
-  else
-    echo "[$(date '+%F %T')] Git operations failed"
-    exit 1
-  fi
-fi
+"$SCRIPT_DIR/git-deploy.sh" "$APP_DIR"
 
 # Execute Laravel and NPM operations in parallel
 echo "[$(date '+%F %T')] Running Laravel and NPM operations in parallel..."
