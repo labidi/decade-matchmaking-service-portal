@@ -14,6 +14,15 @@ echo "[$(date '+%F %T')] Starting Laravel operations..."
 # Change to app directory
 cd "$APP_DIR"
 
+# Merge .env.db with .env.stg
+echo "Merging .env.db with .env.stg..."
+if [[ -f .env.db && -f .env.stg ]]; then
+  cat .env.db >> .env.stg
+  echo "✓ .env.db merged with .env.stg"
+else
+  echo "No .env.db file to merge or .env.stg file missing, skipping merge step"
+fi
+
 # Replace .env file with staging environment
 #echo "Replacing .env with .env.stg..."
 #if [[ -f .env.stg ]]; then

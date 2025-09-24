@@ -30,7 +30,8 @@ export const UIOpportunityForm: UIStep[] = [
                 id: 'thematic_areas',
                 type: 'multiselect',
                 required: true,
-                label: 'If your area is not listed, select “Other” and use the Three Keywords question to describe it, or to further specify the selected areas.\n' +
+                label: 'Thematic Areas',
+                description: 'If your area is not listed, select “Other” and use the Three Keywords question to describe it, or to further specify the selected areas.\n' +
                     'Multiple choice (select all that apply):',
                 // options should be provided by the parent component from backend
             },
