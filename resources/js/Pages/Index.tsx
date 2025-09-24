@@ -5,6 +5,7 @@ import {PortalGuide} from '@/types';
 import OrganizationsDialog from '@/components/dialogs/OrganizationsDialog';
 import IOCPlatformsDialog from '@/components/dialogs/IOCPlatformsDialog';
 import React, { useState } from "react";
+
 interface IndexPageProps {
     portalGuide?: PortalGuide | null;
 }
