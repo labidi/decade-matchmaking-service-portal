@@ -43,9 +43,9 @@ echo "[$(date '+%F %T')] Deploy start"
 
 # Configuration based on environment
 if [[ "$ENVIRONMENT" == "prod" ]]; then
-    APP_DIR="/home/saddem/workspace/Test_Portal"
+    APP_DIR="/var/www/html/decade-matchmaking-service-portal"
 else
-    APP_DIR="/home/saddem/workspace/Test_Portal"
+    APP_DIR="/var/www/html/decade-matchmaking-service-portal_dev"
 fi
 
 BRANCH="main"
