@@ -515,4 +515,65 @@ class NotificationService
 
         return $description;
     }
+
+    /**
+     * Notify administrators about opportunity closure results
+     */
+    public function notifyAdminsOfOpportunityClosure(array $results): void
+    {
+        try {
+            // Get all administrator users
+            $adminUsers = User::role('administrator')->get();
+
+            foreach ($adminUsers as $admin) {
+                $this->createNotificationForAdmin($admin, [
+                    'title' => 'Expired Opportunities Closed',
+                    'description' => $this->generateOpportunityClosureDescription($results),
+                    'type' => 'opportunities_closed'
+                ]);
+            }
+
+            Log::info('Admin notifications sent for opportunity closure', [
+                'total_processed' => $results['total'],
+                'successfully_closed' => $results['closed'],
+                'failed' => $results['failed'],
+                'admin_count' => $adminUsers->count()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send admin notifications for opportunity closure', [
+                'results' => $results,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Generate description for opportunity closure notification
+     */
+    private function generateOpportunityClosureDescription(array $results): string
+    {
+        $description = "System automatically closed {$results['closed']} expired opportunities out of {$results['total']} found.";
+
+        if ($results['failed'] > 0) {
+            $description .= " {$results['failed']} opportunities failed to close due to errors.";
+        }
+
+        if (!empty($results['closed_opportunities'])) {
+            $description .= " Closed opportunities: ";
+            $closedTitles = array_slice(
+                array_column($results['closed_opportunities'], 'title'),
+                0,
+                3 // Show first 3 titles
+            );
+            $description .= implode(', ', $closedTitles);
+
+            if (count($results['closed_opportunities']) > 3) {
+                $remaining = count($results['closed_opportunities']) - 3;
+                $description .= " and {$remaining} more.";
+            }
+        }
+
+        return $description;
+    }
 }

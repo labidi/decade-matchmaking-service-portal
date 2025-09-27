@@ -242,4 +242,90 @@ readonly class OpportunityService
             ->limit($limit)
             ->get();
     }
+
+    /**
+     * Get all opportunities that have passed their closing date and are not already closed
+     */
+    public function getExpiredOpportunities(): Collection
+    {
+        return Opportunity::where('closing_date', '<', now())
+            ->whereNotIn('status', [Status::CLOSED->value, Status::REJECTED->value])
+            ->orderBy('closing_date', 'asc')
+            ->get();
+    }
+
+    /**
+     * Close all expired opportunities and return results summary
+     * @throws Throwable
+     */
+    public function closeExpiredOpportunities(): array
+    {
+        $results = [
+            'total' => 0,
+            'closed' => 0,
+            'failed' => 0,
+            'errors' => [],
+            'closed_opportunities' => []
+        ];
+
+        return DB::transaction(function () use (&$results) {
+            $expiredOpportunities = $this->getExpiredOpportunities();
+            $results['total'] = $expiredOpportunities->count();
+
+            if ($expiredOpportunities->isEmpty()) {
+                Log::info('[OpportunityService] No expired opportunities found');
+                return $results;
+            }
+
+            Log::info("[OpportunityService] Processing {$results['total']} expired opportunities");
+
+            foreach ($expiredOpportunities as $opportunity) {
+                try {
+                    $previousStatus = $opportunity->status;
+
+                    $this->repository->update($opportunity, [
+                        'status' => Status::CLOSED->value,
+                        'closed_at' => now(),
+                        'closed_reason' => 'Automatically closed - deadline passed',
+                        'previous_status' => $previousStatus,
+                    ]);
+
+                    $results['closed']++;
+                    $results['closed_opportunities'][] = [
+                        'id' => $opportunity->id,
+                        'title' => $opportunity->title,
+                        'previous_status' => $previousStatus,
+                        'closing_date' => $opportunity->closing_date
+                    ];
+
+                    Log::info('[OpportunityService] Opportunity auto-closed', [
+                        'opportunity_id' => $opportunity->id,
+                        'title' => $opportunity->title,
+                        'closing_date' => $opportunity->closing_date,
+                        'previous_status' => $previousStatus,
+                    ]);
+
+                } catch (Exception $e) {
+                    $results['failed']++;
+                    $results['errors'][] = [
+                        'opportunity_id' => $opportunity->id,
+                        'error' => $e->getMessage(),
+                    ];
+
+                    Log::error('[OpportunityService] Failed to close expired opportunity', [
+                        'opportunity_id' => $opportunity->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            Log::info('[OpportunityService] Opportunity closure process completed', [
+                'total_processed' => $results['total'],
+                'successfully_closed' => $results['closed'],
+                'failed' => $results['failed'],
+            ]);
+
+            return $results;
+        });
+    }
 }
