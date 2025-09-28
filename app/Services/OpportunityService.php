@@ -33,15 +33,14 @@ readonly class OpportunityService
     {
         return DB::transaction(function () use ($data, $user, $opportunity) {
             $isNew = !$opportunity;
-
+            $data += [
+                'status' => Status::PENDING_REVIEW,
+                'user_id' => $user->id
+            ];
             if ($opportunity) {
                 $this->repository->update($opportunity, $data);
                 $opportunity = $opportunity->fresh();
             } else {
-                $data += [
-                    'status' => Status::PENDING_REVIEW,
-                    'user_id' => $user->id
-                ];
                 $opportunity = $this->repository->create($data);
             }
 
@@ -49,11 +48,6 @@ readonly class OpportunityService
             if ($isNew) {
                 try {
                     $this->notificationService->notifyUsersForNewOpportunity($opportunity);
-                    Log::info('Notifications sent for new opportunity', [
-                        'opportunity_id' => $opportunity->id,
-                        'user_id' => $user->id,
-                        'title' => $opportunity->title
-                    ]);
                 } catch (Exception $e) {
                     Log::error('Failed to send notifications for new opportunity', [
                         'opportunity_id' => $opportunity->id,
@@ -61,7 +55,6 @@ readonly class OpportunityService
                         'error' => $e->getMessage(),
                         'trace' => $e->getTraceAsString()
                     ]);
-                    // Don't fail the transaction for notification errors
                 }
             }
 

@@ -57,7 +57,6 @@ class OpportunityObserver
             try {
                 // Create notification for status change
                 $this->createStatusChangeNotification($opportunity, $originalStatus);
-
                 // Dispatch status change event
                 OpportunityStatusChanged::dispatch(
                     $opportunity,
