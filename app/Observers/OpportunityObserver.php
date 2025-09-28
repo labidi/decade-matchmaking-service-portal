@@ -64,12 +64,6 @@ class OpportunityObserver
                     $originalStatus,
                     $opportunity->status
                 );
-
-                Log::info('Opportunity status changed', [
-                    'opportunity_id' => $opportunity->id,
-                    'from_status' => $originalStatus ? $this->getStatusLabel($originalStatus) : null,
-                    'to_status' => $opportunity->status->label(),
-                ]);
             } catch (Exception $e) {
                 Log::error('Failed to process opportunity status change', [
                     'opportunity_id' => $opportunity->id,

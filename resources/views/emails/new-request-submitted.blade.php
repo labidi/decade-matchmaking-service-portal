@@ -4,8 +4,7 @@
     <h2>Dear {{ $recipient['name'] }},</h2>
 
     @if($recipient['type'] === 'requester')
-        <p>Thank you for submitting your request: {{$request->capacity_development_title}} through the Capacity
-            Development Matchmaking Platform. Your submission has been received and will be reviewed by the IOC
+        <p>Thank you for submitting your request: {{$request->capacity_development_title}} through the Ocean Connector. Your submission has been received and will be reviewed by the IOC
             Secretariat.</p>
     @endif
 

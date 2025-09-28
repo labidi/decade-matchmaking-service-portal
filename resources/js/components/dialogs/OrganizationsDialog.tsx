@@ -45,7 +45,7 @@ export default function OrganizationsDialog({ open, onClose }: OrganizationsDial
         <Dialog open={open} onClose={onClose} size="4xl">
             <DialogTitle>CDF Partners</DialogTitle>
             <DialogDescription>
-                Partners supporting capacity development through the Matchmaking Platform.
+                Partners supporting capacity development through the Ocean Connector.
             </DialogDescription>
 
             <DialogBody>

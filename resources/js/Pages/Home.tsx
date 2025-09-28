@@ -34,7 +34,7 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
 
                                         <CardGuide
                                             title="Partner guide"
-                                            description="A step-by-step guide to help Partners use the Matchmaking Platform, review requests, and submit opportunities."
+                                            description="A step-by-step guide to help Partners use the Ocean connector, review requests, and submit opportunities."
                                             fileUrl={partnerGuide}
                                         />
                                     </div>
@@ -44,7 +44,7 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
 
                                         <CardGuide
                                             title="User guide"
-                                            description="A step-by-step guide to help Users navigate the Matchmaking Platform, submit requests, and engage with partner opportunities."
+                                            description="A step-by-step guide to help Users navigate the Ocean connector, submit requests, and engage with partner opportunities."
                                             fileUrl={userGuide}
                                         />
                                     </div>
