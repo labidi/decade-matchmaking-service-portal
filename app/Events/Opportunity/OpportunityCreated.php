@@ -18,18 +18,4 @@ class OpportunityCreated
         public readonly Opportunity $opportunity
     ) {
     }
-
-    /**
-     * Get the tags that should be assigned to the job.
-     *
-     * @return array<int, string>
-     */
-    public function tags(): array
-    {
-        return [
-            'opportunity',
-            'opportunity:' . $this->opportunity->id,
-            'user:' . $this->opportunity->user_id,
-        ];
-    }
 }

@@ -117,4 +117,16 @@ trait HasPageActions
     ): array {
         return $this->createAction($label, $route, $variant, $icon, 'PATCH');
     }
+
+    /**
+     * Create a PATCH action (common for partial updates)
+     */
+    protected function createLink(
+        string $label,
+        string $route,
+        ?string $icon = null,
+        string $variant = 'secondary'
+    ): array {
+        return $this->createAction($label, $route, $variant, $icon, 'LINK');
+    }
 }

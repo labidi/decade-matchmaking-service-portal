@@ -5,6 +5,7 @@ namespace App\Listeners\Opportunity;
 use App\Events\Opportunity\OpportunityStatusChanged;
 use App\Mail\OpportunityStatusUpdated;
 use App\Models\User;
+use App\Services\UserService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,6 +15,10 @@ use Throwable;
 
 class SendStatusChangeNotifications implements ShouldQueue
 {
+    public function __construct(private readonly  UserService $userService)
+    {
+    }
+
     use InteractsWithQueue;
 
     /**
@@ -38,12 +43,11 @@ class SendStatusChangeNotifications implements ShouldQueue
             // Always notify opportunity creator about status changes
             if ($opportunity->user && $opportunity->user->email) {
                 Mail::to($opportunity->user->email)
-                    ->queue(new OpportunityStatusUpdated(
+                    ->send(new OpportunityStatusUpdated(
                         $opportunity,
                         $event->getPreviousStatusEnum(),
                         $event->newStatus
-                    ))
-                    ->onQueue('mail-priority');
+                    ));
             }
 
             // Notify admins for specific status changes
@@ -80,19 +84,14 @@ class SendStatusChangeNotifications implements ShouldQueue
      */
     private function notifyAdministrators(OpportunityStatusChanged $event): void
     {
-        $admins = User::where('administrator', true)
-            ->whereNotNull('email')
-            ->get();
-
-        foreach ($admins as $admin) {
+        foreach ($this->userService->getAllAdmins() as $admin) {
             Mail::to($admin->email)
                 ->queue(new OpportunityStatusUpdated(
                     $event->opportunity,
                     $event->getPreviousStatusEnum(),
                     $event->newStatus,
                     'admin'
-                ))
-                ->onQueue('mail-priority');
+                ));
         }
     }
 

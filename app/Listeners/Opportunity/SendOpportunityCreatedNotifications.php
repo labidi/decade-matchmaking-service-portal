@@ -35,8 +35,7 @@ class SendOpportunityCreatedNotifications implements ShouldQueue
             // Send confirmation to opportunity creator
             if ($opportunity->user && $opportunity->user->email) {
                 Mail::to($opportunity->user->email)
-                    ->queue(new OpportunityPublished($opportunity, 'creator'))
-                    ->onQueue('mail-priority');
+                    ->queue(new OpportunityPublished($opportunity, 'creator'));
             }
 
             // Notify administrators
@@ -68,8 +67,7 @@ class SendOpportunityCreatedNotifications implements ShouldQueue
 
         foreach ($admins as $admin) {
             Mail::to($admin->email)
-                ->queue(new OpportunityPublished($opportunity, 'admin'))
-                ->onQueue('mail-priority');
+                ->queue(new OpportunityPublished($opportunity, 'admin'));
         }
     }
 

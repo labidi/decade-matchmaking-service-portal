@@ -204,7 +204,7 @@ export interface ActionButton {
     href: string;
     icon?: string;  // Heroicon component name
     variant?: 'primary' | 'secondary' | 'danger';
-    method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'LINK';
     data?: Record<string, any>;  // Form data for non-GET requests
     confirm?: string;  // Confirmation message for destructive actions
 }

@@ -55,7 +55,7 @@ class OpportunityStatusUpdated extends Mailable implements ShouldQueue
                 'previousStatus' => $this->previousStatus?->label() ?? 'N/A',
                 'newStatus' => $this->newStatus->label(),
                 'recipientType' => $this->recipientType,
-                'viewUrl' => route('opportunities.show', $this->opportunity->id),
+                'viewUrl' => route('opportunity.show', $this->opportunity->id),
                 'actionRequired' => $this->determineActionRequired(),
             ]
         );

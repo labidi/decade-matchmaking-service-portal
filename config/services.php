@@ -42,5 +42,8 @@ return [
         'client_id' => env('LINKEDIN_CLIENT_ID', '86xhrmw892wl1w'),
         'client_secret' => env('LINKEDIN_CLIENT_SECRET', 'WPL_AP1.LaADJ3kCxauZZwyF.4Xggag=='),
         'redirect' => env('LINKEDIN_REDIRECT_URI', env('APP_URL') . '/auth/linkedin/callback'),
-    ]
+    ],
+    'mandrill' => [
+        'secret' => env('MANDRILL_KEY'),
+    ],
 ];

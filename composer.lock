@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "63fac215f075dbd68a1cbf23d8e3f9bf",
+    "content-hash": "d13be72f7dae60af9006d5c1025b78b9",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -6710,6 +6710,73 @@
             "time": "2025-04-09T08:14:01+00:00"
         },
         {
+            "name": "therobfonz/laravel-mandrill-driver",
+            "version": "6.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/luisdalmolin/laravel-mandrill-driver.git",
+                "reference": "61d012c0f011ea18973fb90acaad32a6f899092b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/luisdalmolin/laravel-mandrill-driver/zipball/61d012c0f011ea18973fb90acaad32a6f899092b",
+                "reference": "61d012c0f011ea18973fb90acaad32a6f899092b",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0",
+                "mailchimp/transactional": "^1.0",
+                "php": "^8.2",
+                "symfony/mailer": "^7.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.4.4",
+                "orchestra/testbench": "^9.9|^10.0",
+                "phpunit/phpunit": "^10.0|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelMandrill\\MandrillServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelMandrill\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luis Dalmolin",
+                    "email": "luis.nh@gmail.com"
+                },
+                {
+                    "name": "Rob Fonseca",
+                    "email": "robfonseca@gmail.com"
+                },
+                {
+                    "name": "Brandon Ferens",
+                    "email": "brandon@kirschbaumdevelopment.com"
+                }
+            ],
+            "description": "Mandrill Driver for Laravel",
+            "keywords": [
+                "laravel",
+                "mandrill"
+            ],
+            "support": {
+                "issues": "https://github.com/luisdalmolin/laravel-mandrill-driver/issues",
+                "source": "https://github.com/luisdalmolin/laravel-mandrill-driver/tree/6.1.0"
+            },
+            "time": "2025-02-23T17:17:18+00:00"
+        },
+        {
             "name": "tightenco/ziggy",
             "version": "v2.5.2",
             "source": {
@@ -9400,12 +9467,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

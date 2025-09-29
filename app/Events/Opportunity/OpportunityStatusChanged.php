@@ -55,21 +55,4 @@ class OpportunityStatusChanged
         return null;
     }
 
-    /**
-     * Get the tags that should be assigned to the job.
-     *
-     * @return array<int, string>
-     */
-    public function tags(): array
-    {
-        $previousStatusLabel = $this->getPreviousStatusEnum()?->label() ?? 'none';
-        
-        return [
-            'opportunity',
-            'opportunity:' . $this->opportunity->id,
-            'status-change',
-            'from:' . $previousStatusLabel,
-            'to:' . $this->newStatus->label(),
-        ];
-    }
 }
