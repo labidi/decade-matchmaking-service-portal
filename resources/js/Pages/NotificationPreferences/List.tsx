@@ -56,6 +56,7 @@ export default function List({
                         open={isAddDialogOpen}
                         onClose={() => setIsAddDialogOpen(false)}
                         availableOptions={availableOptions}
+                        entityTypes={entityTypes}
                     />
                 </div>
 
