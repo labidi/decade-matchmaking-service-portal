@@ -7,7 +7,7 @@ import {
 } from '@/types';
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@/components/ui/table';
 import {TablePaginationNav} from '@/components/ui/table-pagination-nav';
-import {PreferenceActionsDropdown} from './preference-actions-dropdown';
+import {DropdownActions, Action} from '@/components/ui/data-table/common/dropdown-actions';
 
 type SortField = 'entity_type' | 'attribute_type' | 'attribute_value' | 'created_at' | 'updated_at';
 
@@ -15,8 +15,7 @@ interface NotificationPreferencesDataTableProps {
     preferences: NotificationPreferencesPagination | NotificationPreferencesList;
     columns: NotificationPreferenceTableColumn[];
     routeName?: string;
-    onDeletePreference: (preference: UserNotificationPreference) => void;
-    onEditPreference?: (preference: UserNotificationPreference) => void;
+    getActionsForPreference?: (preference: UserNotificationPreference) => Action[];
     showActions?: boolean;
     updating?: boolean;
 }
@@ -25,8 +24,7 @@ export function NotificationPreferencesDataTable({
                                                      preferences,
                                                      columns,
                                                      routeName = 'notification-preferences.index',
-                                                     onDeletePreference,
-                                                     onEditPreference,
+                                                     getActionsForPreference,
                                                      showActions = true,
                                                      updating = false
                                                  }: Readonly<NotificationPreferencesDataTableProps>) {
@@ -34,7 +32,7 @@ export function NotificationPreferencesDataTable({
     // Extract data array based on whether we have pagination or not
     const preferencesData = Array.isArray(preferences) ? preferences : preferences.data;
     const pagination = !Array.isArray(preferences) ? preferences : undefined;
-    const totalColumns = columns.length + (showActions ? 1 : 0);
+    const totalColumns = columns.length + (showActions && getActionsForPreference ? 1 : 0);
 
     return (
         <>
@@ -49,7 +47,7 @@ export function NotificationPreferencesDataTable({
                                     <span className="font-medium">{column.label}</span>
                                 </TableHeader>
                             ))}
-                            {showActions && (
+                            {showActions && getActionsForPreference && (
                                 <TableHeader className="text-right">
                                     <span className="sr-only">Actions</span>
                                 </TableHeader>
@@ -75,13 +73,10 @@ export function NotificationPreferencesDataTable({
                                             {column.render(preference)}
                                         </TableCell>
                                     ))}
-                                    {showActions && (
+                                    {showActions && getActionsForPreference && (
                                         <TableCell className="text-right">
-                                            <PreferenceActionsDropdown
-                                                preference={preference}
-                                                onEdit={onEditPreference}
-                                                onDelete={onDeletePreference}
-                                                disabled={updating}
+                                            <DropdownActions
+                                                actions={getActionsForPreference(preference)}
                                             />
                                         </TableCell>
                                     )}

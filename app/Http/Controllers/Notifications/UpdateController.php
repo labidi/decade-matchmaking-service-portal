@@ -1,30 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Notifications;
 
 use App\Http\Controllers\Controller;
 use App\Models\NotificationPreference;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationPreferenceService;
+use Illuminate\Http\RedirectResponse;
 
 class UpdateController extends Controller
 {
-    public function __invoke(Request $request, NotificationPreference $preference)
+    public function __construct(
+        private readonly NotificationPreferenceService $preferenceService
+    ) {
+    }
+
+    /**
+     * Toggle email notification for a preference
+     *
+     * @param  NotificationPreference  $preference  Route model binding
+     * @return RedirectResponse
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function __invoke(NotificationPreference $preference): RedirectResponse
     {
-// Ensure user can only update their own preferences
-        if ($preference->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized');
-        }
+//        $this->authorize('update', $preference);
 
-        $request->validate([
-            'email_notification_enabled' => 'boolean',
-        ]);
-
-        $preference->update([
-            'email_notification_enabled' => $request->boolean('email_notification_enabled'),
-        ]);
+        $this->preferenceService->toggleEmailNotification($preference);
 
         return redirect()->back()
-            ->with('success', 'Notification preference updated successfully.');
+            ->with('success', 'Email notification status updated successfully.');
     }
 }

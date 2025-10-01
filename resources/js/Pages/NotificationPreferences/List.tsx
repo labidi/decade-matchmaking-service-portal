@@ -13,6 +13,7 @@ import {
     getNotificationPreferenceColumns
 } from '@/components/ui/data-table/notification-preferences';
 import AddPreferenceDialog from '@/components/features/notification-preferences/AddPreferenceDialog';
+import {useNotificationPreferenceActions} from '@/hooks/useNotificationPreferenceActions';
 
 export default function List({
                                  preferences,
@@ -21,6 +22,7 @@ export default function List({
                                  entityTypes
                              }: Readonly<NotificationPreferencesPagePropsWithPagination>) {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const {getActionsForPreference} = useNotificationPreferenceActions();
 
     // Generate column configuration
     const columns = getNotificationPreferenceColumns({
@@ -66,10 +68,9 @@ export default function List({
                         preferences={preferences.data}
                         columns={columns}
                         routeName="notification-preferences.index"
-                        onDeletePreference={() => {
-                        }} // No-op since we removed delete functionality
+                        getActionsForPreference={getActionsForPreference}
                         updating={false}
-                        showActions={false} // Disable actions since we removed delete functionality
+                        showActions={true}
                     />
                 </div>
             </div>

@@ -190,8 +190,7 @@ class NotificationPreferenceService
     /**
      * Update an existing notification preference
      *
-     * Updates preference attributes. Note: email_notification_enabled
-     * should always remain true as per current requirements.
+     * Updates preference attributes.
      *
      * @param  NotificationPreference  $preference  The preference to update
      * @param  array  $data  Updated preference data
@@ -209,17 +208,6 @@ class NotificationPreferenceService
                 'user_id' => $preference->getAttribute('user_id'),
                 'update_data' => array_keys($data),
             ]);
-
-            // Prevent disabling email notifications
-            if (isset($data['email_notification_enabled'])) {
-                Log::warning('Attempted to modify email_notification_enabled flag', [
-                    'preference_id' => $preference->getAttribute('id'),
-                    'requested_value' => $data['email_notification_enabled'],
-                ]);
-
-                // Force it to true
-                $data['email_notification_enabled'] = true;
-            }
 
             $preference->update($data);
 
@@ -243,6 +231,57 @@ class NotificationPreferenceService
 
             throw NotificationPreferenceException::databaseOperationFailed(
                 'update',
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Toggle email notification enabled status
+     *
+     * @param  NotificationPreference  $preference  The preference to toggle
+     * @return NotificationPreference The updated preference
+     *
+     * @throws NotificationPreferenceException If toggle fails
+     */
+    public function toggleEmailNotification(NotificationPreference $preference): NotificationPreference
+    {
+        DB::beginTransaction();
+
+        try {
+            $currentStatus = $preference->getAttribute('email_notification_enabled');
+            $newStatus = ! $currentStatus;
+
+            Log::info('Toggling email notification status', [
+                'preference_id' => $preference->getAttribute('id'),
+                'user_id' => $preference->getAttribute('user_id'),
+                'from' => $currentStatus,
+                'to' => $newStatus,
+            ]);
+
+            $preference->update(['email_notification_enabled' => $newStatus]);
+
+            DB::commit();
+
+            Log::info('Successfully toggled email notification status', [
+                'preference_id' => $preference->getAttribute('id'),
+                'user_id' => $preference->getAttribute('user_id'),
+                'new_status' => $newStatus,
+            ]);
+
+            return $preference->fresh();
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            Log::error('Failed to toggle email notification status', [
+                'preference_id' => $preference->getAttribute('id'),
+                'user_id' => $preference->getAttribute('user_id'),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw NotificationPreferenceException::databaseOperationFailed(
+                'toggle email notification',
                 $e->getMessage()
             );
         }

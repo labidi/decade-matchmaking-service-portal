@@ -18,7 +18,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('notification-preferences/{preference}', UpdateController::class)
         ->name('notification.preferences.update');
 
-    Route::delete('notification-preferences', DestroyController::class)
+    Route::delete('notification-preferences/{preference}', DestroyController::class)
         ->name('notification.preferences.destroy');
 
     Route::get('notification-preferences/available-options', [ListController::class, 'availableOptions'])

@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Notifications;
 
 use App\Http\Controllers\Controller;
 use App\Models\NotificationPreference;
 use App\Services\NotificationPreferenceService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 
 class DestroyController extends Controller
 {
@@ -15,16 +16,17 @@ class DestroyController extends Controller
     ) {
     }
 
-    public function __invoke(Request $request)
+    /**
+     * Delete a notification preference
+     *
+     * @param  NotificationPreference  $preference  Route model binding
+     * @return RedirectResponse
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function __invoke(NotificationPreference $preference): RedirectResponse
     {
-        $request->validate([
-            'id' => 'required|integer|exists:user_notification_preferences,id',
-        ]);
-
-        $user = Auth::user();
-        $preference = NotificationPreference::where('id', $request->id)
-            ->where('user_id', $user->id)
-            ->firstOrFail();
+//        $this->authorize('delete', $preference);
 
         $this->preferenceService->deletePreference($preference);
 
