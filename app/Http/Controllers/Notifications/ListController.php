@@ -65,14 +65,10 @@ class ListController extends Controller
      */
     private function getAvailableOptions(User $user): array
     {
-        // Request subthemes are available to all authenticated users
-        // since they can all select "request" as an entity type
-        $options[NotificationPreference::ENTITY_TYPE_REQUEST]['subtheme'] = SubTheme::getOptions();
-
-        // Opportunity types are only available to partners
         if ($user->hasRole('partner')) {
-            $options[NotificationPreference::ENTITY_TYPE_OPPORTUNITY]['type'] = Type::getOptions();
+            $options[NotificationPreference::ENTITY_TYPE_REQUEST]['subtheme'] = SubTheme::getOptions();
         }
+        $options[NotificationPreference::ENTITY_TYPE_OPPORTUNITY]['type'] = Type::getOptions();
 
         return $options;
     }
@@ -85,14 +81,14 @@ class ListController extends Controller
         $entityTypes = [];
 
         // Request entity type is available to all authenticated users
-        $entityTypes[NotificationPreference::ENTITY_TYPE_REQUEST] =
-            NotificationPreference::ENTITY_TYPES[NotificationPreference::ENTITY_TYPE_REQUEST];
-
-        // Opportunity entity type is only available to partners
         if ($user->hasRole('partner')) {
-            $entityTypes[NotificationPreference::ENTITY_TYPE_OPPORTUNITY] =
-                NotificationPreference::ENTITY_TYPES[NotificationPreference::ENTITY_TYPE_OPPORTUNITY];
+            $entityTypes[NotificationPreference::ENTITY_TYPE_REQUEST] =
+                NotificationPreference::ENTITY_TYPES[NotificationPreference::ENTITY_TYPE_REQUEST];
         }
+        // Opportunity entity type is only available to partners
+
+        $entityTypes[NotificationPreference::ENTITY_TYPE_OPPORTUNITY] =
+            NotificationPreference::ENTITY_TYPES[NotificationPreference::ENTITY_TYPE_OPPORTUNITY];
 
         return $entityTypes;
     }

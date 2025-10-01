@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\NotificationPreference;
 use App\Services\NotificationPreferenceService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 
 class UpdateController extends Controller
 {
@@ -26,7 +27,7 @@ class UpdateController extends Controller
      */
     public function __invoke(NotificationPreference $preference): RedirectResponse
     {
-//        $this->authorize('update', $preference);
+        Gate::authorize('update', $preference);
 
         $this->preferenceService->toggleEmailNotification($preference);
 

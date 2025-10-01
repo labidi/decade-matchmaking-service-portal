@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\NotificationPreference;
 use App\Services\NotificationPreferenceService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 
 class DestroyController extends Controller
 {
@@ -26,7 +27,7 @@ class DestroyController extends Controller
      */
     public function __invoke(NotificationPreference $preference): RedirectResponse
     {
-//        $this->authorize('delete', $preference);
+        Gate::authorize('delete', $preference);
 
         $this->preferenceService->deletePreference($preference);
 
