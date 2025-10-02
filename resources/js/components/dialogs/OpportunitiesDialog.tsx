@@ -66,7 +66,7 @@ export default function OpportunitiesDialog({ open, onClose, opportunities }: Op
                                                     {opportunity.title}
                                                 </Link>
                                                 {opportunity.summary && (
-                                                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                                    <p className="text-sm text-gray-500 mt-1 line-clamp-2 text-wrap">
                                                         {opportunity.summary}
                                                     </p>
                                                 )}
