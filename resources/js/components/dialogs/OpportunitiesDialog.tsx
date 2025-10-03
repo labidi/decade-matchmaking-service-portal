@@ -42,7 +42,7 @@ export default function OpportunitiesDialog({ open, onClose, opportunities }: Op
                         <div className="text-sm text-gray-600">No active opportunities available.</div>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
+                    <div>
                         <Table className="[--gutter:--spacing(6)] sm:[--gutter:--spacing(8)]">
                             <TableHead>
                                 <TableRow>

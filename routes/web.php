@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\NotificationsController;
 use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentsController;
@@ -58,8 +59,18 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('subscriptions/user/{user}', [SubscriptionController::class, 'userSubscriptions'])->name('admin.subscriptions.user-subscriptions');
     Route::post('subscriptions/bulk-unsubscribe', [SubscriptionController::class, 'bulkUnsubscribe'])->name('admin.subscriptions.bulk-unsubscribe');
 
+    // User Management Routes
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/{user}', [UserController::class, 'show'])->name('show');
+        Route::post('/{user}/roles', [UserController::class, 'assignRoles'])->name('roles.assign');
+        Route::post('/{user}/block', [UserController::class, 'toggleBlock'])->name('block.toggle');
+    });
+
+    // Legacy user role routes (backward compatibility)
     Route::post('users/{user}/roles', [UserRoleController::class, 'update'])->name('admin.users.roles.update');
     Route::get('user/list', [UserRoleController::class, 'index'])->name('admin.users.roles.list');
+
     Route::get('notifications', [NotificationsController::class, 'index'])->name('admin.notifications.index');
     Route::get('notifications/{notification}', [NotificationsController::class, 'show'])->name(
         'admin.notifications.show'

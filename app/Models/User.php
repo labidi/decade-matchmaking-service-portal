@@ -36,6 +36,7 @@ class User extends Authenticatable
         'provider',
         'provider_id',
         'avatar',
+        'is_blocked',
     ];
 
     /**
@@ -73,6 +74,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_blocked' => 'boolean',
         ];
     }
 
@@ -81,9 +83,14 @@ class User extends Authenticatable
         return $this->hasMany(Request::class);
     }
 
-    public function matched_request(): HasOne
+    public function matchedRequests(): HasMany
     {
-        return $this->hasOne(Request::class);
+        return $this->hasMany(Request::class, 'matched_partner_id');
+    }
+
+    public function opportunities(): HasMany
+    {
+        return $this->hasMany(Opportunity::class);
     }
 
     public function notifications(): HasMany
@@ -136,6 +143,55 @@ class User extends Authenticatable
         // Fallback to Gravatar or default avatar
         $hash = md5(strtolower(trim($this->email)));
         return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=150";
+    }
+
+    /**
+     * Scope: Active users (not blocked, email verified)
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_blocked', false)
+            ->whereNotNull('email_verified_at');
+    }
+
+    /**
+     * Scope: Blocked users
+     */
+    public function scopeBlocked($query)
+    {
+        return $query->where('is_blocked', true);
+    }
+
+    /**
+     * Scope: Verified users
+     */
+    public function scopeVerified($query)
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
+
+    /**
+     * Check if user is blocked
+     */
+    public function isBlocked(): bool
+    {
+        return $this->is_blocked === true;
+    }
+
+    /**
+     * Check if user is active
+     */
+    public function isActive(): bool
+    {
+        return ! $this->isBlocked() && $this->hasVerifiedEmail();
+    }
+
+    /**
+     * Check if user can login
+     */
+    public function canLogin(): bool
+    {
+        return ! $this->isBlocked();
     }
 
 }

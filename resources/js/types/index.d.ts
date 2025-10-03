@@ -11,6 +11,19 @@ export {
     NotificationPreferencesList,
     NotificationPreferencesPagination
 } from "@/types/notification-preferences";
+export {
+    UserManagement,
+    UserDetailData,
+    UsersPagination,
+    UserStatus,
+    UserStatistics,
+    UserActivity,
+    UserAction,
+    RoleOption,
+    StatusOption,
+    UserFilters,
+    SortFilters
+} from "@/types/user-management";
 
 export interface UIStep {
     label: string;
