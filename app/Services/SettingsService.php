@@ -111,7 +111,7 @@ class SettingsService
 
         // If this is a file upload setting, return the public URL
         if (Setting::isFileUpload($path) && $setting->value) {
-            return asset('storage/' . $setting->value);
+            return Storage::url($setting->value);
         }
 
         return $setting->value;
