@@ -24,6 +24,7 @@ class UserController extends Controller
 
     /**
      * Display users grid
+     * @throws \Throwable
      */
     public function index(Request $request): Response
     {
@@ -33,10 +34,11 @@ class UserController extends Controller
         $sortFilters = $request->only(['sort', 'direction', 'per_page']);
 
         $users = $this->userService->getUsersPaginated($searchFilters, $sortFilters);
+        $users->toResourceCollection(UserResource::class);
 
         return Inertia::render('Admin/User/Index', [
             'title' => 'User Management',
-            'users' => UserResource::collection($users),
+            'users' => $users,
             'filters' => $searchFilters,
             'sort' => $sortFilters,
             'availableRoles' => Role::all()->map(fn ($role) => [

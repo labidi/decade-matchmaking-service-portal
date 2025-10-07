@@ -52,7 +52,7 @@ export function SidebarContent() {
                         <RocketLaunchIcon/>
                         <SidebarLabel>Opportunities</SidebarLabel>
                     </SidebarItem>
-                    <SidebarItem href={route('admin.users.roles.list')}>
+                    <SidebarItem href={route('admin.users.index')}>
                         <UserIcon/>
                         <SidebarLabel>Users</SidebarLabel>
                     </SidebarItem>

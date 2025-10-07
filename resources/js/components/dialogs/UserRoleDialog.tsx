@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogDescription, DialogBody, DialogActions } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Field, Label } from '@/components/ui/fieldset';
-import { Checkbox, CheckboxField } from '@/components/ui/checkbox';
-import { UserManagement, RoleOption } from '@/types';
-import { router } from '@inertiajs/react';
+import React, {useState, useEffect} from 'react';
+import {Dialog, DialogTitle, DialogDescription, DialogBody, DialogActions} from '@/components/ui/dialog';
+import {Button} from '@/components/ui/button';
+import {Field, Label} from '@/components/ui/fieldset';
+import {Checkbox, CheckboxField} from '@/components/ui/checkbox';
+import {UserManagement, RoleOption} from '@/types';
+import {router} from '@inertiajs/react';
 
 interface UserRoleDialogProps {
     isOpen: boolean;
@@ -13,7 +13,7 @@ interface UserRoleDialogProps {
     availableRoles: RoleOption[];
 }
 
-export function UserRoleDialog({ isOpen, onClose, user, availableRoles }: UserRoleDialogProps) {
+export function UserRoleDialog({isOpen, onClose, user, availableRoles}: Readonly<UserRoleDialogProps>) {
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
     const [processing, setProcessing] = useState(false);
 
@@ -29,8 +29,8 @@ export function UserRoleDialog({ isOpen, onClose, user, availableRoles }: UserRo
 
         setProcessing(true);
         router.post(
-            route('admin.users.roles.assign', user.id),
-            { roles: selectedRoles },
+            route('users.roles.assign', {user: user.id}),
+            {roles: selectedRoles},
             {
                 preserveScroll: true,
                 onSuccess: () => {

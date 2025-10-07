@@ -34,7 +34,8 @@ class Setting extends Model
         self::USER_GUIDE,
         self::PARTNER_GUIDE,
         self::ORGANIZATIONS_CSV,
-        self::IOC_PLATFORMS_CSV
+        self::IOC_PLATFORMS_CSV,
+        self::PORTAL_GUIDE
     ];
 
     /**
