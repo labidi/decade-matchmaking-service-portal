@@ -56,5 +56,6 @@ echo "Running Laravel optimizations..."
 $PHP artisan config:cache
 $PHP artisan route:cache
 $PHP artisan view:cache
+$PHP artisan storage:link
 
 echo "[$(date '+%F %T')] Laravel operations completed successfully"
