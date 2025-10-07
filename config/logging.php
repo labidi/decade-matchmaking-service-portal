@@ -135,6 +135,22 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'email' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/email.log'),
+            'level' => env('EMAIL_LOG_LEVEL', 'info'),
+            'days' => env('EMAIL_LOG_DAYS', 30),
+            'replace_placeholders' => true,
+        ],
+
+        'email_errors' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/email-errors.log'),
+            'level' => 'error',
+            'days' => env('EMAIL_ERROR_LOG_DAYS', 60),
+            'replace_placeholders' => true,
+        ],
+
     ],
 
 ];
