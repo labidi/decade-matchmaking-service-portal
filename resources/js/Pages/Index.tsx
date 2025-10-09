@@ -4,7 +4,7 @@ import PortalGuideSection from "@/components/ui/pages/index/portal-guide-section
 import {PortalGuide} from '@/types';
 import OrganizationsDialog from '@/components/dialogs/OrganizationsDialog';
 import IOCPlatformsDialog from '@/components/dialogs/IOCPlatformsDialog';
-import React, { useState } from "react";
+import React, {useState} from "react";
 
 
 interface IndexPageProps {
@@ -24,12 +24,12 @@ export default function Index({portalGuide}: Readonly<IndexPageProps>) {
             <section id="features" className="py-20 px-4">
                 <div className="max-w-6xl mx-auto text-center">
                     <div className="grid md:grid-cols-2 gap-8">
-                        <Link 
-                            href="#" 
+                        <Link
+                            href="#"
                             onClick={(e) => {
                                 e.preventDefault();
                                 setShowOrganizationsDialog(true);
-                            }} 
+                            }}
                             className="p-12 bg-firefly-600 shadow hover:bg-firefly-700 transition-colors cursor-pointer"
                         >
                             <h4 className="text-xl font-semibold mb-2 text-white">
@@ -46,8 +46,8 @@ export default function Index({portalGuide}: Readonly<IndexPageProps>) {
                             className="p-12 bg-firefly-600 shadow hover:bg-firefly-700 transition-colors cursor-pointer"
                         >
                             <h4 className="text-xl font-semibold text-white mb-2">
-                                Click to view IOC Platforms Directory.
-                            </h4>
+                                Click to view directory of IOC platforms supporting capacity development in ocean
+                                science </h4>
                         </Link>
                     </div>
                 </div>

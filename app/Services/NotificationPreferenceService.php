@@ -20,8 +20,6 @@ use Illuminate\Validation\ValidationException;
  *
  * This service handles CRUD operations for notification preferences,
  * ensuring data integrity, proper logging, and error handling.
- *
- * @package App\Services
  */
 class NotificationPreferenceService
 {
@@ -71,21 +69,6 @@ class NotificationPreferenceService
         }
     }
 
-    /**
-     * Create a new notification preference
-     *
-     * Creates a new preference with automatic duplicate detection,
-     * entity type validation, and email notifications enabled by default.
-     *
-     * @param  User  $user  The user creating the preference
-     * @param  array  $data  Preference data containing:
-     *                    - entity_type: 'request' or 'opportunity'
-     *                    - attribute_value: The value to monitor (e.g., 'Ocean acidification')
-     * @return NotificationPreference The created preference
-     *
-     * @throws NotificationPreferenceException If duplicate exists or validation fails
-     * @throws ValidationException If input data is invalid
-     */
     public function createPreference(User $user, array $data): NotificationPreference
     {
         DB::beginTransaction();
@@ -187,17 +170,6 @@ class NotificationPreferenceService
         }
     }
 
-    /**
-     * Update an existing notification preference
-     *
-     * Updates preference attributes.
-     *
-     * @param  NotificationPreference  $preference  The preference to update
-     * @param  array  $data  Updated preference data
-     * @return NotificationPreference The updated preference
-     *
-     * @throws NotificationPreferenceException If update fails
-     */
     public function updatePreference(NotificationPreference $preference, array $data): NotificationPreference
     {
         DB::beginTransaction();
@@ -236,14 +208,6 @@ class NotificationPreferenceService
         }
     }
 
-    /**
-     * Toggle email notification enabled status
-     *
-     * @param  NotificationPreference  $preference  The preference to toggle
-     * @return NotificationPreference The updated preference
-     *
-     * @throws NotificationPreferenceException If toggle fails
-     */
     public function toggleEmailNotification(NotificationPreference $preference): NotificationPreference
     {
         DB::beginTransaction();
@@ -287,16 +251,6 @@ class NotificationPreferenceService
         }
     }
 
-    /**
-     * Delete a notification preference
-     *
-     * Permanently removes a preference from the database.
-     *
-     * @param  NotificationPreference  $preference  The preference to delete
-     * @return bool True if deletion was successful
-     *
-     * @throws NotificationPreferenceException If deletion fails
-     */
     public function deletePreference(NotificationPreference $preference): bool
     {
         DB::beginTransaction();

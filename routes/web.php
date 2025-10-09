@@ -13,6 +13,13 @@ Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
 Route::get('organizations', [\App\Http\Controllers\OrganizationsController::class, 'index'])->name('organizations.index');
 Route::get('ioc-platforms', [\App\Http\Controllers\IOCPlatformsController::class, 'index'])->name('ioc-platforms.index');
 
+// Email Unsubscribe routes (public - no auth required for email links)
+
+Route::prefix('unsubscribe')->group(function () {
+    Route::get('{user}', [\App\Http\Controllers\UnsubscribeController::class, 'show'])->name('unsubscribe.show');
+    Route::post('{user}', [\App\Http\Controllers\UnsubscribeController::class, 'unsubscribe'])->name('unsubscribe.process');
+    Route::get('{user}/success', [\App\Http\Controllers\UnsubscribeController::class, 'success'])->name('unsubscribe.success');});
+
 // Access denied route for direct navigation
 Route::get('/access-denied', function () {
     return \Inertia\Inertia::render('Auth/AccessDenied', [
