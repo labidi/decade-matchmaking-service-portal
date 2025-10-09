@@ -25,17 +25,12 @@ export default function PortalGuideSection({portalGuide}: Readonly<UserGuideSect
                     <div className=" p-4 flex flex-col leading-normal">
                         <div className="mb-8">
                             <p className="text-white text-2xl">
-                                Do you have a capacity development gap that needs to be addressed? <br/>
-                                Log in to submit a request for training or workshops, or explore currently available
-                                opportunities offered by CDF Partners. <br/>
-                            </p>
-                            <p className="text-white text-2xl py-4">
-                                Are you part of an organization that provides capacity development services? <br/>
-                                Looking to expand your reach or promote your activities? This platform is the right
-                                place for you. <br/>
-                                As a partner, you can both view training needs and submit your own
-                                opportunities. <br/>
-                                To get started, contact cdf@unesco.org to become a partner.
+                                Want to see success stories from completed matches, trainings, and workshops supported
+                                through the CDF? You can also access lessons-learned reports from the workshops and
+                                trainings
+                                <a href={'https://oceandecade.org/capacity-development-facility/'}
+                                   target={'_blank'}> here</a>.
+                                <br/>
                             </p>
                         </div>
                     </div>

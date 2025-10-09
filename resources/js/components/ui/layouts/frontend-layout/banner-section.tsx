@@ -105,13 +105,13 @@ export default function BannerSection({
                             <button
                                 onClick={() => setShowOpportunitiesDialog(true)}
                                 className="hover:opacity-80 transition-opacity"
-                                title="Click here to preview Open Capacity development"
+                                title="Click here to preview open capacity development opportunities"
                             >
                             <span className="block text-5xl font-bold">
                                 {pageMetrics.number_of_open_partner_opportunities}
                             </span>
                                 <span className="mt-2 text-2xl">
-                               <span aria-hidden="true">→</span>  Click here to preview Open Capacity development
+                               <span aria-hidden="true">→</span> Click here to preview open capacity development opportunities
                             </span>
                             </button>
                         </div>
