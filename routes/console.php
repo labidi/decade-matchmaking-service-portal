@@ -42,3 +42,13 @@ Schedule::command('opportunities:close-expired --force')
     ->withoutOverlapping()
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/opportunity-closure.log'));
+
+
+Schedule::command('queue:work --queue=default --stop-when-empty --max-jobs=50 --max-time=50')
+    ->everyMinute()
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->onFailure(function () {
+        // Send notification
+    });
+
