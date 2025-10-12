@@ -197,6 +197,7 @@ export interface Settings {
     partner_guide: string;
     organizations_csv: string;
     ioc_platforms_csv: string;
+    mandrill_api_key: string;
 }
 
 export interface PaginationLinkProps {

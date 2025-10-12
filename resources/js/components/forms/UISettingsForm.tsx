@@ -1,4 +1,3 @@
-import {UIField} from '@/types';
 import {UIStep} from "@/components/forms/UIOfferForm";
 
 
@@ -117,6 +116,18 @@ export const UISettingsForm: UIStep[] = [
                 description: 'Upload a CSV file containing IOC platform data. The file should have 4 columns: name, description, link, and contact.',
                 accept: '.csv,text/csv,application/csv',
             }
+        }
+    },
+    {
+        label: 'Mandrill Settings',
+        fields: {
+            mandrill_api_key: {
+                id: 'mandrill_api_key',
+                type: 'text',
+                required: false,
+                label: 'Mandrill API Key',
+                description: 'Enter your Mandrill API key for email services.',
+            },
         }
     }
 ]

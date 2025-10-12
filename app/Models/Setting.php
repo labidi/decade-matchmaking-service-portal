@@ -26,6 +26,8 @@ class Setting extends Model
     public const ORGANIZATIONS_CSV = 'organizations_csv';
     public const IOC_PLATFORMS_CSV = 'ioc_platforms_csv';
 
+    public const MANDRILL_API_KEY = 'mandrill_api_key';
+
     /**
      * Settings that are file uploads
      */
@@ -55,6 +57,7 @@ class Setting extends Model
         self::REQUEST_IN_IMPLEMENTATION_METRIC,
         self::COMMITTED_FUNDING_METRIC,
         self::OPEN_PARTNER_OPPORTUNITIES_METRIC,
+        self::MANDRILL_API_KEY
     ];
 
     public $timestamps = true;

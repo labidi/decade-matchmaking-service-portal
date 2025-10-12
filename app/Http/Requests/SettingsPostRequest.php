@@ -24,7 +24,7 @@ class SettingsPostRequest extends FormRequest
     public function rules(): array
     {
         $rules = [];
-        
+
         // Define validation rules for all possible settings
         $allValidationRules = $this->getAllValidationRules();
 
@@ -49,20 +49,21 @@ class SettingsPostRequest extends FormRequest
             Setting::SITE_NAME => ['nullable', 'string', 'max:255'],
             Setting::SITE_DESCRIPTION => ['nullable', 'string', 'max:1000'],
             Setting::HOMEPAGE_YOUTUBE_VIDEO => ['nullable', 'string', 'max:500'],
-            
+
             // Metric settings (integers)
             Setting::SUCCESSFUL_MATCHES_METRIC => ['nullable', 'integer', 'min:0'],
             Setting::COMMITTED_FUNDING_METRIC => ['nullable', 'integer', 'min:0'],
             Setting::FULLY_CLOSED_MATCHES_METRIC => ['nullable', 'integer', 'min:0'],
             Setting::REQUEST_IN_IMPLEMENTATION_METRIC => ['nullable', 'integer', 'min:0'],
             Setting::OPEN_PARTNER_OPPORTUNITIES_METRIC => ['nullable', 'integer', 'min:0'],
-            
+
             // File upload settings
             Setting::PORTAL_GUIDE => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
             Setting::USER_GUIDE => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
             Setting::PARTNER_GUIDE => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
             Setting::ORGANIZATIONS_CSV => ['nullable', 'file', 'mimes:csv,txt', 'max:10240'],
             Setting::IOC_PLATFORMS_CSV => ['nullable', 'file', 'mimes:csv,txt', 'max:10240'],
+            Setting::MANDRILL_API_KEY => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -72,8 +73,8 @@ class SettingsPostRequest extends FormRequest
      */
     private function isFieldPresent(string $field): bool
     {
-        return Setting::isFileUpload($field) 
-            ? $this->hasFile($field) 
+        return Setting::isFileUpload($field)
+            ? $this->hasFile($field)
             : $this->has($field);
     }
 
