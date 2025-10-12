@@ -29,7 +29,7 @@ export default function PortalGuideSection({portalGuide}: Readonly<UserGuideSect
                                 through the CDF? You can also access lessons-learned reports from the workshops and
                                 trainings
                                 <a href={'https://oceandecade.org/capacity-development-facility/'}
-                                   target={'_blank'}> here</a>.
+                                   target='_blank' className='inline underline underline-offset-4'> here </a>.
                                 <br/>
                             </p>
                         </div>

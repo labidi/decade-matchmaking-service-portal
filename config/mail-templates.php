@@ -109,8 +109,15 @@ return [
             'template_name' => 'cdf-update-on-your-opportunity',
             'subject' => 'Opportunity Update',
             'variables' => [
-                'Opportunity_Title' => 'required|string',
-                'Opportunity_Link' => 'required|string',
+                'UNSUB' => 'required|string',
+            ],
+            'tags' => ['opportunity', 'notification'],
+        ],
+        'opportunity.newsletter' => [
+            'template_name' => 'cdf-opportunitynewsletter',
+            'subject' => 'Opportunity newsletter',
+            'variables' => [
+                'UNSUB' => 'required|string',
             ],
             'tags' => ['opportunity', 'notification'],
         ],

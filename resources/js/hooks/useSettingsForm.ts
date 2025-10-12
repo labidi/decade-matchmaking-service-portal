@@ -23,6 +23,7 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
         request_in_implementation_metric: '',
         committed_funding_metric: '',
         open_partner_opportunities_metric: '',
+        mandrill_api_key:'',
     };
 
     const form = useForm(initialFormData);
