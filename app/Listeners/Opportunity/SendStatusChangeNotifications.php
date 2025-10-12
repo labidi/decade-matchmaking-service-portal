@@ -3,6 +3,7 @@
 namespace App\Listeners\Opportunity;
 
 use App\Events\Opportunity\OpportunityStatusChanged;
+use App\Jobs\Email\SendTransactionalEmail;
 use App\Mail\OpportunityStatusUpdated;
 use App\Models\User;
 use App\Services\UserService;
@@ -42,56 +43,11 @@ class SendStatusChangeNotifications implements ShouldQueue
         try {
             // Always notify opportunity creator about status changes
             if ($opportunity->user && $opportunity->user->email) {
-                Mail::to($opportunity->user->email)
-                    ->send(new OpportunityStatusUpdated(
-                        $opportunity,
-                        $event->getPreviousStatusEnum(),
-                        $event->newStatus
-                    ));
+
             }
 
-            // Notify admins for specific status changes
-            if ($this->shouldNotifyAdmins($event)) {
-                $this->notifyAdministrators($event);
-            }
-
-            Log::info('Opportunity status change notifications sent', [
-                'opportunity_id' => $opportunity->id,
-                'from_status' => $event->getPreviousStatusEnum()?->label(),
-                'to_status' => $event->newStatus->label(),
-            ]);
         } catch (Exception $e) {
-            Log::error('Failed to send status change notifications', [
-                'opportunity_id' => $opportunity->id,
-                'error' => $e->getMessage(),
-            ]);
-
             throw $e;
-        }
-    }
-
-    /**
-     * Determine if administrators should be notified.
-     */
-    private function shouldNotifyAdmins(OpportunityStatusChanged $event): bool
-    {
-        // Notify admins when opportunity is approved or rejected
-        return $event->wasApproved() || $event->wasRejected();
-    }
-
-    /**
-     * Notify administrators about status change.
-     */
-    private function notifyAdministrators(OpportunityStatusChanged $event): void
-    {
-        foreach ($this->userService->getAllAdmins() as $admin) {
-            Mail::to($admin->email)
-                ->queue(new OpportunityStatusUpdated(
-                    $event->opportunity,
-                    $event->getPreviousStatusEnum(),
-                    $event->newStatus,
-                    'admin'
-                ));
         }
     }
 

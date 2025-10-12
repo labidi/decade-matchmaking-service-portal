@@ -96,48 +96,6 @@ class NotificationService
             ->unique('user_id');
     }
 
-    /**
-     * Extract opportunity attributes that can be used for notifications
-     */
-    private function extractOpportunityAttributes(Opportunity $opportunity): array
-    {
-        $attributes = [];
-
-        // Opportunity Type
-        if (!empty($opportunity->type)) {
-            $attributes['type'] = is_array($opportunity->type) ? $opportunity->type['value'] : $opportunity->type;
-        }
-
-        // Coverage Activity
-        if (!empty($opportunity->coverage_activity)) {
-            $attributes['coverage_activity'] = is_array($opportunity->coverage_activity) ? $opportunity->coverage_activity['value'] : $opportunity->coverage_activity;
-        }
-
-        // Implementation Location
-        if (!empty($opportunity->implementation_location)) {
-            if (is_array($opportunity->implementation_location)) {
-                $attributes['implementation_location'] = array_column($opportunity->implementation_location, 'value');
-            } else {
-                $attributes['implementation_location'] = [$opportunity->implementation_location];
-            }
-        }
-
-        // Target Audience
-        if (!empty($opportunity->target_audience)) {
-            if (is_array($opportunity->target_audience)) {
-                $attributes['target_audience'] = array_column($opportunity->target_audience, 'value');
-            } else {
-                $attributes['target_audience'] = [$opportunity->target_audience];
-            }
-        }
-
-        // Key Words
-        if (!empty($opportunity->key_words) && is_array($opportunity->key_words)) {
-            $attributes['key_words'] = $opportunity->key_words;
-        }
-
-        return array_filter($attributes);
-    }
 
     /**
      * Create notification for a user based on matching opportunity preference

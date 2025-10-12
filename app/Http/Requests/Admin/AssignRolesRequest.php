@@ -17,7 +17,7 @@ class AssignRolesRequest extends FormRequest
         $availableRoles = Role::pluck('name')->toArray();
 
         return [
-            'roles' => ['required', 'array'],
+            'roles' => ['array'],
             'roles.*' => ['required', 'string', 'in:'.implode(',', $availableRoles)],
         ];
     }

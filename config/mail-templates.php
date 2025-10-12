@@ -106,9 +106,12 @@ return [
             'tags' => ['offer', 'notification'],
         ],
         'opportunity.updated' => [
-            'template_name' => 'update-on-your-opportunity',
+            'template_name' => 'cdf-update-on-your-opportunity',
             'subject' => 'Opportunity Update',
-            'variables' => [],
+            'variables' => [
+                'Opportunity_Title' => 'required|string',
+                'Opportunity_Link' => 'required|string',
+            ],
             'tags' => ['opportunity', 'notification'],
         ],
     ],

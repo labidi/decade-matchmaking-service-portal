@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Enums\Opportunity\Status;
 use App\Events\Opportunity\OpportunityCreated;
 use App\Events\Opportunity\OpportunityStatusChanged;
+use App\Jobs\Email\SendTransactionalEmail;
 use App\Models\Notification;
 use App\Models\Opportunity;
 use App\Services\NotificationService;
@@ -58,11 +59,14 @@ class OpportunityObserver
                 // Create notification for status change
                 $this->createStatusChangeNotification($opportunity, $originalStatus);
                 // Dispatch status change event
-                OpportunityStatusChanged::dispatch(
-                    $opportunity,
-                    $originalStatus,
-                    $opportunity->status
-                );
+                dispatch(new SendTransactionalEmail(
+                    'opportunity.updated',
+                    $opportunity->user,
+                    [
+                        'Opportunity_Title'=> $opportunity->title,
+                        'Opportunity_Link'=> route('opportunity.show', $opportunity->id)
+                    ]
+                ));
             } catch (Exception $e) {
                 Log::error('Failed to process opportunity status change', [
                     'opportunity_id' => $opportunity->id,

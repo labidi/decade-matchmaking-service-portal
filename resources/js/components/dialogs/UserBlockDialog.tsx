@@ -19,7 +19,7 @@ export function UserBlockDialog({ isOpen, onClose, user, action }: UserBlockDial
 
         setProcessing(true);
         router.post(
-            route('admin.users.block.toggle', user.id),
+            route('users.block.toggle', user.id),
             { blocked: action === 'block' },
             {
                 preserveScroll: true,

@@ -80,13 +80,8 @@ class UserController extends Controller
     public function assignRoles(AssignRolesRequest $request, User $user)
     {
         Gate::authorize('assignRoles', $user);
-
         $user = $this->userService->assignRoles($user, $request->validated()['roles']);
-
-        return response()->json([
-            'message' => 'Roles updated successfully',
-            'user' => new UserResource($user),
-        ]);
+        return to_route('admin.users.index')->with('success', 'Roles updated successfully');
     }
 
     /**
@@ -98,12 +93,7 @@ class UserController extends Controller
 
         $data = $request->validated();
         $user = $this->userService->toggleBlockStatus($user, $data['blocked']);
-
         $action = $data['blocked'] ? 'blocked' : 'unblocked';
-
-        return response()->json([
-            'message' => "User $action successfully",
-            'user' => new UserResource($user),
-        ]);
+        return to_route('admin.users.index')->with('success', "User $action successfully");
     }
 }
