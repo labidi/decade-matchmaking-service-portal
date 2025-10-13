@@ -52,7 +52,7 @@ class SettingsService
                 // Handle CSV import if organizations_csv is being updated
                 if ($path === Setting::ORGANIZATIONS_CSV && $value) {
                     try {
-                        $csvImportResult = $this->organizationImportService->import($value);
+                        $csvImportResult = $this->organizationImportService->importFromCsv($value);
                     } catch (\Exception $e) {
                         // Re-throw the exception to rollback the transaction
                         throw new \Exception('Organizations CSV import failed: ' . $e->getMessage(), 0, $e);
@@ -62,7 +62,7 @@ class SettingsService
                 // Handle CSV import if ioc_platforms_csv is being updated
                 if ($path === Setting::IOC_PLATFORMS_CSV && $value) {
                     try {
-                        $csvImportResult = $this->iocPlatformImportService->import($value);
+                        $csvImportResult = $this->iocPlatformImportService->importFromCsv($value);
                     } catch (\Exception $e) {
                         // Re-throw the exception to rollback the transaction
                         throw new \Exception('IOC Platforms CSV import failed: ' . $e->getMessage(), 0, $e);
