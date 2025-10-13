@@ -8,15 +8,11 @@ use App\Events\Opportunity\OpportunityStatusChanged;
 use App\Jobs\Email\SendTransactionalEmail;
 use App\Models\Notification;
 use App\Models\Opportunity;
-use App\Services\NotificationService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
 class OpportunityObserver
 {
-    public function __construct(
-        private readonly NotificationService $notificationService
-    ) {}
 
     /**
      * Handle the Opportunity "created" event.
@@ -30,12 +26,8 @@ class OpportunityObserver
             // Dispatch event for further processing
             OpportunityCreated::dispatch($opportunity);
 
-            // Send notifications based on user preferences
-            $notificationsSent = $this->notificationService->notifyUsersForNewOpportunity($opportunity);
-
             Log::info('Opportunity created event processed', [
                 'opportunity_id' => $opportunity->id,
-                'notifications_sent' => count($notificationsSent),
             ]);
         } catch (Exception $e) {
             Log::error('Failed to process opportunity created event', [
@@ -64,7 +56,8 @@ class OpportunityObserver
                     $opportunity->user,
                     [
                         'Opportunity_Title'=> $opportunity->title,
-                        'Opportunity_Link'=> route('opportunity.show', $opportunity->id)
+                        'Opportunity_Link'=> route('opportunity.show', $opportunity->id),
+                        'UNSUB'=> route('unsubscribe.show', $opportunity->user->id)
                     ]
                 ));
             } catch (Exception $e) {

@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Services\NotificationService;
 use App\Services\OpportunityService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -27,7 +26,6 @@ class CloseExpiredOpportunities extends Command
 
     public function __construct(
         private readonly OpportunityService $opportunityService,
-        private readonly NotificationService $notificationService
     ) {
         parent::__construct();
     }
@@ -62,7 +60,7 @@ class CloseExpiredOpportunities extends Command
 
             // Send admin notifications if any opportunities were closed
             if ($results['closed'] > 0) {
-                $this->notificationService->notifyAdminsOfOpportunityClosure($results);
+//                $this->notificationService->notifyAdminsOfOpportunityClosure($results);
                 $this->info('Admin notifications sent successfully.');
             }
 

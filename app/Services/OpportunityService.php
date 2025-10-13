@@ -8,7 +8,6 @@ use App\Enums\Opportunity\Status;
 use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
 use App\Models\User;
-use App\Services\NotificationService;
 use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
 use Exception;
@@ -22,8 +21,7 @@ readonly class OpportunityService
 {
     public function __construct(
         private OpportunityRepository $repository,
-        private OpportunityAnalyticsService $analytics,
-        private NotificationService $notificationService
+        private OpportunityAnalyticsService $analytics
     ) {
     }
 
@@ -34,7 +32,6 @@ readonly class OpportunityService
     public function storeOpportunity(User $user, array $data, ?Opportunity $opportunity): Opportunity
     {
         return DB::transaction(function () use ($data, $user, $opportunity) {
-            $isNew = !$opportunity;
             $data += [
                 'status' => Status::PENDING_REVIEW,
                 'user_id' => $user->id
@@ -44,20 +41,6 @@ readonly class OpportunityService
                 $opportunity = $opportunity->fresh();
             } else {
                 $opportunity = $this->repository->create($data);
-            }
-
-            // Send notifications for new opportunities when they are created
-            if ($isNew) {
-                try {
-                    $this->notificationService->notifyUsersForNewOpportunity($opportunity);
-                } catch (Exception $e) {
-                    Log::error('Failed to send notifications for new opportunity', [
-                        'opportunity_id' => $opportunity->id,
-                        'user_id' => $user->id,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                }
             }
 
             return $opportunity;
@@ -133,31 +116,9 @@ readonly class OpportunityService
 
         $oldStatus = $opportunity->status;
 
-        return DB::transaction(function () use ($opportunity, $statusCode, $oldStatus, $user) {
+        return DB::transaction(function () use ($opportunity, $statusCode) {
             $this->repository->update($opportunity, ['status' => $statusCode]);
             $opportunity = $opportunity->fresh();
-
-            // Send notifications when opportunity is published/activated
-            if ($oldStatus !== Status::ACTIVE && $statusCode === Status::ACTIVE->value) {
-                try {
-                    $this->notificationService->notifyUsersForNewOpportunity($opportunity);
-                    Log::info('Notifications sent for published opportunity', [
-                        'opportunity_id' => $opportunity->id,
-                        'user_id' => $user->id,
-                        'old_status' => $oldStatus,
-                        'new_status' => $statusCode,
-                        'title' => $opportunity->title
-                    ]);
-                } catch (Exception $e) {
-                    Log::error('Failed to send notifications for published opportunity', [
-                        'opportunity_id' => $opportunity->id,
-                        'user_id' => $user->id,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                    // Don't fail the transaction for notification errors
-                }
-            }
 
             return [
                 'opportunity' => $opportunity,

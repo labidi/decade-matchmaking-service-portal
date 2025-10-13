@@ -8,16 +8,11 @@ use App\Models\User;
 use App\Mail\NewRequestSubmitted;
 use App\Mail\RequestStatusChanged;
 use App\Mail\RequestMatchedWithPartner;
-use App\Services\NotificationService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
 class RequestObserver
 {
-    public function __construct(
-        private readonly NotificationService $notificationService
-    ) {
-    }
 
     /**
      * Handle the Request "created" event.
@@ -34,7 +29,6 @@ class RequestObserver
         // Send email notifications
         try {
             $this->sendNewRequestEmails($request);
-            $notificationsSent = $this->notificationService->notifyUsersForNewRequest($request);
         } catch (\Exception $e) {
             Log::error('Failed to send new request emails in observer', [
                 'request_id' => $request->id,

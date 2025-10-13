@@ -4,7 +4,6 @@ namespace App\Listeners\Opportunity;
 
 use App\Events\Opportunity\OpportunityStatusChanged;
 use App\Jobs\Email\SendTransactionalEmail;
-use App\Mail\OpportunityStatusUpdated;
 use App\Models\User;
 use App\Services\UserService;
 use Exception;
@@ -14,23 +13,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
 
-class SendStatusChangeNotifications implements ShouldQueue
+class SendStatusChangeNotifications
 {
     public function __construct(private readonly  UserService $userService)
     {
     }
 
-    use InteractsWithQueue;
-
-    /**
-     * The name of the queue the job should be sent to.
-     */
-    public string $queue = 'mail-priority';
-
-    /**
-     * The number of times the job may be attempted.
-     */
-    public int $tries = 3;
 
     /**
      * Handle the event.

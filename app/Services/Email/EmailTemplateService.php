@@ -53,16 +53,16 @@ class EmailTemplateService
             );
 
             // Log the email being queued/sent
-//            $logId = $this->emailLogger->logQueued(
-//                $eventName,
-//                $template->getMandrillName(),
-//                $recipient->email,
-//                $recipient,
-//                [
-//                    'tags' => $template->getTags(),
-//                    'options' => $options,
-//                ]
-//            );
+            $logId = $this->emailLogger->logQueued(
+                $eventName,
+                $template->getMandrillName(),
+                $recipient->email,
+                $recipient,
+                [
+                    'tags' => $template->getTags(),
+                    'options' => $options,
+                ]
+            );
 
             // Merge tags from template and options
             $options['tags'] = array_unique(array_merge(
@@ -90,7 +90,7 @@ class EmailTemplateService
             );
 
             // Log successful send
-//            $this->emailLogger->logSent($logId, $response['id'], $response);
+            $this->emailLogger->logSent($logId, $response['id'], $response);
 
             return new EmailResult(
                 success: true,
