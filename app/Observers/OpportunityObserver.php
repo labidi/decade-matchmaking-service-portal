@@ -57,7 +57,8 @@ class OpportunityObserver
                     [
                         'Opportunity_Title'=> $opportunity->title,
                         'Opportunity_Link'=> route('opportunity.show', $opportunity->id),
-                        'UNSUB'=> route('unsubscribe.show', $opportunity->user->id)
+                        'UNSUB'=> route('unsubscribe.show', $opportunity->user->id),
+                        'UPDATE_PROFILE'=>  route('notification.preferences.index')
                     ]
                 ));
             } catch (Exception $e) {
