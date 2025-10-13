@@ -28,16 +28,13 @@ export function IOCPlatformsDataTable({ platforms }: Readonly<IOCPlatformsDataTa
             <TableBody>
                 {platforms.map((platform) => (
                     <TableRow key={platform.id}>
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium text-wrap">
                             {platform.name}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className='text-wrap'>
                             {platform.description ? (
                                 <span className="text-sm text-gray-600">
-                                    {platform.description.length > 100
-                                        ? `${platform.description.substring(0, 100)}...`
-                                        : platform.description
-                                    }
+                                    {platform.description}
                                 </span>
                             ) : (
                                 <span className="text-sm text-gray-400 italic">No description</span>
