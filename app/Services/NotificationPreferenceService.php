@@ -59,11 +59,6 @@ class NotificationPreferenceService
             $entityType = $data['entity_type'] ?? null;
 
             if (! $entityType || ! NotificationPreference::isValidEntityType($entityType)) {
-                Log::warning('Invalid entity type provided', [
-                    'user_id' => $user->getAttribute('id'),
-                    'entity_type' => $entityType,
-                ]);
-
                 throw NotificationPreferenceException::invalidEntityType($entityType ?? 'null');
             }
 
@@ -85,13 +80,6 @@ class NotificationPreferenceService
                 ->first();
 
             if ($existingPreference) {
-                Log::warning('Attempted to create duplicate notification preference', [
-                    'user_id' => $user->getAttribute('id'),
-                    'entity_type' => $entityType,
-                    'attribute_type' => $attributeType,
-                    'attribute_value' => $attributeValue,
-                    'existing_preference_id' => $existingPreference->getAttribute('id'),
-                ]);
 
                 throw NotificationPreferenceException::duplicatePreference(
                     $user->getAttribute('id'),

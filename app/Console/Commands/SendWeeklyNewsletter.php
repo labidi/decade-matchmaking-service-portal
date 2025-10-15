@@ -60,6 +60,7 @@ class SendWeeklyNewsletter extends Command
 
             // Send the weekly newsletter
             $this->info('📧 Dispatching weekly newsletters...');
+            // fix type labels / order by close date
             $stats = $newsletterService->sendWeeklyNewsletter();
 
             // Store last send timestamp and stats
