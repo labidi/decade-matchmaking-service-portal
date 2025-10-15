@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Notifications;
 
+use App\Exceptions\NotificationPreferenceException;
 use App\Http\Controllers\Controller;
 use App\Models\NotificationPreference;
 use App\Services\NotificationPreferenceService;
-use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -13,11 +13,13 @@ use Illuminate\Validation\Rule;
 class StoreController extends Controller
 {
     public function __construct(
-        private readonly NotificationService $notificationService,
         private readonly NotificationPreferenceService $preferenceService
     ) {
     }
 
+    /**
+     * @throws NotificationPreferenceException
+     */
     public function __invoke(Request $request)
     {
         $request->validate([
@@ -28,7 +30,7 @@ class StoreController extends Controller
 
         $user = Auth::user();
 
-        $preference = $this->preferenceService->createPreference($user, [
+        $this->preferenceService->createPreference($user, [
             'entity_type' => $request->entity_type,
             'attribute_value' => $request->attribute_value,
             'email_notification_enabled' => $request->boolean('email_notification_enabled', true)

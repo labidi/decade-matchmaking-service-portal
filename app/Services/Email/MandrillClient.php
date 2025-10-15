@@ -46,7 +46,7 @@ class MandrillClient
 
             $response = $this->client->messages->sendTemplate([
                 'template_name' => $templateName,
-                'template_content' => [], // Dynamic content handled via merge_vars
+                'template_content' => $options['template_content'] ?? [], // Support for mc:edit regions
                 'message' => $message,
                 'async' => $options['async'] ?? false,
                 'ip_pool' => $options['ip_pool'] ?? null,

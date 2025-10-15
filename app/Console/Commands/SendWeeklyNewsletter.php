@@ -97,8 +97,8 @@ class SendWeeklyNewsletter extends Command
         $this->table(
             ['Metric', 'Value'],
             [
-                ['Active Subscribers', $stats['active_subscribers']],
-                ['Active Preferences', $stats['total_active_preferences']],
+                ['Active Opportunity Subscribers', $stats['active_opportunity_subscribers'] ?? 0],
+                ['Active Request Subscribers', $stats['active_request_subscribers'] ?? 0],
                 ['Last Send', $stats['last_send'] ? $stats['last_send']->diffForHumans() : 'Never'],
             ]
         );
@@ -110,26 +110,57 @@ class SendWeeklyNewsletter extends Command
     private function displayResults(array $stats): void
     {
         $this->newLine();
+
+        // Display combined stats in a table
+        $opportunityStats = $stats['opportunities'] ?? [];
+        $requestStats = $stats['requests'] ?? [];
+
         $this->table(
-            ['Metric', 'Count'],
+            ['Newsletter Type', 'Users Processed', 'Emails Sent', 'Failed'],
             [
-                ['Total Users Processed', $stats['total_users']],
-                ['Emails Dispatched', $stats['emails_dispatched']],
-                ['Failed', $stats['failed']],
+                [
+                    'Opportunities',
+                    $opportunityStats['total_users'] ?? 0,
+                    $opportunityStats['emails_dispatched'] ?? 0,
+                    $opportunityStats['failed'] ?? 0,
+                ],
+                [
+                    'Requests',
+                    $requestStats['total_users'] ?? 0,
+                    $requestStats['emails_dispatched'] ?? 0,
+                    $requestStats['failed'] ?? 0,
+                ],
+                [
+                    'TOTAL',
+                    ($opportunityStats['total_users'] ?? 0) + ($requestStats['total_users'] ?? 0),
+                    ($opportunityStats['emails_dispatched'] ?? 0) + ($requestStats['emails_dispatched'] ?? 0),
+                    ($opportunityStats['failed'] ?? 0) + ($requestStats['failed'] ?? 0),
+                ],
             ]
         );
 
-        if (!empty($stats['errors'])) {
+        // Display errors for opportunities if any
+        if (!empty($opportunityStats['errors'])) {
             $this->newLine();
-            $this->warn('⚠️  Errors encountered:');
-            foreach ($stats['errors'] as $error) {
+            $this->warn('⚠️  Opportunity Newsletter Errors:');
+            foreach ($opportunityStats['errors'] as $error) {
                 $this->line("  • User #{$error['user_id']} ({$error['email']}): {$error['error']}");
             }
         }
 
-        if ($stats['emails_dispatched'] > 0) {
+        // Display errors for requests if any
+        if (!empty($requestStats['errors'])) {
             $this->newLine();
-            $this->info("📨 {$stats['emails_dispatched']} newsletters have been queued for delivery");
+            $this->warn('⚠️  Request Newsletter Errors:');
+            foreach ($requestStats['errors'] as $error) {
+                $this->line("  • User #{$error['user_id']} ({$error['email']}): {$error['error']}");
+            }
+        }
+
+        $totalDispatched = ($opportunityStats['emails_dispatched'] ?? 0) + ($requestStats['emails_dispatched'] ?? 0);
+        if ($totalDispatched > 0) {
+            $this->newLine();
+            $this->info("📨 {$totalDispatched} newsletters have been queued for delivery");
         }
     }
 }

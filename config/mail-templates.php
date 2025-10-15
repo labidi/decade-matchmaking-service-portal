@@ -122,14 +122,29 @@ return [
             ],
             'tags' => ['opportunity', 'notification'],
         ],
-        'opportunity.newsletter' => [
+        // Separate newsletters for opportunities and requests
+        'opportunity.newsletter.weekly' => [
             'template_name' => 'cdf-opportunitynewsletter',
-            'subject' => 'Opportunity newsletter',
+            'subject' => 'New Ocean Decade Opportunities This Week',
             'variables' => [
                 'UNSUB' => 'required|string',
-                'UPDATE_PROFILE'=>'required|string',
+                'UPDATE_PROFILE' => 'string',
+                'user_name' => 'string',
+                'opportunity_count' => 'integer',
             ],
-            'tags' => ['opportunity', 'notification'],
+            'tags' => ['opportunity', 'newsletter', 'weekly'],
+        ],
+
+        'request.newsletter.weekly' => [
+            'template_name' => 'cdf-request-newsletter-weekly',
+            'subject' => 'New Ocean Decade Requests This Week',
+            'variables' => [
+                'UNSUB' => 'required|string',
+                'UPDATE_PROFILE' => 'string',
+                'user_name' => 'string',
+                'request_count' => 'integer',
+            ],
+            'tags' => ['request', 'newsletter', 'weekly'],
         ],
     ],
 
@@ -144,10 +159,10 @@ return [
     */
     'environment_prefix' => [
         'production' => '',
-        'staging' => 'staging-',
-        'development' => 'dev-',
-        'local' => 'test-',
-        'testing' => 'test-',
+        'staging' => '',
+        'development' => '',
+        'local' => '',
+        'testing' => '',
     ],
 
     /*
