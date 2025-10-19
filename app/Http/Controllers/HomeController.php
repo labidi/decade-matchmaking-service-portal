@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\SettingsService;
-use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Setting;
@@ -12,9 +11,6 @@ use Illuminate\Support\Facades\Route;
 
 class HomeController extends Controller
 {
-
-    use HasBreadcrumbs;
-
     public function __construct(private readonly SettingsService $settingsService)
     {
     }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\OfferService;
 use App\Services\RequestService;
-use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,7 +24,6 @@ use Illuminate\Support\Facades\Log;
  */
 abstract class BaseOfferController extends Controller
 {
-    use HasBreadcrumbs;
 
     public function __construct(
         protected readonly OfferService $offerService

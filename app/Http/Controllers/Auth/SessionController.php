@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\OceanExpertAuthService;
-use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -17,7 +16,6 @@ use Inertia\Response;
 
 class SessionController extends Controller
 {
-    use HasBreadcrumbs;
 
     public function __construct(
         protected OceanExpertAuthService $oceanExpertAuthService,

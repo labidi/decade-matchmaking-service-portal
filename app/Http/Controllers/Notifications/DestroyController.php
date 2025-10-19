@@ -32,6 +32,6 @@ class DestroyController extends Controller
         $this->preferenceService->deletePreference($preference);
 
         return redirect()->back()
-            ->with('success', 'Notification preference removed successfully.');
+            ->with('success', 'SystemNotification preference removed successfully.');
     }
 }

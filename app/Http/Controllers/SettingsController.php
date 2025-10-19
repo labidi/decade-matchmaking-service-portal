@@ -4,14 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SettingsPostRequest;
 use App\Services\SettingsService;
-use App\Traits\HasBreadcrumbs;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 
 class SettingsController extends Controller
 {
-    use HasBreadcrumbs;
-
     public function __construct(
         private readonly SettingsService $settingsService,
 

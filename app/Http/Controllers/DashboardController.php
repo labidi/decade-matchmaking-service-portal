@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Opportunity;
 use App\Models\Request as RequestModel;
 use App\Models\User;
-use App\Traits\HasBreadcrumbs;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    use HasBreadcrumbs;
     public function index(Request $HttpRequest): \Inertia\Response
     {
         $user = $HttpRequest->user();
