@@ -14,6 +14,12 @@ Route::middleware('guest')->group(function () {
         ->name('auth.linkedin');
     Route::get('auth/linkedin/callback', [SocialController::class, 'linkedinCallback'])
         ->name('auth.linkedin.callback');
+
+    // Google OAuth Routes
+    Route::get('auth/google', [SocialController::class, 'googleRedirect'])
+        ->name('auth.google');
+    Route::get('auth/google/callback', [SocialController::class, 'googleCallback'])
+        ->name('auth.google.callback');
 });
 
 Route::middleware('auth')->group(function () {
