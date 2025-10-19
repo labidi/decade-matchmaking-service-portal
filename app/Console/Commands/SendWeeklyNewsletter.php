@@ -25,7 +25,7 @@ class SendWeeklyNewsletter extends Command
      *
      * @var string
      */
-    protected $description = 'Send weekly newsletter to users with active notification preferences';
+    protected $description = 'Send weekly opportunities newsletter to users with active notification preferences';
 
     /**
      * Execute the console command.
@@ -35,7 +35,7 @@ class SendWeeklyNewsletter extends Command
         $isDryRun = $this->option('dry-run');
         $force = $this->option('force');
 
-        $this->info('🚀 Starting weekly newsletter send process...');
+        $this->info('🚀 Starting weekly opportunities newsletter send process...');
 
         try {
             // Check if newsletter was recently sent (within last 6 days) unless forced
@@ -58,9 +58,8 @@ class SendWeeklyNewsletter extends Command
                 return self::SUCCESS;
             }
 
-            // Send the weekly newsletter
-            $this->info('📧 Dispatching weekly newsletters...');
-            // fix type labels / order by close date
+            // Send the weekly opportunities newsletter
+            $this->info('📧 Dispatching weekly opportunities newsletters...');
             $stats = $newsletterService->sendWeeklyNewsletter();
 
             // Store last send timestamp and stats
@@ -69,7 +68,7 @@ class SendWeeklyNewsletter extends Command
 
             // Display results
             $this->newLine();
-            $this->info('✅ Weekly newsletter send completed!');
+            $this->info('✅ Weekly opportunities newsletter send completed!');
             $this->displayResults($stats);
 
             // Log completion
@@ -77,7 +76,7 @@ class SendWeeklyNewsletter extends Command
 
             return self::SUCCESS;
         } catch (\Exception $e) {
-            $this->error('❌ Failed to send weekly newsletter');
+            $this->error('❌ Failed to send weekly opportunities newsletter');
             $this->error("Error: {$e->getMessage()}");
 
             Log::error('[SendWeeklyNewsletter] Command failed', [
@@ -99,7 +98,6 @@ class SendWeeklyNewsletter extends Command
             ['Metric', 'Value'],
             [
                 ['Active Opportunity Subscribers', $stats['active_opportunity_subscribers'] ?? 0],
-                ['Active Request Subscribers', $stats['active_request_subscribers'] ?? 0],
                 ['Last Send', $stats['last_send'] ? $stats['last_send']->diffForHumans() : 'Never'],
             ]
         );
@@ -112,56 +110,28 @@ class SendWeeklyNewsletter extends Command
     {
         $this->newLine();
 
-        // Display combined stats in a table
-        $opportunityStats = $stats['opportunities'] ?? [];
-        $requestStats = $stats['requests'] ?? [];
-
         $this->table(
-            ['Newsletter Type', 'Users Processed', 'Emails Sent', 'Failed'],
+            ['Metric', 'Count'],
             [
-                [
-                    'Opportunities',
-                    $opportunityStats['total_users'] ?? 0,
-                    $opportunityStats['emails_dispatched'] ?? 0,
-                    $opportunityStats['failed'] ?? 0,
-                ],
-                [
-                    'Requests',
-                    $requestStats['total_users'] ?? 0,
-                    $requestStats['emails_dispatched'] ?? 0,
-                    $requestStats['failed'] ?? 0,
-                ],
-                [
-                    'TOTAL',
-                    ($opportunityStats['total_users'] ?? 0) + ($requestStats['total_users'] ?? 0),
-                    ($opportunityStats['emails_dispatched'] ?? 0) + ($requestStats['emails_dispatched'] ?? 0),
-                    ($opportunityStats['failed'] ?? 0) + ($requestStats['failed'] ?? 0),
-                ],
+                ['Users Processed', $stats['processed'] ?? 0],
+                ['Emails Sent', $stats['sent'] ?? 0],
+                ['Failed', $stats['failed'] ?? 0],
             ]
         );
 
-        // Display errors for opportunities if any
-        if (!empty($opportunityStats['errors'])) {
+        // Display errors if any
+        if (!empty($stats['errors'])) {
             $this->newLine();
-            $this->warn('⚠️  Opportunity Newsletter Errors:');
-            foreach ($opportunityStats['errors'] as $error) {
+            $this->warn('⚠️  Newsletter Errors:');
+            foreach ($stats['errors'] as $error) {
                 $this->line("  • User #{$error['user_id']} ({$error['email']}): {$error['error']}");
             }
         }
 
-        // Display errors for requests if any
-        if (!empty($requestStats['errors'])) {
+        $totalSent = $stats['sent'] ?? 0;
+        if ($totalSent > 0) {
             $this->newLine();
-            $this->warn('⚠️  Request Newsletter Errors:');
-            foreach ($requestStats['errors'] as $error) {
-                $this->line("  • User #{$error['user_id']} ({$error['email']}): {$error['error']}");
-            }
-        }
-
-        $totalDispatched = ($opportunityStats['emails_dispatched'] ?? 0) + ($requestStats['emails_dispatched'] ?? 0);
-        if ($totalDispatched > 0) {
-            $this->newLine();
-            $this->info("📨 {$totalDispatched} newsletters have been queued for delivery");
+            $this->info("📨 {$totalSent} newsletters have been queued for delivery");
         }
     }
 }

@@ -43,12 +43,12 @@ Schedule::command('opportunities:close-expired --force')
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/opportunity-closure.log'));
 
-// Send weekly newsletter every Sunday at 8:00 AM
+// Send weekly opportunities newsletter every Sunday at 8:00 AM
 Schedule::command('newsletter:send-weekly')
     ->everyThirtyMinutes()
     ->withoutOverlapping()
     ->runInBackground()
-    ->appendOutputTo(storage_path('logs/newsletter.log'));
+    ->appendOutputTo(storage_path('logs/newsletter-opportunities.log'));
 
 Schedule::command('queue:work --queue=default --stop-when-empty --max-jobs=50 --max-time=50')
     ->everyMinute()

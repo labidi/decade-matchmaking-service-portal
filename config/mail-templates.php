@@ -122,7 +122,7 @@ return [
             ],
             'tags' => ['opportunity', 'notification'],
         ],
-        // Separate newsletters for opportunities and requests
+        // Weekly Opportunity Newsletter
         'opportunity.newsletter.weekly' => [
             'template_name' => 'cdf-opportunitynewsletter',
             'subject' => 'New Ocean Decade Opportunities This Week',
@@ -135,6 +135,7 @@ return [
             'tags' => ['opportunity', 'newsletter', 'weekly'],
         ],
 
+        // DEPRECATED: Request newsletter moved to event-driven notifications
         'request.newsletter.weekly' => [
             'template_name' => 'cdf-request-newsletter-weekly',
             'subject' => 'New Ocean Decade Requests This Week',
@@ -145,6 +146,68 @@ return [
                 'request_count' => 'integer',
             ],
             'tags' => ['request', 'newsletter', 'weekly'],
+            'deprecated' => true,
+            'deprecated_note' => 'Request notifications are now event-driven (instant) rather than weekly batched',
+        ],
+
+        // Instant Request Notification (Event-Driven)
+        'request.notification.instant' => [
+            'template_name' => 'ocd-request-instant-notification',
+            'subject' => 'New Capacity Development Request Matches Your Interests',
+            'variables' => [
+                'user_name' => 'required|string',
+                'request_title' => 'required|string',
+                'request_description' => 'required|string',
+                'request_url' => 'required|url',
+                'subtheme' => 'required|string',
+                'location' => 'optional|string',
+                'UNSUB' => 'required|string',
+                'UPDATE_PROFILE' => 'required|string',
+            ],
+            'tags' => ['request', 'instant', 'notification'],
+        ],
+
+        // Request Created Confirmation
+        'request.created' => [
+            'template_name' => 'ocd-request-created-confirmation',
+            'subject' => 'Your Capacity Development Request Has Been Submitted',
+            'variables' => [
+                'user_name' => 'required|string',
+                'Request_Title' => 'required|string',
+                'Request_Link' => 'required|url',
+                'UNSUB' => 'required|string',
+                'UPDATE_PROFILE' => 'required|string',
+            ],
+            'tags' => ['request', 'confirmation'],
+        ],
+
+        // Offer Events
+        'offer.created' => [
+            'template_name' => 'ocd-offer-created',
+            'subject' => 'New Offer Submitted for Your Request',
+            'variables' => [
+                'user_name' => 'required|string',
+                'partner_name' => 'required|string',
+                'partner_organization' => 'required|string',
+                'request_title' => 'required|string',
+                'offer_url' => 'required|url',
+                'UNSUB' => 'required|string',
+                'UPDATE_PROFILE' => 'required|string',
+            ],
+            'tags' => ['offer', 'notification'],
+        ],
+
+        'offer.rejected' => [
+            'template_name' => 'ocd-offer-rejected',
+            'subject' => 'Update on Your Offer',
+            'variables' => [
+                'partner_name' => 'required|string',
+                'request_title' => 'required|string',
+                'rejection_reason' => 'optional|string',
+                'UNSUB' => 'required|string',
+                'UPDATE_PROFILE' => 'required|string',
+            ],
+            'tags' => ['offer', 'rejection'],
         ],
     ],
 

@@ -73,40 +73,7 @@ class EmailServiceProvider extends ServiceProvider
             $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         }
 
-        // Register event listeners
-        $this->registerEventListeners();
-    }
-
-    /**
-     * Register event listeners for email events.
-     */
-    protected function registerEventListeners(): void
-    {
-        $events = $this->app['events'];
-
-        // Email sent event
-        $events->listen(
-            \App\Events\Email\EmailSent::class,
-            \App\Listeners\Email\LogEmailSent::class
-        );
-
-        // Email failed event
-        $events->listen(
-            \App\Events\Email\EmailFailed::class,
-            \App\Listeners\Email\NotifyAdminOfEmailFailure::class
-        );
-
-        // Email delivered event (from webhook)
-        $events->listen(
-            \App\Events\Email\EmailDelivered::class,
-            \App\Listeners\Email\UpdateEmailDeliveryStatus::class
-        );
-
-        // Email bounced event (from webhook)
-        $events->listen(
-            \App\Events\Email\EmailBounced::class,
-            \App\Listeners\Email\HandleBouncedEmail::class
-        );
+        // Email event listeners are now auto-discovered by Laravel 12
     }
 
     /**
