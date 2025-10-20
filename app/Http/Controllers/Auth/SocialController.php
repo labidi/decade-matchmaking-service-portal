@@ -6,16 +6,21 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UserService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialController extends Controller
 {
+    public function __construct(
+        private readonly UserService $userService
+    ) {
+    }
+
     /**
      * Redirect to LinkedIn for authentication
      */
@@ -119,16 +124,28 @@ class SocialController extends Controller
     protected function processOAuthUser(SocialiteUser $socialUser, string $provider): RedirectResponse
     {
         try {
-            $user = DB::transaction(function () use ($socialUser, $provider) {
-                // Check if user exists with this email
-                $existingUser = User::where('email', $socialUser->getEmail())->first();
+            // Check if user exists with this email
+            $existingUser = User::where('email', $socialUser->getEmail())->first();
 
-                if ($existingUser) {
-                    return $this->updateExistingUser($existingUser, $socialUser, $provider);
-                }
+            if ($existingUser) {
+                // Prepare OAuth data for update
+                $oauthData = [
+                    'provider_id' => $socialUser->getId(),
+                    'avatar' => $socialUser->getAvatar(),
+                ];
 
-                return $this->createNewUser($socialUser, $provider);
-            });
+                $user = $this->userService->updateUserWithOAuth($existingUser, $oauthData, $provider);
+            } else {
+                // Prepare OAuth data for new user creation
+                $oauthData = [
+                    'email' => $socialUser->getEmail(),
+                    'name' => $socialUser->getName() ?? '',
+                    'provider_id' => $socialUser->getId(),
+                    'avatar' => $socialUser->getAvatar(),
+                ];
+
+                $user = $this->userService->createUserFromOAuth($oauthData, $provider);
+            }
 
             Auth::login($user, true);
 
@@ -157,82 +174,6 @@ class SocialController extends Controller
             return redirect()->route('sign.in')
                 ->with('error', 'An error occurred during authentication. Please try again.');
         }
-    }
-
-    /**
-     * Update existing user with OAuth data
-     */
-    protected function updateExistingUser(User $user, SocialiteUser $socialUser, string $provider): User
-    {
-        // Only update OAuth data if user has no provider or same provider
-        if (!$user->provider || $user->provider === $provider) {
-            $user->update([
-                'provider' => $provider,
-                'provider_id' => $socialUser->getId(),
-                'avatar' => $socialUser->getAvatar(),
-            ]);
-
-            Log::info('Updated existing user with OAuth data', [
-                'user_id' => $user->id,
-                'provider' => $provider,
-            ]);
-        } else {
-            Log::info('User signed in with different provider', [
-                'user_id' => $user->id,
-                'existing_provider' => $user->provider,
-                'new_provider' => $provider,
-            ]);
-        }
-
-        return $user;
-    }
-
-    /**
-     * Create new user from OAuth data
-     */
-    protected function createNewUser(SocialiteUser $socialUser, string $provider): User
-    {
-        $nameParts = $this->parseFullName($socialUser->getName());
-
-        $user = User::create([
-            'name' => $socialUser->getName(),
-            'email' => $socialUser->getEmail(),
-            'provider' => $provider,
-            'provider_id' => $socialUser->getId(),
-            'avatar' => $socialUser->getAvatar(),
-            'first_name' => $nameParts['first_name'],
-            'last_name' => $nameParts['last_name'],
-            'email_verified_at' => now(), // OAuth emails are verified by provider
-            'password' => null, // No password needed for social auth
-        ]);
-
-        // Assign default user role
-        $user->assignRole('user');
-
-        Log::info('Created new user from OAuth', [
-            'user_id' => $user->id,
-            'provider' => $provider,
-            'email' => $user->email,
-        ]);
-
-        return $user;
-    }
-
-    /**
-     * Parse full name into first and last name
-     */
-    protected function parseFullName(?string $fullName): array
-    {
-        if (!$fullName) {
-            return ['first_name' => '', 'last_name' => ''];
-        }
-
-        $nameParts = explode(' ', trim($fullName), 2);
-
-        return [
-            'first_name' => $nameParts[0] ?? '',
-            'last_name' => $nameParts[1] ?? '',
-        ];
     }
 
     /**
