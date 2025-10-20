@@ -1,120 +1,81 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Observers;
 
+use App\Events\OfferAccepted;
+use App\Events\RequestOffer\OfferCreated;
+use App\Events\RequestOffer\OfferDeleted;
 use App\Models\Request\Offer;
-use App\Models\User;
-use App\Mail\OfferAcceptedNotification;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
 
+/**
+ * Observer for RequestOffer model.
+ *
+ * This observer follows the Single Responsibility Principle:
+ * - Only checks conditions and dispatches events
+ * - All business logic moved to event listeners
+ */
 class RequestOfferObserver
 {
     /**
      * Handle the Offer "created" event.
+     *
+     * @param Offer $offer The newly created offer
+     * @return void
      */
     public function created(Offer $offer): void
     {
-        //
+        OfferCreated::dispatch($offer);
     }
 
     /**
      * Handle the Offer "updated" event.
+     *
+     * @param Offer $offer The updated offer
+     * @return void
      */
     public function updated(Offer $offer): void
     {
         // Check if is_accepted changed from false to true
-        if ($offer->isDirty('is_accepted') && $offer->is_accepted && !$offer->getOriginal('is_accepted')) {
-            $this->handleOfferAcceptance($offer);
+        if ($offer->isDirty('is_accepted') && $offer->is_accepted && ! $offer->getOriginal('is_accepted')) {
+            $acceptedBy = $offer->request->user;
+            if ($acceptedBy) {
+                OfferAccepted::dispatch($offer, $acceptedBy);
+            }
         }
     }
 
     /**
      * Handle the Offer "deleted" event.
+     *
+     * @param Offer $offer The offer being deleted
+     * @return void
      */
     public function deleted(Offer $offer): void
     {
-        Log::info('Offer being deleted', ['offer_id' => $offer->id]);
+        OfferDeleted::dispatch($offer);
     }
 
     /**
      * Handle the Offer "restored" event.
+     *
+     * @param Offer $offer The restored offer
+     * @return void
      */
     public function restored(Offer $offer): void
     {
-        //
+        // No event needed for restoration currently
     }
 
     /**
      * Handle the Offer "force deleted" event.
+     *
+     * @param Offer $offer The force deleted offer
+     * @return void
      */
     public function forceDeleted(Offer $offer): void
     {
-        //
-    }
-
-    /**
-     * Handle offer acceptance event
-     */
-    private function handleOfferAcceptance(Offer $offer): void
-    {
-        try {
-            $this->sendOfferAcceptedEmails($offer);
-            Log::info('Offer accepted notification emails sent', ['offer_id' => $offer->id]);
-        } catch (\Exception $e) {
-            Log::error('Failed to send offer accepted emails in observer', [
-                'offer_id' => $offer->id,
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
-
-    /**
-     * Send emails for offer acceptance
-     */
-    private function sendOfferAcceptedEmails(Offer $offer): void
-    {
-        $recipients = [];
-        $acceptedBy = $offer->request->user;
-
-        // Notify administrators
-        $admins = User::where('administrator', true)->get();
-        foreach ($admins as $admin) {
-            $recipients[] = [
-                'email' => $admin->email,
-                'name' => $admin->name,
-                'type' => 'admin'
-            ];
-        }
-
-        // Notify the partner who made the offer
-        if ($offer->matchedPartner) {
-            $recipients[] = [
-                'email' => $offer->matchedPartner->email,
-                'name' => $offer->matchedPartner->name,
-                'type' => 'partner'
-            ];
-        }
-
-        // Notify the request owner (confirmation)
-        if ($acceptedBy) {
-            $recipients[] = [
-                'email' => $acceptedBy->email,
-                'name' => $acceptedBy->name,
-                'type' => 'requester'
-            ];
-        }
-
-        // Send emails
-        foreach ($recipients as $recipient) {
-            Mail::to($recipient['email'])
-                ->send(new OfferAcceptedNotification($offer, $acceptedBy, $recipient));
-        }
-
-        Log::info('Offer acceptance emails sent', [
-            'offer_id' => $offer->id,
-            'request_id' => $offer->request_id,
-            'recipient_count' => count($recipients)
-        ]);
+        // No event needed for force deletion currently
     }
 }

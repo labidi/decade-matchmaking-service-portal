@@ -37,6 +37,6 @@ class StoreController extends Controller
         ]);
 
         return redirect()->back()
-            ->with('success', 'Notification preference updated successfully.');
+            ->with('success', 'SystemNotification preference updated successfully.');
     }
 }

@@ -51,9 +51,9 @@ class ListController extends Controller
             'availableOptions' => $availableOptions,
             'entityTypes' => $entityTypes,
             'attributeTypes' => NotificationPreference::ATTRIBUTE_TYPES, // Backward compatibility
-            'title' => 'Notification Preferences',
+            'title' => 'SystemNotification Preferences',
             'banner' => [
-                'title' => 'Notification Preferences',
+                'title' => 'SystemNotification Preferences',
                 'description' => 'Manage your notification preferences for requests and opportunities.',
                 'image' => '/assets/img/sidebar.png',
             ],

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\NotificationsController;
+use App\Http\Controllers\Admin\SystemNotificationsController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentsController;
@@ -66,11 +66,12 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
 
     // User Management Routes
 
-    Route::get('notifications', [NotificationsController::class, 'index'])->name('admin.notifications.index');
-    Route::get('notifications/{notification}', [NotificationsController::class, 'show'])->name(
+    Route::get('system_notifications', [SystemNotificationsController::class, 'index'])->name('admin.notifications.index');
+
+    Route::get('notifications/{notification}', [SystemNotificationsController::class, 'show'])->name(
         'admin.notifications.show'
     );
-    Route::get('notifications/{notification}/read', [NotificationsController::class, 'markAsRead'])->name(
+    Route::get('notifications/{notification}/read', [SystemNotificationsController::class, 'markAsRead'])->name(
         'admin.notifications.read'
     );
 });

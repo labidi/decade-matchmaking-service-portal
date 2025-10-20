@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Notification;
+use App\Models\SystemNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NotificationsController extends Controller
+class SystemNotificationsController extends Controller
 {
     public function index(Request $request): Response
     {
@@ -21,7 +21,7 @@ class NotificationsController extends Controller
         $notifications = Auth::user()->notifications()
             ->orderBy($sortField, $sortOrder)->paginate(10)->appends($request->only(['sort', 'order']));
 
-        return Inertia::render('Admin/Notification/List', [
+        return Inertia::render('Admin/SystemNotification/List', [
             'title' => 'Notifications',
             'notifications' => $notifications,
             'currentSort' => [
@@ -35,11 +35,11 @@ class NotificationsController extends Controller
         ]);
     }
 
-    public function show(Notification $notification): Response
+    public function show(SystemNotification $notification): Response
     {
         $this->authorizeNotification($notification);
 
-        return Inertia::render('Admin/Notification/Show', [
+        return Inertia::render('Admin/SystemNotification/Show', [
             'title' => $notification->title,
             'notification' => $notification,
             'breadcrumbs' => [
@@ -50,15 +50,15 @@ class NotificationsController extends Controller
         ]);
     }
 
-    public function markAsRead(Notification $notification)
+    public function markAsRead(SystemNotification $notification)
     {
         $this->authorizeNotification($notification);
         $notification->update(['is_read' => true]);
 
-        return to_route('admin.notifications.index')->with('success', 'Notification marked as read.');
+        return to_route('admin.notifications.index')->with('success', 'SystemNotification marked as read.');
     }
 
-    private function authorizeNotification(Notification $notification): void
+    private function authorizeNotification(SystemNotification $notification): void
     {
         abort_unless($notification->user_id === Auth::id(), 403);
     }

@@ -30,8 +30,8 @@ class RequestService
     public function storeRequest(User $user, array $data, ?Request $request = null, $mode = 'submit'): Request
     {
         $statusId = match ($mode) {
-            'draft' => $this->getStatusId('under_review'),
-            default => $this->getStatusId('draft'),
+            'draft' => $this->getStatusId('draft'),
+            default => $this->getStatusId('under_review'),
         };
         $requestData = [
             'user_id' => $user->id,

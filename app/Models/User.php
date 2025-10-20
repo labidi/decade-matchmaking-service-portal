@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Request;
-use App\Models\Notification;
+use App\Models\SystemNotification;
 use App\Models\RequestSubscription;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
@@ -95,7 +95,7 @@ class User extends Authenticatable
 
     public function notifications(): HasMany
     {
-        return $this->hasMany(Notification::class);
+        return $this->hasMany(SystemNotification::class);
     }
 
     public function notificationPreferences(): HasMany

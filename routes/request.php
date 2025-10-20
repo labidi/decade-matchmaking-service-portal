@@ -8,6 +8,8 @@ use App\Http\Controllers\Request\ExportRequestPdfController;
 use App\Http\Controllers\Request\ExpressInterestController;
 use App\Http\Controllers\Request\RequestManagementController;
 use App\Http\Controllers\DocumentsController;
+use Diglactic\Breadcrumbs\Breadcrumbs;
+use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,3 +66,27 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('request/export/csv', [RequestListController::class, 'exportCsv'])->name('admin.request.export.csv');
 });
 
+
+
+Breadcrumbs::for('request.me.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('List of my request', route('request.me.list'));
+});
+
+Breadcrumbs::for('request.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('List of my request', route('request.me.list'));
+    $trail->push('Submit new request', route('request.create'));
+});
+
+Breadcrumbs::for('request.edit', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('List of my request', route('request.me.list'));
+    $trail->push('Request #'.request('id'), route('request.edit',request('id')));
+});
+
+Breadcrumbs::for('request.show', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('List of my request', route('request.me.list'));
+    $trail->push('Request #'.request('id'), route('request.show',request('id')));
+});

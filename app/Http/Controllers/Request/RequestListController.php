@@ -32,7 +32,7 @@ class RequestListController extends BaseRequestController
 
         // Define actions for admin requests list page
         $actions = $this->buildActions([
-            $this->createPrimaryAction('New Request', route('request.create')),
+            $this->createPrimaryAction('New Request', route('request.create'),'PlusIcon'),
             $this->createSecondaryAction('Export CSV', route('admin.request.export.csv'), 'ArrowDownTrayIcon'),
         ]);
 
@@ -58,8 +58,7 @@ class RequestListController extends BaseRequestController
 
         // Define actions for user's own requests page
         $actions = $this->buildActions([
-            $this->createPrimaryAction('New Request', route('request.create')),
-            $this->createSecondaryAction('View All Public', route('request.list'), 'EyeIcon'),
+            $this->createPrimaryAction('Submit new request', route('request.create'),'PlusIcon'),
         ]);
 
         return Inertia::render('Request/List', [

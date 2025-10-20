@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Services\UnsubscribeService;
+use App\Services\NotificationPreferenceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ use Inertia\Response;
 class UnsubscribeController extends Controller
 {
     public function __construct(
-        private readonly UnsubscribeService $unsubscribeService
+        private readonly NotificationPreferenceService $notificationPreferenceService
     ) {}
 
     /**
@@ -59,7 +59,7 @@ class UnsubscribeController extends Controller
         try {
             // Use the service to handle the unsubscribe logic
             $removeSubscriptions = $request->boolean('remove_subscriptions', false);
-            $this->unsubscribeService->unsubscribeFromAllNotifications($user, $removeSubscriptions);
+            $this->notificationPreferenceService->unsubscribeFromAllNotifications($user, $removeSubscriptions);
 
             // Log the unsubscribe action with request details
             Log::info('User unsubscribed via web interface', [

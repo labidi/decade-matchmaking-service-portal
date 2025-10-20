@@ -1,168 +1,73 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Observers;
 
-use App\Enums\Opportunity\Status;
+use App\Events\Opportunity\OpportunityClosingDateExtended;
 use App\Events\Opportunity\OpportunityCreated;
+use App\Events\Opportunity\OpportunityDeleted;
 use App\Events\Opportunity\OpportunityStatusChanged;
-use App\Jobs\Email\SendTransactionalEmail;
-use App\Models\Notification;
+use App\Events\Opportunity\OpportunityUpdated;
 use App\Models\Opportunity;
-use Exception;
-use Illuminate\Support\Facades\Log;
 
+/**
+ * Observer for Opportunity model.
+ *
+ * This observer follows the Single Responsibility Principle:
+ * - Only checks conditions and dispatches events
+ * - All business logic moved to event listeners
+ */
 class OpportunityObserver
 {
-
     /**
      * Handle the Opportunity "created" event.
+     *
+     * @param Opportunity $opportunity The newly created opportunity
+     * @return void
      */
     public function created(Opportunity $opportunity): void
     {
-        try {
-            // Create in-app notification for admins
-            $this->createAdminNotification($opportunity, 'created');
-
-            // Dispatch event for further processing
-            OpportunityCreated::dispatch($opportunity);
-
-            Log::info('Opportunity created event processed', [
-                'opportunity_id' => $opportunity->id,
-            ]);
-        } catch (Exception $e) {
-            Log::error('Failed to process opportunity created event', [
-                'opportunity_id' => $opportunity->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-        }
+        OpportunityCreated::dispatch($opportunity);
     }
 
     /**
      * Handle the Opportunity "updated" event.
+     *
+     * @param Opportunity $opportunity The updated opportunity
+     * @return void
      */
     public function updated(Opportunity $opportunity): void
     {
-        // Check if status has changed
         if ($opportunity->isDirty('status')) {
-            $originalStatus = $opportunity->getOriginal('status');
-
-            try {
-                // Create notification for status change
-                $this->createStatusChangeNotification($opportunity, $originalStatus);
-                // Dispatch status change event
-                dispatch(new SendTransactionalEmail(
-                    'opportunity.updated',
-                    $opportunity->user,
-                    [
-                        'Opportunity_Title'=> $opportunity->title,
-                        'Opportunity_Link'=> route('opportunity.show', $opportunity->id),
-                        'UNSUB'=> route('unsubscribe.show', $opportunity->user->id),
-                        'UPDATE_PROFILE'=>  route('notification.preferences.index')
-                    ]
-                ));
-            } catch (Exception $e) {
-                Log::error('Failed to process opportunity status change', [
-                    'opportunity_id' => $opportunity->id,
-                    'error' => $e->getMessage(),
-                ]);
-            }
+            OpportunityStatusChanged::dispatch(
+                $opportunity,
+                $opportunity->getOriginal('status'),
+                $opportunity->getAttribute('status')
+            );
         }
 
         // Handle closing date extension
         if ($opportunity->isDirty('closing_date')) {
-            $this->handleClosingDateChange($opportunity);
+            OpportunityClosingDateExtended::dispatch($opportunity);
+        }
+
+        // Dispatch general update event for all other changes
+        if (!$opportunity->isDirty('status') && !$opportunity->isDirty('closing_date')) {
+            OpportunityUpdated::dispatch($opportunity);
         }
     }
 
     /**
      * Handle the Opportunity "deleting" event.
+     *
+     * @param Opportunity $opportunity The opportunity being deleted
+     * @return void
      */
     public function deleting(Opportunity $opportunity): void
     {
-        Log::info('Opportunity being deleted', [
-            'opportunity_id' => $opportunity->id,
-            'title' => $opportunity->title,
-        ]);
+        OpportunityDeleted::dispatch($opportunity);
     }
 
-    /**
-     * Create admin notification for opportunity events.
-     */
-    private function createAdminNotification(Opportunity $opportunity, string $event): void
-    {
-        $title = match ($event) {
-            'created' => 'New Opportunity Published',
-            default => 'Opportunity Event'
-        };
 
-        Notification::create([
-            'user_id' => 3, // Admin user ID
-            'title' => $title,
-            'description' => sprintf(
-                'A new opportunity "%s" has been published by %s',
-                $opportunity->title,
-                $opportunity->user->name ?? 'Unknown User'
-            ),
-            'is_read' => false,
-        ]);
-    }
-
-    /**
-     * Create notification for status changes.
-     */
-    private function createStatusChangeNotification(
-        Opportunity $opportunity,
-        mixed $originalStatus
-    ): void {
-        // Notify opportunity creator
-        if ($opportunity->user_id) {
-            Notification::create([
-                'user_id' => $opportunity->user_id,
-                'title' => 'Opportunity Status Updated',
-                'description' => sprintf(
-                    'Your opportunity "%s" status has been changed from %s to %s',
-                    $opportunity->title,
-                    $originalStatus ? $this->getStatusLabel($originalStatus) : 'N/A',
-                    $opportunity->status->label()
-                ),
-                'is_read' => false,
-            ]);
-        }
-    }
-
-    /**
-     * Handle closing date changes.
-     */
-    private function handleClosingDateChange(Opportunity $opportunity): void
-    {
-        $originalDate = $opportunity->getOriginal('closing_date');
-        $newDate = $opportunity->closing_date;
-
-        if ($originalDate && $newDate && $newDate->gt($originalDate)) {
-            Log::info('Opportunity closing date extended', [
-                'opportunity_id' => $opportunity->id,
-                'original_date' => $originalDate->format('Y-m-d'),
-                'new_date' => $newDate->format('Y-m-d'),
-                'extension_days' => $originalDate->diffInDays($newDate),
-            ]);
-        }
-    }
-
-    /**
-     * Get status label from status value.
-     */
-    private function getStatusLabel(mixed $status): string
-    {
-        if (is_object($status) && method_exists($status, 'label')) {
-            return $status->label();
-        }
-
-        // Handle case where status might be an integer
-        if (is_numeric($status)) {
-            return Status::getLabelByValue($status) ?? 'Unknown';
-        }
-
-        return 'Unknown';
-    }
 }

@@ -11,6 +11,7 @@ use App\Enums\Request\ProjectStage;
 use App\Enums\Request\RelatedActivity;
 use App\Enums\Request\SubTheme;
 use App\Enums\Request\SupportType;
+use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Requests\StoreRequest;
 use App\Http\Resources\RequestResource;
 use App\Models\Request;
@@ -23,6 +24,8 @@ use Inertia\Response;
 
 class RequestFormController extends BaseRequestController
 {
+    use HasPageActions;
+
     public function __construct(
         private readonly RequestService $service
     ) {
@@ -33,6 +36,10 @@ class RequestFormController extends BaseRequestController
      */
     public function form(?int $id = null): Response|RedirectResponse
     {
+        $actions = $this->buildActions([
+            $this->createPrimaryAction('List of my requests', route('request.create'),'arrowLongLeft'),
+        ]);
+
         // Check if this is edit mode (ID provided) or create mode (no ID)
         $isEditMode = !is_null($id);
         if ($isEditMode) {
@@ -73,7 +80,8 @@ class RequestFormController extends BaseRequestController
                     'title' => 'Create a new request',
                     'description' => 'Create a new request to get started.',
                     'image' => '/assets/img/sidebar.png',
-                ]
+                ],
+                'actions'=>$actions
             ]);
         }
 

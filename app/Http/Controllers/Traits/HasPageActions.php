@@ -44,7 +44,7 @@ trait HasPageActions
     protected function createPrimaryAction(
         string $label,
         string $route,
-        ?string $icon = 'PlusIcon',
+        ?string $icon = '',
         string $method = 'GET'
     ): array {
         return $this->createAction($label, $route, 'primary', $icon, $method);

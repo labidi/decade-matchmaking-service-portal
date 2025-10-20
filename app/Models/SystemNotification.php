@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Notification extends Model
+class SystemNotification extends Model
 {
+    protected $table = 'notifications';
     protected $fillable = [
         'title',
         'description',
