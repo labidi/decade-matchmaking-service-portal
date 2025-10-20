@@ -56,7 +56,6 @@ class SendTransactionalEmail implements ShouldQueue
         // Load configuration
         $this->tries = Config::get('mail-templates.queue.max_attempts', 3);
         $this->backoff = Config::get('mail-templates.queue.backoff', [60, 300, 900]);
-
         // Set queue connection and name
         $this->onConnection(Config::get('mail-templates.queue.connection', 'database'));
         $this->onQueue(Config::get('mail-templates.queue.queue_name', 'emails'));
