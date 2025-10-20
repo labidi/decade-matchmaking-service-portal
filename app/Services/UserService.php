@@ -85,59 +85,100 @@ readonly class UserService
         ];
     }
 
-    /**
-     * Get all users
-     */
-    public function getAllUsers(): Collection
-    {
-        return User::all();
-    }
-
-    /**
-     * Get all users with admin role
-     */
     public function getAllAdmins(): Collection
     {
         return User::role('administrator')->get();
     }
 
     /**
-     * Get all users with a specific role
+     * Create a new user from OAuth authentication data
+     *
+     * @param array{email: string, name: string, provider_id: string, avatar: ?string} $oauthData
+     * @param string $provider The OAuth provider name (e.g., 'google', 'linkedin')
+     * @return User The created user
      */
-    public function getUsersByRole(string $roleName): Collection
+    public function createUserFromOAuth(array $oauthData, string $provider): User
     {
-        return $this->repository->getUsersByRole($roleName);
+        return DB::transaction(function () use ($oauthData, $provider) {
+            $nameParts = $this->parseFullName($oauthData['name'] ?? null);
+
+            $user = $this->repository->create([
+                'name' => $oauthData['name'] ?? '',
+                'email' => $oauthData['email'],
+                'provider' => $provider,
+                'provider_id' => $oauthData['provider_id'],
+                'avatar' => $oauthData['avatar'] ?? null,
+                'first_name' => $nameParts['first_name'],
+                'last_name' => $nameParts['last_name'],
+                'email_verified_at' => now(), // OAuth emails are verified by provider
+                'password' => null, // No password needed for social auth
+            ]);
+
+            // Assign default user role
+            $user->assignRole('user');
+
+            Log::info('Created new user from OAuth', [
+                'user_id' => $user->id,
+                'provider' => $provider,
+                'email' => $user->email,
+            ]);
+
+            return $user;
+        });
     }
 
     /**
-     * Get all users with any of the specified roles
+     * Update existing user with OAuth authentication data
+     *
+     * @param User $user The existing user to update
+     * @param array{provider_id: string, avatar: ?string} $oauthData OAuth data to update
+     * @param string $provider The OAuth provider name
+     * @return User The updated user
      */
-    public function getUsersByRoles(array $roleNames): Collection
+    public function updateUserWithOAuth(User $user, array $oauthData, string $provider): User
     {
-        return User::role($roleNames)->get();
+        return DB::transaction(function () use ($user, $oauthData, $provider) {
+            // Only update OAuth data if user has no provider or same provider
+            if (!$user->provider || $user->provider === $provider) {
+                $this->repository->update($user, [
+                    'provider' => $provider,
+                    'provider_id' => $oauthData['provider_id'],
+                    'avatar' => $oauthData['avatar'] ?? null,
+                ]);
+
+                Log::info('Updated existing user with OAuth data', [
+                    'user_id' => $user->id,
+                    'provider' => $provider,
+                ]);
+            } else {
+                Log::info('User signed in with different provider', [
+                    'user_id' => $user->id,
+                    'existing_provider' => $user->provider,
+                    'new_provider' => $provider,
+                ]);
+            }
+
+            return $user->fresh();
+        });
     }
 
     /**
-     * Get all users with a specific permission
+     * Parse full name into first and last name components
+     *
+     * @param string|null $fullName The full name to parse
+     * @return array{first_name: string, last_name: string}
      */
-    public function getUsersByPermission(string $permissionName): Collection
+    private function parseFullName(?string $fullName): array
     {
-        return User::permission($permissionName)->get();
-    }
+        if (!$fullName) {
+            return ['first_name' => '', 'last_name' => ''];
+        }
 
-    /**
-     * Check if a user has admin privileges
-     */
-    public function isAdmin(User $user): bool
-    {
-        return $user->hasRole('administrator');
-    }
+        $nameParts = explode(' ', trim($fullName), 2);
 
-    /**
-     * Check if a user is a partner
-     */
-    public function isPartner(User $user): bool
-    {
-        return $user->hasRole('partner');
+        return [
+            'first_name' => $nameParts[0] ?? '',
+            'last_name' => $nameParts[1] ?? '',
+        ];
     }
 }
