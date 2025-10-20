@@ -46,7 +46,7 @@ return [
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID','604432289754-g698iihhp9mufilhp7fgors2fntclmu7.apps.googleusercontent.com'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET','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'),
-        'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL') . '/auth/google/callback'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', 'http://localhost:8888/auth/google/callback'),
     ],
     'mandrill' => [
         'secret' => env('MANDRILL_KEY'),

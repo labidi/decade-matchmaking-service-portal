@@ -63,7 +63,7 @@ class NavigationService
             'divider' => true,
         ];
 
-        // Notification Settings
+        // SystemNotification Settings
         $items[] = [
             'id' => 'notification-settings',
             'label' => 'Notifications settings',

@@ -59,7 +59,7 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
 
                                         <CardGuide
                                             title="User guide"
-                                            description="A step-by-step guide to help Users navigate the Matchmaking Platform, submit requests, and engage with partner opportunities."
+                                            description="A step-by-step guide to help Users navigate the Oceanconnector Platform, submit requests, and engage with partner opportunities."
                                             fileUrl={userGuide}
                                         />
                                     </div>

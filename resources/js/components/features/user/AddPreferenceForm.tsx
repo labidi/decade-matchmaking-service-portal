@@ -123,7 +123,7 @@ export default function AddPreferenceForm({
                     )}
                 </FieldGroup>
 
-                {/* Email Notification Preference */}
+                {/* Email SystemNotification Preference */}
                 {data.attribute_type && data.attribute_value && (
                     <FieldGroup>
                         <div className="space-y-4">

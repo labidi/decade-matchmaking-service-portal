@@ -17,7 +17,7 @@ class NotificationPreferenceException extends Exception
     public static function duplicatePreference(int $userId, string $entityType, string $attributeValue): self
     {
         return new self(
-            "Notification preference already exists for user {$userId}, entity type '{$entityType}', and attribute value '{$attributeValue}'."
+            "SystemNotification preference already exists for user {$userId}, entity type '{$entityType}', and attribute value '{$attributeValue}'."
         );
     }
 
@@ -37,7 +37,7 @@ class NotificationPreferenceException extends Exception
     public static function preferenceNotFound(int $preferenceId): self
     {
         return new self(
-            "Notification preference with ID {$preferenceId} not found."
+            "SystemNotification preference with ID {$preferenceId} not found."
         );
     }
 

@@ -58,7 +58,7 @@ export default function PreferenceCard({
                 </Button>
             </div>
 
-            {/* Email Notification Control */}
+            {/* Email SystemNotification Control */}
             <div className="space-y-3">
                 <SwitchField>
                     <div className="flex items-center justify-between">

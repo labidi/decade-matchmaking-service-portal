@@ -280,7 +280,7 @@ export const UIRequestForm: UIStep[] = [
                 id: 'expected_outcomes',
                 type: 'textarea',
                 required: true,
-                label: 'What do you hope to achieve through this matchmaking service?',
+                label: 'What do you hope to achieve through this oceanconnector service?',
                 description: 'Describe tangible or intangible outputs.',
             },
             success_metrics: {

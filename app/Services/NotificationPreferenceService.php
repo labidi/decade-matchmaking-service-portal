@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Exceptions\NotificationPreferenceException;
 use App\Http\Resources\NotificationPreferenceResource;
 use App\Models\NotificationPreference;
+use App\Models\RequestSubscription;
 use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -236,5 +237,36 @@ class NotificationPreferenceService
             NotificationPreference::ENTITY_TYPE_OPPORTUNITY => 'type',
             default => throw NotificationPreferenceException::invalidEntityType($entityType)
         };
+    }
+
+    public function unsubscribeFromAllNotifications(User $user, bool $removeSubscriptions = false): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            // Disable all notification preferences for the user
+            $updatedCount = NotificationPreference::where('user_id', $user->id)
+                ->update(['email_notification_enabled' => false]);
+
+            // Optionally remove all request subscriptions
+            if ($removeSubscriptions) {
+                RequestSubscription::where('user_id', $user->id)->delete();
+            }
+
+            DB::commit();
+
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Failed to unsubscribe user from notifications', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
+        }
     }
 }
