@@ -114,9 +114,6 @@ readonly class UserService
                 'password' => null, // No password needed for social auth
             ]);
 
-            // Assign default user role
-            $user->assignRole('user');
-
             Log::info('Created new user from OAuth', [
                 'user_id' => $user->id,
                 'provider' => $provider,
