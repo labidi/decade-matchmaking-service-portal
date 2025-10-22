@@ -7,7 +7,7 @@ import NavigationMenu from '@/components/layouts/NavigationMenu';
 export default function Header() {
   const { auth } = usePage<{ auth: Auth }>().props;
   return (
-    <header className="bg-firefly-900 text-white py-2 px-4 shadow">
+    <header className="bg-firefly-900 dark:bg-firefly-950 text-white py-2 px-4 shadow">
       <div className="container mx-auto flex items-center justify-between">
         <ApplicationLogo />
         <nav className="relative">

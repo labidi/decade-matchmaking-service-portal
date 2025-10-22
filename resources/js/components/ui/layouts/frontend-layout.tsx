@@ -17,7 +17,7 @@ const FrontendLayout: React.FC<FrontendLayoutProps> = ({children}) => {
     const actions = usePage().props?.actions as ActionButton[] | undefined;
 
     return (
-        <div className="min-h-screen flex flex-col  text-gray-900">
+        <div className="min-h-screen flex flex-col text-gray-900 dark:text-gray-100 dark:bg-gray-900">
             <Header/>
             <BannerSection/>
             <Breadcrumb/>
@@ -25,7 +25,7 @@ const FrontendLayout: React.FC<FrontendLayoutProps> = ({children}) => {
                 <div className="">
                     <FlashMessages className=""/>
                 </div>
-                <div className="container shadow rounded bg-white p-6">
+                <div className="container shadow rounded bg-white dark:bg-gray-800 p-6">
                     {children}
                     <Divider className={'mt-4 mb-4'}/>
                     { actions && (<ActionsBar actions={actions}/>)}

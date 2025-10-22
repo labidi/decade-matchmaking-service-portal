@@ -5,6 +5,10 @@ import {createInertiaApp} from '@inertiajs/react';
 import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
 import {createRoot} from 'react-dom/client';
 import {ConfirmationProvider} from '@/components/ui/confirmation';
+import {initDarkMode} from '@/utils/darkMode';
+
+// Initialize dark mode detection
+initDarkMode();
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

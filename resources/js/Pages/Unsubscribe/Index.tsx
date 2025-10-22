@@ -44,8 +44,8 @@ function UnsubscribePage({ user }: UnsubscribePageProps) {
                 <Head title="Unsubscribed Successfully" />
                 <div className="max-w-2xl mx-auto text-center py-12">
                     <div className="mb-6 flex justify-center">
-                        <div className="rounded-full bg-green-50 p-3">
-                            <CheckCircleIcon className="h-12 w-12 text-green-600" data-slot="icon" />
+                        <div className="rounded-full bg-green-50 dark:bg-green-900 p-3">
+                            <CheckCircleIcon className="h-12 w-12 text-green-600 dark:text-green-400" data-slot="icon" />
                         </div>
                     </div>
 
@@ -53,7 +53,7 @@ function UnsubscribePage({ user }: UnsubscribePageProps) {
                         You've Been Unsubscribed
                     </Heading>
 
-                    <Text className="mb-8 text-gray-500">
+                    <Text className="mb-8 text-gray-500 dark:text-gray-400">
                         You will no longer receive email notifications about requests, opportunities.
                         If you change your mind, you can always re-enable notifications from your account settings.
                     </Text>
@@ -74,8 +74,8 @@ function UnsubscribePage({ user }: UnsubscribePageProps) {
             <Head title="Unsubscribe from Notifications" />
             <div className="max-w-2xl mx-auto text-center py-12">
                 <div className="mb-6 flex justify-center">
-                    <div className="rounded-full bg-amber-50 p-3">
-                        <EnvelopeIcon className="h-12 w-12 text-amber-600" data-slot="icon" />
+                    <div className="rounded-full bg-amber-50 dark:bg-amber-900 p-3">
+                        <EnvelopeIcon className="h-12 w-12 text-amber-600 dark:text-amber-400" data-slot="icon" />
                     </div>
                 </div>
 
@@ -83,36 +83,36 @@ function UnsubscribePage({ user }: UnsubscribePageProps) {
                     Unsubscribe from Email Notifications
                 </Heading>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <Text className="text-sm text-blue-800">
+                <div className="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
+                    <Text className="text-sm text-blue-800 dark:text-blue-200">
                         <strong>Account:</strong> {user.first_name} {user.last_name} ({user.email})
                     </Text>
                 </div>
 
-                <Text className="text-lg mb-6 text-gray-600">
+                <Text className="text-lg mb-6 text-gray-600 dark:text-gray-300">
                     Are you sure you want to unsubscribe from all email notifications?
                 </Text>
 
-                <Text className="mb-8 text-gray-500">
+                <Text className="mb-8 text-gray-500 dark:text-gray-400">
                     By unsubscribing, you will no longer receive:
                 </Text>
 
-                <div className="bg-gray-50 rounded-lg p-6 mb-8 text-left max-w-md mx-auto">
-                    <ul className="space-y-2 text-gray-600">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-8 text-left max-w-md mx-auto">
+                    <ul className="space-y-2 text-gray-600 dark:text-gray-300">
                         <li className="flex items-start">
-                            <XCircleIcon className="h-5 w-5 text-gray-400 mr-2 mt-0.5 flex-shrink-0" data-slot="icon" />
+                            <XCircleIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-2 mt-0.5 flex-shrink-0" data-slot="icon" />
                             <span>Notifications about new opportunities</span>
                         </li>
                         <li className="flex items-start">
-                            <XCircleIcon className="h-5 w-5 text-gray-400 mr-2 mt-0.5 flex-shrink-0" data-slot="icon" />
+                            <XCircleIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-2 mt-0.5 flex-shrink-0" data-slot="icon" />
                             <span>Notifications about new requests</span>
                         </li>
                     </ul>
                 </div>
 
                 {errors.token && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <Text className="text-sm text-red-600">
+                    <div className="mb-6 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
+                        <Text className="text-sm text-red-600 dark:text-red-200">
                             {errors.token}
                         </Text>
                     </div>
@@ -136,7 +136,7 @@ function UnsubscribePage({ user }: UnsubscribePageProps) {
                     </Button>
                 </form>
 
-                <Text className="mt-8 text-sm text-gray-500">
+                <Text className="mt-8 text-sm text-gray-500 dark:text-gray-400">
                     You can re-enable notifications at any time from your account settings.
                 </Text>
             </div>

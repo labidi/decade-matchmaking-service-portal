@@ -14,9 +14,9 @@ type HomePageProps = {
 export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>) {
 
     const {auth} = usePage<{ auth: Auth }>().props;
-    const LinkRequestCardClassNameDisabled = "max-w-sm rounded overflow-hidden shadow-lg bg-gray-300 hover:bg-gray-300 text-white"
-    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-900 hover:bg-firefly-600 text-white"
-    const LinkOpportunityCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-500 hover:bg-firefly-600 text-white"
+    const LinkRequestCardClassNameDisabled = "max-w-sm rounded overflow-hidden shadow-lg bg-gray-300 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-700 text-white"
+    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-900 dark:bg-firefly-950 hover:bg-firefly-600 dark:hover:bg-firefly-700 text-white"
+    const LinkOpportunityCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-500 dark:bg-firefly-600 hover:bg-firefly-600 dark:hover:bg-firefly-700 text-white"
 
     // Helper function to check if user has access (either is_user or is_partner)
     const userHasAccess = (user: User): boolean => user.is_user || user.is_partner;
@@ -24,7 +24,7 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
     return (
         <FrontendLayout>
             <Head title="Welcome"/>
-            <section className="text-gray-600 body-font">
+            <section className="text-gray-600 dark:text-gray-300 body-font">
                 <div className="container px-5 py-5 mx-auto flex flex-wrap">
                     <div className="flex flex-wrap -m-4">
                         {auth.user.is_partner ? (

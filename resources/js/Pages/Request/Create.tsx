@@ -66,7 +66,7 @@ export default function RequestForm({request, formOptions}: Readonly<RequestForm
     return (
         <FrontendLayout>
             <Head title="Submit Request"/>
-            <form className="mx-auto bg-white">
+            <form className="mx-auto">
                 <input type="hidden" name="id" value={form.data.id}/>
                 <input type="hidden" name="mode" value={form.data.mode}/>
                 {/* Stepper */}

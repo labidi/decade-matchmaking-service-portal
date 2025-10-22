@@ -30,7 +30,7 @@ export default function Index({portalGuide}: Readonly<IndexPageProps>) {
                                 e.preventDefault();
                                 setShowOrganizationsDialog(true);
                             }}
-                            className="p-12 bg-firefly-600 shadow hover:bg-firefly-700 transition-colors cursor-pointer"
+                            className="p-12 bg-firefly-600 dark:bg-firefly-700 shadow hover:bg-firefly-700 dark:hover:bg-firefly-800 transition-colors cursor-pointer"
                         >
                             <h4 className="text-xl font-semibold mb-2 text-white">
                                 Click to view CDF Partners supporting capacity development through Ocean connector.<br/>
@@ -43,7 +43,7 @@ export default function Index({portalGuide}: Readonly<IndexPageProps>) {
                                 e.preventDefault();
                                 setShowIOCPlatformsDialog(true);
                             }}
-                            className="p-12 bg-firefly-600 shadow hover:bg-firefly-700 transition-colors cursor-pointer"
+                            className="p-12 bg-firefly-600 dark:bg-firefly-700 shadow hover:bg-firefly-700 dark:hover:bg-firefly-800 transition-colors cursor-pointer"
                         >
                             <h4 className="text-xl font-semibold text-white mb-2">
                                 Click to view directory of IOC platforms supporting capacity development in ocean

@@ -6,7 +6,7 @@ import {Instagram, Facebook, Linkedin} from 'lucide-react';
 
 const Header: React.FC = () => {
     return (
-        <section id="footer" className="bg-gray-700 py-8 px-4">
+        <section id="footer" className="bg-gray-700 dark:bg-gray-950 py-8 px-4">
             <div className='container grid md:grid-cols-5 gap-3 mx-auto'>
                 <div>
                     <ApplicationLogo/>
