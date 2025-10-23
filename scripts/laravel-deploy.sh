@@ -45,6 +45,7 @@ fi
 # Install composer dependencies
 echo "Installing composer dependencies..."
 $COMPOSER install --prefer-dist --no-interaction --optimize-autoloader
+$COMPOSER  dump-autoload
 
 # Check if migrations are needed
 echo "Applying database migrations if needed..."
