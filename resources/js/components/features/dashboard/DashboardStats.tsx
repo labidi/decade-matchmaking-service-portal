@@ -31,9 +31,9 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Platform Overview</h2>
-        <p className="mt-1 text-sm text-gray-600">
+      <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Platform Overview</h2>
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Key performance indicators and platform usage statistics
         </p>
       </div>
@@ -142,31 +142,31 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       </div>*/}
 
       {/* Activity Summary */}
-      <div className="mt-8 rounded-lg bg-gray-50 p-6">
+      <div className="mt-8 rounded-lg bg-gray-50 dark:bg-gray-800 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-            <p className="text-sm text-gray-600">Platform activity over the last 24 hours</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Platform activity over the last 24 hours</p>
           </div>
-          <Activity className="h-6 w-6 text-gray-400" />
+          <Activity className="h-6 w-6 text-gray-400 dark:text-gray-500" />
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="flex items-center space-x-3">
-            <div className="h-2 w-2 rounded-full bg-green-500"></div>
-            <span className="text-sm text-gray-600">
+            <div className="h-2 w-2 rounded-full bg-green-500 dark:bg-green-400"></div>
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               <span className="font-medium">{stats.dailyRequests}</span> new requests
             </span>
           </div>
           <div className="flex items-center space-x-3">
-            <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-            <span className="text-sm text-gray-600">
+            <div className="h-2 w-2 rounded-full bg-blue-500 dark:bg-blue-400"></div>
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               <span className="font-medium">{stats.dailyOpportunities}</span> new opportunities
             </span>
           </div>
           <div className="flex items-center space-x-3">
-            <div className="h-2 w-2 rounded-full bg-purple-500"></div>
-            <span className="text-sm text-gray-600">
+            <div className="h-2 w-2 rounded-full bg-purple-500 dark:bg-purple-400"></div>
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               <span className="font-medium">{Math.floor(stats.weeklyRegistrations / 7)}</span> new users today
             </span>
           </div>
