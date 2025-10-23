@@ -74,7 +74,7 @@ class SessionController extends Controller
         Auth::login($user, $remember);
         $request->session()->put('external_api_token', $token);
         $request->session()->regenerate();
-        return to_route('user.home')->with([
+        return redirect()->intended('/home')->with([
             'status' => 'You are logged in successfully.',
         ]);
     }
