@@ -7,6 +7,7 @@ namespace App\Listeners\Request;
 use App\Events\Request\RequestCreated;
 use App\Jobs\Email\SendTransactionalEmail;
 use App\Models\SystemNotification;
+use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -19,21 +20,20 @@ use Illuminate\Support\Facades\Log;
  */
 class SendRequestCreatedNotifications implements ShouldQueue
 {
+    public function __construct(private readonly UserService $userService) {}
+
     /**
      * Handle the event.
      *
-     * @param RequestCreated $event The request created event
-     * @return void
+     * @param  RequestCreated  $event  The request created event
      */
     public function handle(RequestCreated $event): void
     {
         $request = $event->request;
 
         try {
-            // Notify all administrators
-            $adminUsers = \App\Models\User::where('administrator', true)->get();
 
-            foreach ($adminUsers as $admin) {
+            foreach ($this->userService->getAllAdmins() as $admin) {
                 SystemNotification::create([
                     'user_id' => $admin->id,
                     'title' => 'New Request Submitted',

@@ -44,25 +44,6 @@ class RequestObserver
         if ($request->isDirty('status_id')) {
             $previousStatus = $this->getPreviousStatus($request);
             RequestStatusChanged::dispatch($request, $previousStatus);
-
-            // Trigger instant notifications when request is validated/approved
-            $newStatus = $request->status;
-            if ($newStatus && in_array($newStatus->status_code ?? '', ['approved', 'validated', 'active'])) {
-                RequestValidated::dispatch($request);
-
-                Log::info('Request validated - instant notifications dispatched', [
-                    'request_id' => $request->id,
-                    'status' => $newStatus->status_label ?? 'Unknown',
-                ]);
-            }
-        }
-
-        // Check if partner matched
-        if ($request->isDirty('matched_partner_id') && $request->matched_partner_id) {
-            $partner = $request->matchedPartner;
-            if ($partner) {
-                RequestPartnerMatched::dispatch($request, $partner);
-            }
         }
     }
 

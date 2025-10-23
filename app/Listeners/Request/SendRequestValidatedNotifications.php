@@ -75,10 +75,8 @@ class SendRequestValidatedNotifications implements ShouldQueue
                     $skippedCount++;
                     continue;
                 }
-
                 // Mark as sent for 24 hours
                 Cache::put($cacheKey, true, now()->addDay());
-
                 dispatch(new SendTransactionalEmail(
                     'request.notification.instant',
                     $user,
@@ -95,19 +93,7 @@ class SendRequestValidatedNotifications implements ShouldQueue
                 $sentCount++;
             }
 
-            Log::info('Request validated instant notifications dispatched', [
-                'request_id' => $request->id,
-                'subthemes' => $requestSubthemes,
-                'users_matched' => $matchingUsers->count(),
-                'emails_sent' => $sentCount,
-                'duplicates_skipped' => $skippedCount,
-            ]);
         } catch (\Exception $e) {
-            Log::error('Failed to send request validated instant notifications', [
-                'request_id' => $request->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
         }
     }
 }

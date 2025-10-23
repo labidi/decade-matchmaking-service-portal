@@ -96,6 +96,18 @@ return [
             ],
             'tags' => ['request', 'match', 'partner'],
         ],
+        'request.status.changed' => [
+            'template_name' => 'cdf-status-change-notification-user',
+            'subject' => 'Status change notification-User',
+            'variables' => [
+                'Request_Title' => 'required|string',
+                'Request_Status' => 'required|string',
+                'Link_to_Request' => 'required|string',
+                'UNSUB'=>'required|string',
+                'UPDATE_PROFILE'=>'required|string',
+            ],
+            'tags' => ['request', 'user', 'status'],
+        ],
 
         // Offer Events
         'offer.received' => [
@@ -169,14 +181,13 @@ return [
 
         // Request Created Confirmation
         'request.created' => [
-            'template_name' => 'ocd-request-created-confirmation',
+            'template_name' => 'cdf-request-submission',
             'subject' => 'Your Capacity Development Request Has Been Submitted',
             'variables' => [
                 'user_name' => 'required|string',
                 'Request_Title' => 'required|string',
                 'Request_Link' => 'required|url',
                 'UNSUB' => 'required|string',
-                'UPDATE_PROFILE' => 'required|string',
             ],
             'tags' => ['request', 'confirmation'],
         ],

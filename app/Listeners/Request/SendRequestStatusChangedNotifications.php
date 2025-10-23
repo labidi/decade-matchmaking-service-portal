@@ -24,10 +24,22 @@ class SendRequestStatusChangedNotifications implements ShouldQueue
     {
         $request = $event->request;
         $previousStatus = $event->previousStatus;
-
         // Eager load relationships to prevent N+1 queries
         $request->load(['user', 'matchedPartner', 'status']);
 
+        dispatch(new SendTransactionalEmail(
+            'request.status.changed',
+            $request->user,
+            [
+                'Request_Title' => $request->detail->capacity_development_title,
+                'Request_Status' => $request->status->status_label,
+                'Link_to_Request' => route('request.show', $request->id),
+                'UNSUB' => route('unsubscribe.show', $request->user->id),
+                'UPDATE_PROFILE' => route('notification.preferences.index'),
+            ]
+        ));
+
+        return ;
         try {
             $recipients = [];
             $currentStatus = $request->status->status_label ?? 'Unknown';

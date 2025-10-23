@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Log;
  * - Creating in-app notification for opportunity creator
  * - Sending email to opportunity creator
  */
-class SendOpportunityStatusChangedNotifications implements ShouldQueue
+class SendOpportunityStatusChangedNotifications
 {
     /**
      * Handle the event.
