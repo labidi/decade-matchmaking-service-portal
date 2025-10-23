@@ -83,12 +83,6 @@ class OfferService
             if (! $offer) {
                 throw new Exception('Offer not found');
             }
-
-            // Check authorization
-            if (! $offer->can_edit) {
-                throw new Exception('Unauthorized to edit this offer');
-            }
-
             // Update offer data
             $updateData = [];
             if (isset($data['description'])) {
