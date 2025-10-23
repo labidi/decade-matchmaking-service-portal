@@ -36,7 +36,7 @@ export default function SettingsForm({settings}: Readonly<SettingsFormProps>) {
                 <form onSubmit={handleSubmit}>
                     {UISettingsForm.map((step) => (
                         <div key={step.label}>
-                            <h2 className="text-lg font-bold mt-8 mb-2">{step.label}</h2>
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mt-8 mb-2">{step.label}</h2>
                             {Object.entries(step.fields).map(([key, field]) => {
                                 // Enhance field with existing file information for file inputs
                                 const enhancedField = { ...field } as typeof field;

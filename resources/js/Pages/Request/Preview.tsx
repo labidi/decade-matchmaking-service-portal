@@ -29,7 +29,7 @@ export default function ShowRequest() {
             {/*<RequestDetailsSection OcdRequest={OcdRequest} fieldsToShow={previewFields}/>*/}
 
             {/* Separator */}
-            <div className="border-t border-gray-200 my-6"/>
+            <div className="border-t border-gray-200 dark:border-gray-700 my-6"/>
 
             {/* Actions */}
             <div className="mt-8 flex space-x-4">

@@ -110,9 +110,9 @@ export default function SubscriptionsIndex({subscriptions}: SubscriptionsIndexPr
 
                 {subscriptions.data.length === 0 ? (
                     <div className="text-center py-12">
-                        <BellSlashIcon className="mx-auto h-12 w-12 text-gray-400"/>
-                        <Heading level={3} className="mt-4 text-gray-900">No subscriptions</Heading>
-                        <Text className="mt-2 text-gray-600">
+                        <BellSlashIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"/>
+                        <Heading level={3} className="mt-4 text-gray-900 dark:text-gray-100">No subscriptions</Heading>
+                        <Text className="mt-2 text-gray-600 dark:text-gray-400">
                             You haven't subscribed to any requests yet. Visit request details to subscribe.
                         </Text>
                         <div className="mt-6">
@@ -140,10 +140,10 @@ export default function SubscriptionsIndex({subscriptions}: SubscriptionsIndexPr
                                     <TableRow key={subscription.id}>
                                         <TableCell>
                                             <div>
-                                                <Text className="font-medium text-gray-900">
+                                                <Text className="font-medium text-gray-900 dark:text-gray-100">
                                                     {subscription.request?.detail.capacity_development_title || `Request #${subscription.request_id}`}
                                                 </Text>
-                                                <Text className="text-sm text-gray-500">
+                                                <Text className="text-sm text-gray-500 dark:text-gray-400">
                                                     by {subscription.request?.user.name || 'Unknown'}
                                                 </Text>
                                             </div>
@@ -155,7 +155,7 @@ export default function SubscriptionsIndex({subscriptions}: SubscriptionsIndexPr
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <Text className="text-sm text-gray-900">
+                                            <Text className="text-sm text-gray-900 dark:text-gray-100">
                                                 {formatDate(subscription.created_at)}
                                             </Text>
                                         </TableCell>

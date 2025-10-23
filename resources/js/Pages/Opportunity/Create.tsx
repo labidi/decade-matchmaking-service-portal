@@ -43,7 +43,7 @@ export default function CreateOpportunity({opportunity, formOptions}: Readonly<C
                     <input type="hidden" name="id" value={form.data.id}/>
                     {/* Current Step Fields */}
                     <div className="mb-8">
-                        <h2 className="text-2xl font-bold mb-6">{UIOpportunityForm[currentStep].label}</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">{UIOpportunityForm[currentStep].label}</h2>
                         {Object.entries(UIOpportunityForm[currentStep].fields).map(([key, field]) => {
                             const fieldWithOptions = {...field};
 

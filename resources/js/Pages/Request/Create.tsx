@@ -76,13 +76,13 @@ export default function RequestForm({request, formOptions}: Readonly<RequestForm
                             setStep(idx + 1)
                         }}>
                             <div
-                                className={`w-8 h-8 mx-auto rounded-full text-center leading-8 ${step === idx + 1 ? 'bg-firefly-600 text-white' : 'bg-firefly-200 text-gray-600'
-                                } ${errorSteps.includes(idx + 1) && step !== idx + 1 ? 'bg-red-600 text-white' : ''}`}
+                                className={`w-8 h-8 mx-auto rounded-full text-center leading-8 ${step === idx + 1 ? 'bg-firefly-600 text-white dark:bg-firefly-500' : 'bg-firefly-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                                } ${errorSteps.includes(idx + 1) && step !== idx + 1 ? 'bg-red-600 text-white dark:bg-red-500' : ''}`}
                             >
                                 {idx + 1}
                             </div>
                             <div
-                                className={`text-xl text-center mt-2 ${errorSteps.includes(idx + 1) && step !== idx + 1 ? 'text-red-600' : ''}`}>{label}</div>
+                                className={`text-xl text-center mt-2 text-gray-900 dark:text-gray-100 ${errorSteps.includes(idx + 1) && step !== idx + 1 ? 'text-red-600 dark:text-red-400' : ''}`}>{label}</div>
                         </div>
                     ))}
                 </div>
@@ -116,7 +116,7 @@ export default function RequestForm({request, formOptions}: Readonly<RequestForm
                         type="button"
                         onClick={handleBack}
                         disabled={step === 1}
-                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
                     >
                         Back
                     </button>
@@ -126,7 +126,7 @@ export default function RequestForm({request, formOptions}: Readonly<RequestForm
                             handleSubmit('draft');
                         }}
                         disabled={form.processing}
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {form.processing? 'Saving...' : 'Save Draft'}
                     </button>
@@ -134,7 +134,7 @@ export default function RequestForm({request, formOptions}: Readonly<RequestForm
                         <button
                             type="button"
                             onClick={handleNext}
-                            className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700 dark:bg-firefly-500 dark:hover:bg-firefly-600 disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={form.processing}
                         >
                             Next
@@ -146,7 +146,7 @@ export default function RequestForm({request, formOptions}: Readonly<RequestForm
                                 handleSubmit('submit');
                             }}
                             disabled={form.processing}
-                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {form.processing ? 'Submitting...' : 'Submit'}
                         </button>

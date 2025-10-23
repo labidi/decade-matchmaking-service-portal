@@ -26,7 +26,7 @@ export default function RequestShowPage({request, availableStatuses = []}: Reado
             <Head title="Request Details"/>
             <div className="mx-auto">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                    <Heading level={1} className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+                    <Heading level={1} className="text-2xl/7 font-bold text-gray-900 dark:text-gray-100 sm:truncate sm:text-3xl sm:tracking-tight">
                         Request Details
                     </Heading>
 

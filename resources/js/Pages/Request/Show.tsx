@@ -22,7 +22,7 @@ export default function ShowRequest({
     return (
         <FrontendLayout>
             <Head title={`Request: ${request.id}`}/>
-            <Heading className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+            <Heading className="text-2xl/7 font-bold text-gray-900 dark:text-gray-100 sm:truncate sm:text-3xl sm:tracking-tight">
                 Request Details
             </Heading>
             <RequestDetails request={request}/>
