@@ -116,7 +116,7 @@ export default function RequestForm({request, formOptions}: Readonly<RequestForm
                         type="button"
                         onClick={handleBack}
                         disabled={step === 1}
-                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
+                        className="px-4 py-2 bg-firefly-600 text-white rounded hover:bg-firefly-700 dark:bg-firefly-500 dark:hover:bg-firefly-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Back
                     </button>
