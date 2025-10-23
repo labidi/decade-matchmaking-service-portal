@@ -147,7 +147,7 @@ class RequestListController extends BaseRequestController
             'sort' => [
                 'field' => $sortField,
                 'order' => $sortOrder,
-                'per_page' => 2,
+                'per_page' => 10,
             ],
             'current' => [
                 'sort' => ['field' => $sortField, 'order' => $sortOrder],
