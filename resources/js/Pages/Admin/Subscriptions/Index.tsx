@@ -13,6 +13,7 @@ import { PlusIcon, EyeIcon, TrashIcon, UsersIcon } from '@heroicons/react/16/sol
 import { UISubscribeForm } from '@/components/forms/UISubscribeForm';
 import { useSubscribeForm } from '@/hooks/useSubscribeForm';
 import FieldRenderer from '@/components/ui/forms/field-renderer';
+import axios from 'axios';
 
 interface AdminSubscriptionsIndexProps extends PageProps {
     subscriptions: {
@@ -63,32 +64,23 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
         setIsSubmitting(true);
 
         try {
-            const response = await fetch(route('admin.subscriptions.unsubscribe-user'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: JSON.stringify({
-                    user_id: subscriptionToDelete.user_id,
-                    request_id: subscriptionToDelete.request_id,
-                }),
+            // Use axios which handles CSRF tokens automatically
+            const response = await axios.post(route('admin.subscriptions.unsubscribe-user'), {
+                user_id: subscriptionToDelete.user_id,
+                request_id: subscriptionToDelete.request_id,
             });
 
-            const data = await response.json();
-
-            if (data.success) {
+            if (response.data.success) {
                 router.reload();
+                setShowDeleteDialog(false);
+                setSubscriptionToDelete(null);
             } else {
-                console.error('Failed to delete subscription:', data.message);
+                console.error('Failed to delete subscription:', response.data.message);
             }
-        } catch (error) {
-            console.error('Delete subscription error:', error);
+        } catch (error: any) {
+            console.error('Delete subscription error:', error.response?.data?.message || error.message);
         } finally {
             setIsSubmitting(false);
-            setShowDeleteDialog(false);
-            setSubscriptionToDelete(null);
         }
     };
 
