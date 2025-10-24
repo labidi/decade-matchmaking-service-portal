@@ -123,7 +123,7 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
                 </div>
 
                 {/* Statistics Cards */}
-                <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+                <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="bg-white overflow-hidden shadow rounded-lg">
                         <div className="p-5">
                             <div className="flex items-center">
@@ -177,24 +177,6 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
                             </div>
                         </div>
                     </div>
-
-                    <div className="bg-white overflow-hidden shadow rounded-lg">
-                        <div className="p-5">
-                            <div className="flex items-center">
-                                <div className="ml-5 w-0 flex-1">
-                                    <dl>
-                                        <dt className="text-sm font-medium text-gray-500 truncate">
-                                            Unique Subscribers
-                                        </dt>
-                                        <dd className="text-lg font-medium text-gray-900">
-                                            {stats.unique_subscribers}
-                                        </dd>
-                                    </dl>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div className="bg-white overflow-hidden shadow rounded-lg">
                         <div className="p-5">
                             <div className="flex items-center">
@@ -274,12 +256,6 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
-                                            <Button
-                                                href={route('admin.subscriptions.request-subscribers', subscription.request_id)}
-                                            >
-                                                <EyeIcon data-slot="icon" />
-                                                View Request
-                                            </Button>
                                             <Button
                                                 color="red"
                                                 onClick={() => handleDeleteSubscription(subscription)}

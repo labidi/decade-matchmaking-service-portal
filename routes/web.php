@@ -62,8 +62,6 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::post('subscriptions/unsubscribe-user', [SubscriptionController::class, 'unsubscribeUser'])->name('admin.subscriptions.unsubscribe-user');
     Route::get('subscriptions/request/{request}', [SubscriptionController::class, 'requestSubscribers'])->name('admin.subscriptions.request-subscribers');
     Route::get('subscriptions/user/{user}', [SubscriptionController::class, 'userSubscriptions'])->name('admin.subscriptions.user-subscriptions');
-    Route::post('subscriptions/bulk-unsubscribe', [SubscriptionController::class, 'bulkUnsubscribe'])->name('admin.subscriptions.bulk-unsubscribe');
-
     // User Management Routes
 
     Route::get('system_notifications', [SystemNotificationsController::class, 'index'])->name('admin.notifications.index');

@@ -18,11 +18,6 @@ class SubscriptionService
      */
     public function subscribe(User $user, Request $request, ?User $adminUser = null): RequestSubscription
     {
-        // Check if user can view the request
-        if (!$request->can_view) {
-            throw new \Exception('User does not have permission to view this request.');
-        }
-
         // Check if subscription already exists
         $existingSubscription = RequestSubscription::where('user_id', $user->id)
             ->where('request_id', $request->id)
@@ -45,11 +40,6 @@ class SubscriptionService
      */
     public function unsubscribe(User $user, Request $request): bool
     {
-        // Request owners cannot unsubscribe from their own requests
-        if ($request->user_id === $user->id) {
-            throw new \Exception('Request owners cannot unsubscribe from their own requests.');
-        }
-
         return RequestSubscription::where('user_id', $user->id)
             ->where('request_id', $request->id)
             ->delete() > 0;
@@ -118,45 +108,7 @@ class SubscriptionService
             'total_subscriptions' => RequestSubscription::count(),
             'admin_created_subscriptions' => RequestSubscription::where('subscribed_by_admin', true)->count(),
             'user_created_subscriptions' => RequestSubscription::where('subscribed_by_admin', false)->count(),
-            'unique_subscribers' => RequestSubscription::distinct('user_id')->count(),
             'unique_subscribed_requests' => RequestSubscription::distinct('request_id')->count(),
         ];
-    }
-
-    /**
-     * Bulk unsubscribe users from a request (admin only)
-     */
-    public function bulkUnsubscribeFromRequest(User $admin, Request $request, array $userIds): int
-    {
-        if (!$admin->hasRole('administrator')) {
-            throw new \Exception('Only administrators can perform bulk operations.');
-        }
-
-        return RequestSubscription::where('request_id', $request->id)
-            ->whereIn('user_id', $userIds)
-            ->where('user_id', '!=', $request->user_id) // Don't remove request owner
-            ->delete();
-    }
-
-    /**
-     * Auto-subscribe request owner to their own request
-     */
-    public function autoSubscribeRequestOwner(Request $request): RequestSubscription
-    {
-        // Check if owner is already subscribed
-        $existingSubscription = RequestSubscription::where('user_id', $request->user_id)
-            ->where('request_id', $request->id)
-            ->first();
-
-        if ($existingSubscription) {
-            return $existingSubscription;
-        }
-
-        return RequestSubscription::create([
-            'user_id' => $request->user_id,
-            'request_id' => $request->id,
-            'subscribed_by_admin' => false,
-            'admin_user_id' => null,
-        ]);
     }
 }
