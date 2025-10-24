@@ -95,3 +95,8 @@ export interface SubscriptionStats {
     unique_subscribers: number;
     unique_subscribed_requests: number;
 }
+
+export interface SubscriptionFormOptions {
+    users: Array<{ value: number; label: string }>;
+    requests: Array<{ value: number; label: string }>;
+}

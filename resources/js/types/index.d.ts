@@ -36,7 +36,7 @@ export interface UIField {
     label?: string;
     description?: string;
     placeholder?: string;
-    options?: { value: string; label: string }[];
+    options?: { value: string | number; label: string }[];
     required?: boolean;
     show?: (data: any) => boolean;  // Remove RequestForm dependency
     multiple?: boolean;

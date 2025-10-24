@@ -26,9 +26,39 @@ class SubscriptionController extends Controller
         $subscriptions = $this->subscriptionService->getAllSubscriptions();
         $stats = $this->subscriptionService->getSubscriptionStats();
 
+        // Format users for SelectField dropdown
+        $users = User::select('id', 'name', 'email')
+            ->where('is_blocked', false)
+            ->orderBy('name')
+            ->get()
+            ->map(fn($user) => [
+                'value' => $user->id,
+                'label' => "{$user->name} ({$user->email})"
+            ]);
+
+        // Format requests for SelectField dropdown
+        $requests = OCDRequest::select('id', 'status_id', 'user_id')
+            ->with([
+                'detail:request_id,capacity_development_title',
+                'user:id,name',
+                'status:id,status_code'
+            ])
+            ->whereHas('status', fn($q) =>
+                $q->whereNotIn('status_code', ['draft', 'deleted'])
+            )
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(fn($req) => [
+                'value' => $req->id,
+                'label' => ($req->detail->capacity_development_title ?? 'Untitled') .
+                           " (by {$req->user->name})"
+            ]);
+
         return Inertia::render('Admin/Subscriptions/Index', [
             'subscriptions' => $subscriptions,
             'stats' => $stats,
+            'users' => $users,
+            'requests' => $requests,
         ]);
     }
 

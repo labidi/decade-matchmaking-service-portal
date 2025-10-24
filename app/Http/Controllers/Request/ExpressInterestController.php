@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Request;
 
+use App\Models\SystemNotification;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
 use App\Mail\ExpressInterest;
@@ -13,9 +14,10 @@ use Exception;
 class ExpressInterestController extends BaseRequestController
 {
     public function __construct(
-        private readonly UserService $userService,
+        private readonly UserService    $userService,
         private readonly RequestService $requestService
-    ) {
+    )
+    {
     }
 
     /**
@@ -26,18 +28,7 @@ class ExpressInterestController extends BaseRequestController
         // Validate request existence
         try {
             $ocdRequest = $this->requestService->findRequest($requestId);
-            $interestedUser = $request->user();
-            // Get admin recipients using UserService
-            $admins = $this->userService->getAllAdmins();
-            // Send emails to admins
-            foreach ($admins as $admin) {
-                $recipient = [
-                    'email' => $admin->email,
-                    'name' => $admin->name,
-                    'type' => 'admin'
-                ];
-                Mail::to($recipient['email'])->send(new ExpressInterest($ocdRequest, $interestedUser, $recipient));
-            }
+            $this->createSystemNotificationForAdmins($partner, $ocdRequest);
             return back()->with(
                 'success',
                 'Your interest has been expressed successfully. The CDF Secretariat will follow up within three business days.'
@@ -48,5 +39,22 @@ class ExpressInterestController extends BaseRequestController
                 'Failed to express interest. Please try again.'
             );
         }
+    }
+
+    private function createSystemNotificationForAdmins($partner, $ocdRequest)
+    {
+        foreach ($this->userService->getAllAdmins() as $admin) {
+            SystemNotification::create([
+                'user_id' => $admin->id,
+                'title' => 'this user has expressed interest  Interest in this request ',
+                'description' => '',
+                'is_read' => false,
+            ]);
+        }
+    }
+
+    private function sentConfirmationEmailToUser($user)
+    {
+
     }
 }

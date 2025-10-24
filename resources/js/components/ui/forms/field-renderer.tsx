@@ -321,7 +321,7 @@ export default function FieldRenderer({
                         <div className="flex gap-6">
                             {field.options?.map(opt => (
                                 <RadioField key={opt.value}>
-                                    <Radio value={opt.value}/>
+                                    <Radio value={String(opt.value)}/>
                                     <Label className="capitalize">{opt.label}</Label>
                                 </RadioField>
                             ))}
@@ -345,7 +345,7 @@ export default function FieldRenderer({
                             <CheckboxField key={opt.value}>
                                 <Checkbox
                                     checked={Array.isArray(value) ? value.includes(opt.value) : false}
-                                    onChange={() => handleCheckboxChange(opt.value)}
+                                    onChange={() => handleCheckboxChange(String(opt.value))}
                                 />
                                 <Label>{opt.label}</Label>
                             </CheckboxField>

@@ -8,10 +8,11 @@ import { Divider } from '@/components/ui/divider';
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Field, Label } from '@/components/ui/fieldset';
 import { RequestSubscription, SubscriptionStats, PageProps } from '@/types';
 import { PlusIcon, EyeIcon, TrashIcon, UsersIcon } from '@heroicons/react/16/solid';
+import { UISubscribeForm } from '@/components/forms/UISubscribeForm';
+import { useSubscribeForm } from '@/hooks/useSubscribeForm';
+import FieldRenderer from '@/components/ui/forms/field-renderer';
 
 interface AdminSubscriptionsIndexProps extends PageProps {
     subscriptions: {
@@ -20,45 +21,34 @@ interface AdminSubscriptionsIndexProps extends PageProps {
         meta: any;
     };
     stats: SubscriptionStats;
+    users: Array<{ value: number; label: string }>;
+    requests: Array<{ value: number; label: string }>;
 }
 
-export default function AdminSubscriptionsIndex({ subscriptions, stats }: AdminSubscriptionsIndexProps) {
+export default function AdminSubscriptionsIndex({ subscriptions, stats, users, requests }: AdminSubscriptionsIndexProps) {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [subscriptionToDelete, setSubscriptionToDelete] = useState<RequestSubscription | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [formData, setFormData] = useState({
-        user_id: '',
-        request_id: '',
+    const [isSubmitting, setIsSubmitting] = useState(false); // Still used for delete operation
+
+    // Use the new form hook
+    const subscribeForm = useSubscribeForm({
+        onSuccess: () => {
+            router.reload();
+            setShowCreateDialog(false);
+        }
     });
 
-    const handleCreateSubscription = async () => {
-        setIsSubmitting(true);
-
-        try {
-            const response = await fetch(route('admin.subscriptions.subscribe-user'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                router.reload();
-                setShowCreateDialog(false);
-                setFormData({ user_id: '', request_id: '' });
-            } else {
-                console.error('Failed to create subscription:', data.message);
-            }
-        } catch (error) {
-            console.error('Create subscription error:', error);
-        } finally {
-            setIsSubmitting(false);
+    // Merge options into form fields
+    const formFieldsWithOptions = {
+        ...UISubscribeForm[0].fields,
+        user_id: {
+            ...UISubscribeForm[0].fields.user_id,
+            options: users
+        },
+        request_id: {
+            ...UISubscribeForm[0].fields.request_id,
+            options: requests
         }
     };
 
@@ -313,39 +303,40 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats }: AdminS
                     </DialogDescription>
                     <DialogBody>
                         <div className="space-y-4">
-                            <Field>
-                                <Label>User ID</Label>
-                                <Input
-                                    type="number"
-                                    value={formData.user_id}
-                                    onChange={(e) => setFormData({ ...formData, user_id: e.target.value })}
-                                    placeholder="Enter user ID"
+                            {Object.entries(formFieldsWithOptions).map(([name, field]) => (
+                                <FieldRenderer
+                                    key={name}
+                                    name={name}
+                                    field={field}
+                                    value={subscribeForm.form.data[name as keyof typeof subscribeForm.form.data]}
+                                    error={subscribeForm.form.errors[name as keyof typeof subscribeForm.form.errors]}
+                                    onChange={subscribeForm.handleFieldChange}
+                                    formData={subscribeForm.form.data}
                                 />
-                            </Field>
-                            <Field>
-                                <Label>Request ID</Label>
-                                <Input
-                                    type="number"
-                                    value={formData.request_id}
-                                    onChange={(e) => setFormData({ ...formData, request_id: e.target.value })}
-                                    placeholder="Enter request ID"
-                                />
-                            </Field>
+                            ))}
+                            {subscribeForm.form.errors.general && (
+                                <Text className="text-red-600 text-sm">
+                                    {subscribeForm.form.errors.general}
+                                </Text>
+                            )}
                         </div>
                     </DialogBody>
                     <DialogActions>
                         <Button
                             plain
-                            onClick={() => setShowCreateDialog(false)}
-                            disabled={isSubmitting}
+                            onClick={() => {
+                                setShowCreateDialog(false);
+                                subscribeForm.form.reset();
+                            }}
+                            disabled={subscribeForm.form.processing}
                         >
                             Cancel
                         </Button>
                         <Button
-                            onClick={handleCreateSubscription}
-                            disabled={isSubmitting || !formData.user_id || !formData.request_id}
+                            onClick={subscribeForm.handleSubmit}
+                            disabled={subscribeForm.form.processing || !subscribeForm.form.data.user_id || !subscribeForm.form.data.request_id}
                         >
-                            {isSubmitting ? 'Creating...' : 'Create Subscription'}
+                            {subscribeForm.form.processing ? 'Creating...' : 'Create Subscription'}
                         </Button>
                     </DialogActions>
                 </Dialog>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Request;
 
 use App\Http\Controllers\Traits\HasPageActions;
+use App\Http\Resources\PublicRequestResource;
 use App\Http\Resources\RequestResource;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
@@ -84,7 +85,7 @@ class RequestListController extends BaseRequestController
     {
         $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getPublicRequests($filters['search'], $filters['sort']);
-        $requests->toResourceCollection(RequestResource::class);
+        $requests->toResourceCollection(PublicRequestResource::class);
 
         return Inertia::render('Request/List', [
             'title' => 'View Request for Training workshops',
