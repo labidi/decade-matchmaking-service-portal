@@ -13,7 +13,6 @@ import { PlusIcon, EyeIcon, TrashIcon, UsersIcon } from '@heroicons/react/16/sol
 import { UISubscribeForm } from '@/components/forms/UISubscribeForm';
 import { useSubscribeForm } from '@/hooks/useSubscribeForm';
 import FieldRenderer from '@/components/ui/forms/field-renderer';
-import axios from 'axios';
 
 interface AdminSubscriptionsIndexProps extends PageProps {
     subscriptions: {
@@ -30,7 +29,6 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [subscriptionToDelete, setSubscriptionToDelete] = useState<RequestSubscription | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false); // Still used for delete operation
 
     // Use the new form hook
     const subscribeForm = useSubscribeForm({
@@ -58,30 +56,20 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
         setShowDeleteDialog(true);
     };
 
-    const confirmDelete = async () => {
+    const confirmDelete = () => {
         if (!subscriptionToDelete) return;
 
-        setIsSubmitting(true);
-
-        try {
-            // Use axios which handles CSRF tokens automatically
-            const response = await axios.post(route('admin.subscriptions.unsubscribe-user'), {
-                user_id: subscriptionToDelete.user_id,
-                request_id: subscriptionToDelete.request_id,
-            });
-
-            if (response.data.success) {
-                router.reload();
+        // Use Inertia's router.post - handles CSRF automatically
+        router.post(route('admin.subscriptions.unsubscribe-user'), {
+            user_id: subscriptionToDelete.user_id,
+            request_id: subscriptionToDelete.request_id,
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
                 setShowDeleteDialog(false);
                 setSubscriptionToDelete(null);
-            } else {
-                console.error('Failed to delete subscription:', response.data.message);
-            }
-        } catch (error: any) {
-            console.error('Delete subscription error:', error.response?.data?.message || error.message);
-        } finally {
-            setIsSubmitting(false);
-        }
+            },
+        });
     };
 
     const formatDate = (dateString: string) => {
@@ -282,9 +270,9 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
                                     formData={subscribeForm.form.data}
                                 />
                             ))}
-                            {subscribeForm.form.errors.general && (
+                            {(subscribeForm.form.errors as any).general && (
                                 <Text className="text-red-600 text-sm">
-                                    {subscribeForm.form.errors.general}
+                                    {(subscribeForm.form.errors as any).general}
                                 </Text>
                             )}
                         </div>
@@ -331,16 +319,14 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
                         <Button
                             plain
                             onClick={() => setShowDeleteDialog(false)}
-                            disabled={isSubmitting}
                         >
                             Cancel
                         </Button>
                         <Button
                             color="red"
                             onClick={confirmDelete}
-                            disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Removing...' : 'Remove Subscription'}
+                            Remove Subscription
                         </Button>
                     </DialogActions>
                 </Dialog>

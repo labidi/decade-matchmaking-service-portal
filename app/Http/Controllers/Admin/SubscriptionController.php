@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
 use App\Models\User;
 use App\Services\SubscriptionService;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -65,58 +68,104 @@ class SubscriptionController extends Controller
     /**
      * Subscribe a user to a request (admin action)
      */
-    public function subscribeUser(Request $request): JsonResponse
+    public function subscribeUser(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'request_id' => 'required|exists:requests,id',
         ]);
 
         try {
-            $user = User::findOrFail($request->input('user_id'));
-            $ocdRequest = OCDRequest::findOrFail($request->input('request_id'));
+            $user = User::findOrFail($validated['user_id']);
+            $ocdRequest = OCDRequest::findOrFail($validated['request_id']);
             $admin = auth()->user();
+
+            // Check if already subscribed
+            if ($this->subscriptionService->isUserSubscribed($user, $ocdRequest)) {
+                return back()->with('warning', 'User is already subscribed to this request.');
+            }
 
             $subscription = $this->subscriptionService->adminSubscribeUser($admin, $user, $ocdRequest);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'User successfully subscribed to request',
-                'subscription' => $subscription,
+            // Log the admin action
+            Log::info('Admin subscription created', [
+                'admin_id' => $admin->id,
+                'user_id' => $user->id,
+                'request_id' => $ocdRequest->id,
+                'subscription_id' => $subscription->id,
             ]);
+
+            return to_route('admin.subscriptions.index')->with(
+                'success',
+                sprintf(
+                    'User "%s" has been successfully subscribed to request "%s".',
+                    $user->name,
+                    $ocdRequest->detail->capacity_development_title ?? 'Untitled Request'
+                )
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            Log::error('Failed to subscribe user', [
+                'admin_id' => auth()->id(),
+                'user_id' => $validated['user_id'] ?? null,
+                'request_id' => $validated['request_id'] ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['general' => 'Failed to subscribe user: ' . $e->getMessage()]);
         }
     }
 
     /**
      * Unsubscribe a user from a request (admin action)
      */
-    public function unsubscribeUser(Request $request): JsonResponse
+    public function unsubscribeUser(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'request_id' => 'required|exists:requests,id',
         ]);
 
         try {
-            $user = User::findOrFail($request->input('user_id'));
-            $ocdRequest = OCDRequest::findOrFail($request->input('request_id'));
+            $user = User::findOrFail($validated['user_id']);
+            $ocdRequest = OCDRequest::findOrFail($validated['request_id']);
 
             $success = $this->subscriptionService->unsubscribe($user, $ocdRequest);
 
-            return response()->json([
-                'success' => $success,
-                'message' => $success ? 'User successfully unsubscribed from request' : 'Subscription not found',
+            if (!$success) {
+                return back()->with(
+                    'warning',
+                    'Subscription not found. The user may have already been unsubscribed.'
+                );
+            }
+
+            // Log the admin action
+            Log::info('Admin unsubscribed user', [
+                'admin_id' => auth()->id(),
+                'user_id' => $user->id,
+                'request_id' => $ocdRequest->id,
             ]);
+
+            return to_route('admin.subscriptions.index')->with(
+                'success',
+                sprintf(
+                    'User "%s" has been successfully unsubscribed from request "%s".',
+                    $user->name,
+                    $ocdRequest->detail->capacity_development_title ?? 'Untitled Request'
+                )
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            Log::error('Failed to unsubscribe user', [
+                'admin_id' => auth()->id(),
+                'user_id' => $validated['user_id'] ?? null,
+                'request_id' => $validated['request_id'] ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['general' => 'Failed to unsubscribe user: ' . $e->getMessage()]);
         }
     }
 
@@ -149,18 +198,18 @@ class SubscriptionController extends Controller
     /**
      * Bulk unsubscribe users from a request
      */
-    public function bulkUnsubscribe(Request $request): JsonResponse
+    public function bulkUnsubscribe(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'request_id' => 'required|exists:requests,id',
-            'user_ids' => 'required|array',
+            'user_ids' => 'required|array|min:1',
             'user_ids.*' => 'exists:users,id',
         ]);
 
         try {
-            $ocdRequest = OCDRequest::findOrFail($request->input('request_id'));
+            $ocdRequest = OCDRequest::findOrFail($validated['request_id']);
             $admin = auth()->user();
-            $userIds = $request->input('user_ids');
+            $userIds = $validated['user_ids'];
 
             $unsubscribedCount = $this->subscriptionService->bulkUnsubscribeFromRequest(
                 $admin,
@@ -168,16 +217,41 @@ class SubscriptionController extends Controller
                 $userIds
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully unsubscribed {$unsubscribedCount} users from request",
+            if ($unsubscribedCount === 0) {
+                return back()->with(
+                    'warning',
+                    'No users were unsubscribed. They may have already been unsubscribed.'
+                );
+            }
+
+            // Log the bulk admin action
+            Log::info('Admin bulk unsubscribed users', [
+                'admin_id' => $admin->id,
+                'request_id' => $ocdRequest->id,
+                'user_ids' => $userIds,
                 'unsubscribed_count' => $unsubscribedCount,
             ]);
+
+            return to_route('admin.subscriptions.index')->with(
+                'success',
+                sprintf(
+                    'Successfully unsubscribed %d user%s from request "%s".',
+                    $unsubscribedCount,
+                    $unsubscribedCount !== 1 ? 's' : '',
+                    $ocdRequest->detail->capacity_development_title ?? 'Untitled Request'
+                )
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            Log::error('Failed to bulk unsubscribe users', [
+                'admin_id' => auth()->id(),
+                'request_id' => $validated['request_id'] ?? null,
+                'user_ids' => $validated['user_ids'] ?? [],
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['general' => 'Failed to unsubscribe users: ' . $e->getMessage()]);
         }
     }
 }
