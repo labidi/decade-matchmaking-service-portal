@@ -14,7 +14,7 @@ abstract class Controller
 
     protected function getViewPrefix(): string
     {
-        return $this->isAdminRoute() ? 'Admin/' : '';
+        return $this->isAdminRoute() ? 'admin/' : '';
     }
 
     protected function buildBanner(string $title, string $description): array

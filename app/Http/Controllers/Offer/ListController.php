@@ -28,7 +28,7 @@ class ListController extends BaseOfferController
         $offers->toResourceCollection(OfferResource::class);
         $breadcrumbs = $this->buildOfferBreadcrumbs('list');
 
-        return Inertia::render('Admin/Offers/List', [
+        return Inertia::render('admin/Offers/List', [
             'offers' => $offers,
             'currentSort' => $filters['current']['sort'],
             'currentSearch' => $filters['current']['search'],

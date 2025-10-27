@@ -1,6 +1,6 @@
 import {useForm} from '@inertiajs/react';
 import {useEffect, useState, useRef} from 'react';
-import {UISettingsForm} from '@/components/forms/UISettingsForm';
+import { settingsFormFields } from '@features/settings/config';
 import {Settings} from '@/types';
 
 interface UseSettingsFormProps {
@@ -32,7 +32,7 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
     const initialValues = useRef(initialFormData);
 
     const [step, setStep] = useState(1);
-    const steps = UISettingsForm.map((s) => s.label);
+    const steps = settingsFormFields.map((s) => s.label);
     const [errorSteps, setErrorSteps] = useState<number[]>([]);
     const [changedFields, setChangedFields] = useState<Set<string>>(new Set());
 
@@ -156,8 +156,8 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
 
     // Get current step data for easier access in components
     const getCurrentStepFields = () => {
-        if (step <= 0 || step > UISettingsForm.length) return {};
-        return UISettingsForm[step - 1].fields;
+        if (step <= 0 || step > settingsFormFields.length) return {};
+        return settingsFormFields[step - 1].fields;
     };
 
     // Check if current step has any errors
@@ -169,7 +169,7 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
     const processFormErrors = (errors: any): number[] => {
         const stepsWithError: number[] = [];
         Object.keys(errors).forEach(field => {
-            const idx = UISettingsForm.findIndex(step => step.fields[field]);
+            const idx = settingsFormFields.findIndex(step => step.fields[field]);
             if (idx !== -1 && !stepsWithError.includes(idx + 1)) {
                 stepsWithError.push(idx + 1);
             }

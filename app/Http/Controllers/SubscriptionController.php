@@ -86,7 +86,7 @@ class SubscriptionController extends Controller
         $user = auth()->user();
         $subscriptions = $this->subscriptionService->getUserSubscriptions($user);
 
-        return Inertia::render('Subscriptions/Index', [
+        return Inertia::render('subscriptions/Index', [
             'subscriptions' => $subscriptions,
         ]);
     }

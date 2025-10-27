@@ -36,7 +36,7 @@ class UserController extends Controller
         $users = $this->userService->getUsersPaginated($searchFilters, $sortFilters);
         $users->toResourceCollection(UserResource::class);
 
-        return Inertia::render('Admin/User/Index', [
+        return Inertia::render('admin/User/Index', [
             'title' => 'User Management',
             'users' => $users,
             'filters' => $searchFilters,
@@ -63,7 +63,7 @@ class UserController extends Controller
 
         $details = $this->userService->getUserDetails($user);
 
-        return Inertia::render('Admin/User/Show', [
+        return Inertia::render('admin/User/Show', [
             'title' => 'User Details',
             'user' => new UserDetailResource((object) $details),
             'availableRoles' => Role::all()->map(fn ($role) => [

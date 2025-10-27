@@ -27,7 +27,7 @@ class ListController extends BaseOpportunitiesController
     {
         return match ($context) {
             'admin' => [
-                'component' => 'Admin/Opportunity/List',
+                'component' => 'admin/Opportunity/List',
                 'title' => 'Opportunities',
                 'searchFields' => [
                     ['name' => 'user', 'label' => 'User', 'type' => 'text'],
@@ -40,7 +40,7 @@ class ListController extends BaseOpportunitiesController
                 'showRouteName' => 'admin.opportunity.show',
             ],
             'user_own' => [
-                'component' => 'Opportunity/List',
+                'component' => 'opportunity/List',
                 'title' => 'Opportunities',
                 'banner' => [
                     'title' => 'List of My submitted Opportunities',
@@ -64,7 +64,7 @@ class ListController extends BaseOpportunitiesController
                     ]),
             ],
             'public' => [
-                'component' => 'Opportunity/List',
+                'component' => 'opportunity/List',
                 'title' => 'Opportunities',
                 'banner' => [
                     'title' => 'List of Opportunities',

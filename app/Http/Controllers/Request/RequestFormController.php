@@ -85,7 +85,7 @@ class RequestFormController extends BaseRequestController
             ]);
         }
 
-        return Inertia::render('Request/Create', $data);
+        return Inertia::render('request/Create', $data);
     }
 
     /**

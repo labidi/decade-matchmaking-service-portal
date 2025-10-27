@@ -46,7 +46,7 @@ class ListController extends Controller
         // Filter entity types based on user role
         $entityTypes = $this->getFilteredEntityTypes($user);
 
-        return Inertia::render('NotificationPreferences/List', [
+        return Inertia::render('notification-preferences/List', [
             'preferences' => $preferences,
             'availableOptions' => $availableOptions,
             'entityTypes' => $entityTypes,

@@ -22,7 +22,7 @@ class ShowController extends BaseOfferController
     {
         $offer = $this->offerService->getOfferById($id);
 
-        return Inertia::render('Admin/Offers/Show', [
+        return Inertia::render('admin/Offers/Show', [
             'offer' => $offer->toResource(OfferResource::class),
             'breadcrumbs' => [
                 ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],

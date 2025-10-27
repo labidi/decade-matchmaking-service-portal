@@ -62,7 +62,7 @@ class RequestListController extends BaseRequestController
             $this->createPrimaryAction('Submit new request', route('request.create'),'PlusIcon'),
         ]);
 
-        return Inertia::render('Request/List', [
+        return Inertia::render('request/List', [
             'title' => 'My requests',
             'banner' => [
                 'title' => 'List of my requests',
@@ -87,7 +87,7 @@ class RequestListController extends BaseRequestController
         $requests = $this->service->getPublicRequests($filters['search'], $filters['sort']);
         $requests->toResourceCollection(PublicRequestResource::class);
 
-        return Inertia::render('Request/List', [
+        return Inertia::render('request/List', [
             'title' => 'View Request for Training workshops',
             'banner' => [
                 'title' => 'View Request for Training workshops',
@@ -110,7 +110,7 @@ class RequestListController extends BaseRequestController
         $filters = $this->buildFilters($httpRequest);
         $requests = $this->service->getMatchedRequests($httpRequest->user(), $filters['search'], $filters['sort']);
         $requests->toResourceCollection(RequestResource::class) ;
-        return Inertia::render('Request/List', [
+        return Inertia::render('request/List', [
             'title' => 'View my matched requests',
             'banner' => [
                 'title' => 'View my matched requests',

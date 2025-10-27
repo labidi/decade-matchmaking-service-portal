@@ -41,7 +41,7 @@ class DashboardController extends Controller
         $opportunityTrend = $yesterdayOpportunities > 0 ? round((($dailyOpportunities - $yesterdayOpportunities) / $yesterdayOpportunities) * 100) : 0;
         $registrationTrend = $lastWeekRegistrations > 0 ? round((($weeklyRegistrations - $lastWeekRegistrations) / $lastWeekRegistrations) * 100) : 0;
 
-        return Inertia::render('Admin/Dashboard', [
+        return Inertia::render('admin/Dashboard', [
             'title' => 'Welcome '.$user->name,
             'stats' => [
                 'dailyRequests' => $dailyRequests,

@@ -24,7 +24,7 @@ class SessionController extends Controller
 
     public function create(Request $request): Response
     {
-        return Inertia::render('Auth/SignIn', [
+        return Inertia::render('auth/SignIn', [
             'status' => $request->session()->get('status'),
             'banner' => [
                 'title' => 'Sign in to Ocean Decade Portal',

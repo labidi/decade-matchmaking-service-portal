@@ -18,7 +18,7 @@ class SettingsController extends Controller
     {
         $settings = $this->settingsService->getAllSettings();
 
-        return Inertia::render('Admin/Portal/Settings', [
+        return Inertia::render('admin/Portal/Settings', [
             'title' => 'Portal Settings',
             'settings' => $settings, // Pass current settings to form
         ]);

@@ -38,7 +38,7 @@ class FormController extends BaseOfferController
         $partners = $this->getPartnersForSelection();
         $breadcrumbs = $this->buildOfferBreadcrumbs('create', null, $selectedRequest?->id);
 
-        return Inertia::render('Admin/Offers/Create', [
+        return Inertia::render('admin/Offers/Create', [
             'formOptions' => [
                 'availableRequests' => $this->requestService->getAllRequests()->map(function ($request) {
                     return [

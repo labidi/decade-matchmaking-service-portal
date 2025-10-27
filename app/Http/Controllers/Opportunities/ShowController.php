@@ -50,7 +50,7 @@ class ShowController extends BaseOpportunitiesController
             );
         }
 
-        return Inertia::render('Opportunity/Show', [
+        return Inertia::render('opportunity/Show', [
             'banner' => $this->buildBanner(
                 'List of Opportunities',
                 'Browse and view opportunities submitted by CDF partners here.'

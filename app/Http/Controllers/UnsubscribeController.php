@@ -28,7 +28,7 @@ class UnsubscribeController extends Controller
             abort(403, 'This user account has been blocked.');
         }
 
-        return Inertia::render('Unsubscribe/Index', [
+        return Inertia::render('unsubscribe/Index', [
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -90,7 +90,7 @@ class UnsubscribeController extends Controller
      */
     public function success(User $user): Response
     {
-        return Inertia::render('Unsubscribe/Success', [
+        return Inertia::render('unsubscribe/Success', [
             'user' => [
                 'name' => $user->name,
                 'email' => $user->email,

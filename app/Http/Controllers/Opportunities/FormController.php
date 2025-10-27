@@ -54,7 +54,7 @@ class FormController extends BaseOpportunitiesController
             'yes_no' => YesNo::getOptions(),
         ];
 
-        return Inertia::render('Opportunity/Create', $pageProps);
+        return Inertia::render('opportunity/Create', $pageProps);
     }
 
     public function store(OpportunityPostRequest $request, ?int $id = null): \Illuminate\Http\RedirectResponse

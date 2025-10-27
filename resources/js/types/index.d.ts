@@ -23,7 +23,7 @@ export {
     StatusOption,
     UserFilters,
     SortFilters
-} from "@/types/user-management";
+} from "@features/users";
 
 export interface UIStep {
     label: string;

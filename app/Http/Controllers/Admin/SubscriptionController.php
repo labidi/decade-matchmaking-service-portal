@@ -57,7 +57,7 @@ class SubscriptionController extends Controller
                            " (by {$req->user->name})"
             ]);
 
-        return Inertia::render('Admin/Subscriptions/Index', [
+        return Inertia::render('admin/Subscriptions/Index', [
             'subscriptions' => $subscriptions,
             'stats' => $stats,
             'users' => $users,
@@ -176,7 +176,7 @@ class SubscriptionController extends Controller
     {
         $subscribers = $this->subscriptionService->getRequestSubscribers($request);
 
-        return Inertia::render('Admin/Subscriptions/RequestSubscribers', [
+        return Inertia::render('admin/Subscriptions/RequestSubscribers', [
             'request' => $request->load('user', 'status', 'detail'),
             'subscribers' => $subscribers,
         ]);
@@ -189,7 +189,7 @@ class SubscriptionController extends Controller
     {
         $subscriptions = $this->subscriptionService->getUserSubscriptions($user);
 
-        return Inertia::render('Admin/Subscriptions/UserSubscriptions', [
+        return Inertia::render('admin/Subscriptions/UserSubscriptions', [
             'user' => $user,
             'subscriptions' => $subscriptions,
         ]);

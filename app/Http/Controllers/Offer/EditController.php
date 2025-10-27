@@ -23,7 +23,7 @@ class EditController extends BaseOfferController
         $partners = $this->getPartnersWithDetails();
         $breadcrumbs = $this->buildOfferBreadcrumbs('edit', $id);
 
-        return Inertia::render('Admin/Offers/Edit', [
+        return Inertia::render('admin/Offers/Edit', [
             'offer' => $offer,
             'partners' => $partners,
             'breadcrumbs' => $breadcrumbs,

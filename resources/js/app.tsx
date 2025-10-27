@@ -4,8 +4,8 @@ import './bootstrap';
 import {createInertiaApp} from '@inertiajs/react';
 import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
 import {createRoot} from 'react-dom/client';
-import {ConfirmationProvider} from '@/components/ui/confirmation';
-import {initDarkMode} from '@/utils/darkMode';
+import {ConfirmationProvider} from '@ui/organisms/confirmation';
+import {initDarkMode} from '@shared/utils/darkMode';
 
 // Initialize dark mode detection
 initDarkMode();
@@ -16,8 +16,8 @@ createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
         resolvePageComponent(
-            `./Pages/${name}.tsx`,
-            import.meta.glob('./Pages/**/*.tsx'),
+            `./pages/${name}.tsx`,
+            import.meta.glob('./pages/**/*.tsx'),
         ),
     setup({el, App, props}) {
         const root = createRoot(el);

@@ -21,7 +21,7 @@ class SystemNotificationsController extends Controller
         $notifications = Auth::user()->notifications()
             ->orderBy($sortField, $sortOrder)->paginate(10)->appends($request->only(['sort', 'order']));
 
-        return Inertia::render('Admin/SystemNotification/List', [
+        return Inertia::render('admin/SystemNotification/List', [
             'title' => 'Notifications',
             'notifications' => $notifications,
             'currentSort' => [
@@ -39,7 +39,7 @@ class SystemNotificationsController extends Controller
     {
         $this->authorizeNotification($notification);
 
-        return Inertia::render('Admin/SystemNotification/Show', [
+        return Inertia::render('admin/SystemNotification/Show', [
             'title' => $notification->title,
             'notification' => $notification,
             'breadcrumbs' => [
