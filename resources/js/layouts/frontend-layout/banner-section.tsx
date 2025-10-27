@@ -83,7 +83,7 @@ export default function BannerSection({
                             <span className="block text-5xl font-bold">
                                 {pageMetrics.number_fully_closed_matches}
                             </span>
-                            <span className="mt-2 text-2xl">Fully Closed Matches</span>
+                            <span className="mt-2 text-2xl">Completed Trainings & Workshops</span>
                         </div>
                         <div className="flex flex-col gap-y-3 border-l border-white pl-6">
                             <span className="block text-5xl font-bold">

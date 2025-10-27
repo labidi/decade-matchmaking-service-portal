@@ -76,7 +76,7 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
                             <CardLink
                                 link={route('request.create')}
                                 className={userHasAccess(auth.user) ? LinkRequestCardClassName : LinkRequestCardClassNameDisabled}
-                                title="Submit new Request"
+                                title="Submit New Request"
                                 text="Use this feature to submit a new capacity development request for training and workshops "
                                 disabled={!userHasAccess(auth.user)}
                             />
@@ -139,7 +139,7 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
                             <CardLink
                                 link={route('me.opportunity.list')}
                                 className={LinkOpportunityCardClassName}
-                                title="View My submited Opportunities"
+                                title="View My Submitted Opportunities"
                                 text="View the capacity development opportunity you have submitted as a Partner "
                             />
                         )}
