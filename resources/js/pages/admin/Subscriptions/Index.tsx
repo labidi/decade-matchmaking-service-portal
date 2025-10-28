@@ -103,7 +103,7 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
                 </div>
 
                 {/* Statistics Cards */}
-                <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <div className="bg-white overflow-hidden shadow rounded-lg">
                         <div className="p-5">
                             <div className="flex items-center">
@@ -134,23 +134,6 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
                                         </dt>
                                         <dd className="text-lg font-medium text-gray-900">
                                             {stats.admin_created_subscriptions}
-                                        </dd>
-                                    </dl>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white overflow-hidden shadow rounded-lg">
-                        <div className="p-5">
-                            <div className="flex items-center">
-                                <div className="ml-5 w-0 flex-1">
-                                    <dl>
-                                        <dt className="text-sm font-medium text-gray-500 truncate">
-                                            User Created
-                                        </dt>
-                                        <dd className="text-lg font-medium text-gray-900">
-                                            {stats.user_created_subscriptions}
                                         </dd>
                                     </dl>
                                 </div>
@@ -212,13 +195,6 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
                                                 {subscription.request?.user?.name || 'Unknown Requester'}
                                             </Text>
                                         </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        {subscription.subscribed_by_admin ? (
-                                            <Badge color="purple">Admin Created</Badge>
-                                        ) : (
-                                            <Badge color="blue">User Created</Badge>
-                                        )}
                                     </TableCell>
                                     <TableCell>
                                         <Text className="text-sm text-gray-900">
