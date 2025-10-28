@@ -8,6 +8,11 @@ set -euo pipefail
 NPM="/usr/bin/npm"
 APP_DIR="$1"
 
+# Setup logging
+LOG_FILE="$APP_DIR/storage/logs/npm-deploy.log"
+mkdir -p "$APP_DIR/storage/logs"
+exec &>> "$LOG_FILE"
+
 echo "[$(date '+%F %T')] Starting NPM operations..."
 
 # Change to app directory

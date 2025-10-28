@@ -49,17 +49,6 @@ fi
 BRANCH="main"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts"
 
-# Setup log file in application directory
-LOG_DIR="$APP_DIR/storage/logs"
-LOG_FILE="$LOG_DIR/deploy.log"
-
-# Create log directory if it doesn't exist
-mkdir -p "$LOG_DIR"
-
-# Redirect all output to log file (both stdout and stderr)
-# Using tee to also display on console
-exec > >(tee -a "$LOG_FILE") 2>&1
-
 echo "Environment: $ENVIRONMENT"
 
 printf "deploying $BRANCH in $APP_DIR \n"

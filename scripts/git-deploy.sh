@@ -9,6 +9,11 @@ REMOTE="origin"
 BRANCH="main"
 APP_DIR="$1"
 
+# Setup logging
+LOG_FILE="$APP_DIR/storage/logs/git-deploy.log"
+mkdir -p "$APP_DIR/storage/logs"
+exec &>> "$LOG_FILE"
+
 echo "[$(date '+%F %T')] Starting git operations..."
 
 # Change to app directory
