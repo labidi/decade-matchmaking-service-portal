@@ -17,7 +17,7 @@ enum SupportType: string
             self::FUNDING_WORKSHOP => 'Funding to organize a workshop or training',
             self::TECHNICAL_SUPPORT => 'Technical support for planning and delivering a workshop or training',
             self::FACILITATION_SUPPORT => 'Facilitation or coordination support',
-            self::PARTICIPATION_EXISTING => 'Participation in an existing training or capacity-building event',
+            self::PARTICIPATION_EXISTING => 'Support for participation of additional participants (e.g., SIDS, LDCs, ECOPs) in training/workshops organized by the requesting institution.',
             self::ACCESS_MATERIALS => 'Access to training materials or curriculum',
             self::OTHER => 'Other',
         };
