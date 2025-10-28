@@ -169,7 +169,6 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
                                 <TableHeader>Request</TableHeader>
                                 <TableHeader>Type</TableHeader>
                                 <TableHeader>Created</TableHeader>
-                                <TableHeader>Admin User</TableHeader>
                                 <TableHeader className="text-right">Actions</TableHeader>
                             </TableRow>
                         </TableHead>
