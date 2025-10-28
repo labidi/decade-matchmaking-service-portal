@@ -243,9 +243,13 @@ return [
     |--------------------------------------------------------------------------
     | Mandrill Settings
     |--------------------------------------------------------------------------
+    |
+    | The API key is configured from the database via EmailServiceProvider.
+    | It does not use ENV fallback - if no API key is found in database,
+    | an exception will be thrown.
+    |
     */
     'mandrill' => [
-        'api_key' => env('MANDRILL_API_KEY'),
         'from_address' => env('MANDRILL_FROM_ADDRESS', 'noreply@oceandecade.org'),
         'from_name' => env('MANDRILL_FROM_NAME', 'Ocean Decade Portal'),
         'reply_to' => env('MANDRILL_REPLY_TO', 'support@oceandecade.org'),

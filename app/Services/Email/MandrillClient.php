@@ -19,6 +19,9 @@ class MandrillClient
 
     private array $defaultOptions;
 
+    /**
+     * @throws MandrillApiException
+     */
     public function __construct(?ApiClient $client = null)
     {
         $this->client = $client ?? $this->createClient();

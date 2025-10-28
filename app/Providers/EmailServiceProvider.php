@@ -15,6 +15,7 @@ use App\Services\Email\MandrillClient;
 use App\Services\Email\RateLimiter;
 use App\Services\Email\TemplateResolver;
 use App\Services\Email\VariableValidator;
+use App\Services\SettingsService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use MailchimpTransactional\ApiClient;
@@ -63,6 +64,9 @@ class EmailServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Configure Mandrill API key from database
+        $this->configureMandrillApiKey();
+
         // Publish configuration
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -74,6 +78,48 @@ class EmailServiceProvider extends ServiceProvider
         }
 
         // Email event listeners are now auto-discovered by Laravel 12
+    }
+
+    /**
+     * Configure Mandrill API key from database (database-only, no ENV fallback).
+     *
+     * Exception handling is deferred to MandrillClient::createClient() when API client is actually used.
+     */
+    private function configureMandrillApiKey(): void
+    {
+        // Skip if running migrations to prevent errors when settings table doesn't exist yet
+        if ($this->app->runningInConsole() && !$this->app->environment('testing')) {
+            $command = $_SERVER['argv'][1] ?? '';
+            if (str_contains($command, 'migrate')) {
+                return;
+            }
+        }
+
+        try {
+            /** @var SettingsService $settingsService */
+            $settingsService = $this->app->make(SettingsService::class);
+
+            // Get API key from database only (no ENV fallback)
+            $apiKey = $settingsService->getSetting('mandrill_api_key');
+
+            // Set the API key in config (even if null - exception will be thrown when MandrillClient is used)
+            config(['mail-templates.mandrill.api_key' => $apiKey]);
+
+            // Log the configuration source for debugging
+            if (config('app.debug')) {
+                if (!empty($apiKey)) {
+                    \Log::debug('Mandrill API key loaded from database settings');
+                } else {
+                    \Log::warning('Mandrill API key not configured in database - emails will fail until configured');
+                }
+            }
+        } catch (\Exception $e) {
+            // During fresh installs or when database is not available, silently skip
+            // The MandrillClient will throw its own exception when actually needed
+            if (config('app.debug')) {
+                \Log::warning('Could not load Mandrill API key from database: ' . $e->getMessage());
+            }
+        }
     }
 
     /**
