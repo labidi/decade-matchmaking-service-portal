@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-
-
 #be very strict
 #next line is for production use only
 set -euo pipefail
