@@ -26,9 +26,10 @@ class DetailResource extends JsonResource
         $requestOwner = $this->resource->request?->user;
         $isOwner = $currentUser && $requestOwner && $currentUser->id === $requestOwner->id;
         $isAdmin = $currentUser && $currentUser->is_admin;
+        $isSubscriber = $this->resource->request?->subscriptions->contains('user_id', $currentUser->id);
 
         // Determine if user has full access (owner or admin)
-        $hasFullAccess = $isOwner || $isAdmin;
+        $hasFullAccess = $isOwner || $isAdmin || $isSubscriber;
 
         // Public attributes - always visible
         $publicAttributes = [
