@@ -108,7 +108,7 @@ export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>)
                         )}
                         {auth.user && (
                             <CardLink
-                                link={route('request.me.matched-requests')}
+                                link={route('request.me.subscribed-requests')}
                                 className={userHasAccess(auth.user) ? LinkRequestCardClassName : LinkRequestCardClassNameDisabled}
                                 title="My Subscribed requests"
                                 text="Manage and keep track of the requests you have subscribed to for updates and notifications."

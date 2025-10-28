@@ -4,25 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Http\Resources\RequestResource;
 use App\Models\Request;
-use App\Models\Request\Offer;
 use App\Models\Request\Status;
 use App\Models\User;
 use App\Services\Request\RequestRepository;
 use Exception;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class RequestService
 {
     public function __construct(
         private readonly RequestRepository $repository
-    ) {
-    }
+    ) {}
 
     /**
      * Store a new request or update existing one
@@ -35,7 +30,7 @@ class RequestService
         };
         $requestData = [
             'user_id' => $user->id,
-            'status_id' => $statusId
+            'status_id' => $statusId,
         ];
         if ($request) {
             $this->repository->update($request, $requestData);
@@ -43,6 +38,7 @@ class RequestService
             $request = $this->repository->create($requestData);
         }
         $this->repository->createOrUpdateDetail($request, $data);
+
         return $request->load(['status', 'detail']);
     }
 
@@ -66,17 +62,17 @@ class RequestService
     {
         $request = $this->repository->findById($requestId);
 
-        if (!$request) {
+        if (! $request) {
             throw new Exception('Request not found');
         }
 
         // Check authorization
-        if ($request->user_id !== $user->id && !$user->hasRole('administrator')) {
+        if ($request->user_id !== $user->id && ! $user->hasRole('administrator')) {
             throw new Exception('Unauthorized to update this request');
         }
 
         $statusId = $this->getStatusId($statusCode);
-        if (!$statusId) {
+        if (! $statusId) {
             throw new Exception('Invalid status code');
         }
 
@@ -92,12 +88,12 @@ class RequestService
     {
         $request = $this->repository->findById($requestId);
 
-        if (!$request) {
+        if (! $request) {
             throw new Exception('Request not found');
         }
 
         // Check authorization
-        if ($request->user_id !== $user->id && !$user->hasRole('administrator')) {
+        if ($request->user_id !== $user->id && ! $user->hasRole('administrator')) {
             throw new Exception('Unauthorized to delete this request');
         }
 
@@ -122,7 +118,6 @@ class RequestService
         return $this->repository->getPaginated($searchFilters, $sortFilters)->withQueryString();
     }
 
-
     /**
      * Get public requests (for partners)
      */
@@ -144,6 +139,13 @@ class RequestService
         return $this->repository->getMatchedRequests($user, $searchFilters, $sortFilters)->withQueryString();
     }
 
+    public function getSubscribedRequests(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): AbstractPaginator {
+        return $this->repository->getSubscribedRequests($user, $searchFilters, $sortFilters)->withQueryString();
+    }
 
     /**
      * Get user's requests
@@ -170,6 +172,7 @@ class RequestService
     private function getStatusId(string $statusCode): ?int
     {
         $status = $this->repository->getStatusByCode($statusCode);
+
         return $status?->getAttribute('id');
     }
 
@@ -182,5 +185,4 @@ class RequestService
             ->orderBy('status_label')
             ->get();
     }
-
 }

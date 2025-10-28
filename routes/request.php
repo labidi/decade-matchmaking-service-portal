@@ -1,15 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Request\RequestListController;
-use App\Http\Controllers\Request\RequestFormController;
-use App\Http\Controllers\Request\ViewController;
+use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\Request\ExportRequestPdfController;
 use App\Http\Controllers\Request\ExpressInterestController;
+use App\Http\Controllers\Request\RequestFormController;
+use App\Http\Controllers\Request\RequestListController;
 use App\Http\Controllers\Request\RequestManagementController;
-use App\Http\Controllers\DocumentsController;
+use App\Http\Controllers\Request\ViewController;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +35,9 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('request/me/list', [RequestListController::class, 'myRequests'])->name('request.me.list');
     Route::get('request/me/matched-requests', [RequestListController::class, 'matchedRequests'])->name(
         'request.me.matched-requests'
+    );
+    Route::get('request/me/subscribed-requests', [RequestListController::class, 'subscribedRequest'])->name(
+        'request.me.subscribed-requests'
     );
 
     // Request interaction
@@ -66,8 +69,6 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('request/export/csv', [RequestListController::class, 'exportCsv'])->name('admin.request.export.csv');
 });
 
-
-
 Breadcrumbs::for('request.me.list', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');
     $trail->push('List of my request', route('request.me.list'));
@@ -82,11 +83,11 @@ Breadcrumbs::for('request.create', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('request.edit', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');
     $trail->push('List of my request', route('request.me.list'));
-    $trail->push('Request #'.request('id'), route('request.edit',request('id')));
+    $trail->push('Request #'.request('id'), route('request.edit', request('id')));
 });
 
 Breadcrumbs::for('request.show', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');
     $trail->push('List of my request', route('request.me.list'));
-    $trail->push('Request #'.request('id'), route('request.show',request('id')));
+    $trail->push('Request #'.request('id'), route('request.show', request('id')));
 });

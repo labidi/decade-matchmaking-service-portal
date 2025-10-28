@@ -117,6 +117,17 @@ class RequestRepository
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
+    public function getSubscribedRequests(
+        User $user,
+        array $searchFilters = [],
+        array $sortFilters = []
+    ): LengthAwarePaginator {
+        $query = $this->queryBuilder->buildSubscribedRequestsQuery($user->id);
+        $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
+        $query = $this->queryBuilder->applySorting($query, $sortFilters);
+        return $this->queryBuilder->applyPagination($query, $sortFilters);
+    }
+
 
     /**
      * Get status by code

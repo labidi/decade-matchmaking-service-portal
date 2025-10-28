@@ -125,6 +125,28 @@ class RequestListController extends BaseRequestController
     }
 
     /**
+     * @throws \Throwable
+     */
+    public function subscribedRequest(Request $httpRequest): Response
+    {
+        $filters = $this->buildFilters($httpRequest);
+        $requests = $this->service->getSubscribedRequests($httpRequest->user(), $filters['search'], $filters['sort']);
+        $requests->toResourceCollection(RequestResource::class) ;
+        return Inertia::render('request/List', [
+            'title' => 'View my subscribed requests',
+            'banner' => [
+                'title' => 'View my subscribed requests',
+                'description' => 'View and browse my subscribed Request.',
+                'image' => '/assets/img/sidebar.png',
+            ],
+            'routeName' => 'request.me.subscribed-requests',
+            'currentSort' => $filters['current']['sort'],
+            'currentSearch' => $filters['current']['search'],
+            'requests' => $requests,
+        ]);
+    }
+
+    /**
      * Export requests to CSV - admin only functionality
      */
     public function exportCsv(ExportService $exportService): StreamedResponse

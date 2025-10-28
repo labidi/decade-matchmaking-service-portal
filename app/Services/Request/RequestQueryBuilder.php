@@ -121,6 +121,13 @@ class RequestQueryBuilder
             });
     }
 
+    public function buildSubscribedRequestsQuery(int $userId): Builder
+    {
+        return OCDRequest::with(['status', 'detail'])
+            ->whereHas('subscriptions', function (Builder $query) use ($userId) {
+                $query->where('user_id', $userId);
+            });
+    }
     /**
      * Build query with standard relationships
      */
