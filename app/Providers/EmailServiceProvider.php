@@ -30,11 +30,6 @@ class EmailServiceProvider extends ServiceProvider
         // Register Mandrill API client as singleton
         $this->app->singleton(ApiClient::class, function (Application $app) {
             $apiKey = config('mail-templates.mandrill.api_key');
-
-            if (empty($apiKey)) {
-                throw new \RuntimeException('Mandrill API key not configured. Please set MANDRILL_API_KEY in your .env file.');
-            }
-
             $client = new ApiClient();
             $client->setApiKey($apiKey);
 
