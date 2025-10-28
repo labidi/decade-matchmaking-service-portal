@@ -21,7 +21,7 @@ export const adminColumns = [
         sortField: 'title' as const,
         render: (opportunity: Opportunity) => (
             <div className="max-w-xs">
-                <span className="truncate font-medium">{opportunity.title}</span>
+                <span className="truncate font-medium text-wrap">{opportunity.title}</span>
             </div>
         )
     },

@@ -45,7 +45,7 @@ class ViewController extends BaseRequestController
                 ]
             ]);
         }
-        return Inertia::render($this->getViewPrefix() . 'Request/Show', $viewData);
+        return Inertia::render($this->getViewPrefix() . 'request/Show', $viewData);
     }
 
 }
