@@ -1,0 +1,85 @@
+import React from 'react';
+import {OCDRequestStatus} from '@/types';
+import {SidebarLayout} from '@layouts/index'
+import {Head} from "@inertiajs/react";
+import {Heading} from "@ui/primitives/heading";
+import {DropdownActions} from '@ui/organisms/data-table/common';
+import {useRequestActions} from '@features/requests/hooks';
+import {UpdateStatusDialog} from "@ui/organisms/dialogs";
+
+import {OCDRequest, PageProps} from '@/types';
+import {RequestShowActionButtons} from '@features/requests';
+import {
+    StatusBanner,
+    StatusInfoCard,
+    RequestDetailsCard,
+    OfferDetailsCard,
+} from '@features/requests/components/show';
+
+
+interface RequestShowPageProps
+    extends PageProps<{
+        request: OCDRequest;
+        current_route_name: string;
+        availableStatuses?: OCDRequestStatus[];
+    }> {
+}
+
+export default function RequestShowPage({
+                                            auth,
+                                            request,
+                                            availableStatuses = [],
+                                            current_route_name
+                                        }: Readonly<RequestShowPageProps>) {
+    const {
+        isStatusDialogOpen,
+        selectedRequest,
+        closeStatusDialog,
+        getActionsForRequest,
+        availableStatuses: dialogStatuses,
+    } = useRequestActions('admin');
+    return (
+        <SidebarLayout>
+            <Head title={`Request: ${request.detail.capacity_development_title || request.id}`} />
+
+            {/* Page Title */}
+            <Heading className="text-2xl/7 font-bold text-gray-900 dark:text-gray-100 sm:truncate sm:text-3xl sm:tracking-tight mb-6">
+                Request Details
+            </Heading>
+            <div className="mb-6">
+                <StatusBanner auth={auth} request={request} />
+            </div>
+            {/* Two-Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Content - Left Column (2/3 width on large screens) */}
+                <div className="lg:col-span-2 space-y-6">
+                    <RequestDetailsCard request={request} />
+
+                    {/* Display offer details if there's an active offer */}
+                    {request.active_offer && (
+                        <OfferDetailsCard offer={request.active_offer} request={request} />
+                    )}
+                </div>
+                <div className="space-y-6">
+                    <StatusInfoCard request={request} />
+
+                    {/* Action Buttons in Sidebar */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                            Actions
+                        </h3>
+                        <RequestShowActionButtons request={request} auth={auth} />
+                    </div>
+                </div>
+            </div>
+            {/* Status Banner */}
+
+            <UpdateStatusDialog
+                isOpen={isStatusDialogOpen}
+                onClose={closeStatusDialog}
+                request={selectedRequest}
+                availableStatuses={dialogStatuses.length > 0 ? dialogStatuses : availableStatuses}
+            />
+        </SidebarLayout>
+    )
+}

@@ -15,6 +15,7 @@ export interface RequestShowActionButtonsProps {
     request: OCDRequest;
     auth?: import('@/types').Auth;
     className?: string;
+    layout?: 'horizontal' | 'vertical';
 }
 /**
  * RequestShowActionButtons - Specialized action buttons for the Request Show page
@@ -25,7 +26,8 @@ export interface RequestShowActionButtonsProps {
 export function RequestShowActionButtons({
     request,
     auth,
-    className
+    className,
+    layout = 'horizontal'
 }: Readonly<RequestShowActionButtonsProps>) {
 
     const handleAcceptOffer = () => {
@@ -41,8 +43,9 @@ export function RequestShowActionButtons({
     };
 
     const handleDelete = () => {
-        RequestActionService.delete(request, (errors: any) => {
-            console.error('Error deleting request:', errors);
+        RequestActionService.delete(request, (errors: unknown) => {
+            // Errors are already logged in RequestActionService
+            // Additional error handling can be added here if needed
         });
     };
 
@@ -63,9 +66,9 @@ export function RequestShowActionButtons({
                 key="express-interest"
                 color="blue"
                 onClick={() => RequestActionService.expressInterest(request)}
-                className="flex items-center gap-2"
+                className={clsx("flex items-center gap-2", layout === 'vertical' && "w-full justify-center")}
             >
-                <CheckIcon className="h-4 w-4" data-slot="icon" />
+                <CheckIcon data-slot="icon" />
                 Express Interest
             </Button>
         );
@@ -77,9 +80,9 @@ export function RequestShowActionButtons({
                 key="accept-offer"
                 color="green"
                 onClick={handleAcceptOffer}
-                className="flex items-center gap-2"
+                className={clsx("flex items-center gap-2", layout === 'vertical' && "w-full justify-center")}
             >
-                <CheckIcon className="h-4 w-4" data-slot="icon" />
+                <CheckIcon data-slot="icon" />
                 Accept Offer
             </Button>
         );
@@ -91,9 +94,9 @@ export function RequestShowActionButtons({
                 key="request-clarifications"
                 outline
                 onClick={handleRequestClarifications}
-                className="flex items-center gap-2"
+                className={clsx("flex items-center gap-2", layout === 'vertical' && "w-full justify-center")}
             >
-                <QuestionMarkCircleIcon className="h-4 w-4" data-slot="icon" />
+                <QuestionMarkCircleIcon data-slot="icon" />
                 Request clarifications from IOC
             </Button>
         );
@@ -105,9 +108,9 @@ export function RequestShowActionButtons({
             <Button
                 key="edit"
                 onClick={handleEdit}
-                className="flex items-center gap-2"
+                className={clsx("flex items-center gap-2", layout === 'vertical' && "w-full justify-center")}
             >
-                <PencilSquareIcon className="h-4 w-4" data-slot="icon" />
+                <PencilSquareIcon data-slot="icon" />
                 Edit Request
             </Button>
         );
@@ -119,9 +122,9 @@ export function RequestShowActionButtons({
                 key="view-offers"
                 outline
                 onClick={handleViewOffers}
-                className="flex items-center gap-2"
+                className={clsx("flex items-center gap-2", layout === 'vertical' && "w-full justify-center")}
             >
-                <DocumentTextIcon className="h-4 w-4" data-slot="icon" />
+                <DocumentTextIcon data-slot="icon" />
                 View All Offers ({request.offers.length})
             </Button>
         );
@@ -134,9 +137,9 @@ export function RequestShowActionButtons({
                 key="export-pdf"
                 outline
                 onClick={handleExportPdf}
-                className="flex items-center gap-2"
+                className={clsx("flex items-center gap-2", layout === 'vertical' && "w-full justify-center")}
             >
-                <DocumentTextIcon className="h-4 w-4" data-slot="icon" />
+                <DocumentTextIcon data-slot="icon" />
                 Export PDF
             </Button>
         );
@@ -148,9 +151,9 @@ export function RequestShowActionButtons({
                 key="delete"
                 color="red"
                 onClick={handleDelete}
-                className="flex items-center gap-2"
+                className={clsx("flex items-center gap-2", layout === 'vertical' && "w-full justify-center")}
             >
-                <TrashIcon className="h-4 w-4" data-slot="icon" />
+                <TrashIcon data-slot="icon" />
                 Delete Request
             </Button>
         );
@@ -162,10 +165,15 @@ export function RequestShowActionButtons({
     }
 
     return (
-        <div className={clsx(
-            'actions-buttons flex flex-wrap items-center justify-end gap-3 mt-6',
-            className
-        )}>
+        <div
+            className={clsx(
+                'actions-buttons flex gap-3',
+                layout === 'horizontal' ? 'flex-wrap items-center justify-end mt-6' : 'flex-col items-stretch',
+                className
+            )}
+            role="group"
+            aria-label="Request action buttons"
+        >
             {actions}
         </div>
     );

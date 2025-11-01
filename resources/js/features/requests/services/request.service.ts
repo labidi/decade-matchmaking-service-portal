@@ -47,7 +47,7 @@ export class RequestActionService {
     /**
      * Delete a request with confirmation and error handling
      */
-    static delete(request: OCDRequest, onError?: (errors: any) => void): void {
+    static delete(request: OCDRequest, onError?: (errors: unknown) => void): void {
         const confirmMessage = 'Are you sure you want to delete this request? This action cannot be undone.';
 
         if (confirm(confirmMessage)) {
@@ -105,7 +105,7 @@ export class RequestActionService {
      * This is a specialized action that requires additional state management
      * and should be handled by the calling component
      */
-    static updateStatus(request: OCDRequest, onStatusUpdate: (request: OCDRequest, statuses?: any[]) => void, availableStatuses?: any[]): void {
+    static updateStatus(request: OCDRequest, onStatusUpdate: (request: OCDRequest, statuses?: unknown[]) => void, availableStatuses?: unknown[]): void {
         onStatusUpdate(request, availableStatuses);
     }
 

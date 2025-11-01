@@ -1,7 +1,7 @@
 export {
     OCDRequest, OCDRequestList, RequestPermissions, OCDRequestStatus,
     RequestSubscription, SubscriptionStats
-} from "@/types/request";
+} from "@/features/requests";
 export {RequestOffer, RequestOfferList, RequestOfferPermissions} from "@/types/offer";
 export {Opportunity, OpportunitiesList, OpportunityFormOptions, OpportunitiesPagination} from "@/types/opportunity";
 export {

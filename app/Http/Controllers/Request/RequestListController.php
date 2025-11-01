@@ -37,7 +37,7 @@ class RequestListController extends BaseRequestController
             $this->createSecondaryAction('Export CSV', route('admin.request.export.csv'), 'ArrowDownTrayIcon'),
         ]);
 
-        return Inertia::render($this->getViewPrefix() . 'Request/List', [
+        return Inertia::render($this->getViewPrefix() . 'request/List', [
             'title' => "Requests",
             'requests' => $requests,
             'currentSort' => $filters['current']['sort'],
