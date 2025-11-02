@@ -36,7 +36,6 @@ class FormController extends BaseOfferController
         }
 
         $partners = $this->getPartnersForSelection();
-        $breadcrumbs = $this->buildOfferBreadcrumbs('create', null, $selectedRequest?->id);
 
         return Inertia::render('admin/Offers/Create', [
             'formOptions' => [
@@ -48,8 +47,7 @@ class FormController extends BaseOfferController
                 }),
                 'partners' => $partners,
             ],
-            'offer' => $offer,
-            'breadcrumbs' => $breadcrumbs
+            'offer' => $offer
         ]);
     }
 }

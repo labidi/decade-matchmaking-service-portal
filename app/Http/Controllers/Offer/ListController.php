@@ -26,7 +26,6 @@ class ListController extends BaseOfferController
         $filters = $this->buildFilters($request);
         $offers = $this->offerService->getPaginatedOffers($filters['search'], $filters['sort']);
         $offers->toResourceCollection(OfferResource::class);
-        $breadcrumbs = $this->buildOfferBreadcrumbs('list');
 
         return Inertia::render('admin/Offers/List', [
             'offers' => $offers,
@@ -41,7 +40,6 @@ class ListController extends BaseOfferController
                 })
             ],
             'routeName' => 'admin.offer.list',
-            'breadcrumbs' => $breadcrumbs
         ]);
     }
 }

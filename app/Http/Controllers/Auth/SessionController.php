@@ -55,9 +55,7 @@ class SessionController extends Controller
 
 
         } catch (\Exception $e) {
-            throw ValidationException::withMessages([
-                "error" => $e->getMessage(),
-            ]);
+            return to_route('sign.in')->with('error', 'Login failed. Your Ocean Expert account may not yet be approved, or your ID or password is incorrect.')->withInput();
         }
         $user = User::updateOrCreate(
             ['email' => $credentials['email']],

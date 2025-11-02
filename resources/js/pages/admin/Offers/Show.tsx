@@ -6,8 +6,7 @@ import {Button} from '@ui/primitives/button';
 import {Badge} from '@ui/primitives/badge';
 import {PencilIcon, TrashIcon, EyeIcon} from '@heroicons/react/16/solid';
 import {formatDate, offerStatusBadgeRenderer} from '@shared/utils';
-import {DropdownActions} from '@ui/organisms/data-table/common';
-import {useOfferActions} from '@features/offers/hooks';
+import {OfferActionButtons} from '@features/offers/components/offer-action-buttons';
 
 interface ShowOfferPageProps {
     offer: RequestOffer;
@@ -15,24 +14,6 @@ interface ShowOfferPageProps {
 
 
 export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
-
-    const {
-        getActionsForOffer,
-    } = useOfferActions('admin');
-
-    const handleDeleteOffer = () => {
-        if (confirm(`Are you sure you want to delete this offer? This action cannot be undone.`)) {
-            router.delete(route('admin.offer.destroy', {id: offer.id}), {
-                onSuccess: () => {
-                    router.visit(route('admin.offer.list'));
-                },
-                onError: (errors) => {
-                    console.error('Failed to delete offer:', errors);
-                }
-            });
-        }
-    };
-
 
     return (
         <SidebarLayout>
@@ -48,10 +29,9 @@ export default function ShowOffer({offer}: Readonly<ShowOfferPageProps>) {
                             Created {formatDate(offer.created_at)}
                         </p>
                     </div>
+                    {/* Action Buttons */}
                     <div className="flex-shrink-0">
-                        <DropdownActions
-                            actions={getActionsForOffer(offer)}
-                        />
+                        <OfferActionButtons offer={offer} layout="horizontal" />
                     </div>
                 </div>
 

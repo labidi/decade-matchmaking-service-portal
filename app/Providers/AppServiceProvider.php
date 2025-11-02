@@ -14,6 +14,8 @@ use App\Observers\UserObserver;
 use App\Policies\OfferPolicy;
 use App\Policies\OpportunityPolicy;
 use App\Policies\RequestPolicy;
+use App\Services\Actions\RequestActionProvider;
+use App\Services\Actions\OfferActionProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
@@ -27,7 +29,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register simplified Action Provider Pattern services
+        $this->app->singleton(RequestActionProvider::class);
+        $this->app->singleton(OfferActionProvider::class);
     }
 
     /**
@@ -48,10 +52,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Request::class, RequestPolicy::class);
         Gate::policy(Opportunity::class, OpportunityPolicy::class);
         Gate::policy(Offer::class, OfferPolicy::class);
-
-        // Register event subscribers
-        Event::subscribe(NotifyAdminAboutOpportunityActivity::class);
-
         // Note: Event listeners are automatically discovered in app/Listeners/
         // with proper handle() methods that type-hint events
     }

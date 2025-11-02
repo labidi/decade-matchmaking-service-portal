@@ -163,7 +163,7 @@ export default function OfferDetailsSection({offer, request}: Readonly<OfferDeta
                                         </p>
                                         {document.document_type && (
                                             <Badge color="blue" className="mt-1">
-                                                {document.document_type.replace(/_/g, ' ').toUpperCase()}
+                                                {document.document_type.label.toUpperCase()}
                                             </Badge>
                                         )}
                                     </div>
@@ -177,7 +177,7 @@ export default function OfferDetailsSection({offer, request}: Readonly<OfferDeta
                                             Download
                                         </Button>
 
-                                        {document.uploader_id === auth.user.id && (
+                                        {document.permissions.can_delete && (
                                             <Button
                                                 outline
                                                 onClick={() => handleDeleteDocument(document.id)}

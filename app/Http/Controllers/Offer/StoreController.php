@@ -22,7 +22,6 @@ class StoreController extends BaseOfferController
 
         try {
             $offer = $this->offerService->createOffer($validated, auth()->user());
-
             return to_route('admin.offer.show', $offer->id)
                 ->with('success', 'Offer created successfully');
         } catch (Exception $e) {

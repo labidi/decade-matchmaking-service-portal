@@ -36,7 +36,7 @@ class SendWelcomeEmail implements ShouldQueue
                 $user,
                 [
                     'user_name' => $user->name,
-                    'Dashboard_Link' => route('dashboard'),
+                    'Dashboard_Link' => route('user.home'),
                     'Profile_Link' => route('profile.edit'),
                     'UNSUB' => route('unsubscribe.show', $user->id),
                     'UPDATE_PROFILE' => route('notification.preferences.index'),

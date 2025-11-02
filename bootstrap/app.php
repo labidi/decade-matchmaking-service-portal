@@ -40,7 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             // Handle web requests with Inertia page
-            return Inertia::render('Auth/AccessDenied', [
+            return Inertia::render('auth/AccessDenied', [
                 'requiredRoles' => $e->getRequiredRoles(),
                 'contactEmail' => 'cdf@unesco.org',
                 'attemptedRoute' => $request->route()?->getName(),

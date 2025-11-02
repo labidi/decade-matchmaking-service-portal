@@ -9,6 +9,7 @@ import { useDocumentManagement } from '@features/requests/hooks/use-document-man
 import { DocumentUploadForm } from './components/document-upload-form';
 import { DocumentList } from './components/document-list';
 import { OfferInfoSection } from './components/offer-info-section';
+import { OfferActionButtons } from '@features/offers/components/offer-action-buttons';
 
 interface OfferDetailsCardProps {
     request: OCDRequest;
@@ -40,6 +41,17 @@ export function OfferDetailsCard({ offer, request }: OfferDetailsCardProps) {
             <div className="p-6 space-y-6">
                 {/* Partner Information & Offer Details */}
                 <OfferInfoSection offer={offer} />
+
+                {/* Offer Actions */}
+                {offer.actions && offer.actions.length > 0 && (
+                    <>
+                        <Divider />
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Offer Actions</h4>
+                            <OfferActionButtons offer={offer} layout="horizontal" />
+                        </div>
+                    </>
+                )}
 
                 <Divider />
 

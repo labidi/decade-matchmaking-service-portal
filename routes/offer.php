@@ -10,6 +10,8 @@ use App\Http\Controllers\Offer\StoreController;
 use App\Http\Controllers\Offer\UpdateController;
 use App\Http\Controllers\Offer\UpdateStatusController;
 use Illuminate\Support\Facades\Route;
+use Diglactic\Breadcrumbs\Breadcrumbs;
+use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('offer', ListController::class)->name('admin.offer.list');
@@ -23,6 +25,16 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::post('offer/{id}/update-status', UpdateStatusController::class)->name(
         'admin.offer.update-status'
     );
+});
+
+Breadcrumbs::for('admin.offer.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('Offers list', route('admin.offer.list'));
+});
+
+Breadcrumbs::for('admin.offer.show', function (BreadcrumbTrail $trail) {
+    $trail->parent('user.home');
+    $trail->push('Offers list', route('admin.offer.list'));
 });
 
 // Public routes for offer acceptance (authenticated users only)

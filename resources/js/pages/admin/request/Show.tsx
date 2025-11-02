@@ -3,8 +3,6 @@ import {OCDRequestStatus} from '@/types';
 import {SidebarLayout} from '@layouts/index'
 import {Head} from "@inertiajs/react";
 import {Heading} from "@ui/primitives/heading";
-import {DropdownActions} from '@ui/organisms/data-table/common';
-import {useRequestActions} from '@features/requests/hooks';
 import {UpdateStatusDialog} from "@ui/organisms/dialogs";
 
 import {OCDRequest, PageProps} from '@/types';
@@ -31,13 +29,20 @@ export default function RequestShowPage({
                                             availableStatuses = [],
                                             current_route_name
                                         }: Readonly<RequestShowPageProps>) {
-    const {
-        isStatusDialogOpen,
-        selectedRequest,
-        closeStatusDialog,
-        getActionsForRequest,
-        availableStatuses: dialogStatuses,
-    } = useRequestActions('admin');
+    const [isStatusDialogOpen, setIsStatusDialogOpen] = React.useState(false);
+    const [selectedRequest, setSelectedRequest] = React.useState<OCDRequest | null>(null);
+
+    const handleDialogOpen = (dialogComponent: string, action: any) => {
+        if (dialogComponent === 'UpdateStatusDialog') {
+            setSelectedRequest(request);
+            setIsStatusDialogOpen(true);
+        }
+    };
+
+    const closeStatusDialog = () => {
+        setIsStatusDialogOpen(false);
+        setSelectedRequest(null);
+    };
     return (
         <SidebarLayout>
             <Head title={`Request: ${request.detail.capacity_development_title || request.id}`} />
@@ -61,14 +66,19 @@ export default function RequestShowPage({
                     )}
                 </div>
                 <div className="space-y-6">
-                    <StatusInfoCard request={request} />
+                    <StatusInfoCard  auth={auth} request={request} />
 
                     {/* Action Buttons in Sidebar */}
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">
                             Actions
                         </h3>
-                        <RequestShowActionButtons request={request} auth={auth} />
+                        <RequestShowActionButtons
+                            request={request}
+                            auth={auth}
+                            layout="vertical"
+                            onDialogOpen={handleDialogOpen}
+                        />
                     </div>
                 </div>
             </div>
@@ -78,7 +88,7 @@ export default function RequestShowPage({
                 isOpen={isStatusDialogOpen}
                 onClose={closeStatusDialog}
                 request={selectedRequest}
-                availableStatuses={dialogStatuses.length > 0 ? dialogStatuses : availableStatuses}
+                availableStatuses={availableStatuses}
             />
         </SidebarLayout>
     )

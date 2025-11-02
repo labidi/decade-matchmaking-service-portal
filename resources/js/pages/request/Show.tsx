@@ -52,7 +52,7 @@ export default function ShowRequest({auth, request, current_route_name}: Readonl
 
                 {/* Sidebar - Right Column (1/3 width on large screens) */}
                 <div className="space-y-6">
-                    <StatusInfoCard request={request}/>
+                    <StatusInfoCard auth={auth} request={request}/>
 
                     {/* Desktop-only sticky action buttons */}
                     <div className="hidden lg:block">

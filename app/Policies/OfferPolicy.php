@@ -93,7 +93,7 @@ class OfferPolicy
         }
 
         // Only the request owner can accept offers
-        return $user->id === $offer->request->user_id
+        return $user->id === $offer->request->user->id
             && $offer->status === RequestOfferStatus::ACTIVE
             && !$offer->is_accepted;
     }

@@ -1,5 +1,6 @@
 import {User} from '@/types';
 import {RequestOffer, RequestOfferList} from '@features/offers/types';
+import {EntityAction} from '@/types/actions';
 
 export interface OCDRequestStatus {
     id: string;
@@ -72,6 +73,7 @@ export interface OCDRequest {
     active_offer?: RequestOffer;
     permissions: RequestPermissions;
     matched_partner?: User;
+    actions?: EntityAction[]; // Actions from backend Action Provider Pattern
 }
 
 export type OCDRequestList = OCDRequest[];

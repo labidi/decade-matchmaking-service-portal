@@ -45,16 +45,17 @@ class OceanExpertAuthService
         }
 
         $data = $response->json();
-
+        if(isset($data['error'])){
+            throw new \Exception(Arr::get($data, 'error.message', 'Invalid credentials provided.'));
+        }
         $token = Arr::get($data, 'token');
+        if (! $token || ! is_string($token)) {
+            throw new \Exception('Authentication service did not return a valid token.');
+        }
         $user  = [
             'password'  => $password,
             'email' => $email,
         ];
-
-        if (! $token || ! is_string($token)) {
-            throw new \Exception('Authentication service did not return a valid token.');
-        }
 
         return ['token' => $token, 'user' => $user];
     }

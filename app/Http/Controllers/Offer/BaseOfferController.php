@@ -105,39 +105,6 @@ abstract class BaseOfferController extends Controller
     }
 
     /**
-     * Build context-aware breadcrumbs for offer operations
-     */
-    protected function buildOfferBreadcrumbs(string $action, ?int $offerId = null, ?int $requestId = null): array
-    {
-        $breadcrumbs = [
-            ['name' => 'Dashboard', 'url' => route('admin.dashboard.index')],
-        ];
-
-        if ($requestId && $action !== 'list') {
-            $breadcrumbs[] = [
-                'name' => 'Request #' . $requestId,
-                'url' => route('admin.request.show', $requestId)
-            ];
-        } else {
-            $breadcrumbs[] = ['name' => 'Manage offers', 'url' => route('admin.offer.list')];
-        }
-
-        switch ($action) {
-            case 'create':
-                $breadcrumbs[] = ['name' => 'Create new offer'];
-                break;
-            case 'edit':
-                $breadcrumbs[] = ['name' => 'Edit offer #' . $offerId];
-                break;
-            case 'show':
-                $breadcrumbs[] = ['name' => 'Offer #' . $offerId, 'url' => route('admin.offer.show', $offerId)];
-                break;
-        }
-
-        return $breadcrumbs;
-    }
-
-    /**
      * Handle exceptions with consistent logging and response formatting
      */
     protected function handleException(\Exception $exception, string $operation, array $context = []): JsonResponse|RedirectResponse

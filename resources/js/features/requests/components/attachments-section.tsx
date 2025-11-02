@@ -84,12 +84,12 @@ export function AttachmentsSection({OcdRequest, canEdit = false, documents = []}
                                 <td className="p-2">
                                     {doc.name}
                                 </td>
-                                <td className="p-2">{doc.document_type}</td>
+                                <td className="p-2">{doc.document_type?.label}</td>
                                 <td className="p-2">{new Date(doc.created_at).toLocaleDateString()}</td>
                                 <td className="p-2 space-x-2">
                                     <a href={route('user.document.download', doc.id)}
                                        className="text-blue-600 underline">Download</a>
-                                    {doc.uploader_id === auth.user.id && canEdit && (
+                                    {doc.permissions.can_delete && canEdit && (
                                     <button type="button" onClick={() => handleDelete(doc.id)}
                                             className="text-red-600 underline">Delete
                                     </button>

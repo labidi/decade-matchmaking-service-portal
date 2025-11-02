@@ -22,7 +22,7 @@ Route::prefix('unsubscribe')->group(function () {
 
 // Access denied route for direct navigation
 Route::get('/access-denied', function () {
-    return \Inertia\Inertia::render('Auth/AccessDenied', [
+    return \Inertia\Inertia::render('auth/AccessDenied', [
         'requiredRoles' => request('roles', []),
         'contactEmail' => 'cdf@unesco.org',
         'attemptedRoute' => request('route'),

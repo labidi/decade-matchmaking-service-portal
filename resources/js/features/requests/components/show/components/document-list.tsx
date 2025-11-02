@@ -34,7 +34,7 @@ export function DocumentList({ documents, currentUserId, onDelete, isDeleting = 
                         </p>
                         {document.document_type && (
                             <Badge color="blue" className="mt-2">
-                                {document.document_type.replace(/_/g, ' ').toUpperCase()}
+                                {document.document_type.label.toUpperCase()}
                             </Badge>
                         )}
                     </div>
@@ -50,7 +50,7 @@ export function DocumentList({ documents, currentUserId, onDelete, isDeleting = 
                             Download
                         </Button>
 
-                        {document.uploader_id === currentUserId && (
+                        {document.permissions.can_delete && (
                             <Button
                                 outline
                                 onClick={() => onDelete(document.id)}

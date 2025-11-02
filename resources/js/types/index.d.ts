@@ -142,12 +142,29 @@ export interface Document {
     name: string;
     path: string;
     file_type?: string;
-    document_type?: string;
+    document_type?: {
+        value: string;
+        label: string;
+    };
     parent_id?: number;
     parent_type?: string;
-    uploader_id: number;
     created_at: string;
     updated_at: string;
+
+    // Computed properties
+    file_size: number;
+    file_size_human: string;
+    download_url: string;
+    file_extension: string;
+
+    // Relationships
+    uploader?: User;
+
+    // Permissions
+    permissions: {
+        can_download: boolean;
+        can_delete: boolean;
+    };
 }
 
 export interface Organization {

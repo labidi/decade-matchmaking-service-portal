@@ -1,4 +1,5 @@
 import {Document, OCDRequest, User} from "@/types/index";
+import {EntityAction} from '@/types/actions';
 
 export interface RequestOfferPermissions {
     can_view: boolean;
@@ -24,6 +25,7 @@ export interface RequestOffer {
     request: OCDRequest;
     matched_partner?: User;
     permissions: RequestOfferPermissions;
+    actions?: EntityAction[]; // Actions from backend Action Provider Pattern
 }
 
 export type RequestOfferList = RequestOffer[];

@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
-use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request\Offer;
+use App\Services\Actions\OfferActionProvider;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Gate;
 
 /**
  * @mixin Offer
@@ -14,6 +15,12 @@ use Illuminate\Support\Facades\Gate;
 class OfferResource extends JsonResource
 {
     public static $wrap = null;
+
+    public function __construct(
+        $resource
+    ) {
+        parent::__construct($resource);
+    }
 
     /**
      * Transform the resource into an array.
@@ -38,9 +45,24 @@ class OfferResource extends JsonResource
                 return new RequestResource($this->request);
             }),
             'matched_partner' => $this->whenLoaded('matchedPartner'),
-            'documents' => $this->whenLoaded('documents')
+            'documents' => $this->whenLoaded('documents', function () {
+                return DocumentResource::collection($this->documents);
+            }),
         ];
 
+        // Determine context from route
+        $context = str_starts_with($request->route()?->getPrefix() ?? '', '/admin') ? 'admin' : 'user';
+
+        // Get available actions using simplified Action Provider Pattern
+        $actionProvider = app(OfferActionProvider::class);
+        $baseData['actions'] = $actionProvider->getActions(
+            $this->resource,
+            $request->user(),
+            $context
+        );
+
+        // Keep legacy permissions for backward compatibility during migration
+        // TODO: Remove this after frontend migration is complete
         $baseData['permissions'] = [
             'can_view' => $request->user()->can('view', [Offer::class, $this->resource]),
             'can_edit' => $request->user()->can('update', [Offer::class, $this->resource]),
