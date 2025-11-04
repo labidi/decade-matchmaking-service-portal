@@ -50,7 +50,7 @@ class ExpressInterestController extends BaseRequestController
                 'user_id' => $admin->id,
                 'title' => 'Express interest in a request',
                 'description' => sprintf(
-                    'User %s has expressed interest in request <a href="%s" target="_blank">%s</a> ',
+                    'User <span class="font-bold">%s</span> has expressed interest in request <a href="%s" target="_blank" class="font-bold underline">%s</a> ',
                     $partner->name,
                     route('request.show', ['id' => $ocdRequest->id]),
                     $ocdRequest->detail->capacity_development_title
