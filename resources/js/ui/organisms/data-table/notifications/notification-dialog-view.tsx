@@ -31,7 +31,15 @@ export function NotificationDialogView({ isOpen, onClose, notification }: Notifi
                 <div className="space-y-4">
                     <div>
                         <h4 className="font-medium text-gray-900 dark:text-gray-100">Description</h4>
-                        <p className="mt-1 text-gray-600 dark:text-gray-400">{notification.description} </p>
+                        {/*
+                         * Using dangerouslySetInnerHTML to render HTML content from the backend.
+                         * Security Note: Only safe because content comes from trusted Laravel backend.
+                         * If using external/user content, sanitization would be required.
+                         */}
+                        <div
+                            className="mt-1 text-gray-600 dark:text-gray-400"
+                            dangerouslySetInnerHTML={{ __html: notification.description }}
+                        />
                     </div>
                     <div>
                         <h4 className="font-medium text-gray-900 dark:text-gray-100">Status</h4>

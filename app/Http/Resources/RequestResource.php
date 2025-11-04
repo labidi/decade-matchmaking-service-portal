@@ -39,11 +39,12 @@ class RequestResource extends JsonResource
             'status' => $this->whenLoaded('status'),
             'user' => $this->whenLoaded('user'),
             'matched_partner' => $this->whenLoaded('matchedPartner'),
-            'offers' => OfferResource::collection($this->whenLoaded('offers')),
+            'offers' => $this->getAuthorizedOffers($request),
             'detail' => new DetailResource($this->whenLoaded('detail')),
             'subscriptions' => $this->whenLoaded('subscriptions'),
             'subscribers' => $this->whenLoaded('subscribers'),
         ];
+
 
         // Determine context from route
         $context = $this->resolveContext($request);
@@ -89,6 +90,20 @@ class RequestResource extends JsonResource
             'api' => 'api',
             default => 'user',
         };
+    }
+
+    /**
+     * Get offers that the current user is authorized to view.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|null
+     */
+    private function getAuthorizedOffers(Request $request)
+    {
+        if (!$this->relationLoaded('offers') || !$request->user()?->can('viewOffers', $this->resource)) {
+            return null;
+        }
+        return OfferResource::collection($this->whenLoaded('offers'));
     }
 
 }

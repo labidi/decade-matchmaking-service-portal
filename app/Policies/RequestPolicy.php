@@ -27,6 +27,31 @@ class RequestPolicy
     }
 
     /**
+     * Determine whether the user can view offers for the request.
+     * Individual offers will be filtered based on OfferPolicy::view().
+     */
+    public function viewOffers(?User $user, Request $request): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        // Administrators can always view all offers
+        if ($user->hasRole('administrator')) {
+            return true;
+        }
+
+        // Request owner can view all offers on their request
+        if ($user->id === $request->user_id) {
+            return true;
+        }
+
+        // Partners can proceed to view filtered offers
+        // Individual offers will be filtered based on OfferPolicy::view()
+        return $user->hasRole('partner');
+    }
+
+    /**
      * Determine whether the user can update the request.
      */
     public function update(?User $user, Request $request): bool

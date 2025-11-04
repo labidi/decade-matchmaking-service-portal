@@ -153,7 +153,8 @@ export function NotificationsDataTable({
                                     {notification.title}
                                 </TableCell>
                                 <TableCell className="text-zinc-600 dark:text-zinc-400 hidden sm:table-cell">
-                                    {notification.description}
+
+                                    <div dangerouslySetInnerHTML={{ __html: notification.description }} />
                                 </TableCell>
                                 <TableCell className="text-zinc-500">
                                     {formatDate(notification.created_at)}
