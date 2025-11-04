@@ -141,6 +141,16 @@ class OfferPolicy
         return $user->id === $offer->matched_partner_id;
     }
 
+    public function uploadFinancialBreakDown(?User $user, Offer $offer): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        // Only the request owner can upload financial breakdown
+        return $user->id === $offer->request->user_id;
+    }
+
     /**
      * Determine whether the user can restore the model.
      */
