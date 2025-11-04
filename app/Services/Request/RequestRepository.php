@@ -58,15 +58,6 @@ class RequestRepository
         return OCDRequest::with(['status', 'detail', 'user', 'offers'])->get();
     }
 
-    public function getAllAvailableForOffers(): collection
-    {
-        return OCDRequest::with(['status', 'detail'])
-            ->whereHas('status', function ($query) {
-                $query->whereIn('status_code', ['validated', 'offer_made', 'match_made']);
-            })
-            ->get();
-    }
-
     /**
      * Get paginated requests with search and sorting
      */
