@@ -27,15 +27,15 @@ class RequestResource extends JsonResource
     {
         // Eager load relationships to avoid N+1 queries
         $this->resource->loadMissing(['activeOffer', 'matchedPartner', 'user', 'offers']);
-
+        $user = $request->user();
         $baseData = [
             'id' => $this->id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             // Relationships
-            'active_offer' => $this->whenLoaded(('activeOffer'), function ($offer) {
+            'active_offer' => $user->can('viewActiveOffer', $this->resource) ? $this->whenLoaded(('activeOffer'), function ($offer) {
                 return new OfferResource($offer);
-            }),
+            }): null,
             'status' => $this->whenLoaded('status'),
             'user' => $this->whenLoaded('user'),
             'matched_partner' => $this->whenLoaded('matchedPartner'),
