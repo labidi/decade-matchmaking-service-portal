@@ -1,6 +1,6 @@
 import {useForm} from '@inertiajs/react';
 import {OCDRequest} from '../types/request.types';
-import { AttachmentsSection } from './attachments-section';
+import {OfferDocumentUpload} from './offer-document-upload';
 
 export interface OfferProps {
     OcdRequest: OCDRequest;
@@ -105,7 +105,21 @@ export function OfferSection({OcdRequest}: Readonly<OfferProps>) {
                         <div className='my-5'>
                             <p>{OcdRequest.active_offer.description}</p>
                         </div>
-                        <AttachmentsSection OcdRequest={OcdRequest} documents={OcdRequest.active_offer.documents}/>
+                        <div className='my-5 space-y-4'>
+                            <h3 className="text-lg font-semibold">Upload Documents</h3>
+                            <div className="flex gap-4">
+                                <OfferDocumentUpload
+                                    offerId={OcdRequest.active_offer.id}
+                                    documentType="financial_breakdown"
+                                    label="Upload Financial Breakdown"
+                                />
+                                <OfferDocumentUpload
+                                    offerId={OcdRequest.active_offer.id}
+                                    documentType="lesson_learned"
+                                    label="Upload Lesson Learned Report"
+                                />
+                            </div>
+                        </div>
                     </>
                 )}
             </div>

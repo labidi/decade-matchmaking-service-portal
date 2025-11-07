@@ -2,15 +2,16 @@
  * ActionButton Component
  *
  * Renders a single action button from backend action configuration.
- * Handles route navigation, HTTP methods, confirmations, and dialogs.
+ * Handles route navigation, HTTP methods, confirmations, dialogs, and file uploads.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@ui/primitives/button';
 import { router } from '@inertiajs/react';
 import { getIconComponent } from '@/utils/icon-mapper';
 import type { EntityAction } from '@/types/actions';
 import { clsx } from 'clsx';
+import { FileUploadDialog } from '@/components/dialogs/FileUploadDialog';
 
 export interface ActionButtonProps {
     action: EntityAction;
@@ -29,8 +30,15 @@ export function ActionButton({
     onDialogOpen,
 }: Readonly<ActionButtonProps>) {
     const Icon = getIconComponent(action.style.icon);
+    const [showFileUpload, setShowFileUpload] = useState(false);
 
     const handleClick = () => {
+        // Handle file upload actions
+        if (action.metadata?.handler === 'file_upload') {
+            setShowFileUpload(true);
+            return;
+        }
+
         // Handle dialog actions
         if (action.metadata?.handler === 'dialog' && action.metadata.dialog_component) {
             onDialogOpen?.(action.metadata.dialog_component, action);
@@ -102,9 +110,24 @@ export function ActionButton({
     }
 
     return (
-        <Button {...buttonProps}>
-            <Icon data-slot="icon" />
-            {action.label}
-        </Button>
+        <>
+            <Button {...buttonProps}>
+                <Icon data-slot="icon" />
+                {action.label}
+            </Button>
+
+            {/* File Upload Dialog */}
+            {action.metadata?.handler === 'file_upload' && (
+                <FileUploadDialog
+                    isOpen={showFileUpload}
+                    onClose={() => setShowFileUpload(false)}
+                    action={action}
+                    onSuccess={() => {
+                        // Refresh the page to show updated data
+                        router.reload();
+                    }}
+                />
+            )}
+        </>
     );
 }

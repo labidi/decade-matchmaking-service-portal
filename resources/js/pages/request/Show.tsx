@@ -14,11 +14,10 @@ import {
 interface ShowRequestProps
     extends PageProps<{
         request: OCDRequest;
-        current_route_name: string;
     }> {
 }
 
-export default function ShowRequest({auth, request, current_route_name}: Readonly<ShowRequestProps>) {
+export default function ShowRequest({auth, request}: Readonly<ShowRequestProps>) {
     return (
         <FrontendLayout>
             <Head title={`Request: ${request.detail.capacity_development_title || request.id}`}/>
@@ -46,14 +45,13 @@ export default function ShowRequest({auth, request, current_route_name}: Readonl
                     <RequestDetailsCard request={request}/>
                     {/* Display offer details if there's an active offer */}
                     {request.active_offer && (
-                        <OfferDetailsCard offer={request.active_offer} request={request}/>
+                        <OfferDetailsCard offer={request.active_offer}/>
                     )}
                 </div>
 
                 {/* Sidebar - Right Column (1/3 width on large screens) */}
                 <div className="space-y-6">
                     <StatusInfoCard auth={auth} request={request}/>
-
                     {/* Desktop-only sticky action buttons */}
                     <div className="hidden lg:block">
                         <div

@@ -15,6 +15,7 @@ export type ValidIconName =
     | 'pencil-square'
     | 'trash'
     | 'document-text'
+    | 'document-arrow-up'
     | 'plus'
     | 'pencil'
     | 'arrow-right'
@@ -53,13 +54,32 @@ export interface ActionStyle {
 }
 
 /**
+ * File upload configuration for file upload actions.
+ */
+export interface FileUploadMetadata {
+    accept?: string;
+    maxSize?: number;
+    multiple?: boolean;
+    endpoint?: string;
+    documentType?: string;
+    title?: string;
+    description?: string;
+    validationRules?: {
+        required?: boolean;
+        mimeTypes?: string[];
+        maxSizeBytes?: number;
+    };
+}
+
+/**
  * Action metadata for additional configuration.
  * Matches backend metadata structure.
  */
 export interface ActionMetadata {
     open_in_new_tab?: boolean;
-    handler?: 'route' | 'dialog' | 'custom';
+    handler?: 'route' | 'dialog' | 'custom' | 'file_upload';
     dialog_component?: string;
+    file_upload?: FileUploadMetadata;
 }
 
 /**

@@ -98,8 +98,10 @@ class DocumentResource extends JsonResource
      */
     private function getDownloadUrl(): string
     {
-        return 'https://example.com';
-        return route('user.document.download', ['document' => $this->id]);
+        return route('offer.documents.download', [
+            'id' => $this->parent_id,
+            'document' => $this->id,
+        ]);
     }
 
     /**
