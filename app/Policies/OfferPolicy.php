@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request\Offer;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class OfferPolicy
 {
@@ -23,7 +22,7 @@ class OfferPolicy
      */
     public function view(?User $user, Offer $offer): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -47,24 +46,25 @@ class OfferPolicy
      */
     public function update(?User $user, Offer $offer): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
         if ($user->hasRole('administrator')) {
             return true;
         }
+
         // Only the offer creator can edit, and only when active and not accepted
         return $user->id === $offer->matched_partner_id
             && $offer->status === RequestOfferStatus::ACTIVE
-            && !$offer->is_accepted;
+            && ! $offer->is_accepted;
     }
 
     public function canEnableOrDisable(?User $user): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
-        
+
         // Only administrators can enable or disable offers
         return $user->hasRole('administrator');
     }
@@ -74,13 +74,13 @@ class OfferPolicy
      */
     public function delete(?User $user, Offer $offer): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
         // Offer creator or admin can delete, only when not accepted
         return ($user->id === $offer->matched_partner_id || $user->hasRole('administrator'))
-            && !$offer->is_accepted;
+            && ! $offer->is_accepted;
     }
 
     /**
@@ -88,14 +88,14 @@ class OfferPolicy
      */
     public function accept(?User $user, Offer $offer): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
         // Only the request owner can accept offers
         return $user->id === $offer->request->user->id
             && $offer->status === RequestOfferStatus::ACTIVE
-            && !$offer->is_accepted;
+            && ! $offer->is_accepted;
     }
 
     /**
@@ -103,14 +103,14 @@ class OfferPolicy
      */
     public function reject(?User $user, Offer $offer): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
         // Only the request owner can reject offers
         return $user->id === $offer->request->user_id
             && $offer->status === RequestOfferStatus::ACTIVE
-            && !$offer->is_accepted;
+            && ! $offer->is_accepted;
     }
 
     /**
@@ -118,14 +118,14 @@ class OfferPolicy
      */
     public function requestClarifications(?User $user, Offer $offer): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
         // Request owner can request clarifications on active offers
         return $user->id === $offer->request->user_id
             && $offer->status === RequestOfferStatus::ACTIVE
-            && !$offer->is_accepted;
+            && ! $offer->is_accepted;
     }
 
     /**
@@ -133,7 +133,7 @@ class OfferPolicy
      */
     public function manageDocuments(?User $user, Offer $offer): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -143,10 +143,12 @@ class OfferPolicy
 
     public function uploadFinancialBreakDown(?User $user, Offer $offer): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
-        // only when status in implementation.
+        if ($offer->request->status->status_code !== 'in_implementation') {
+            return false;
+        }
 
         // Only the request owner can upload financial breakdown
         return $user->id === $offer->matchedPartner->id || $user->id === $offer->request->user_id;
@@ -154,10 +156,14 @@ class OfferPolicy
 
     public function uploadLessonLearned(?User $user, Offer $offer): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
-        // only when status in implementation.
+
+        if ($offer->request->status->status_code !== 'in_implementation') {
+            return false;
+        }
+
         // Only the request owner can upload financial breakdown
         return $user->id === $offer->matchedPartner->id || $user->id === $offer->request->user_id;
     }
