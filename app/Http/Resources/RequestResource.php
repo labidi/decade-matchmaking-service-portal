@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
-use App\Services\Actions\RequestActionProvider;
 use App\Models\Request as RequestModel;
+use App\Services\Actions\RequestActionProvider;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Gate;
 
 /**
  * @mixin RequestModel
  */
 class RequestResource extends JsonResource
 {
-
     public static $wrap = null;
 
     /**
@@ -35,7 +33,7 @@ class RequestResource extends JsonResource
             // Relationships
             'active_offer' => $user->can('viewActiveOffer', $this->resource) ? $this->whenLoaded(('activeOffer'), function ($offer) {
                 return new OfferResource($offer);
-            }): null,
+            }) : null,
             'status' => $this->whenLoaded('status'),
             'user' => $this->whenLoaded('user'),
             'matched_partner' => $this->whenLoaded('matchedPartner'),
@@ -44,7 +42,6 @@ class RequestResource extends JsonResource
             'subscriptions' => $this->whenLoaded('subscriptions'),
             'subscribers' => $this->whenLoaded('subscribers'),
         ];
-
 
         // Determine context from route
         $context = $this->resolveContext($request);
@@ -62,27 +59,23 @@ class RequestResource extends JsonResource
 
     /**
      * Resolve the UI context from the current request.
-     *
-     * @param Request $request
-     * @return string
      */
     private function resolveContext(Request $request): string
     {
-        return str_contains($request->route()?->getPrefix(),'admin')? 'admin': 'user';
+        return str_contains($request->route()?->getPrefix()??'', 'admin') ? 'admin' : 'user';
     }
 
     /**
      * Get offers that the current user is authorized to view.
      *
-     * @param Request $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|null
      */
     private function getAuthorizedOffers(Request $request)
     {
-        if (!$this->relationLoaded('offers') || !$request->user()?->can('viewOffers', $this->resource)) {
+        if (! $this->relationLoaded('offers') || ! $request->user()?->can('viewOffers', $this->resource)) {
             return null;
         }
+
         return OfferResource::collection($this->whenLoaded('offers'));
     }
-
 }
