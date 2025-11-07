@@ -62,7 +62,7 @@ export default function RequestShowPage({
 
                     {/* Display offer details if there's an active offer */}
                     {request.active_offer && (
-                        <OfferDetailsCard offer={request.active_offer} request={request} />
+                        <OfferDetailsCard offer={request.active_offer} />
                     )}
                 </div>
                 <div className="space-y-6">
