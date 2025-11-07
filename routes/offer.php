@@ -2,16 +2,19 @@
 
 use App\Http\Controllers\Offer\AcceptOfferController;
 use App\Http\Controllers\Offer\ClarificationRequestController;
+use App\Http\Controllers\Offer\DeleteDocumentController;
 use App\Http\Controllers\Offer\DestroyController;
+use App\Http\Controllers\Offer\DownloadDocumentController;
 use App\Http\Controllers\Offer\FormController;
 use App\Http\Controllers\Offer\ListController;
 use App\Http\Controllers\Offer\ShowController;
 use App\Http\Controllers\Offer\StoreController;
 use App\Http\Controllers\Offer\UpdateController;
 use App\Http\Controllers\Offer\UpdateStatusController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Offer\UploadDocumentController;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('offer', ListController::class)->name('admin.offer.list');
@@ -27,18 +30,27 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     );
 });
 
-Breadcrumbs::for('admin.offer.list', function (BreadcrumbTrail $trail) {
-    $trail->parent('user.home');
-    $trail->push('Offers list', route('admin.offer.list'));
-});
-
-Breadcrumbs::for('admin.offer.show', function (BreadcrumbTrail $trail) {
-    $trail->parent('user.home');
-    $trail->push('Offers list', route('admin.offer.list'));
-});
-
 // Public routes for offer acceptance (authenticated users only)
 Route::middleware(['auth'])->group(function () {
     Route::post('offer/{id}/accept', AcceptOfferController::class)->name('offer.accept');
     Route::post('offer/{id}/request-clarification', ClarificationRequestController::class)->name('offer.clarification-request');
+
+    Route::post('offer/{id}/documents/{type}', UploadDocumentController::class)
+        ->name('offer.documents.upload');
+    Route::get('offer/{id}/documents/{document}/download', DownloadDocumentController::class)
+        ->name('offer.documents.download');
+    Route::delete('offer/{id}/documents/{document}', DeleteDocumentController::class)
+        ->name('offer.documents.destroy');
 });
+
+try {
+    Breadcrumbs::for('admin.offer.list', function (BreadcrumbTrail $trail) {
+        $trail->parent('user.home');
+        $trail->push('Offers list', route('admin.offer.list'));
+    });
+    Breadcrumbs::for('admin.offer.show', function (BreadcrumbTrail $trail) {
+        $trail->parent('user.home');
+        $trail->push('Offers list', route('admin.offer.list'));
+    });
+} catch (\Diglactic\Breadcrumbs\Exceptions\DuplicateBreadcrumbException $e) {
+}

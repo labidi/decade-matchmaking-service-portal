@@ -69,25 +69,34 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('request/export/csv', [RequestListController::class, 'exportCsv'])->name('admin.request.export.csv');
 });
 
-Breadcrumbs::for('request.me.list', function (BreadcrumbTrail $trail) {
-    $trail->parent('user.home');
-    $trail->push('List of my request', route('request.me.list'));
-});
+try {
+    Breadcrumbs::for('request.edit', function (BreadcrumbTrail $trail) {
+        $trail->parent('user.home');
+        $trail->push('List of my request', route('request.me.list'));
+        $trail->push('Request #'.request('id'), route('request.edit', request('id')));
+    });
+    Breadcrumbs::for('request.show', function (BreadcrumbTrail $trail) {
+        $trail->parent('user.home');
+        $trail->push('List of my request', route('request.me.list'));
+        $trail->push('Request #'.request('id'), route('request.show', request('id')));
+    });
+    Breadcrumbs::for('request.me.list', function (BreadcrumbTrail $trail) {
+        $trail->parent('user.home');
+        $trail->push('List of my request', route('request.me.list'));
+    });
+    Breadcrumbs::for('request.me.subscribed-requests', function (BreadcrumbTrail $trail) {
+        $trail->parent('user.home');
+        $trail->push('My subscribed Requests', route('request.me.subscribed-requests'));
+    });
+    Breadcrumbs::for('request.me.matched-requests', function (BreadcrumbTrail $trail) {
+        $trail->parent('user.home');
+        $trail->push('My Matched Requests', route('request.me.matched-requests'));
+    });
+    Breadcrumbs::for('request.create', function (BreadcrumbTrail $trail) {
+        $trail->parent('user.home');
+        $trail->push('List of my request', route('request.me.list'));
+        $trail->push('Submit new request', route('request.create'));
+    });
+} catch (\Diglactic\Breadcrumbs\Exceptions\DuplicateBreadcrumbException $e) {
 
-Breadcrumbs::for('request.create', function (BreadcrumbTrail $trail) {
-    $trail->parent('user.home');
-    $trail->push('List of my request', route('request.me.list'));
-    $trail->push('Submit new request', route('request.create'));
-});
-
-Breadcrumbs::for('request.edit', function (BreadcrumbTrail $trail) {
-    $trail->parent('user.home');
-    $trail->push('List of my request', route('request.me.list'));
-    $trail->push('Request #'.request('id'), route('request.edit', request('id')));
-});
-
-Breadcrumbs::for('request.show', function (BreadcrumbTrail $trail) {
-    $trail->parent('user.home');
-    $trail->push('List of my request', route('request.me.list'));
-    $trail->push('Request #'.request('id'), route('request.show', request('id')));
-});
+}
