@@ -60,7 +60,7 @@ export default function OpportunitiesDialog({ open, onClose, opportunities }: Op
                                         <TableCell>
                                             <div>
                                                 <Link
-                                                    href={route('opportunity.show', opportunity.id)}
+                                                    href={"#"}
                                                     className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
                                                 >
                                                     {opportunity.title}
@@ -101,7 +101,7 @@ export default function OpportunitiesDialog({ open, onClose, opportunities }: Op
                                         </TableCell>
                                         <TableCell>
                                             <Link
-                                                href={route('opportunity.show', opportunity.id)}
+                                                href="#"
                                                 className="text-blue-600 hover:text-blue-500 text-sm hover:underline"
                                             >
                                                 View Details
