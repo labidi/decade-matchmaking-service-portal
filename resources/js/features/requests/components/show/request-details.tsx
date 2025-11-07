@@ -1,5 +1,5 @@
 import { requestFormFields } from '../../config';
-import {OCDRequest} from '../../types/request.types';
+import {OCDRequest} from '@features/requests';
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/react'
 import {ChevronDownIcon} from '@heroicons/react/20/solid'
 
