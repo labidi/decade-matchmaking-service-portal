@@ -24,6 +24,21 @@ class OfferRepository
     }
 
     /**
+     * Find offer by ID with full relationships or fail
+     */
+    public function findByIdWithRelations(int $id): Offer
+    {
+        return Offer::with([
+            'request',
+            'request.status',
+            'request.user',
+            'matchedPartner',
+            'documents',
+            'request.detail'
+        ])->findOrFail($id);
+    }
+
+    /**
      * Create new offer
      */
     public function create(array $data): Offer

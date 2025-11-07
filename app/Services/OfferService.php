@@ -14,6 +14,7 @@ use Exception;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class OfferService
 {
@@ -27,14 +28,18 @@ class OfferService
      */
     public function getPaginatedOffers(array $searchFilters = [], array $sortFilters = []): AbstractPaginator
     {
-        return $this->repository->getPaginated($searchFilters, $sortFilters);
+        return $this->repository->getPaginated($searchFilters, $sortFilters)->withQueryString();
     }
 
     /**
      * Create a new offer
+     *
+     * @throws Throwable
      */
     public function createOffer(array $data, User $user): Offer
     {
+        DB::beginTransaction();
+
         try {
             // Validate that user can create offers for this request
             $request = Request::findOrFail($data['request_id']);
@@ -65,19 +70,24 @@ class OfferService
                 );
             }
 
+            DB::commit();
+
             return $offer->load(['request', 'matchedPartner', 'documents']);
         } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to create offer: '.$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Update an existing offer
+     *
+     * @throws Throwable
      */
     public function updateOffer(int $offerId, array $data, User $user): Offer
     {
         DB::beginTransaction();
-
         try {
             $offer = $this->repository->findById($offerId);
             if (! $offer) {
@@ -91,15 +101,16 @@ class OfferService
             if (isset($data['status'])) {
                 $updateData['status'] = $data['status'];
             }
-
             $this->repository->update($offer, $updateData);
-
             // Handle document upload if provided
             if (isset($data['document']) && $data['document']) {
-                $documentService = app(DocumentService::class);
-                $documentService->storeDocument($data['document'], $offer, $user, 'offer_document');
+                $this->documentService->storeDocumentForOffer(
+                    $data['document'],
+                    DocumentType::OFFER_DOCUMENT->value,
+                    $offer,
+                    $user,
+                );
             }
-
             DB::commit();
 
             return $offer->load(['request', 'matchedPartner', 'documents']);
@@ -112,6 +123,7 @@ class OfferService
 
     /**
      * Delete an offer
+     * @throws Throwable
      */
     public function deleteOffer(int $offerId): bool
     {
@@ -145,12 +157,7 @@ class OfferService
      */
     public function getOfferById(int $offerId): Offer
     {
-        $offer = Offer::with(
-            ['request', 'request.status', 'request.user', 'matchedPartner', 'documents', 'request.detail']
-        )
-            ->findOrFail($offerId);
-
-        return $offer;
+        return $this->repository->findByIdWithRelations($offerId);
     }
 
     /**
@@ -159,15 +166,18 @@ class OfferService
     public function changeOfferStatus(Offer $offer, RequestOfferStatus $status): Offer
     {
         $this->repository->update($offer, ['status' => $status]);
-
         return $offer;
     }
 
     /**
      * Accept an offer
+     *
+     * @throws Throwable
      */
     public function acceptOffer(Offer $offer, User $acceptedBy): Offer
     {
+        DB::beginTransaction();
+
         try {
             // Validate that the user can accept this offer
             if ($offer->request->user_id !== $acceptedBy->id) {
@@ -188,8 +198,72 @@ class OfferService
                 'is_accepted' => true,
             ]);
 
+            DB::commit();
+
             return $offer->fresh();
         } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to accept offer: '.$e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Upload a document for an offer
+     * @throws Throwable
+     */
+    public function uploadDocument(\Illuminate\Http\UploadedFile $file, Offer $offer, string $documentType, User $uploader): \App\Models\Document
+    {
+        DB::beginTransaction();
+
+        try {
+            // Store the new document
+            $document = $this->documentService->storeDocumentForOffer(
+                $file,
+                $documentType,
+                $offer,
+                $uploader
+            );
+
+            DB::commit();
+
+            Log::info('Document uploaded for offer', [
+                'offer_id' => $offer->id,
+                'document_id' => $document->id,
+                'document_type' => $documentType,
+                'uploader_id' => $uploader->id,
+            ]);
+
+            return $document;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to upload document for offer: '.$e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Delete a document from an offer
+     * @throws Throwable
+     */
+    public function deleteDocument(\App\Models\Document $document): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $deleted = $this->documentService->deleteDocument($document);
+
+            DB::commit();
+
+            Log::info('Document deleted from offer', [
+                'document_id' => $document->id,
+                'offer_id' => $document->parent_id,
+            ]);
+
+            return $deleted;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to delete document from offer: '.$e->getMessage());
             throw $e;
         }
     }

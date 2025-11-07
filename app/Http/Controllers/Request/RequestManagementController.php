@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Request;
 
 use App\Services\RequestService;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use Exception;
+use Illuminate\Http\Request;
 
 class RequestManagementController extends BaseRequestController
 {
-    public function __construct(protected readonly RequestService $service)
-    {
-    }
+    public function __construct(protected readonly RequestService $service) {}
 
     /**
      * Update request status - unified method for both admin and user contexts
@@ -38,7 +35,7 @@ class RequestManagementController extends BaseRequestController
             // For non-admin routes, return JSON with updated status
             return response()->json([
                 'message' => $message,
-                'status' => $result['request']->status
+                'status' => $result['request']->status,
             ]);
         } catch (Exception $e) {
             $statusCode = $e->getCode() ?: 500;
@@ -51,7 +48,6 @@ class RequestManagementController extends BaseRequestController
         }
     }
 
-
     private function getSuccessResponse(string $message, ?string $redirectRoute = null)
     {
         if ($this->isAdminRoute() && $redirectRoute) {
@@ -61,7 +57,6 @@ class RequestManagementController extends BaseRequestController
         // Default JSON response for non-admin routes
         return response()->json(['message' => $message]);
     }
-
 
     /**
      * Get error response based on context
@@ -79,16 +74,17 @@ class RequestManagementController extends BaseRequestController
     /**
      * Remove the specified resource from storage
      */
-    public function destroy(Request $request): JsonResponse
+    public function destroy(Request $request): \Illuminate\Http\RedirectResponse
     {
         try {
-            $requestId = (int)$request->route('id');
+            $requestId = (int) $request->route('id');
             $this->service->deleteRequest($requestId, $request->user());
 
-            return response()->json(['message' => 'Request deleted successfully']);
+            return back()->with('success', 'Request deleted successfully.');
         } catch (Exception $e) {
             $statusCode = $e->getCode() ?: 500;
-            return response()->json(['error' => $e->getMessage()], $statusCode);
+
+            return back()->with('error', 'Request deletion failed: ');
         }
     }
 }

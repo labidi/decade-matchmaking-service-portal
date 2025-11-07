@@ -51,6 +51,7 @@ class RequestPolicy
         if (! $user) {
             return false;
         }
+        // also allow subscribers
         if ($user->id === $request->user_id || $user->id === $request->activeOffer?->matchedPartner?->id) {
             return true;
         }

@@ -26,10 +26,8 @@ class OfferActionProvider implements ActionProviderInterface
         if (!$entity instanceof Offer) {
             return [];
         }
-
         $actions = [];
         $request = $entity->request;
-
         // Accept Offer - for request owner
         if ($user && $request && $user->can('accept', $entity)) {
             $actions[] = [
@@ -47,8 +45,6 @@ class OfferActionProvider implements ActionProviderInterface
             ];
         }
 
-
-        // Request Clarifications - for request owner
         if ($user && $user->can('requestClarifications', $entity)) {
             $actions[] = [
                 'key' => 'request_clarifications',
@@ -60,6 +56,69 @@ class OfferActionProvider implements ActionProviderInterface
                     'color' => 'blue',
                     'icon' => 'question-mark-circle',
                     'variant' => 'outline',
+                ],
+            ];
+        }
+
+        if ($user->can('upload-financial-break-down', $entity)) {
+            $actions[] = [
+                'key' => 'upload_financial_breakdown',
+                'label' => 'Upload Financial Breakdown report',
+                'route' => route('offer.documents.upload', ['id' => $entity->id, 'type' => 'financial_breakdown']),
+                'method' => 'POST',
+                'enabled' => true,
+                'style' => [
+                    'color' => 'blue',
+                    'icon' => 'document-arrow-up',
+                    'variant' => 'outline',
+                ],
+                'metadata' => [
+                    'handler' => 'file_upload',
+                    'file_upload' => [
+                        'accept' => '.pdf,.xlsx,.xls,.csv',
+                        'maxSize' => 10,  // MB
+                        'multiple' => false,
+                        'endpoint' => route('offer.documents.upload', ['id' => $entity->id, 'type' => 'financial_breakdown']),
+                        'documentType' => 'financial_breakdown',
+                        'title' => 'Upload Financial Breakdown',
+                        'description' => 'Please upload a detailed financial breakdown document (PDF, Excel, or CSV format)',
+                        'validationRules' => [
+                            'required' => true,
+                            'mimeTypes' => ['application/pdf', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'],
+                            'maxSizeBytes' => 10485760,  // 10MB
+                        ],
+                    ],
+                ],
+            ];
+        }
+        if ($user->can('upload-lesson-learned', $entity)) {
+            $actions[] = [
+                'key' => 'upload_lesson_learned',
+                'label' => 'Upload Lesson Learned Report',
+                'route' => route('offer.documents.upload', ['id' => $entity->id, 'type' => 'lesson_learned']),
+                'method' => 'POST',
+                'enabled' => true,
+                'style' => [
+                    'color' => 'blue',
+                    'icon' => 'document-arrow-up',
+                    'variant' => 'outline',
+                ],
+                'metadata' => [
+                    'handler' => 'file_upload',
+                    'file_upload' => [
+                        'accept' => '.pdf,.xlsx,.xls,.csv',
+                        'maxSize' => 10,  // MB
+                        'multiple' => false,
+                        'endpoint' => route('offer.documents.upload', ['id' => $entity->id, 'type' => 'lesson_learned']),
+                        'documentType' => 'financial_breakdown',
+                        'title' => 'Upload Lesson Learned report',
+                        'description' => 'Please Upload Lesson Learned report document (PDF, Excel, or CSV format)',
+                        'validationRules' => [
+                            'required' => true,
+                            'mimeTypes' => ['application/pdf', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'],
+                            'maxSizeBytes' => 10485760,  // 10MB
+                        ],
+                    ],
                 ],
             ];
         }
@@ -116,6 +175,7 @@ class OfferActionProvider implements ActionProviderInterface
                     'confirm' => 'This action cannot be undone. Are you sure you want to delete this offer?',
                 ];
             }
+
         }
 
         return array_values($actions);

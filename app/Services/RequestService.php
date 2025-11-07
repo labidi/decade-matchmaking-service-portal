@@ -13,10 +13,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\DB;
 
-class RequestService
+readonly class RequestService
 {
     public function __construct(
-        private readonly RequestRepository $repository
+        private RequestRepository $repository
     ) {}
 
     /**
@@ -179,7 +179,7 @@ class RequestService
     /**
      * Get available statuses for filtering
      */
-    public static function getAvailableStatuses()
+    public static function getAvailableStatuses(): Collection
     {
         return Status::select('id', 'status_code', 'status_label')
             ->orderBy('status_label')

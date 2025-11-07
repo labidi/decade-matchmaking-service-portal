@@ -146,9 +146,20 @@ class OfferPolicy
         if (!$user) {
             return false;
         }
+        // only when status in implementation.
 
         // Only the request owner can upload financial breakdown
-        return $user->id === $offer->request->user_id;
+        return $user->id === $offer->matchedPartner->id || $user->id === $offer->request->user_id;
+    }
+
+    public function uploadLessonLearned(?User $user, Offer $offer): bool
+    {
+        if (!$user) {
+            return false;
+        }
+        // only when status in implementation.
+        // Only the request owner can upload financial breakdown
+        return $user->id === $offer->matchedPartner->id || $user->id === $offer->request->user_id;
     }
 
     /**
