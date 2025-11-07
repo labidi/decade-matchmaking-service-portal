@@ -6,8 +6,6 @@ use App\Http\Controllers\Opportunities\FormController;
 use App\Http\Controllers\Opportunities\ListController;
 use App\Http\Controllers\Opportunities\ShowController;
 use App\Http\Controllers\Opportunities\UpdateStatusController as OpportunityUpdateStatusController;
-use Diglactic\Breadcrumbs\Breadcrumbs;
-use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function (){

@@ -8,10 +8,11 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(Request $HttpRequest): \Inertia\Response
+    public function index(Request $HttpRequest): Response
     {
         $user = $HttpRequest->user();
 
@@ -54,10 +55,7 @@ class DashboardController extends Controller
                     'requests' => $requestTrend,
                     'opportunities' => $opportunityTrend,
                     'registrations' => $registrationTrend,
-                ]
-            ],
-            'breadcrumbs' => [
-                ['name' => 'Dashboard'],
+                ],
             ],
         ]);
     }

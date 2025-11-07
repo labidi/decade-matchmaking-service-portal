@@ -12,8 +12,6 @@ use App\Http\Controllers\Offer\StoreController;
 use App\Http\Controllers\Offer\UpdateController;
 use App\Http\Controllers\Offer\UpdateStatusController;
 use App\Http\Controllers\Offer\UploadDocumentController;
-use Diglactic\Breadcrumbs\Breadcrumbs;
-use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
@@ -42,15 +40,3 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('offer/{id}/documents/{document}', DeleteDocumentController::class)
         ->name('offer.documents.destroy');
 });
-
-try {
-    Breadcrumbs::for('admin.offer.list', function (BreadcrumbTrail $trail) {
-        $trail->parent('user.home');
-        $trail->push('Offers list', route('admin.offer.list'));
-    });
-    Breadcrumbs::for('admin.offer.show', function (BreadcrumbTrail $trail) {
-        $trail->parent('user.home');
-        $trail->push('Offers list', route('admin.offer.list'));
-    });
-} catch (\Diglactic\Breadcrumbs\Exceptions\DuplicateBreadcrumbException $e) {
-}
