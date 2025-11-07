@@ -2,8 +2,8 @@ import React from 'react';
 import {Head} from '@inertiajs/react';
 import {SidebarLayout} from '@layouts/index';
 import {RequestOffer, User, Document} from '@/types';
-import { FormProvider } from '@ui/organisms/forms';
-import { offerFormFields } from '@features/offers/config';
+import {FormProvider} from '@ui/organisms/forms';
+import {offerFormFields} from '@features/offers/config';
 import {Heading} from "@ui/primitives/heading";
 
 interface EditOfferPageProps {

@@ -3,11 +3,11 @@ import {Head} from '@inertiajs/react';
 import {SidebarLayout} from '@layouts/index';
 import {RequestOffer} from '@/types';
 import {useOfferForm} from '@features/offers/hooks';
-import { offerFormFields } from '@features/offers/config';
+import {offerFormFields} from '@features/offers/config';
 import {Heading} from "@ui/primitives/heading";
 import {Button} from '@ui/primitives/button';
 import {ChevronLeftIcon} from '@heroicons/react/16/solid';
-import { FieldRenderer } from '@ui/organisms/forms';
+import {FieldRenderer} from '@ui/organisms/forms';
 import {Fieldset, Legend} from "@ui/primitives/fieldset";
 
 function getOptionsKey(fieldKey: string): string | null {
@@ -33,7 +33,7 @@ export default function CreateOffer({
                                         formOptions,
                                     }: Readonly<CreateOfferPageProps>) {
     const isEditing = Boolean(offer?.id);
-    
+
     const {
         form,
         step,
