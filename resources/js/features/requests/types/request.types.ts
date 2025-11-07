@@ -10,6 +10,10 @@ export interface OCDRequestStatus {
     updated_at: string;
 }
 
+/**
+ * @deprecated Use actions array from EntityAction instead
+ * Legacy permission structure - will be removed in future version
+ */
 export interface RequestPermissions {
     can_view?: boolean;
     can_delete?: boolean;
@@ -71,9 +75,10 @@ export interface OCDRequest {
     user: User;
     offers?: RequestOfferList
     active_offer?: RequestOffer;
-    permissions: RequestPermissions;
+    /** @deprecated Use actions array instead */
+    permissions?: RequestPermissions;
     matched_partner?: User;
-    actions?: EntityAction[]; // Actions from backend Action Provider Pattern
+    actions: EntityAction[]; // Actions from backend Action Provider Pattern
 }
 
 export type OCDRequestList = OCDRequest[];

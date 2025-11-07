@@ -6,6 +6,7 @@
  */
 
 import {
+    ArrowDownTrayIcon,
     CheckIcon,
     QuestionMarkCircleIcon,
     PencilSquareIcon,
@@ -27,6 +28,7 @@ import type React from 'react';
  * Only icons in this map can be rendered.
  */
 const ICON_MAP: Record<ValidIconName, React.ComponentType<React.ComponentProps<'svg'>>> = {
+    'arrow-down-tray': ArrowDownTrayIcon,
     'check': CheckIcon,
     'question-mark-circle': QuestionMarkCircleIcon,
     'pencil-square': PencilSquareIcon,

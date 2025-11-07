@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\Document;
+use App\Services\Actions\DocumentActionProvider;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -48,11 +49,11 @@ class DocumentResource extends JsonResource
                 return new UserResource($this->uploader);
             }),
 
-            // Permissions
-            'permissions' => [
-                'can_download' => $this->canDownload($request->user()),
-                'can_delete' => $this->canDelete($request->user()),
-            ],
+            // Actions
+            'actions' => app(DocumentActionProvider::class)->getActions(
+                $this->resource,
+                $request->user()
+            ),
         ];
     }
 
@@ -112,71 +113,4 @@ class DocumentResource extends JsonResource
         return pathinfo($this->name, PATHINFO_EXTENSION);
     }
 
-    /**
-     * Check if the current user can download this document.
-     */
-    private function canDownload(?\App\Models\User $user): bool
-    {
-        if (!$user) {
-            return false;
-        }
-
-        // Document uploader can always download
-        if ($this->uploader_id === $user->id) {
-            return true;
-        }
-
-        // Request owner can download
-        if ($this->parent_type === \App\Models\Request::class) {
-            $parent = \App\Models\Request::find($this->parent_id);
-            if ($parent && $parent->user_id === $user->id) {
-                return true;
-            }
-        }
-
-        // Offer partner can download
-        if ($this->parent_type === \App\Models\Request\Offer::class) {
-            $parent = \App\Models\Request\Offer::find($this->parent_id);
-            if ($parent && $parent->matched_partner_id === $user->id) {
-                return true;
-            }
-        }
-
-        // Admin can always download
-        if ($user->hasRole('administrator')) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if the current user can delete this document.
-     */
-    private function canDelete(?\App\Models\User $user): bool
-    {
-        if (!$user) {
-            return false;
-        }
-
-        // Document uploader can delete their own documents
-        if ($this->uploader_id === $user->id) {
-            return true;
-        }
-
-        // Admin can delete any document
-        if ($user->hasRole('administrator')) {
-            return true;
-        }
-
-        // Request owner can delete documents attached to their request
-        if ($this->parent_type === \App\Models\Request::class) {
-            $parent = \App\Models\Request::find($this->parent_id);
-            if ($parent && $parent->user_id === $user->id) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

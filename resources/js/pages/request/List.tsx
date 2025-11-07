@@ -4,7 +4,6 @@ import { FrontendLayout } from '@layouts/index';
 import {OCDRequestList, PaginationLinkProps} from '@/types';
 import {RequestsDataTable} from '@ui/organisms/data-table/requests';
 import {userColumns} from '@ui/organisms/data-table/requests';
-import {useRequestActions} from '@features/requests/hooks';
 
 interface RequestsPagination {
     current_page: number;
@@ -38,12 +37,6 @@ export default function RequestsList({
                                          routeName,
                                          currentSearch = {}
                                      }: Readonly<RequestsListPageProps>) {
-
-
-    const {
-        getActionsForRequest,
-    } = useRequestActions('user');
-
     return (
         <FrontendLayout>
             <Head title="Welcome"/>
@@ -54,7 +47,6 @@ export default function RequestsList({
                     currentSearch={currentSearch}
                     columns={userColumns}
                     routeName={routeName}
-                    getActionsForRequest={getActionsForRequest}
                     pagination={{
                         current_page: requests.current_page,
                         last_page: requests.last_page,

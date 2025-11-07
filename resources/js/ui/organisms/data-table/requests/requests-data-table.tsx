@@ -6,7 +6,7 @@ import {Badge} from '@ui/primitives/badge'
 import {TablePaginationNav} from '@ui/molecules';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@ui/organisms/data-table/search';
-import { DropdownActions, Action } from '@ui/organisms/data-table/common';
+import { RequestDropdownActions } from '@features/requests/components/request-dropdown-actions';
 // Types and Interfaces
 interface PaginationData {
     current_page: number;
@@ -40,7 +40,6 @@ interface RequestsDataTableProps {
     searchFields?: UIField[];
     columns: TableColumn[];
     routeName?: string;
-    getActionsForRequest: (request: OCDRequest) => Action[];
     showSearch?: boolean;
     showActions?: boolean;
 }
@@ -86,7 +85,6 @@ export function RequestsDataTable({
                                       searchFields = [],
                                       columns,
                                       routeName = 'admin.request.list',
-                                      getActionsForRequest,
                                       showSearch = true,
                                       showActions = true
                                   }: Readonly<RequestsDataTableProps>) {
@@ -166,9 +164,7 @@ export function RequestsDataTable({
                                 ))}
                                 {showActions && (
                                     <TableCell className="text-right">
-                                        <DropdownActions
-                                            actions={getActionsForRequest(request)}
-                                        />
+                                        <RequestDropdownActions request={request} />
                                     </TableCell>
                                 )}
                             </TableRow>

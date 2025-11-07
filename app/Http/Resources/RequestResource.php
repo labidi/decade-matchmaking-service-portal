@@ -57,21 +57,6 @@ class RequestResource extends JsonResource
             $context
         );
 
-        // Keep legacy permissions for backward compatibility during migration
-        // TODO: Remove this after frontend migration is complete
-        $baseData['permissions'] = [
-            'can_view' => $request->user()->can('view', [RequestModel::class, $this->resource]),
-            'can_edit' => $request->user()->can('update', [RequestModel::class, $this->resource]),
-            'can_delete' => $request->user()->can('delete', [RequestModel::class, $this->resource]),
-            'can_manage_offers' => $request->user()->can('manageOffers', [RequestModel::class, $this->resource]),
-            'can_update_status' => $request->user()->can('updateStatus', [RequestModel::class, $this->resource]),
-            'can_export_pdf' => $request->user()->can('exportPdf', [RequestModel::class, $this->resource]),
-            'can_express_interest' => $request->user()->can('expressInterest', [RequestModel::class, $this->resource]),
-            // Fixed: Add missing permissions identified in tech review
-            'can_accept_offer' => $request->user()->can('acceptOffer', [RequestModel::class, $this->resource]),
-            'can_request_clarifications' => $request->user()->can('requestClarifications', [RequestModel::class, $this->resource]),
-        ];
-
         return $baseData;
     }
 
@@ -83,13 +68,7 @@ class RequestResource extends JsonResource
      */
     private function resolveContext(Request $request): string
     {
-        $routePrefix = $request->route()?->getPrefix();
-
-        return match ($routePrefix) {
-            'admin' => 'admin',
-            'api' => 'api',
-            default => 'user',
-        };
+        return str_contains($request->route()?->getPrefix(),'admin')? 'admin': 'user';
     }
 
     /**

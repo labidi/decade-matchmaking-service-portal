@@ -10,6 +10,7 @@
  * These must match the icons available in the icon mapper.
  */
 export type ValidIconName =
+    | 'arrow-down-tray'
     | 'check'
     | 'question-mark-circle'
     | 'pencil-square'

@@ -59,6 +59,4 @@ class ExpressInterestController extends BaseRequestController
             ]);
         }
     }
-
-    private function sentConfirmationEmailToUser($user) {}
 }

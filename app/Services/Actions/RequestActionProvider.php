@@ -16,14 +16,14 @@ class RequestActionProvider implements ActionProviderInterface
     /**
      * Get available actions for a request.
      *
-     * @param mixed $entity The request entity
-     * @param User|null $user The current user
-     * @param string|null $context The UI context (admin, user, etc.)
+     * @param  mixed  $entity  The request entity
+     * @param  User|null  $user  The current user
+     * @param  string|null  $context  The UI context (admin, user, etc.)
      * @return array<int, array<string, mixed>>
      */
     public function getActions(mixed $entity, ?User $user = null, ?string $context = null): array
     {
-        if (!$entity instanceof Request) {
+        if (! $entity instanceof Request) {
             return [];
         }
 
@@ -31,7 +31,7 @@ class RequestActionProvider implements ActionProviderInterface
         $isAdmin = $context === 'admin';
 
         // Express Interest - for partners on user context
-        if (!$isAdmin && $user && $user->can('expressInterest', $entity)) {
+        if (! $isAdmin && $user && $user->can('expressInterest', $entity)) {
             $actions[] = [
                 'key' => 'express_interest',
                 'label' => 'Express Interest',
@@ -45,7 +45,20 @@ class RequestActionProvider implements ActionProviderInterface
                 ],
             ];
         }
-
+        if ($user && $user->can('view', $entity)) {
+            $actions[] = [
+                'key' => 'view',
+                'label' => 'View Request',
+                'route' => route((($context === 'admin') ? 'admin.' : '').'request.show', ['id' => $entity->id]),
+                'method' => 'GET',
+                'enabled' => true,
+                'style' => [
+                    'color' => 'blue',
+                    'icon' => 'eye',
+                    'variant' => 'solid',
+                ],
+            ];
+        }
         // Edit - for request owners
         if ($user && $user->can('update', $entity)) {
             $actions[] = [
@@ -120,7 +133,7 @@ class RequestActionProvider implements ActionProviderInterface
             }
 
             // View Offers
-            if ($user->can('manageOffers', $entity) && $entity->offers && $entity->offers->count() > 0) {
+            if ($user->can('manageOffers', $entity) && $entity->offers()->count() > 0) {
                 $actions[] = [
                     'key' => 'view_offers',
                     'label' => 'View All Offers',

@@ -5,10 +5,10 @@ import {OCDRequest} from '../../types/request.types';
 import {Button} from '@ui/primitives/button';
 import {Field, Label} from '@ui/primitives/fieldset';
 import {Badge} from '@ui/primitives/badge';
-import {DocumentArrowUpIcon, TrashIcon} from '@heroicons/react/16/solid';
-import axios from 'axios';
+import {DocumentArrowUpIcon} from '@heroicons/react/16/solid';
 import {Heading} from "@ui/primitives/heading";
 import {offerStatusBadgeRenderer} from '@shared/utils';
+import {DocumentDropdownActions} from '@features/documents/components/document-dropdown-actions';
 
 interface OfferDetailsSectionProps {
     request: OCDRequest;
@@ -44,16 +44,6 @@ export default function OfferDetailsSection({offer, request}: Readonly<OfferDeta
         });
     };
 
-    const handleDeleteDocument = async (documentId: number) => {
-        if (!confirm('Are you sure you want to delete this document?')) return;
-
-        try {
-            await axios.delete(route('user.document.destroy', documentId));
-            setDocuments(prev => prev.filter(doc => doc.id !== documentId));
-        } catch (error) {
-            console.error('Failed to delete document:', error);
-        }
-    };
 
     return (
         <section id="offer-details" className="my-8">
@@ -169,23 +159,7 @@ export default function OfferDetailsSection({offer, request}: Readonly<OfferDeta
                                     </div>
 
                                     <div className="flex items-center space-x-2">
-                                        <Button
-                                            outline
-                                            href={route('user.document.download', document.id)}
-                                            target="_blank"
-                                        >
-                                            Download
-                                        </Button>
-
-                                        {document.permissions.can_delete && (
-                                            <Button
-                                                outline
-                                                onClick={() => handleDeleteDocument(document.id)}
-                                                className="text-red-600 hover:text-red-700"
-                                            >
-                                                <TrashIcon data-slot="icon"/>
-                                            </Button>
-                                        )}
+                                        <DocumentDropdownActions document={document} />
                                     </div>
                                 </div>
                             ))}

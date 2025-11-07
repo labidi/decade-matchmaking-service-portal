@@ -4,8 +4,6 @@ import {OCDRequestList, PaginationLinkProps, OCDRequestStatus} from '@/types';
 import { SidebarLayout } from '@layouts/index'
 import { RequestsDataTable, adminColumns } from "@ui/organisms/data-table/requests";
 import { Heading } from "@ui/primitives/heading";
-import { useRequestActions } from '@features/requests/hooks';
-import { UpdateStatusDialog } from '@ui/organisms/dialogs';
 
 
 interface RequestsPagination {
@@ -35,15 +33,7 @@ interface RequestsListPageProps {
 }
 
 
-export default function RequestListPage({requests, currentSort, currentSearch = {}, availableStatuses}: Readonly<RequestsListPageProps>) {
-    const {
-        isStatusDialogOpen,
-        selectedRequest,
-        closeStatusDialog,
-        getActionsForRequest,
-        availableStatuses: dialogStatuses,
-    } = useRequestActions('admin');
-
+export default function RequestListPage({requests, currentSort, currentSearch = {}}: Readonly<RequestsListPageProps>) {
     return (
         <SidebarLayout>
             <Head title="Requests List"/>
@@ -60,7 +50,6 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     currentSearch={currentSearch}
                     columns={adminColumns}
                     routeName="admin.request.list"
-                    getActionsForRequest={(request) => getActionsForRequest(request, availableStatuses)}
                     pagination={{
                         current_page: requests.current_page,
                         last_page: requests.last_page,
@@ -89,12 +78,6 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     showActions={true}
                 />
             </div>
-            <UpdateStatusDialog
-                isOpen={isStatusDialogOpen}
-                onClose={closeStatusDialog}
-                request={selectedRequest}
-                availableStatuses={dialogStatuses.length > 0 ? dialogStatuses : availableStatuses}
-            />
         </SidebarLayout>
     );
 }

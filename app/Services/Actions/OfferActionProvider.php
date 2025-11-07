@@ -60,7 +60,7 @@ class OfferActionProvider implements ActionProviderInterface
             ];
         }
 
-        if ($user->can('upload-financial-break-down', $entity)) {
+        if ($user && $user->can('uploadFinancialBreakDown', $entity)) {
             $actions[] = [
                 'key' => 'upload_financial_breakdown',
                 'label' => 'Upload Financial Breakdown report',
@@ -91,7 +91,7 @@ class OfferActionProvider implements ActionProviderInterface
                 ],
             ];
         }
-        if ($user->can('upload-lesson-learned', $entity)) {
+        if ($user && $user->can('uploadLessonLearned', $entity)) {
             $actions[] = [
                 'key' => 'upload_lesson_learned',
                 'label' => 'Upload Lesson Learned Report',

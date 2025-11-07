@@ -148,7 +148,11 @@ class RequestPolicy
             return false;
         }
 
-        if ($user->id === $request->user_id) {
+        if ($user->id === $request->user->id) {
+            return false;
+        }
+
+        if ($request->activeOffer?->matchedPartner?->id === $user->id) {
             return false;
         }
 

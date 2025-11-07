@@ -197,9 +197,7 @@ class OfferService
             $this->repository->update($offer, [
                 'is_accepted' => true,
             ]);
-
             DB::commit();
-
             return $offer->fresh();
         } catch (Exception $e) {
             DB::rollBack();

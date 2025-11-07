@@ -2,7 +2,7 @@ import {usePage, useForm} from '@inertiajs/react';
 import {Auth, Document} from '@/types';
 import {OCDRequest} from '../types/request.types';
 import React, {useState} from 'react';
-import axios from 'axios';
+import {DocumentDropdownActions} from '@features/documents/components/document-dropdown-actions';
 
 export interface AttachmentsSectionProps {
     OcdRequest: OCDRequest;
@@ -19,11 +19,6 @@ export function AttachmentsSection({OcdRequest, canEdit = false, documents = []}
         file: null,
         document_type: 'financial_breakdown_report',
     });
-    const handleDelete = (id: number) => {
-        axios.delete(route('user.document.destroy', id)).then(() => {
-            setDocumentList(prev => prev.filter(d => d.id !== id));
-        });
-    };
     return (
         <section id="attachements" className='my-8'>
             <div className="grid grid-cols-1">
@@ -87,13 +82,7 @@ export function AttachmentsSection({OcdRequest, canEdit = false, documents = []}
                                 <td className="p-2">{doc.document_type?.label}</td>
                                 <td className="p-2">{new Date(doc.created_at).toLocaleDateString()}</td>
                                 <td className="p-2 space-x-2">
-                                    <a href={route('user.document.download', doc.id)}
-                                       className="text-blue-600 underline">Download</a>
-                                    {doc.permissions.can_delete && canEdit && (
-                                    <button type="button" onClick={() => handleDelete(doc.id)}
-                                            className="text-red-600 underline">Delete
-                                    </button>
-                                    )}
+                                    <DocumentDropdownActions document={doc} />
                                 </td>
                             </tr>
                         ))}

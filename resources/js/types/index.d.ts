@@ -4,6 +4,7 @@ export {
 } from "@/features/requests";
 export {RequestOffer, RequestOfferList, RequestOfferPermissions} from "@/types/offer";
 export {Opportunity, OpportunitiesList, OpportunityFormOptions, OpportunitiesPagination} from "@/types/opportunity";
+export type {EntityAction} from "@/types/actions";
 export {
     UserNotificationPreference,
     NotificationEntityType,
@@ -160,11 +161,8 @@ export interface Document {
     // Relationships
     uploader?: User;
 
-    // Permissions
-    permissions: {
-        can_download: boolean;
-        can_delete: boolean;
-    };
+    // Actions from backend Action Provider Pattern
+    actions?: EntityAction[];
 }
 
 export interface Organization {

@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu, DropdownDivider } from '@ui/primitives/dropdown';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
+import { router } from '@inertiajs/react';
+import { getIconComponent } from '@/utils/icon-mapper';
+import type { EntityAction } from '@/types/actions';
+import { FileUploadDialog } from '@/components/dialogs/FileUploadDialog';
 
+// Simple action type for backward compatibility
 export interface Action {
     key: string;
     label: string;
@@ -11,33 +16,148 @@ export interface Action {
 }
 
 interface DropdownActionsProps {
-    actions: Action[];
+    actions: Action[] | EntityAction[];
+    onDialogOpen?: (dialogComponent: string, action: EntityAction) => void;
 }
 
-export function DropdownActions({ actions }: DropdownActionsProps) {
+/**
+ * Type guard to check if an action is an EntityAction
+ */
+function isEntityAction(action: Action | EntityAction): action is EntityAction {
+    return 'route' in action && 'method' in action && 'style' in action;
+}
+
+export function DropdownActions({ actions, onDialogOpen }: DropdownActionsProps) {
+    const [fileUploadAction, setFileUploadAction] = useState<EntityAction | null>(null);
+
     if (!actions || actions.length === 0) {
         return null;
     }
 
+    /**
+     * Handle EntityAction execution with route navigation, confirmations, and dialogs
+     */
+    const handleEntityAction = (action: EntityAction) => {
+        // Handle file upload actions
+        if (action.metadata?.handler === 'file_upload') {
+            setFileUploadAction(action);
+            return;
+        }
+
+        // Handle dialog actions
+        if (action.metadata?.handler === 'dialog' && action.metadata.dialog_component) {
+            onDialogOpen?.(action.metadata.dialog_component, action);
+            return;
+        }
+
+        // Handle route-based actions
+        if (!action.route) {
+            console.warn(`Action "${action.key}" has no route defined`);
+            return;
+        }
+
+        // Show confirmation if required
+        if (action.confirm) {
+            if (!window.confirm(action.confirm)) {
+                return;
+            }
+        }
+
+        // Handle different HTTP methods
+        const method = action.method.toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete';
+
+        // Open in new tab for GET requests with metadata flag
+        if (method === 'get' && action.metadata?.open_in_new_tab) {
+            window.open(action.route, '_blank', 'noopener,noreferrer');
+            return;
+        }
+
+        // Use Inertia router for navigation
+        if (method === 'get') {
+            router.visit(action.route);
+        } else {
+            // For POST/PUT/PATCH/DELETE
+            router[method](action.route, {} as any, {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    // Success handled by backend flash messages
+                },
+                onError: (errors) => {
+                    console.error(`Action "${action.key}" failed:`, errors);
+                },
+            });
+        }
+    };
+
+    /**
+     * Render a dropdown item for an EntityAction
+     */
+    const renderEntityActionItem = (action: EntityAction) => {
+        const Icon = getIconComponent(action.style.icon);
+        const isDanger = action.style.color === 'red';
+
+        return (
+            <DropdownItem
+                onClick={() => handleEntityAction(action)}
+                disabled={!action.enabled}
+                className={isDanger ? 'text-red-600 hover:bg-red-50' : undefined}
+            >
+                <Icon data-slot="icon" />
+                {action.label}
+            </DropdownItem>
+        );
+    };
+
+    /**
+     * Render a dropdown item for a simple Action
+     */
+    const renderSimpleActionItem = (action: Action) => {
+        return (
+            <DropdownItem
+                onClick={action.onClick}
+                disabled={action.disabled}
+            >
+                {action.label}
+            </DropdownItem>
+        );
+    };
+
     return (
-        <Dropdown>
-            <DropdownButton color="white" className="flex items-center gap-2">
-                Actions
-                <ChevronDownIcon className="h-4 w-4" />
-            </DropdownButton>
-            <DropdownMenu anchor="bottom end">
-                {actions.map((action, index) => (
-                    <React.Fragment key={action.key}>
-                        {action.divider && index > 0 && <DropdownDivider />}
-                        <DropdownItem
-                            onClick={action.onClick}
-                            disabled={action.disabled}
-                        >
-                            {action.label}
-                        </DropdownItem>
-                    </React.Fragment>
-                ))}
-            </DropdownMenu>
-        </Dropdown>
+        <>
+            <Dropdown>
+                <DropdownButton color="white" className="flex items-center gap-2">
+                    Actions
+                    <ChevronDownIcon className="h-4 w-4" />
+                </DropdownButton>
+                <DropdownMenu anchor="bottom end">
+                    {actions.map((action, index) => (
+                        <React.Fragment key={action.key}>
+                            {/* Simple actions support divider property */}
+                            {!isEntityAction(action) && action.divider && index > 0 && <DropdownDivider />}
+
+                            {/* Render based on action type */}
+                            {isEntityAction(action)
+                                ? renderEntityActionItem(action)
+                                : renderSimpleActionItem(action)
+                            }
+                        </React.Fragment>
+                    ))}
+                </DropdownMenu>
+            </Dropdown>
+
+            {/* File Upload Dialog */}
+            {fileUploadAction && (
+                <FileUploadDialog
+                    isOpen={true}
+                    onClose={() => setFileUploadAction(null)}
+                    action={fileUploadAction}
+                    onSuccess={() => {
+                        setFileUploadAction(null);
+                        router.reload();
+                    }}
+                />
+            )}
+        </>
     );
 }
