@@ -8,12 +8,14 @@ use App\Http\Requests\Admin\BlockUserRequest;
 use App\Http\Resources\Admin\UserDetailResource;
 use App\Http\Resources\Admin\UserResource;
 use App\Models\User;
+use App\Services\User\UserExportService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserController extends Controller
 {
@@ -95,5 +97,15 @@ class UserController extends Controller
         $user = $this->userService->toggleBlockStatus($user, $data['blocked']);
         $action = $data['blocked'] ? 'blocked' : 'unblocked';
         return to_route('admin.users.index')->with('success', "User $action successfully");
+    }
+
+    /**
+     * Export users to CSV file
+     */
+    public function exportCsv(UserExportService $exportService): StreamedResponse
+    {
+        Gate::authorize('exportUsers', User::class);
+
+        return $exportService->exportUsersCsv();
     }
 }

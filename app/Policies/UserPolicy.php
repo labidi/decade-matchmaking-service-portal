@@ -27,8 +27,7 @@ class UserPolicy
      */
     public function assignRoles(User $user, User $model): bool
     {
-        // Admins can assign roles to anyone except themselves
-        return $user->hasRole('administrator') && $user->id !== $model->id;
+        return $user->hasRole('administrator');
     }
 
     /**
@@ -47,5 +46,13 @@ class UserPolicy
     {
         // For now, no one can delete users
         return false;
+    }
+
+    /**
+     * Determine if user can export user data to CSV
+     */
+    public function exportUsers(User $user): bool
+    {
+        return $user->hasRole('administrator');
     }
 }

@@ -3,6 +3,8 @@ import { Head, usePage } from '@inertiajs/react';
 import {SidebarLayout} from '@layouts/index';
 import axios from 'axios';
 import { Role, UserWithRoles } from '@/types';
+import {Button, Heading} from "@ui/primitives";
+import {PlusIcon} from "@heroicons/react/16/solid";
 
 export default function UserRolesList() {
     const users = usePage().props.users as UserWithRoles[];
@@ -30,6 +32,23 @@ export default function UserRolesList() {
     return (
         <SidebarLayout>
             <Head title="Manage User Roles" />
+            <div className="mx-auto">
+                <Heading level={1}>
+                    Requests List
+                </Heading>
+                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
+            </div>
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        View and manage all requests submitted by users.
+                    </p>
+                </div>
+                <Button href={route('admin.offer.create')}>
+                    <PlusIcon data-slot="icon"/>
+                    Export Requests
+                </Button>
+            </div>
             <div className="overflow-x-auto">
                 <table className="min-w-full table-auto bg-white">
                     <thead className="bg-gray-50">

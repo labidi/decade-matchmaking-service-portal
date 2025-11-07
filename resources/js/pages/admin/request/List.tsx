@@ -4,6 +4,8 @@ import {OCDRequestList, PaginationLinkProps, OCDRequestStatus} from '@/types';
 import { SidebarLayout } from '@layouts/index'
 import { RequestsDataTable, adminColumns } from "@ui/organisms/data-table/requests";
 import { Heading } from "@ui/primitives/heading";
+import {Button} from "@ui/primitives";
+import {PlusIcon} from "@heroicons/react/16/solid";
 
 
 interface RequestsPagination {
@@ -42,6 +44,17 @@ export default function RequestListPage({requests, currentSort, currentSearch = 
                     Requests List
                 </Heading>
                 <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
+            </div>
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        View and manage all requests submitted by users.
+                    </p>
+                </div>
+                <Button href={route('admin.offer.create')}>
+                    <PlusIcon data-slot="icon"/>
+                    Export Requests
+                </Button>
             </div>
             <div className="py-8">
                 <RequestsDataTable

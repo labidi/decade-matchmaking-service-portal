@@ -5,6 +5,9 @@ import { Heading } from '@ui/primitives/heading';
 import { UsersDataTable, adminUserColumns } from '@ui/organisms/data-table/users';
 import { UserRoleDialog, UserBlockDialog, UserDetailsDialog, useUserActions } from '@features/users';
 import { UsersPagination, RoleOption, StatusOption, UserFilters, SortFilters } from '@/types';
+import {Button} from "@ui/primitives";
+import {ArrowDownTrayIcon, PlusIcon} from "@heroicons/react/16/solid";
+import { DownloadButton } from '@/components/ui/download-button';
 
 interface UserIndexPageProps {
     title: string;
@@ -64,10 +67,27 @@ export default function UserIndexPage({
     return (
         <SidebarLayout>
             <Head title={title} />
-
-            <div className="mx-auto max-w-7xl">
-                <Heading level={1}>{title}</Heading>
-                <hr className="my-4 border-zinc-200 dark:border-zinc-700" />
+            <div className="mx-auto">
+                <Heading level={1}>
+                    {title}
+                </Heading>
+                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
+            </div>
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        View and manage all requests submitted by users.
+                    </p>
+                </div>
+                <DownloadButton
+                    url={route('admin.users.export.csv')}
+                    fileName={'Users Export.csv'}
+                    outline
+                    className="flex-1 sm:flex-initial"
+                >
+                    <ArrowDownTrayIcon data-slot="icon" />
+                    Download
+                </DownloadButton>
             </div>
 
             <div className="py-8">
