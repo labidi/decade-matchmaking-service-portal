@@ -55,8 +55,8 @@ $COMPOSER  dump-autoload
 # Check if migrations are needed
 echo "Applying database migrations if needed..."
 $PHP artisan migrate -n --force
-
-
+# Generate Ziggy routes
+$PHP artisan ziggy:generate
 # Laravel optimization commands
 echo "Running Laravel optimizations..."
 $PHP artisan config:cache

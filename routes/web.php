@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\SystemNotificationsController;
 use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\SystemNotificationsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\HomeController;
@@ -18,7 +18,8 @@ Route::get('ioc-platforms', [\App\Http\Controllers\IOCPlatformsController::class
 Route::prefix('unsubscribe')->group(function () {
     Route::get('{user}', [\App\Http\Controllers\UnsubscribeController::class, 'show'])->name('unsubscribe.show');
     Route::post('{user}', [\App\Http\Controllers\UnsubscribeController::class, 'unsubscribe'])->name('unsubscribe.process');
-    Route::get('{user}/success', [\App\Http\Controllers\UnsubscribeController::class, 'success'])->name('unsubscribe.success');});
+    Route::get('{user}/success', [\App\Http\Controllers\UnsubscribeController::class, 'success'])->name('unsubscribe.success');
+});
 
 // Access denied route for direct navigation
 Route::get('/access-denied', function () {
