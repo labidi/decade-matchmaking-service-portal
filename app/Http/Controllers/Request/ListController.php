@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Resources\PublicRequestResource;
 use App\Http\Resources\RequestResource;
 use App\Services\ExportService;
+use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,7 +19,8 @@ class ListController extends BaseRequestController
     use HasPageActions;
 
     public function __construct(
-        private readonly RequestService $service
+        private readonly RequestService $service,
+        private readonly RequestContextService $contextService
     ) {}
 
     /**
@@ -27,7 +29,7 @@ class ListController extends BaseRequestController
     private function getContextConfiguration(string $context): array
     {
         return match ($context) {
-            'admin' => [
+            RequestContextService::CONTEXT_ADMIN => [
                 'component' => $this->getViewPrefix().'request/List',
                 'title' => 'Requests',
                 'searchFields' => [
@@ -44,8 +46,9 @@ class ListController extends BaseRequestController
                 'resourceClass' => RequestResource::class,
                 'serviceMethod' => 'getPaginatedRequests',
                 'additionalData' => ['availableStatuses' => $this->service->getAvailableStatuses()],
+                'context' => $context,
             ],
-            'user_own' => [
+            RequestContextService::CONTEXT_USER_OWN => [
                 'component' => 'request/List',
                 'title' => 'My requests',
                 'banner' => [
@@ -65,8 +68,9 @@ class ListController extends BaseRequestController
                 'resourceClass' => RequestResource::class,
                 'serviceMethod' => 'getUserRequests',
                 'requiresUser' => true,
+                'context' => $context,
             ],
-            'public' => [
+            RequestContextService::CONTEXT_PUBLIC => [
                 'component' => 'request/List',
                 'title' => 'View Request for Training workshops',
                 'banner' => [
@@ -83,8 +87,9 @@ class ListController extends BaseRequestController
                 'routeName' => 'request.list',
                 'resourceClass' => PublicRequestResource::class,
                 'serviceMethod' => 'getPublicRequests',
+                'context' => $context,
             ],
-            'matched' => [
+            RequestContextService::CONTEXT_MATCHED => [
                 'component' => 'request/List',
                 'title' => 'View my matched requests',
                 'banner' => [
@@ -101,8 +106,9 @@ class ListController extends BaseRequestController
                 'resourceClass' => RequestResource::class,
                 'serviceMethod' => 'getMatchedRequests',
                 'requiresUser' => true,
+                'context' => $context,
             ],
-            'subscribed' => [
+            RequestContextService::CONTEXT_SUBSCRIBED => [
                 'component' => 'request/List',
                 'title' => 'View my subscribed requests',
                 'banner' => [
@@ -119,6 +125,7 @@ class ListController extends BaseRequestController
                 'resourceClass' => RequestResource::class,
                 'serviceMethod' => 'getSubscribedRequests',
                 'requiresUser' => true,
+                'context' => $context,
             ],
         };
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Request;
 
 use App\Http\Controllers\Controller;
 use App\Models\Request\Status;
+use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
 
@@ -19,26 +20,47 @@ abstract class BaseRequestController extends Controller
 
         // Admin context
         if (str_starts_with($routeName, 'admin.')) {
-            return 'admin';
+            return RequestContextService::CONTEXT_ADMIN;
         }
 
         // User own requests
         if ($routeName === 'request.me.list') {
-            return 'user_own';
+            return RequestContextService::CONTEXT_USER_OWN;
         }
 
         // Matched requests
         if ($routeName === 'request.me.matched-requests') {
-            return 'matched';
+            return RequestContextService::CONTEXT_MATCHED;
         }
 
         // Subscribed requests
         if ($routeName === 'request.me.subscribed-requests') {
-            return 'subscribed';
+            return RequestContextService::CONTEXT_SUBSCRIBED;
         }
 
         // Public context (default for partners)
-        return 'public';
+        return RequestContextService::CONTEXT_PUBLIC;
+    }
+
+    /**
+     * Get context from request (query parameter or route)
+     * Prioritizes query parameter for detail views
+     *
+     * @param Request $request HTTP request
+     * @return string Context identifier
+     */
+    protected function getContextFromRequest(Request $request): string
+    {
+        $contextService = app(RequestContextService::class);
+
+        // Check for explicit context query parameter
+        $queryContext = $request->query('context');
+        if ($queryContext && $contextService->isValidContext($queryContext)) {
+            return $queryContext;
+        }
+
+        // Fall back to route-based context
+        return $this->getRouteContext();
     }
 
     /**

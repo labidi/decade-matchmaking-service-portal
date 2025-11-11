@@ -31,7 +31,7 @@ class ClarificationRequestController extends Controller
         foreach ($this->userService->getAllAdmins() as $admin) {
             SystemNotification::create([
                 'user_id' => $admin->id,
-                'title' => 'Accepted Offer for a request',
+                'title' => 'Request for Clarification on an Offer',
                 'description' => sprintf(
                     'User <span class="font-bold">%s</span> has requested clarification for the offer on his request <a href="%s" target="_blank" class="font-bold underline">%s</a> ',
                     $user->name,
