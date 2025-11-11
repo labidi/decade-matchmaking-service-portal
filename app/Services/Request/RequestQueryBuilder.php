@@ -2,6 +2,7 @@
 
 namespace App\Services\Request;
 
+use App\Enums\Request\PublicRequestStatus;
 use App\Models\Request as OCDRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,6 +35,11 @@ class RequestQueryBuilder
         if (!empty($searchFilters['status'])) {
             $query->whereHas('status', function (Builder $q) use ($searchFilters) {
                 $q->whereIn('status_code', $searchFilters['status']);
+            });
+        }
+        if(!empty($searchFilters['public_status'])){
+            $query->whereHas('status', function (Builder $q) use ($searchFilters) {
+                $q->whereIn('status_code', PublicRequestStatus::getTechnicalStatusCodes($searchFilters['public_status']));
             });
         }
 

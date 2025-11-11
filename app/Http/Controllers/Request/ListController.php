@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Request;
 
+use App\Enums\Request\PublicRequestStatus;
 use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Resources\PublicRequestResource;
 use App\Http\Resources\RequestResource;
@@ -74,12 +75,9 @@ class ListController extends BaseRequestController
                 ],
                 'searchFields' => [
                     ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
-                    ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [
-                        ['label' => 'Open', 'value' => 'open'],
-                        ['label' => 'Closed', 'value' => 'closed'],
-                    ]],
+                    ['name' => 'public_status', 'label' => 'Status', 'type' => 'select', 'options' => PublicRequestStatus::getOptions()],
                 ],
-                'currentSearchFields' => ['title'],
+                'currentSearchFields' => ['title', 'public_status'],
                 'listRouteName' => 'request.list',
                 'showRouteName' => 'request.show',
                 'routeName' => 'request.list',

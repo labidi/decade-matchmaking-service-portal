@@ -71,6 +71,20 @@ enum PublicRequestStatus: string
     }
 
     /**
+     * Get the technical status codes that map to this public status.
+     *
+     * @param string $publicStatusCode
+     * @return string[]
+     */
+    public static function getTechnicalStatusCodes(string $publicStatusCode): array
+    {
+        return match ($publicStatusCode) {
+            self::MATCHING_ONGOING->value => ['validated'],
+            self::MATCHING_CLOSED->value => ['offer_made', 'in_implementation', 'closed'],
+        };
+    }
+
+    /**
      * Get all public status options for frontend use.
      *
      * @return array<int, array{value: string, label: string}> Array of status options
