@@ -147,7 +147,7 @@ class RequestActionProvider implements ActionProviderInterface
                 $actions[] = [
                     'key' => 'view_offers',
                     'label' => 'View All Offers',
-                    'route' => route('admin.offer.list', ['id' => $entity->id]),
+                    'route' => route('admin.offer.list', ['request' => $entity->id]),
                     'method' => 'GET',
                     'enabled' => true,
                     'style' => [
