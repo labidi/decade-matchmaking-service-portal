@@ -7,12 +7,17 @@ namespace App\Services\Actions;
 use App\Contracts\Actions\ActionProviderInterface;
 use App\Models\Request;
 use App\Models\User;
+use App\Services\RequestService;
 
 /**
  * Provides available actions for requests.
  */
 class RequestActionProvider implements ActionProviderInterface
 {
+    public function __construct(
+        private readonly RequestService $requestService
+    ) {}
+
     /**
      * Get available actions for a request.
      *
@@ -112,6 +117,11 @@ class RequestActionProvider implements ActionProviderInterface
                     'metadata' => [
                         'handler' => 'dialog',
                         'dialog_component' => 'UpdateStatusDialog',
+                        'dialog_props' => [
+                            'requestId' => $entity->id,
+                            'currentStatus' => $entity->status,
+                            'availableStatuses' => RequestService::getAvailableStatuses(),
+                        ],
                     ],
                 ];
             }
