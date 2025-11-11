@@ -4,7 +4,6 @@
 // Components
 export {
     AttachmentsSection,
-    OfferSection,
     RequestDetailsSection,
     RequestShowActionButtons,
     OfferDetailsSection,

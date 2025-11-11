@@ -2,16 +2,16 @@
  * ActionButton Component
  *
  * Renders a single action button from backend action configuration.
- * Handles route navigation, HTTP methods, confirmations, dialogs, and file uploads.
+ * Handles route navigation, HTTP methods, confirmations, and dialogs.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@ui/primitives/button';
 import { router } from '@inertiajs/react';
 import { getIconComponent } from '@/utils/icon-mapper';
 import type { EntityAction } from '@/types/actions';
+import { ActionHandlerGuards } from '@/types/actions';
 import { clsx } from 'clsx';
-import { FileUploadDialog } from '@/components/dialogs/FileUploadDialog';
 
 export interface ActionButtonProps {
     action: EntityAction;
@@ -22,6 +22,7 @@ export interface ActionButtonProps {
 
 /**
  * ActionButton - Renders a single action based on backend configuration
+ * Supports two handler types: 'route' for navigation and 'dialog' for modals
  */
 export function ActionButton({
     action,
@@ -30,17 +31,10 @@ export function ActionButton({
     onDialogOpen,
 }: Readonly<ActionButtonProps>) {
     const Icon = getIconComponent(action.style.icon);
-    const [showFileUpload, setShowFileUpload] = useState(false);
 
     const handleClick = () => {
-        // Handle file upload actions
-        if (action.metadata?.handler === 'file_upload') {
-            setShowFileUpload(true);
-            return;
-        }
-
         // Handle dialog actions
-        if (action.metadata?.handler === 'dialog' && action.metadata.dialog_component) {
+        if (ActionHandlerGuards.isDialogHandler(action.metadata)) {
             onDialogOpen?.(action.metadata.dialog_component, action);
             return;
         }
@@ -62,7 +56,7 @@ export function ActionButton({
         const method = action.method.toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete';
 
         // Open in new tab for GET requests with metadata flag
-        if (method === 'get' && action.metadata?.open_in_new_tab) {
+        if (method === 'get' && ActionHandlerGuards.isRouteHandler(action.metadata) && action.metadata.open_in_new_tab) {
             window.open(action.route, '_blank', 'noopener,noreferrer');
             return;
         }
@@ -110,24 +104,9 @@ export function ActionButton({
     }
 
     return (
-        <>
-            <Button {...buttonProps}>
-                <Icon data-slot="icon" />
-                {action.label}
-            </Button>
-
-            {/* File Upload Dialog */}
-            {action.metadata?.handler === 'file_upload' && (
-                <FileUploadDialog
-                    isOpen={showFileUpload}
-                    onClose={() => setShowFileUpload(false)}
-                    action={action}
-                    onSuccess={() => {
-                        // Refresh the page to show updated data
-                        router.reload();
-                    }}
-                />
-            )}
-        </>
+        <Button {...buttonProps}>
+            <Icon data-slot="icon" />
+            {action.label}
+        </Button>
     );
 }

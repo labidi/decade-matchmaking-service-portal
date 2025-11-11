@@ -19,6 +19,7 @@ import {
     XMarkIcon,
     PauseIcon,
     PlayIcon,
+    EyeIcon,
 } from '@heroicons/react/16/solid';
 import type { ValidIconName } from '@/types/actions';
 import type React from 'react';
@@ -41,6 +42,7 @@ const ICON_MAP: Record<ValidIconName, React.ComponentType<React.ComponentProps<'
     'x-mark': XMarkIcon,
     'pause': PauseIcon,
     'play': PlayIcon,
+    'eye': EyeIcon,
 } as const;
 
 /**

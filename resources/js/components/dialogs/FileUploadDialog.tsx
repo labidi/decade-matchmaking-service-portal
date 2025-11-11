@@ -3,6 +3,7 @@
  *
  * Generic file upload dialog that can be used for any entity's file upload actions.
  * Supports drag-and-drop, file validation, and progress tracking.
+ * Works with both dialog handler (dialog_props) and file_upload handler approaches.
  */
 
 import React, { useState } from 'react';
@@ -10,17 +11,25 @@ import { useForm } from '@inertiajs/react';
 import { Dialog, DialogBody, DialogDescription, DialogTitle, DialogActions } from '@ui/primitives/dialog';
 import { Button } from '@ui/primitives/button';
 import { DocumentArrowUpIcon, DocumentIcon, XCircleIcon } from '@heroicons/react/16/solid';
-import type { EntityAction } from '@/types/actions';
+import type { EntityAction, FileUploadMetadata } from '@/types/actions';
+import { ActionHandlerGuards } from '@/types/actions';
 
 interface FileUploadDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    action: EntityAction;
+    /** Optional EntityAction for file_upload handler approach */
+    action?: EntityAction;
+    /** Optional direct fileUploadMeta for dialog handler approach */
+    fileUploadMeta?: FileUploadMetadata;
     onSuccess?: () => void;
 }
 
-export function FileUploadDialog({ isOpen, onClose, action, onSuccess }: FileUploadDialogProps) {
-    const fileUploadMeta = action.metadata?.file_upload;
+export function FileUploadDialog({ isOpen, onClose, action, fileUploadMeta: propFileUploadMeta, onSuccess }: FileUploadDialogProps) {
+    // Support both approaches: direct props or from EntityAction
+    const fileUploadMeta = propFileUploadMeta ||
+        (action && ActionHandlerGuards.isFileUploadHandler(action.metadata)
+            ? action.metadata.file_upload
+            : undefined);
     const [dragActive, setDragActive] = useState(false);
     const [preview, setPreview] = useState<{ name: string; size: number } | null>(null);
     const [validationError, setValidationError] = useState<string | null>(null);

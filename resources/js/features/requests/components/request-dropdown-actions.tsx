@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { DropdownActions } from '@ui/organisms/data-table/common';
 import { UpdateStatusDialog } from '@ui/organisms/dialogs';
 import type { EntityAction } from '@/types/actions';
-import { OCDRequest } from '../types';
+import { ActionHandlerGuards } from '@/types/actions';
+import type { OCDRequest, OCDRequestStatus } from '@/types';
 
 interface RequestDropdownActionsProps {
     request: OCDRequest;
@@ -12,7 +13,7 @@ interface RequestDropdownActionsProps {
  * RequestDropdownActions - Entity-specific dropdown for request actions
  *
  * Encapsulates action dropdown and dialog management for requests.
- * No prop drilling needed - manages its own state internally.
+ * Uses the new type-safe ActionMetadata system to extract dialog props from action metadata.
  */
 export function RequestDropdownActions({ request }: Readonly<RequestDropdownActionsProps>) {
     const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
@@ -33,6 +34,21 @@ export function RequestDropdownActions({ request }: Readonly<RequestDropdownActi
         setIsStatusDialogOpen(false);
     };
 
+    /**
+     * Extract availableStatuses from the update_status action metadata
+     * Using type-safe metadata extraction from the new ActionMetadata system
+     */
+    const getAvailableStatuses = (): OCDRequestStatus[] => {
+        const updateStatusAction = request.actions.find(action => action.key === 'update_status');
+
+        if (updateStatusAction && ActionHandlerGuards.isDialogHandler(updateStatusAction.metadata)) {
+            // Type guard ensures metadata.dialog_props is available
+            return (updateStatusAction.metadata.dialog_props?.availableStatuses as OCDRequestStatus[]) || [];
+        }
+
+        return [];
+    };
+
     return (
         <>
             <DropdownActions
@@ -45,7 +61,7 @@ export function RequestDropdownActions({ request }: Readonly<RequestDropdownActi
                     request={request}
                     isOpen={isStatusDialogOpen}
                     onClose={closeStatusDialog}
-                    availableStatuses={[]}
+                    availableStatuses={getAvailableStatuses()}
                 />
             )}
         </>

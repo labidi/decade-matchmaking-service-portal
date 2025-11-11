@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu, DropdownDivider } from '@ui/primitives/dropdown';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { router } from '@inertiajs/react';
 import { getIconComponent } from '@/utils/icon-mapper';
 import type { EntityAction } from '@/types/actions';
-import { FileUploadDialog } from '@/components/dialogs/FileUploadDialog';
+import { ActionHandlerGuards } from '@/types/actions';
 
 // Simple action type for backward compatibility
 export interface Action {
@@ -27,9 +27,13 @@ function isEntityAction(action: Action | EntityAction): action is EntityAction {
     return 'route' in action && 'method' in action && 'style' in action;
 }
 
+/**
+ * DropdownActions - Generic dropdown for entity actions
+ * Supports two action types:
+ * 1. EntityAction (route and dialog handlers)
+ * 2. Simple Action (legacy support with onClick callback)
+ */
 export function DropdownActions({ actions, onDialogOpen }: DropdownActionsProps) {
-    const [fileUploadAction, setFileUploadAction] = useState<EntityAction | null>(null);
-
     if (!actions || actions.length === 0) {
         return null;
     }
@@ -38,14 +42,8 @@ export function DropdownActions({ actions, onDialogOpen }: DropdownActionsProps)
      * Handle EntityAction execution with route navigation, confirmations, and dialogs
      */
     const handleEntityAction = (action: EntityAction) => {
-        // Handle file upload actions
-        if (action.metadata?.handler === 'file_upload') {
-            setFileUploadAction(action);
-            return;
-        }
-
         // Handle dialog actions
-        if (action.metadata?.handler === 'dialog' && action.metadata.dialog_component) {
+        if (ActionHandlerGuards.isDialogHandler(action.metadata)) {
             onDialogOpen?.(action.metadata.dialog_component, action);
             return;
         }
@@ -67,7 +65,7 @@ export function DropdownActions({ actions, onDialogOpen }: DropdownActionsProps)
         const method = action.method.toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete';
 
         // Open in new tab for GET requests with metadata flag
-        if (method === 'get' && action.metadata?.open_in_new_tab) {
+        if (method === 'get' && ActionHandlerGuards.isRouteHandler(action.metadata) && action.metadata.open_in_new_tab) {
             window.open(action.route, '_blank', 'noopener,noreferrer');
             return;
         }
@@ -124,40 +122,25 @@ export function DropdownActions({ actions, onDialogOpen }: DropdownActionsProps)
     };
 
     return (
-        <>
-            <Dropdown>
-                <DropdownButton color="white" className="flex items-center gap-2">
-                    Actions
-                    <ChevronDownIcon className="h-4 w-4" />
-                </DropdownButton>
-                <DropdownMenu anchor="bottom end">
-                    {actions.map((action, index) => (
-                        <React.Fragment key={action.key}>
-                            {/* Simple actions support divider property */}
-                            {!isEntityAction(action) && action.divider && index > 0 && <DropdownDivider />}
+        <Dropdown>
+            <DropdownButton color="white" className="flex items-center gap-2">
+                Actions
+                <ChevronDownIcon className="h-4 w-4" />
+            </DropdownButton>
+            <DropdownMenu anchor="bottom end">
+                {actions.map((action, index) => (
+                    <React.Fragment key={action.key}>
+                        {/* Simple actions support divider property */}
+                        {!isEntityAction(action) && action.divider && index > 0 && <DropdownDivider />}
 
-                            {/* Render based on action type */}
-                            {isEntityAction(action)
-                                ? renderEntityActionItem(action)
-                                : renderSimpleActionItem(action)
-                            }
-                        </React.Fragment>
-                    ))}
-                </DropdownMenu>
-            </Dropdown>
-
-            {/* File Upload Dialog */}
-            {fileUploadAction && (
-                <FileUploadDialog
-                    isOpen={true}
-                    onClose={() => setFileUploadAction(null)}
-                    action={fileUploadAction}
-                    onSuccess={() => {
-                        setFileUploadAction(null);
-                        router.reload();
-                    }}
-                />
-            )}
-        </>
+                        {/* Render based on action type */}
+                        {isEntityAction(action)
+                            ? renderEntityActionItem(action)
+                            : renderSimpleActionItem(action)
+                        }
+                    </React.Fragment>
+                ))}
+            </DropdownMenu>
+        </Dropdown>
     );
 }
