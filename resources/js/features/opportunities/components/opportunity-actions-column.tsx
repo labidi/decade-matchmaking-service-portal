@@ -1,8 +1,8 @@
 import React from 'react';
 import {DropdownActions} from '@ui/organisms/data-table/common';
 import {Context} from '@/types';
-import {Opportunity} from '../types/opportunity.types';
-import {useOpportunityActions} from '../hooks/use-opportunity-actions';
+import {Opportunity} from '@features/opportunities';
+import {useOpportunityActions} from '@features/opportunities';
 
 interface OpportunityActionsProps {
     opportunity: Opportunity;

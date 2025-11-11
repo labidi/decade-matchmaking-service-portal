@@ -4,7 +4,7 @@ use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\Request\ExportRequestPdfController;
 use App\Http\Controllers\Request\ExpressInterestController;
 use App\Http\Controllers\Request\RequestFormController;
-use App\Http\Controllers\Request\RequestListController;
+use App\Http\Controllers\Request\ListController;
 use App\Http\Controllers\Request\RequestManagementController;
 use App\Http\Controllers\Request\ViewController;
 use Illuminate\Support\Facades\Route;
@@ -30,13 +30,10 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::get('pdf/{id}', ExportRequestPdfController::class)->name('request.pdf');
 
-    Route::get('request/me/list', [RequestListController::class, 'myRequests'])->name('request.me.list');
-    Route::get('request/me/matched-requests', [RequestListController::class, 'matchedRequests'])->name(
-        'request.me.matched-requests'
-    );
-    Route::get('request/me/subscribed-requests', [RequestListController::class, 'subscribedRequest'])->name(
-        'request.me.subscribed-requests'
-    );
+    // UPDATED: Use __invoke instead of specific methods
+    Route::get('request/me/list', ListController::class)->name('request.me.list');
+    Route::get('request/me/matched-requests', ListController::class)->name('request.me.matched-requests');
+    Route::get('request/me/subscribed-requests', ListController::class)->name('request.me.subscribed-requests');
 
     // Request interaction
     Route::post('request/{id}/express-interest', ExpressInterestController::class)->name(
@@ -54,15 +51,20 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
 // Partner role request routes
 Route::middleware(['auth', 'role:partner'])->group(function () {
-    // Request listings for partners
-    Route::get('request/list', [RequestListController::class, 'publicRequests'])->name('request.list');
+    // UPDATED: Use __invoke instead of publicRequests method
+    Route::get('request/list', ListController::class)->name('request.list');
 });
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::post('request/{id}/update-status', [RequestManagementController::class, 'updateStatus'])->name(
         'admin.request.update-status'
     );
-    Route::get('request/list', [RequestListController::class, 'list'])->name('admin.request.list');
+
+    // UPDATED: Use __invoke instead of list method
+    Route::get('request/list', ListController::class)->name('admin.request.list');
+
     Route::get('request/{id}/show', [ViewController::class, 'show'])->name('admin.request.show');
-    Route::get('request/export/csv', [RequestListController::class, 'exportCsv'])->name('admin.request.export.csv');
+
+    // KEPT: exportCsv remains separate method (returns StreamedResponse)
+    Route::get('request/export/csv', [ListController::class, 'exportCsv'])->name('admin.request.export.csv');
 });

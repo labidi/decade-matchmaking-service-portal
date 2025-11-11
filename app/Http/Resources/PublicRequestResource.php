@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Enums\Request\PublicRequestStatus;
 use Illuminate\Http\Request;
 
 /**
  * Public Request Resource
  *
  * Extends RequestResource to provide simplified status labels for public-facing request lists.
- * Maps technical status codes to user-friendly labels:
- * - 'validated' → 'Matching Ongoing'
- * - 'offer_made', 'in_implementation', 'closed' → 'Matching Closed'
+ * Uses PublicRequestStatus enum to map technical status codes to user-friendly labels.
  */
 class PublicRequestResource extends RequestResource
 {
@@ -37,19 +36,21 @@ class PublicRequestResource extends RequestResource
     /**
      * Transform status object to use simplified labels for public display.
      *
-     * @param object $status
-     * @return object
+     * Uses the PublicRequestStatus enum to determine the appropriate public-facing label
+     * based on the technical status code.
+     *
+     * @param object $status The status object containing status_code and status_label
+     * @return object The transformed status object with updated label
      */
     private function transformStatus(object $status): object
     {
         $statusCode = $status->status_code ?? '';
 
-        // Map technical status codes to public-friendly labels
-        $statusLabel = match ($statusCode) {
-            'validated' => 'Matching Ongoing',
-            'offer_made', 'in_implementation', 'closed' => 'Matching Closed',
-            default => $status->status_label ?? $statusCode,
-        };
+        // Get the public status enum from the technical status code
+        $publicStatus = PublicRequestStatus::fromTechnicalStatus($statusCode);
+
+        // Use the enum's label if a mapping exists, otherwise fall back to original label
+        $statusLabel = $publicStatus?->label() ?? $status->status_label ?? $statusCode;
 
         // Clone the status object and update the label
         $transformedStatus = clone $status;

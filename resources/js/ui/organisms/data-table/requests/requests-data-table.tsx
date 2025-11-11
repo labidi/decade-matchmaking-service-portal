@@ -1,6 +1,6 @@
 import React from 'react';
 import {ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/16/solid';
-import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus, UIField} from "@/types";
+import {OCDRequest, OCDRequestList, PaginationLinkProps, OCDRequestStatus, UIField, Context} from "@/types";
 import {Table, TableHead, TableBody, TableRow, TableHeader, TableCell} from '@ui/primitives/table';
 import {Badge} from '@ui/primitives/badge'
 import {TablePaginationNav} from '@ui/molecules';
@@ -40,6 +40,7 @@ interface RequestsDataTableProps {
     searchFields?: UIField[];
     columns: TableColumn[];
     routeName?: string;
+    context?: Context;
     showSearch?: boolean;
     showActions?: boolean;
 }
@@ -85,6 +86,7 @@ export function RequestsDataTable({
                                       searchFields = [],
                                       columns,
                                       routeName = 'admin.request.list',
+                                      context = 'public',
                                       showSearch = true,
                                       showActions = true
                                   }: Readonly<RequestsDataTableProps>) {
@@ -164,7 +166,7 @@ export function RequestsDataTable({
                                 ))}
                                 {showActions && (
                                     <TableCell className="text-right">
-                                        <RequestDropdownActions request={request} />
+                                        <RequestDropdownActions request={request} context={context} />
                                     </TableCell>
                                 )}
                             </TableRow>

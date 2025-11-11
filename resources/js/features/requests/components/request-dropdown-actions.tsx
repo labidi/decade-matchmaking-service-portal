@@ -3,10 +3,11 @@ import { DropdownActions } from '@ui/organisms/data-table/common';
 import { UpdateStatusDialog } from '@ui/organisms/dialogs';
 import type { EntityAction } from '@/types/actions';
 import { ActionHandlerGuards } from '@/types/actions';
-import type { OCDRequest, OCDRequestStatus } from '@/types';
+import type { OCDRequest, OCDRequestStatus, Context } from '@/types';
 
 interface RequestDropdownActionsProps {
     request: OCDRequest;
+    context?: Context;
 }
 
 /**
@@ -15,7 +16,7 @@ interface RequestDropdownActionsProps {
  * Encapsulates action dropdown and dialog management for requests.
  * Uses the new type-safe ActionMetadata system to extract dialog props from action metadata.
  */
-export function RequestDropdownActions({ request }: Readonly<RequestDropdownActionsProps>) {
+export function RequestDropdownActions({ request, context = 'public' }: Readonly<RequestDropdownActionsProps>) {
     const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
 
     /**

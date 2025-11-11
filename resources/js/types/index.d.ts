@@ -409,4 +409,4 @@ export type NotificationPreferenceActionHandler = (preference: UserNotificationP
 
 export type NotificationPreferenceBulkActionHandler = (preferences: UserNotificationPreference[]) => void;
 
-export type Context = 'admin' | 'user_own' | 'public';
+export type Context = 'admin' | 'user_own' | 'public' | 'matched' | 'subscribed';
