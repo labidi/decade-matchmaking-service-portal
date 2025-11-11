@@ -73,8 +73,9 @@ class OfferActionProvider implements ActionProviderInterface
                     'variant' => 'outline',
                 ],
                 'metadata' => [
-                    'handler' => 'file_upload',
-                    'file_upload' => [
+                    'handler' => 'dialog',
+                    'dialog_component' => 'FileUploadDialogProps',
+                    'dialog_props' => [
                         'accept' => '.pdf,.xlsx,.xls,.csv',
                         'maxSize' => 10,  // MB
                         'multiple' => false,
@@ -104,8 +105,9 @@ class OfferActionProvider implements ActionProviderInterface
                     'variant' => 'outline',
                 ],
                 'metadata' => [
-                    'handler' => 'file_upload',
-                    'file_upload' => [
+                    'handler' => 'dialog',
+                    'dialog_component' => 'FileUploadDialogProps',
+                    'dialog_props' => [
                         'accept' => '.pdf,.xlsx,.xls,.csv',
                         'maxSize' => 10,  // MB
                         'multiple' => false,
