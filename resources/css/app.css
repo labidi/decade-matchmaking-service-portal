@@ -31,6 +31,22 @@
 
 @font-face {
     font-family: 'DINPro';
+    src: url('/assets/fonts/DIN-Pro-Light-300.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'DINPro';
+    src: url('/assets/fonts/DIN-Pro-Light-Italic-300.otf') format('opentype');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'DINPro';
     src: url('/assets/fonts/DIN-Pro-400.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
@@ -39,9 +55,9 @@
 
 @font-face {
     font-family: 'DINPro';
-    src: url('/assets/fonts/DIN-Pro-Bold-700.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
+    src: url('/assets/fonts/DIN-Pro-Italic-400.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
     font-display: swap;
 }
 
@@ -63,41 +79,9 @@
 
 @font-face {
     font-family: 'DINPro';
-    src: url('/assets/fonts/DIN-Pro-Light-Italic-300.otf') format('opentype');
-    font-weight: 300;
-    font-style: italic;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'DINPro';
-    src: url('/assets/fonts/DIN-Pro-Light-300.otf') format('opentype');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'DINPro';
-    src: url('/assets/fonts/DIN-Pro-Italic-400.otf') format('opentype');
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'DINPro';
-    src: url('/assets/fonts/DIN-Pro-Italic-400.otf') format('opentype');
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'DINPro';
-    src: url('/assets/fonts/DIN-Pro-Bold-Italic-700.otf') format('opentype');
+    src: url('/assets/fonts/DIN-Pro-Bold-700.otf') format('opentype');
     font-weight: 700;
-    font-style: italic;
+    font-style: normal;
     font-display: swap;
 }
 
@@ -123,4 +107,21 @@
     font-weight: 900;
     font-style: italic;
     font-display: swap;
+}
+
+@layer base {
+    .font-sans {
+        font-family: 'DINPro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    html {
+        font-family: 'DINPro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+}
+@layer utilities {
+    .font-sans {
+        font-family: 'DINPro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    html {
+        font-family: 'DINPro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 }
