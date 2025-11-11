@@ -94,6 +94,7 @@ class RequestActionProvider implements ActionProviderInterface
                     'variant' => 'outline',
                 ],
                 'metadata' => [
+                    'handler' => 'route',
                     'open_in_new_tab' => true,
                 ],
             ];
