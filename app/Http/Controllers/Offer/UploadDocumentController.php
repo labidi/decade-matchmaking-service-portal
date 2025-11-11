@@ -69,6 +69,7 @@ class UploadDocumentController extends BaseOfferController
         return match ($type) {
             'financial_breakdown' => DocumentType::FINANCIAL_BREAKDOWN_REPORT,
             'offer_document' => DocumentType::OFFER_DOCUMENT,
+            'lesson_learned'=> DocumentType::LESSON_LEARNED_REPORT,
             default => throw new \InvalidArgumentException("Invalid document type: {$type}")
         };
     }
