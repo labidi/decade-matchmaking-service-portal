@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers\Request;
 
+use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Exception;
 use Illuminate\Http\Request;
 
 class RequestManagementController extends BaseRequestController
 {
-    public function __construct(protected readonly RequestService $service) {}
+    public function __construct(
+        protected readonly RequestService $service,
+        RequestContextService $contextService
+    ) {
+        parent::__construct($contextService);
+    }
 
     /**
      * Update request status - unified method for both admin and user contexts

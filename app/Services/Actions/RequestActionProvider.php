@@ -7,6 +7,7 @@ namespace App\Services\Actions;
 use App\Contracts\Actions\ActionProviderInterface;
 use App\Models\Request;
 use App\Models\User;
+use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 
 /**
@@ -54,7 +55,7 @@ class RequestActionProvider implements ActionProviderInterface
             $actions[] = [
                 'key' => 'view',
                 'label' => 'View Request',
-                'route' => route((($context === 'admin') ? 'admin.' : '').'request.show', ['id' => $entity->id]),
+                'route' => route($this->getViewRouteName($context ?? RequestContextService::CONTEXT_USER_OWN), ['id' => $entity->id]),
                 'method' => 'GET',
                 'enabled' => true,
                 'style' => [
@@ -178,5 +179,23 @@ class RequestActionProvider implements ActionProviderInterface
         }
 
         return array_values($actions);
+    }
+
+    /**
+     * Get the appropriate view route name based on context.
+     *
+     * @param  string  $context
+     * @return string
+     */
+    private function getViewRouteName(string $context): string
+    {
+        return match ($context) {
+            RequestContextService::CONTEXT_ADMIN => 'admin.request.show',
+            RequestContextService::CONTEXT_USER_OWN => 'request.me.show',
+            RequestContextService::CONTEXT_PUBLIC => 'request.public.show',
+            RequestContextService::CONTEXT_MATCHED => 'request.matched.show',
+            RequestContextService::CONTEXT_SUBSCRIBED => 'request.subscribed.show',
+            default => 'request.show', // Fallback for backward compatibility
+        };
     }
 }

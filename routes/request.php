@@ -24,7 +24,10 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     // Request CRUD operations
     Route::get('request/create', [RequestFormController::class, 'form'])->name('request.create');
     Route::get('request/{id}/edit', [RequestFormController::class, 'form'])->name('request.edit');
-    Route::get('request/{id}/show', [ViewController::class, 'show'])->name('request.show');
+    Route::get('public/request/{id}/show', [ViewController::class, 'show'])->name('request.public.show');
+    Route::get('me/request/{id}/show', [ViewController::class, 'show'])->name('request.me.show');
+    Route::get('matched/request/{id}/show', [ViewController::class, 'show'])->name('request.matched.show');
+    Route::get('subscribed/request/{id}/show', [ViewController::class, 'show'])->name('request.subscribed.show');
     Route::post('request/submit/{id?}', [RequestFormController::class, 'submit'])->name('request.submit');
     Route::delete('request/{id}', [RequestManagementController::class, 'destroy'])->name('user.request.destroy');
 

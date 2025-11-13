@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Request;
 
 use App\Models\SystemNotification;
+use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use App\Services\UserService;
 use Exception;
@@ -13,8 +14,11 @@ class ExpressInterestController extends BaseRequestController
 {
     public function __construct(
         private readonly UserService $userService,
-        private readonly RequestService $requestService
-    ) {}
+        private readonly RequestService $requestService,
+        RequestContextService $contextService
+    ) {
+        parent::__construct($contextService);
+    }
 
     /**
      * Express interest in a request

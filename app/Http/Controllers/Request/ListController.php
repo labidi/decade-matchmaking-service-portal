@@ -20,8 +20,10 @@ class ListController extends BaseRequestController
 
     public function __construct(
         private readonly RequestService $service,
-        private readonly RequestContextService $contextService
-    ) {}
+        RequestContextService $contextService
+    ) {
+        parent::__construct($contextService);
+    }
 
     /**
      * Get context-specific configuration
@@ -83,7 +85,7 @@ class ListController extends BaseRequestController
                 ],
                 'currentSearchFields' => ['title', 'public_status'],
                 'listRouteName' => 'request.list',
-                'showRouteName' => 'request.show',
+                'showRouteName' => 'public.request.show',
                 'routeName' => 'request.list',
                 'resourceClass' => PublicRequestResource::class,
                 'serviceMethod' => 'getPublicRequests',
@@ -175,8 +177,11 @@ class ListController extends BaseRequestController
             $sortFilters
         );
 
-        // Transform to appropriate resource
-        $requests->toResourceCollection($config['resourceClass']);
+        // Transform to appropriate resource with explicit context
+        $resourceClass = $config['resourceClass'];
+        $requests->getCollection()->transform(function ($request) use ($resourceClass, $context) {
+            return new $resourceClass($request, $context);
+        });
 
         // Build response data
         $responseData = [

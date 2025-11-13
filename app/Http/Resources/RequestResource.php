@@ -6,6 +6,7 @@ namespace App\Http\Resources;
 
 use App\Models\Request as RequestModel;
 use App\Services\Actions\RequestActionProvider;
+use App\Services\Request\RequestContextService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,6 +16,57 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class RequestResource extends JsonResource
 {
     public static $wrap = null;
+
+    /**
+     * Explicitly injected context for resource transformation
+     */
+    private ?string $injectedContext = null;
+
+    /**
+     * Create a new resource instance.
+     *
+     * @param  mixed  $resource
+     * @param  string|null  $context
+     */
+    public function __construct($resource, ?string $context = null)
+    {
+        parent::__construct($resource);
+
+        if ($context !== null) {
+            $this->validateContext($context);
+        }
+
+        $this->injectedContext = $context;
+    }
+
+    /**
+     * Validate that the context is one of the allowed values.
+     *
+     * @param  string  $context
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function validateContext(string $context): void
+    {
+        $validContexts = [
+            RequestContextService::CONTEXT_ADMIN,
+            RequestContextService::CONTEXT_USER_OWN,
+            RequestContextService::CONTEXT_PUBLIC,
+            RequestContextService::CONTEXT_MATCHED,
+            RequestContextService::CONTEXT_SUBSCRIBED,
+        ];
+
+        if (! in_array($context, $validContexts, true)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Invalid context "%s". Valid contexts are: %s',
+                    $context,
+                    implode(', ', $validContexts)
+                )
+            );
+        }
+    }
 
     /**
      * Transform the resource into an array.
@@ -62,7 +114,13 @@ class RequestResource extends JsonResource
      */
     private function resolveContext(Request $request): string
     {
-        return str_contains($request->route()?->getPrefix()??'', 'admin') ? 'admin' : 'user';
+        // Priority 1: Use explicitly injected context
+        if ($this->injectedContext !== null) {
+            return $this->injectedContext;
+        }
+
+        // Priority 2: Fallback to route-based resolution for backward compatibility
+        return str_contains($request->route()?->getPrefix() ?? '', 'admin') ? 'admin' : 'user';
     }
 
     /**

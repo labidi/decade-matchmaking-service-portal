@@ -15,6 +15,7 @@ use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Requests\StoreRequest;
 use App\Http\Resources\RequestResource;
 use App\Models\Request;
+use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -27,8 +28,10 @@ class RequestFormController extends BaseRequestController
     use HasPageActions;
 
     public function __construct(
-        private readonly RequestService $service
+        private readonly RequestService $service,
+        RequestContextService $contextService
     ) {
+        parent::__construct($contextService);
     }
 
     /**
@@ -70,7 +73,7 @@ class RequestFormController extends BaseRequestController
                     'Request : ' . $requestTitle,
                     'Edit my request details here.'
                 ),
-                'request' => new RequestResource($request)
+                'request' => new RequestResource($request, RequestContextService::CONTEXT_USER_OWN)
             ]);
         } else {
             // Create mode - new request

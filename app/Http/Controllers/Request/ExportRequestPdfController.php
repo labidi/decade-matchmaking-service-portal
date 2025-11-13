@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers\Request;
 
+use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 
 class ExportRequestPdfController extends BaseRequestController
 {
-    public function __construct(private readonly RequestService $requestService)
-    {
+    public function __construct(
+        private readonly RequestService $requestService,
+        RequestContextService $contextService
+    ) {
+        parent::__construct($contextService);
     }
 
     /**

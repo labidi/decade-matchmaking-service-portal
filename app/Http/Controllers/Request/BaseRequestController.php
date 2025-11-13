@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Request;
 
 use App\Http\Controllers\Controller;
@@ -11,56 +13,51 @@ use Illuminate\Http\Request;
 
 abstract class BaseRequestController extends Controller
 {
+    public function __construct(
+        protected readonly RequestContextService $contextService
+    ) {
+    }
+
     /**
-     * Get the context based on route name
+     * Get the context based on route name.
+     * Supports both list and detail (show) route names.
      */
     protected function getRouteContext(): string
     {
-        $routeName = request()->route()->getName() ?? '';
+        $routeName = request()->route()?->getName() ?? '';
 
-        // Admin context
+        // Admin context (both list and show routes)
         if (str_starts_with($routeName, 'admin.')) {
             return RequestContextService::CONTEXT_ADMIN;
         }
 
-        // User own requests
-        if ($routeName === 'request.me.list') {
+        // User own requests (both list and show)
+        if ($routeName === 'request.me.list' || $routeName === 'request.me.show') {
             return RequestContextService::CONTEXT_USER_OWN;
         }
 
-        // Matched requests
-        if ($routeName === 'request.me.matched-requests') {
+        // Matched requests (both list and show)
+        if ($routeName === 'request.me.matched-requests' || $routeName === 'request.matched.show') {
             return RequestContextService::CONTEXT_MATCHED;
         }
 
-        // Subscribed requests
-        if ($routeName === 'request.me.subscribed-requests') {
+        // Subscribed requests (both list and show)
+        if ($routeName === 'request.me.subscribed-requests' || $routeName === 'request.subscribed.show') {
             return RequestContextService::CONTEXT_SUBSCRIBED;
         }
 
-        // Public context (default for partners)
-        return RequestContextService::CONTEXT_PUBLIC;
-    }
-
-    /**
-     * Get context from request (query parameter or route)
-     * Prioritizes query parameter for detail views
-     *
-     * @param Request $request HTTP request
-     * @return string Context identifier
-     */
-    protected function getContextFromRequest(Request $request): string
-    {
-        $contextService = app(RequestContextService::class);
-
-        // Check for explicit context query parameter
-        $queryContext = $request->query('context');
-        if ($queryContext && $contextService->isValidContext($queryContext)) {
-            return $queryContext;
+        // Public show route
+        if ($routeName === 'request.public.show') {
+            return RequestContextService::CONTEXT_PUBLIC;
         }
 
-        // Fall back to route-based context
-        return $this->getRouteContext();
+        // Public list route (partners viewing all requests)
+        if ($routeName === 'request.list') {
+            return RequestContextService::CONTEXT_PUBLIC;
+        }
+
+        // Default fallback
+        return RequestContextService::CONTEXT_PUBLIC;
     }
 
     /**
