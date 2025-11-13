@@ -42,13 +42,13 @@ export default function OrganizationsDialog({ open, onClose }: OrganizationsDial
     };
 
     return (
-        <Dialog open={open} onClose={onClose} size="4xl">
+        <Dialog open={open} onClose={onClose} size="5xl">
             <DialogTitle>CDF Partners</DialogTitle>
             <DialogDescription>
                 Partners supporting capacity development through the Ocean Connector.
             </DialogDescription>
 
-            <DialogBody>
+            <DialogBody className="flex flex-col">
                 {loading && (
                     <div className="flex justify-center items-center py-12">
                         <div className="text-sm text-gray-600">Loading organizations...</div>
@@ -65,7 +65,9 @@ export default function OrganizationsDialog({ open, onClose }: OrganizationsDial
                 )}
 
                 {!loading && !error && (
-                    <OrganizationsDataTable organizations={organizations} />
+                    <div className="overflow-y-auto max-h-[60vh] -mx-6 px-6">
+                        <OrganizationsDataTable organizations={organizations} />
+                    </div>
                 )}
             </DialogBody>
 

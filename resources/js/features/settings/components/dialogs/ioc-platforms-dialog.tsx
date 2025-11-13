@@ -41,13 +41,13 @@ export default function IOCPlatformsDialog({ open, onClose }: IOCPlatformsDialog
     };
 
     return (
-        <Dialog open={open} onClose={onClose} size="4xl">
+        <Dialog open={open} onClose={onClose} size="5xl">
             <DialogTitle>IOC Platforms</DialogTitle>
             <DialogDescription>
                 Intergovernmental Oceanographic Commission platforms and initiatives supporting ocean science.
             </DialogDescription>
 
-            <DialogBody>
+            <DialogBody className="flex flex-col">
                 {loading && (
                     <div className="flex justify-center items-center py-12">
                         <div className="text-sm text-gray-600">Loading IOC platforms...</div>
@@ -64,7 +64,9 @@ export default function IOCPlatformsDialog({ open, onClose }: IOCPlatformsDialog
                 )}
 
                 {!loading && !error && (
-                    <IOCPlatformsDataTable platforms={platforms} />
+                    <div className="overflow-y-auto max-h-[60vh] -mx-6 px-6">
+                        <IOCPlatformsDataTable platforms={platforms} />
+                    </div>
                 )}
             </DialogBody>
 
