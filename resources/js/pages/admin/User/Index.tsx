@@ -1,12 +1,11 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
-import { SidebarLayout } from '@layouts/index';
+import { SidebarLayout } from '@/layouts';
 import { Heading } from '@ui/primitives/heading';
 import { UsersDataTable, adminUserColumns } from '@ui/organisms/data-table/users';
 import { UserRoleDialog, UserBlockDialog, UserDetailsDialog, useUserActions } from '@features/users';
 import { UsersPagination, RoleOption, StatusOption, UserFilters, SortFilters } from '@/types';
-import {Button} from "@ui/primitives";
-import {ArrowDownTrayIcon, PlusIcon} from "@heroicons/react/16/solid";
+import {ArrowDownTrayIcon} from "@heroicons/react/16/solid";
 import { DownloadButton } from '@/components/ui/download-button';
 
 interface UserIndexPageProps {
