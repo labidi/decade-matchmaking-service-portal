@@ -188,6 +188,14 @@ readonly class OpportunityService
     }
 
     /**
+     * Get all active public opportunities
+     */
+    public function getPublicOpportunities(): Collection
+    {
+        return $this->repository->getPublicOpportunities();
+    }
+
+    /**
      * Get the most recent active opportunities
      */
     public function getRecentActiveOpportunities(int $limit = 10): Collection
