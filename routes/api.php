@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\OpportunityController;
 use App\Http\Controllers\Webhooks\MandrillWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,10 @@ use Illuminate\Support\Facades\Route;
 // Mandrill Webhook Route (No authentication - uses signature verification)
 Route::post('/webhooks/mandrill', [MandrillWebhookController::class, 'handle'])
     ->name('webhooks.mandrill');
+
+// API v1 Routes
+Route::prefix('v1')->name('api.v1.')->group(function () {
+    // Public endpoints
+    Route::get('/opportunities', [OpportunityController::class, 'index'])
+        ->name('opportunities.index');
+});
