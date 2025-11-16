@@ -118,16 +118,16 @@ export default function NavigationMenu() {
     return (
         <Dropdown>
             {/* Modern dropdown button with avatar */}
-            <DropdownButton  color={'teal'} className="inline-flex items-center gap-2 px-3 py-2 bg-firefly-200 text-white focus:outline-none">
+            <DropdownButton  plain className="inline-flex items-center gap-2 px-3 py-2  text-white focus:outline-none">
                 <Avatar
                     initials={getUserInitials(navigation.user.displayName)}
                     alt={navigation.user.displayName}
-                    className="size-8"
+                    className="size-8 text-white bg-firefly-600"
                 />
-                <span className="text-base font-medium">
+                <span className="text-base text-white font-medium">
                     {navigation.user.displayName}
                 </span>
-                <ChevronDownIcon className="size-4" />
+                <ChevronDownIcon className="size-4 text-white" />
             </DropdownButton>
 
             {/* Dropdown menu with Catalyst UI styling */}
