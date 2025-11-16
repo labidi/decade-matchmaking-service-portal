@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Events\User\UserRoleChanged;
 use App\Models\User;
 use App\Services\User\UserAnalyticsService;
 use App\Services\User\UserRepository;
@@ -11,14 +12,14 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 readonly class UserService
 {
     public function __construct(
         private UserRepository $repository,
         private UserAnalyticsService $analytics
-    ) {
-    }
+    ) {}
 
     /**
      * Get paginated users for admin grid
@@ -32,24 +33,27 @@ readonly class UserService
 
     /**
      * Assign roles to user
+     * @throws Throwable
      */
     public function assignRoles(User $user, array $roleNames): User
     {
-        return DB::transaction(function () use ($user, $roleNames) {
-            $user->syncRoles($roleNames);
 
+        return DB::transaction(function () use ($user, $roleNames) {
+            $previousRoles = $user->roles;
+            $user->syncRoles($roleNames);
             Log::info('User roles updated', [
                 'user_id' => $user->id,
                 'roles' => $roleNames,
                 'updated_by' => auth()->id(),
             ]);
-
+            UserRoleChanged::dispatch($user,$previousRoles->toArray(),$roleNames);
             return $user->fresh(['roles']);
         });
     }
 
     /**
      * Block/unblock user account
+     * @throws Throwable
      */
     public function toggleBlockStatus(User $user, bool $blocked): User
     {
@@ -96,6 +100,7 @@ readonly class UserService
      * @param array{email: string, name: string, provider_id: string, avatar: ?string} $oauthData
      * @param string $provider The OAuth provider name (e.g., 'google', 'linkedin')
      * @return User The created user
+     * @throws Throwable
      */
     public function createUserFromOAuth(array $oauthData, string $provider): User
     {
@@ -131,12 +136,13 @@ readonly class UserService
      * @param array{provider_id: string, avatar: ?string} $oauthData OAuth data to update
      * @param string $provider The OAuth provider name
      * @return User The updated user
+     * @throws Throwable
      */
     public function updateUserWithOAuth(User $user, array $oauthData, string $provider): User
     {
         return DB::transaction(function () use ($user, $oauthData, $provider) {
             // Only update OAuth data if user has no provider or same provider
-            if (!$user->provider || $user->provider === $provider) {
+            if (! $user->provider || $user->provider === $provider) {
                 $this->repository->update($user, [
                     'provider' => $provider,
                     'provider_id' => $oauthData['provider_id'],
@@ -162,12 +168,12 @@ readonly class UserService
     /**
      * Parse full name into first and last name components
      *
-     * @param string|null $fullName The full name to parse
+     * @param  string|null  $fullName  The full name to parse
      * @return array{first_name: string, last_name: string}
      */
     private function parseFullName(?string $fullName): array
     {
-        if (!$fullName) {
+        if (! $fullName) {
             return ['first_name' => '', 'last_name' => ''];
         }
 

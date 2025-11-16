@@ -16,19 +16,16 @@ use Illuminate\Queue\SerializesModels;
  */
 class UserRoleChanged
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * Create a new event instance.
      *
      * @param User $user The user with changed roles
-     * @param array<string> $previousRoles Array of previous role names
-     * @param array<string> $newRoles Array of new role names
      */
     public function __construct(
-        public readonly User $user,
-        public readonly array $previousRoles,
-        public readonly array $newRoles
+        public readonly User $user
     ) {
     }
 }

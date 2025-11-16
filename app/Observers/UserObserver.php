@@ -6,7 +6,6 @@ namespace App\Observers;
 
 use App\Events\User\UserProfileUpdated;
 use App\Events\User\UserRegistered;
-use App\Events\User\UserRoleChanged;
 use App\Models\User;
 
 /**
