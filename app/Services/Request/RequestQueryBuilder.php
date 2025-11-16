@@ -4,10 +4,8 @@ namespace App\Services\Request;
 
 use App\Enums\Request\PublicRequestStatus;
 use App\Models\Request as OCDRequest;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Schema;
-use \Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Pagination\AbstractPaginator;
 
 class RequestQueryBuilder
 {
@@ -16,28 +14,28 @@ class RequestQueryBuilder
      */
     public function applySearchFilters(Builder $query, array $searchFilters): Builder
     {
-        if (!empty($searchFilters['user'])) {
+        if (! empty($searchFilters['user'])) {
             $query->whereHas('user', function ($q) use ($searchFilters) {
-                $q->where('name', 'like', '%' . $searchFilters['user'] . '%');
+                $q->where('name', 'like', '%'.$searchFilters['user'].'%');
             });
         }
 
-        if (!empty($searchFilters['title'])) {
+        if (! empty($searchFilters['title'])) {
             $query->whereHas('detail', function ($q) use ($searchFilters) {
-                $q->where('capacity_development_title', 'like', '%' . $searchFilters['title'] . '%');
+                $q->where('capacity_development_title', 'like', '%'.$searchFilters['title'].'%');
             });
         }
 
-        if (!empty($searchFilters['search'])) {
+        if (! empty($searchFilters['search'])) {
             $this->applyGeneralSearch($query, $searchFilters['search']);
         }
 
-        if (!empty($searchFilters['status'])) {
+        if (! empty($searchFilters['status'])) {
             $query->whereHas('status', function (Builder $q) use ($searchFilters) {
                 $q->whereIn('status_code', $searchFilters['status']);
             });
         }
-        if(!empty($searchFilters['public_status'])){
+        if (! empty($searchFilters['public_status'])) {
             $query->whereHas('status', function (Builder $q) use ($searchFilters) {
                 $q->whereIn('status_code', PublicRequestStatus::getTechnicalStatusCodes($searchFilters['public_status']));
             });
@@ -51,7 +49,7 @@ class RequestQueryBuilder
      */
     public function applySorting(Builder $query, array $sortFilters): Builder
     {
-        if (!empty($sortFilters['field']) && !empty($sortFilters['order'])) {
+        if (! empty($sortFilters['field']) && ! empty($sortFilters['order'])) {
             if ($sortFilters['field'] === 'user') {
                 $query->join('users', 'requests.user_id', '=', 'users.id')
                     ->orderBy('users.name', $sortFilters['order'])
@@ -78,6 +76,7 @@ class RequestQueryBuilder
     public function applyPagination(Builder $query, array $sortFilters): AbstractPaginator
     {
         $perPage = $sortFilters['per_page'] ?? 10;
+
         return $query->paginate($perPage)->withQueryString();
     }
 
@@ -134,6 +133,7 @@ class RequestQueryBuilder
                 $query->where('user_id', $userId);
             });
     }
+
     /**
      * Build query with standard relationships
      */

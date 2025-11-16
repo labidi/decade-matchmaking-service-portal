@@ -14,8 +14,7 @@ class RequestRepository
 {
     public function __construct(
         private readonly RequestQueryBuilder $queryBuilder
-    ) {
-    }
+    ) {}
 
     /**
      * Find request by ID with relationships
@@ -66,6 +65,7 @@ class RequestRepository
         $query = $this->queryBuilder->buildBaseQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -77,6 +77,7 @@ class RequestRepository
         $query = $this->queryBuilder->buildPublicRequestsQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -91,6 +92,7 @@ class RequestRepository
         $query = $this->queryBuilder->buildUserRequestsQuery($user->id);
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -105,6 +107,7 @@ class RequestRepository
         $query = $this->queryBuilder->buildMatchedRequestsQuery($user->id);
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -116,9 +119,9 @@ class RequestRepository
         $query = $this->queryBuilder->buildSubscribedRequestsQuery($user->id);
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
-
 
     /**
      * Get status by code
@@ -161,7 +164,7 @@ class RequestRepository
     ): ?OCDRequest {
         $request = $this->findById($id);
 
-        if (!$request) {
+        if (! $request) {
             return null;
         }
 
