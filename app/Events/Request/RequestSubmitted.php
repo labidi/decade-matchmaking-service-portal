@@ -14,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
  * This event is fired immediately after a request is persisted to the database.
  * Listeners should handle notifications to admins and confirmation emails to requesters.
  */
-class RequestCreated
+class RequestSubmitted
 {
     use Dispatchable, SerializesModels;
 

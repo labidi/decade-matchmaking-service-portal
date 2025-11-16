@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
-use App\Events\Request\RequestCreated;
+use App\Events\Request\RequestSubmitted;
 use App\Events\Request\RequestDeleted;
 use App\Events\Request\RequestPartnerMatched;
 use App\Events\Request\RequestStatusChanged;
@@ -29,7 +29,7 @@ class RequestObserver
      */
     public function created(Request $request): void
     {
-        RequestCreated::dispatch($request);
+
     }
 
     /**

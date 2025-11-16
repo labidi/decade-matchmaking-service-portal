@@ -39,6 +39,7 @@ readonly class RequestService
         }
         $this->repository->createOrUpdateDetail($request, $data);
 
+
         return $request->load(['status', 'detail']);
     }
 
