@@ -5,28 +5,29 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AssignRolesRequest;
 use App\Http\Requests\Admin\BlockUserRequest;
-use App\Http\Resources\Admin\UserDetailResource;
 use App\Http\Resources\Admin\UserResource;
 use App\Models\User;
 use App\Services\User\UserExportService;
 use App\Services\UserService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class UserController extends Controller
 {
     public function __construct(
         private readonly UserService $userService
-    ) {
-    }
+    ) {}
 
     /**
      * Display users grid
-     * @throws \Throwable
+     *
+     * @throws Throwable
      */
     public function index(Request $request): Response
     {
@@ -57,55 +58,53 @@ class UserController extends Controller
     }
 
     /**
-     * Show user details
-     */
-    public function show(User $user): Response
-    {
-        Gate::authorize('view', $user);
-
-        $details = $this->userService->getUserDetails($user);
-
-        return Inertia::render('admin/User/Show', [
-            'title' => 'User Details',
-            'user' => new UserDetailResource((object) $details),
-            'availableRoles' => Role::all()->map(fn ($role) => [
-                'id' => $role->id,
-                'name' => $role->name,
-                'label' => ucfirst($role->name),
-            ]),
-        ]);
-    }
-
-    /**
      * Assign roles to user
      */
     public function assignRoles(AssignRolesRequest $request, User $user)
     {
-        Gate::authorize('assignRoles', $user);
-        $user = $this->userService->assignRoles($user, $request->validated()['roles']);
-        return to_route('admin.users.index')->with('success', 'Roles updated successfully');
+
+        try {
+            Gate::authorize('assignRoles', $user);
+            $user = $this->userService->assignRoles($user, $request->validated()['roles']);
+
+            return to_route('admin.users.index')->with('success', 'Roles updated successfully');
+        } catch (\Exception $exception) {
+            return to_route('admin.users.index')->with('error', 'Failed to update user roles, '.$exception->getMessage());
+        }
     }
 
     /**
      * Block/unblock user
+     *
+     * @throws Throwable
      */
-    public function toggleBlock(BlockUserRequest $request, User $user)
+    public function toggleBlock(BlockUserRequest $request, User $user): RedirectResponse
     {
-        Gate::authorize('block', $user);
+        try {
+            Gate::authorize('block', $user);
 
-        $data = $request->validated();
-        $user = $this->userService->toggleBlockStatus($user, $data['blocked']);
-        $action = $data['blocked'] ? 'blocked' : 'unblocked';
-        return to_route('admin.users.index')->with('success', "User $action successfully");
+            $data = $request->validated();
+            $user = $this->userService->toggleBlockStatus($user, $data['blocked']);
+            $action = $data['blocked'] ? 'blocked' : 'unblocked';
+
+            return to_route('admin.users.index')->with('success', "User $action successfully");
+        } catch (\Exception $exception) {
+            return to_route('admin.users.index')->with('error', 'Failed to update user block status, '.$exception->getMessage());
+        }
+
     }
 
     /**
      * Export users to CSV file
      */
-    public function exportCsv(UserExportService $exportService): StreamedResponse
+    public function exportCsv(UserExportService $exportService): StreamedResponse|RedirectResponse
     {
-        Gate::authorize('exportUsers', User::class);
+        try {
+            Gate::authorize('exportUsers', User::class);
 
-        return $exportService->exportUsersCsv();
+            return $exportService->exportUsersCsv();
+        } catch (\Exception $exception) {
+            return to_route('admin.users.index')->with('error', 'Failed to export users, '.$exception->getMessage());
+        }
     }
 }

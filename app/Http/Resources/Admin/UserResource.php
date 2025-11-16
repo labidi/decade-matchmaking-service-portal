@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Admin;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -9,29 +10,32 @@ class UserResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        /** @var User $user */
+        $user = $this->resource;
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'country' => $this->country,
-            'city' => $this->city,
-            'roles' => $this->roles->map(fn ($role) => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'country' => $user->country,
+            'city' => $user->city,
+            'roles' => $user->roles->map(fn ($role) => [
                 'id' => $role->id,
                 'name' => $role->name,
             ]),
-            'permissions' => $this->permissions->pluck('name'),
-            'is_blocked' => $this->is_blocked ?? false,
-            'email_verified' => ! is_null($this->email_verified_at),
-            'email_verified_at' => $this->email_verified_at?->toDateTimeString(),
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+            'permissions' => $user->permissions->pluck('name'),
+            'is_blocked' => $user->is_blocked ?? false,
+            'email_verified' => ! is_null($user->email_verified_at),
+            'email_verified_at' => $user->email_verified_at?->toDateTimeString(),
+            'created_at' => $user->created_at->toDateTimeString(),
+            'updated_at' => $user->updated_at->toDateTimeString(),
             'requests_count' => $this->whenCounted('requests'),
             'notifications_count' => $this->whenCounted('notifications'),
-            'avatar_url' => $this->getAvatarUrl(),
-            'is_social_user' => $this->isSocialUser(),
-            'provider' => $this->provider,
+            'avatar_url' => $user->getAvatarUrl(),
+            'is_social_user' => $user->isSocialUser(),
+            'provider' => $user->provider,
             'status' => $this->getStatusAttribute(),
         ];
     }
