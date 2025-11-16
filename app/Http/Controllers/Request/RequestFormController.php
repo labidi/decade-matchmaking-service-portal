@@ -11,15 +11,14 @@ use App\Enums\Request\ProjectStage;
 use App\Enums\Request\RelatedActivity;
 use App\Enums\Request\SubTheme;
 use App\Enums\Request\SupportType;
+use App\Events\Request\RequestSubmitted;
 use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Requests\StoreRequest;
 use App\Http\Resources\RequestResource;
-use App\Models\Request;
 use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -40,15 +39,15 @@ class RequestFormController extends BaseRequestController
     public function form(?int $id = null): Response|RedirectResponse
     {
         $actions = $this->buildActions([
-            $this->createPrimaryAction('List of my requests', route('request.create'),'arrowLongLeft'),
+            $this->createPrimaryAction('List of my requests', route('request.create'), 'arrowLongLeft'),
         ]);
 
         // Check if this is edit mode (ID provided) or create mode (no ID)
-        $isEditMode = !is_null($id);
+        $isEditMode = ! is_null($id);
         if ($isEditMode) {
             $request = $this->service->findRequest($id);
             // Edit mode - fetch the existing request
-            if (!$request) {
+            if (! $request) {
                 return to_route('request.me.list')->with('error', 'Request not found.');
             }
         }
@@ -68,12 +67,12 @@ class RequestFormController extends BaseRequestController
         if ($isEditMode) {
             $requestTitle = $request->detail?->capacity_development_title ?? 'Untitled';
             $data = array_merge($data, [
-                'title' => 'Request : ' . $requestTitle,
+                'title' => 'Request : '.$requestTitle,
                 'banner' => $this->buildBanner(
-                    'Request : ' . $requestTitle,
+                    'Request : '.$requestTitle,
                     'Edit my request details here.'
                 ),
-                'request' => new RequestResource($request, RequestContextService::CONTEXT_USER_OWN)
+                'request' => new RequestResource($request, RequestContextService::CONTEXT_USER_OWN),
             ]);
         } else {
             // Create mode - new request
@@ -84,7 +83,7 @@ class RequestFormController extends BaseRequestController
                     'description' => 'Create a new request to get started.',
                     'image' => '/assets/img/sidebar.png',
                 ],
-                'actions'=>$actions
+                'actions' => $actions,
             ]);
         }
 
@@ -104,17 +103,21 @@ class RequestFormController extends BaseRequestController
                 $id ? $this->service->findRequest($id) : null,
                 $mode
             );
-            return match ($mode) {
-                'draft' => to_route('request.edit', ['id' => $request->id])->with(
-                    'success',
-                    'Request draft saved successfully.'
-                ),
-                default => to_route('request.me.list')->with('success', 'Request submitted successfully.'),
-            };
+            if ($mode == 'submit') {
+                RequestSubmitted::dispatch($request);
+
+                return to_route('request.me.list')->with('success', 'Request submitted successfully.');
+            }
+
+            return to_route('request.edit', ['id' => $request->id])->with(
+                'success',
+                'Request draft saved successfully.'
+            );
         } catch (Exception $e) {
             if ($id) {
                 return to_route('request.edit', ['id' => $id])->with('error', $e->getMessage());
             }
+
             return to_route('request.create')->with('error', $e->getMessage());
         }
     }

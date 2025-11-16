@@ -22,6 +22,10 @@ class SendRequestStatusChangedNotifications implements ShouldQueue
     {
         $request = $event->request;
         $previousStatus = $event->previousStatus;
+        if ($previousStatus === 'draft' && $request->status->status_code === 'under_review') {
+            // New submission - handled by RequestSubmitted event
+            return;
+        }
         // Eager load relationships to prevent N+1 queries
         $request->load(['user', 'matchedPartner', 'status']);
         dispatch(new SendTransactionalEmail(
@@ -36,7 +40,7 @@ class SendRequestStatusChangedNotifications implements ShouldQueue
             ]
         ));
         // Notify matched partner if exists
-        if($request->activeOffer?->matchedPartner) {
+        if ($request->activeOffer?->matchedPartner) {
             dispatch(new SendTransactionalEmail(
                 'request.status.changed.matched_partner',
                 $request->activeOffer->matchedPartner,
