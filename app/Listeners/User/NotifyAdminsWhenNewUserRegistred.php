@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Listeners\User;
 
 use App\Events\User\UserRegistered;
-use App\Jobs\Email\SendTransactionalEmail;
-use App\Models\SystemNotification;
 use App\Services\SystemNotificationService;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -44,8 +43,8 @@ class NotifyAdminsWhenNewUserRegistred implements ShouldQueue
                 )
             );
 
-        } catch (\Exception $e) {
-            Log::error('Failed to create admin notificaiton', [
+        } catch (Exception $e) {
+            Log::error('Failed to create admin notification', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
