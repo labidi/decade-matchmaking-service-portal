@@ -30,6 +30,15 @@ return [
             ],
             'tags' => ['user', 'registration', 'welcome'],
         ],
+        'user.roles_changed' => [
+            'template_name' => 'cdf-user-role-changed',
+            'subject' => 'Update to your Ocean Connector role and access',
+            'variables' => [
+                'name' => 'required|string',
+                'portal_url' => 'required|url',
+            ],
+            'tags' => ['user', 'registration', 'roles update'],
+        ],
 
         'user.email_verified' => [
             'template_name' => 'ocd-email-verified',

@@ -3,22 +3,18 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Models\Request;
-use App\Models\SystemNotification;
-use App\Models\RequestSubscription;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -51,18 +47,15 @@ class User extends Authenticatable
 
     protected $appends = ['is_partner', 'is_admin'];
 
-
-    public function getIsAdminAttribute()
+    public function getIsAdminAttribute(): bool
     {
         return $this->hasRole('administrator');
     }
 
-    public function getIsPartnerAttribute()
+    public function getIsPartnerAttribute(): bool
     {
         return $this->hasRole('partner');
     }
-
-
 
     /**
      * Get the attributes that should be cast.
@@ -83,6 +76,9 @@ class User extends Authenticatable
         return $this->hasMany(Request::class);
     }
 
+    /**
+     * @toDo remove this and remove column 'matched_partner_id' from requests table since it's now handled by the request offer
+     */
     public function matchedRequests(): HasMany
     {
         return $this->hasMany(Request::class, 'matched_partner_id');
@@ -120,15 +116,7 @@ class User extends Authenticatable
      */
     public function isSocialUser(): bool
     {
-        return !empty($this->provider) && !empty($this->provider_id);
-    }
-
-    /**
-     * Check if user is authenticated via LinkedIn
-     */
-    public function isLinkedInUser(): bool
-    {
-        return $this->provider === 'linkedin';
+        return ! empty($this->provider) && ! empty($this->provider_id);
     }
 
     /**
@@ -142,32 +130,8 @@ class User extends Authenticatable
 
         // Fallback to Gravatar or default avatar
         $hash = md5(strtolower(trim($this->email)));
+
         return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=150";
-    }
-
-    /**
-     * Scope: Active users (not blocked, email verified)
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('is_blocked', false)
-            ->whereNotNull('email_verified_at');
-    }
-
-    /**
-     * Scope: Blocked users
-     */
-    public function scopeBlocked($query)
-    {
-        return $query->where('is_blocked', true);
-    }
-
-    /**
-     * Scope: Verified users
-     */
-    public function scopeVerified($query)
-    {
-        return $query->whereNotNull('email_verified_at');
     }
 
     /**
@@ -185,13 +149,4 @@ class User extends Authenticatable
     {
         return ! $this->isBlocked() && $this->hasVerifiedEmail();
     }
-
-    /**
-     * Check if user can login
-     */
-    public function canLogin(): bool
-    {
-        return ! $this->isBlocked();
-    }
-
 }
