@@ -105,13 +105,25 @@ return [
             ],
             'tags' => ['request', 'match', 'partner'],
         ],
-        'request.status.changed' => [
+        'request.status.changed.user' => [
             'template_name' => 'cdf-status-change-notification-user',
             'subject' => 'Status change notification-User',
             'variables' => [
                 'Request_Title' => 'required|string',
                 'Request_Status' => 'required|string',
                 'Link_to_Request' => 'required|string',
+                'UNSUB'=>'required|string',
+                'UPDATE_PROFILE'=>'required|string',
+            ],
+            'tags' => ['request', 'user', 'status'],
+        ],
+        'request.status.changed.matched_partner' => [
+            'template_name' => 'cdf-status-change-notification-partner',
+            'subject' => 'Status change notification-User',
+            'variables' => [
+                'Request_Title' => 'required|string',
+                'Request_Status' => 'required|string',
+                'Link_to_Matched_Request' => 'required|string',
                 'UNSUB'=>'required|string',
                 'UPDATE_PROFILE'=>'required|string',
             ],

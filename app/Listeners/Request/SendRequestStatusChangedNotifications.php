@@ -24,9 +24,8 @@ class SendRequestStatusChangedNotifications implements ShouldQueue
         $previousStatus = $event->previousStatus;
         // Eager load relationships to prevent N+1 queries
         $request->load(['user', 'matchedPartner', 'status']);
-
         dispatch(new SendTransactionalEmail(
-            'request.status.changed',
+            'request.status.changed.user',
             $request->user,
             [
                 'Request_Title' => $request->detail->capacity_development_title,
@@ -36,5 +35,19 @@ class SendRequestStatusChangedNotifications implements ShouldQueue
                 'UPDATE_PROFILE' => route('notification.preferences.index'),
             ]
         ));
+        // Notify matched partner if exists
+        if($request->activeOffer?->matchedPartner) {
+            dispatch(new SendTransactionalEmail(
+                'request.status.changed.matched_partner',
+                $request->activeOffer->matchedPartner,
+                [
+                    'Request_Title' => $request->detail->capacity_development_title,
+                    'Request_Status' => $request->status->status_label,
+                    'Link_to_Matched_Request' => route('request.matched.show', $request->id),
+                    'UNSUB' => route('unsubscribe.show', $request->user->id),
+                    'UPDATE_PROFILE' => route('notification.preferences.index'),
+                ]
+            ));
+        }
     }
 }
