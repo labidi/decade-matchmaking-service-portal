@@ -11,21 +11,20 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Event dispatched when a partner expresses interest in a request.
- *
  */
 class RequestExpressInterest
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * Create a new event instance.
      *
-     * @param Request $request Request
-     * @param User $partner The partner expressing interest
+     * @param  Request  $request  Request
+     * @param  User  $partner  The partner expressing interest
      */
     public function __construct(
         public readonly Request $request,
         public readonly User $partner
-    ) {
-    }
+    ) {}
 }

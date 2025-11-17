@@ -7,28 +7,39 @@ namespace App\Services\Email;
 use App\Models\User;
 use App\Services\Email\Exceptions\EmailTemplateException;
 use App\Services\Email\Exceptions\MandrillApiException;
+use App\Services\Email\Exceptions\MissingVariableException;
+use App\Services\Email\Exceptions\TemplateNotFoundException;
+use App\Services\Email\Exceptions\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Main orchestrator for sending templated emails
  */
-class EmailTemplateService
+readonly class EmailTemplateService
 {
     public function __construct(
-        private readonly TemplateResolver $templateResolver,
-        private readonly VariableValidator $variableValidator,
-        private readonly MandrillClient $mandrillClient,
-        private readonly EmailLogger $emailLogger
+        private TemplateResolver  $templateResolver,
+        private VariableValidator $variableValidator,
+        private MandrillClient    $mandrillClient,
+        private EmailLogger       $emailLogger
     ) {
     }
 
     /**
      * Send a templated email
      *
+     * @param string $eventName
+     * @param User $recipient
      * @param array<string, mixed> $variables Template variables
      * @param array<string, mixed> $options Additional options (cc, bcc, attachments, etc.)
      * @return EmailResult
      * @throws EmailTemplateException
+     * @throws MissingVariableException
+     * @throws TemplateNotFoundException
+     * @throws ValidationException
+     * @throws MandrillApiException
+     * @throws Throwable
      */
     public function send(
         string $eventName,
@@ -139,7 +150,7 @@ class EmailTemplateService
             // Report and re-throw
             $e->setEventName($eventName)->report();
             throw $e;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Log unexpected errors
             $this->emailLogger->logFailed(
                 $eventName,
@@ -180,7 +191,7 @@ class EmailTemplateService
         foreach ($recipients as $recipient) {
             try {
                 $results[] = $this->send($eventName, $recipient, $variables, $options);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Log error but continue with other recipients
                 Log::error('Failed to send email to recipient', [
                     'event' => $eventName,
@@ -203,6 +214,7 @@ class EmailTemplateService
      *
      * @param array<string, mixed> $variables
      * @return array<string, mixed>
+     * @throws TemplateNotFoundException
      */
     public function preview(string $eventName, array $variables): array
     {
@@ -249,13 +261,10 @@ class EmailTemplateService
     public function getAvailableTemplates(): array
     {
         $templates = $this->templateResolver->getAllTemplates();
-        $result = [];
 
-        foreach ($templates as $eventName => $template) {
-            $result[$eventName] = $template->toArray();
-        }
-
-        return $result;
+        return array_map(function ($template) {
+            return $template->toArray();
+        }, $templates);
     }
 
     /**
@@ -268,7 +277,7 @@ class EmailTemplateService
             $mandrillTemplate = $this->mandrillClient->getTemplate($template->getMandrillName());
 
             return !empty($mandrillTemplate['name']);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::warning('Failed to validate Mandrill template', [
                 'event' => $eventName,
                 'error' => $e->getMessage(),
@@ -301,14 +310,14 @@ class EmailTemplateService
 /**
  * Result object for email operations
  */
-class EmailResult
+readonly class EmailResult
 {
     public function __construct(
-        public readonly bool $success,
-        public readonly ?string $mandrillId = null,
-        public readonly ?string $status = null,
-        public readonly ?string $error = null,
-        public readonly int $logId = 0
+        public bool    $success,
+        public ?string $mandrillId = null,
+        public ?string $status = null,
+        public ?string $error = null,
+        public int     $logId = 0
     ) {
     }
 

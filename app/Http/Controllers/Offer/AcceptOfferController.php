@@ -12,11 +12,11 @@ use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-class AcceptOfferController
+readonly class AcceptOfferController
 {
     public function __construct(
-        private readonly OfferService $offerService,
-        private readonly UserService $userService
+        private OfferService $offerService,
+        private UserService  $userService
     ) {}
 
     /**
