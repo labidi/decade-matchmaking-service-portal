@@ -200,6 +200,18 @@ return [
             'tags' => ['request', 'instant', 'notification'],
         ],
 
+        // Instant Request Notification (Event-Driven)
+        'request.express-interest.partner' => [
+            'template_name' => 'cdf-expression-of-interest-partner',
+            'subject' => 'New Capacity Development Request Matches Your Interests',
+            'variables' => [
+                'Request_Title' => 'required|string',
+                'UNSUB' => 'required|string',
+                'UPDATE_PROFILE' => 'required|string',
+            ],
+            'tags' => ['request', 'express-interest', 'partner'],
+        ],
+
         // Request Created Confirmation
         'request.created' => [
             'template_name' => 'cdf-request-submission',
