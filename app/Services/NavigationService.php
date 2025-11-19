@@ -26,7 +26,7 @@ class NavigationService
         ];
 
         // Admin Dashboard - only for administrators
-        if ($user->is_admin) {
+        if ($user->hasRole('administrator')) {
             $items[] = [
                 'id' => 'dashboard',
                 'label' => 'Dashboard',
@@ -37,17 +37,18 @@ class NavigationService
             ];
         }
 
-        // My Requests - available to all authenticated users
-        $items[] = [
-            'id' => 'my-requests',
-            'label' => 'My Requests List',
-            'route' => 'request.me.list',
-            'icon' => 'DocumentTextIcon',
-            'visible' => true,
-        ];
+        if ($user->hasRole('user') || $user->hasRole('partner')) {
+            $items[] = [
+                'id' => 'my-requests',
+                'label' => 'My Requests List',
+                'route' => 'request.me.list',
+                'icon' => 'DocumentTextIcon',
+                'visible' => true,
+            ];
+        }
 
         // My Opportunities - only for partners
-        if ($user->is_partner) {
+        if ($user->hasRole('partner')) {
             $items[] = [
                 'id' => 'my-opportunities',
                 'label' => 'My Opportunities List',
