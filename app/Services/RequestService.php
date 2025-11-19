@@ -31,14 +31,14 @@ readonly class RequestService
      * @param  User  $user  The user creating/updating the request
      * @param  array<string, mixed>  $data  The request data
      * @param  Request|null  $request  Existing request for updates
-     * @param  string  $mode  Operation mode: 'draft' or 'submit'
+     * @param string $mode  Operation mode: 'draft' or 'submit'
      * @return Request The created or updated request
      *
      * @throws RequestValidationException If mode is invalid
      * @throws RequestNotFoundException If request not found during update
      * @throws RequestStorageException If database operation fails
      */
-    public function storeRequest(User $user, array $data, ?Request $request = null, $mode = 'submit'): Request
+    public function storeRequest(User $user, array $data, ?Request $request = null, string $mode = 'submit'): Request
     {
         // Validate mode parameter
         if (! in_array($mode, ['draft', 'submit'], true)) {
@@ -114,37 +114,22 @@ readonly class RequestService
     /**
      * Update request status
      *
-     * @param  int  $requestId  The ID of the request to update
-     * @param  string  $statusCode  The new status code
-     * @param  User  $user  The user performing the update
+     * @param Request $request
+     * @param string $statusCode The new status code
      * @return Request The updated request
      *
-     * @throws RequestNotFoundException If request not found
-     * @throws RequestAuthorizationException If user not authorized
-     * @throws RequestValidationException If status code is invalid
      * @throws RequestStorageException If database update fails
+     * @throws RequestValidationException If status code is invalid
      */
-    public function updateRequestStatus(int $requestId, string $statusCode, User $user): Request
+    public function updateRequestStatus(Request $request, string $statusCode): Request
     {
-        $request = $this->repository->findById($requestId);
-
-        if (! $request) {
-            throw RequestNotFoundException::forStatusChange($requestId);
-        }
-
-        // Check authorization
-        if ($request->user_id !== $user->id && ! $user->hasRole('administrator')) {
-            $this->logger->logAuthorizationFailure('updateRequestStatus', $requestId, $user);
-            throw RequestAuthorizationException::forStatusChange($requestId, $user->id);
-        }
-
         $statusId = $this->getStatusId($statusCode);
         if (! $statusId) {
             throw RequestValidationException::invalidField('status_code', "Status code '{$statusCode}' does not exist");
         }
 
         try {
-            return DB::transaction(function () use ($request, $statusId, $user) {
+            return DB::transaction(function () use ($request, $statusId) {
                 $oldStatusId = $request->status_id;
 
                 $updated = $this->repository->update($request, ['status_id' => $statusId]);
@@ -153,17 +138,13 @@ readonly class RequestService
                     throw RequestStorageException::failedToUpdateStatus($request->id, $statusId);
                 }
 
-                // Log the status change
-                $this->logger->logStatusChanged($request, $oldStatusId, $statusId, $user);
-
                 return $request->fresh();
             });
         } catch (RequestStorageException $e) {
             throw $e;
         } catch (Throwable $e) {
             $this->logger->logError('updateRequestStatus', $e, [
-                'request_id' => $requestId,
-                'user_id' => $user->id,
+                'request_id' => $request->id,
                 'status_code' => $statusCode,
             ]);
             throw RequestStorageException::transactionFailed('updateRequestStatus', $e);
@@ -275,10 +256,17 @@ readonly class RequestService
 
     /**
      * Get request by ID (for admin/system use)
+     *
+     * @throws RequestNotFoundException
      */
     public function getRequestById(int $id, ?User $user = null): ?Request
     {
-        return $this->repository->findById($id);
+        $request = $this->repository->findById($id);
+        if (! $request) {
+            throw RequestNotFoundException::forId($id);
+        }
+
+        return $request;
     }
 
     /**

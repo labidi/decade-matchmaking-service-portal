@@ -10,6 +10,7 @@ use App\Services\OfferService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 
 class DeleteDocumentController extends BaseOfferController
 {
@@ -28,19 +29,13 @@ class DeleteDocumentController extends BaseOfferController
             $document = Document::where('parent_id', $offerId)
                 ->where('parent_type', Offer::class)
                 ->findOrFail($documentId);
-            //@toDo : replace with proper policy method
-            // Authorize delete access
-            $this->authorize('update', $offer);
-
+            Gate::authorize('delete-document', $document);
             // Delete the document
             $this->offerService->deleteDocument($document);
 
-            return $this->getSuccessResponse('Document deleted successfully');
-        } catch (Exception | \Throwable $e) {
-            return $this->handleException($e, 'document deletion', [
-                'offer_id' => $offerId,
-                'document_id' => $documentId,
-            ]);
+            return back()->with('success', 'Document deleted successfully');
+        } catch (Exception|\Throwable $e) {
+            return back()->with('error', 'Failed to delete document: '.$e->getMessage());
         }
     }
 }

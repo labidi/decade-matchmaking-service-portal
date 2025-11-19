@@ -7,6 +7,7 @@ namespace App\Listeners\RequestOffer;
 use App\Events\OfferAccepted;
 use App\Jobs\Email\SendTransactionalEmail;
 use App\Models\User;
+use App\Services\SystemNotificationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -20,6 +21,12 @@ use Illuminate\Support\Facades\Log;
  */
 class SendOfferAcceptedNotifications implements ShouldQueue
 {
+    public function __construct(
+        private readonly SystemNotificationService $systemNotificationService
+    )
+    {
+    }
+
     /**
      * Handle the event.
      *
@@ -34,6 +41,15 @@ class SendOfferAcceptedNotifications implements ShouldQueue
         // Eager load relationships to prevent N+1 queries
         $offer->load(['request.user', 'matchedPartner']);
 
+        $this->systemNotificationService->notifyAdmins(
+            'Accepted Offer for a request',
+            sprintf(
+                'User <span class="font-bold">%s</span> has accepted offer for request <a href="%s" target="_blank" class="font-bold underline">%s</a> ',
+                $acceptedBy->name,
+                route('admin.request.show', ['id' => $offer->request->id]),
+                $offer->request->detail->capacity_development_title
+            )
+        );
         try {
             $recipients = [];
 
@@ -70,7 +86,7 @@ class SendOfferAcceptedNotifications implements ShouldQueue
                     [
                         'Offer_ID' => $offer->id,
                         'Request_Title' => $offer->request->capacity_development_title ?? 'N/A',
-                        'Request_Link' => route('request.show', $offer->request_id),
+                        'Request_Link' => route('request.public.show', $offer->request_id),
                         'Partner_Name' => $offer->matchedPartner?->name ?? 'N/A',
                         'Accepted_By' => $acceptedBy->name ?? 'N/A',
                         'user_name' => $recipient['user']->name,
@@ -80,12 +96,6 @@ class SendOfferAcceptedNotifications implements ShouldQueue
                     ]
                 ));
             }
-
-            Log::info('Offer acceptance notifications sent', [
-                'offer_id' => $offer->id,
-                'request_id' => $offer->request_id,
-                'recipient_count' => count($recipients),
-            ]);
         } catch (\Exception $e) {
             Log::error('Failed to send offer accepted notifications', [
                 'offer_id' => $offer->id,

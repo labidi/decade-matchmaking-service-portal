@@ -6,6 +6,7 @@ use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RequestManagementController extends BaseRequestController
 {
@@ -19,17 +20,17 @@ class RequestManagementController extends BaseRequestController
     /**
      * Update request status - unified method for both admin and user contexts
      */
-    public function updateStatus(Request $request, ?int $id = null)
+    public function updateStatus(Request $httpRequest, ?int $id = null)
     {
         try {
-            $validated = $request->validate([
+            $validated = $httpRequest->validate([
                 'status_code' => 'required|string|exists:request_statuses,status_code',
             ]);
-
+            $request = $this->service->getRequestById($id);
+            Gate::authorize('update-status',$request);
             $result = $this->service->updateRequestStatus(
-                $id,
-                $validated['status_code'],
-                $request->user()
+                $request,
+                $validated['status_code']
             );
 
             $message = 'Request status updated successfully';

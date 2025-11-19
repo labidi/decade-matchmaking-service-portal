@@ -6,11 +6,14 @@ namespace App\Services;
 
 use App\Enums\Document\DocumentType;
 use App\Enums\Offer\RequestOfferStatus;
+use App\Events\OfferAccepted;
+use App\Models\Document;
 use App\Models\Request;
 use App\Models\Request\Offer;
 use App\Models\User;
 use App\Services\Offer\OfferRepository;
 use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -174,7 +177,7 @@ class OfferService
      *
      * @throws Throwable
      */
-    public function acceptOffer(Offer $offer, User $acceptedBy): Offer
+    public function  acceptOffer(Offer $offer, User $acceptedBy): Offer
     {
         DB::beginTransaction();
 
@@ -198,6 +201,7 @@ class OfferService
                 'is_accepted' => true,
             ]);
             DB::commit();
+            OfferAccepted::dispatch($offer,$acceptedBy);
             return $offer->fresh();
         } catch (Exception $e) {
             DB::rollBack();
@@ -210,7 +214,7 @@ class OfferService
      * Upload a document for an offer
      * @throws Throwable
      */
-    public function uploadDocument(\Illuminate\Http\UploadedFile $file, Offer $offer, string $documentType, User $uploader): \App\Models\Document
+    public function uploadDocument(UploadedFile $file, Offer $offer, string $documentType, User $uploader): Document
     {
         DB::beginTransaction();
 
@@ -244,7 +248,7 @@ class OfferService
      * Delete a document from an offer
      * @throws Throwable
      */
-    public function deleteDocument(\App\Models\Document $document): bool
+    public function deleteDocument(Document $document): bool
     {
         DB::beginTransaction();
 

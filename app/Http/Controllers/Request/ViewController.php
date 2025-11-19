@@ -8,6 +8,7 @@ use App\Http\Resources\RequestResource;
 use App\Models\Request as OCDRequest;
 use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -35,7 +36,7 @@ class ViewController extends BaseRequestController
      * @param  int|null  $id  Request ID
      * @return Response
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function show(Request $request, ?int $id = null): Response
     {

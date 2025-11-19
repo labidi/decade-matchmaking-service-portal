@@ -2,7 +2,7 @@
 
 namespace App\Services\Request;
 
-use App\Models\Request as OCDRequest;
+use App\Models\Request;
 use App\Models\Request\Detail;
 use App\Models\Request\Status;
 use App\Models\User;
@@ -19,24 +19,24 @@ class RequestRepository
     /**
      * Find request by ID with relationships
      */
-    public function findById(int $id): ?OCDRequest
+    public function findById(int $id): ?Request
     {
-        return OCDRequest::with(['status', 'user', 'detail', 'activeOffer.documents'])
+        return Request::with(['status', 'user', 'detail', 'activeOffer.documents'])
             ->find($id);
     }
 
     /**
      * Create new request
      */
-    public function create(array $data): OCDRequest
+    public function create(array $data): Request
     {
-        return OCDRequest::create($data);
+        return Request::create($data);
     }
 
     /**
      * Update existing request
      */
-    public function update(OCDRequest $request, array $data): bool
+    public function update(Request $request, array $data): bool
     {
         return $request->update($data);
     }
@@ -44,7 +44,7 @@ class RequestRepository
     /**
      * Delete request
      */
-    public function delete(OCDRequest $request): bool
+    public function delete(Request $request): bool
     {
         return $request->delete();
     }
@@ -54,7 +54,7 @@ class RequestRepository
      */
     public function getAll(): Collection
     {
-        return OCDRequest::with(['status', 'detail', 'user', 'offers'])->get();
+        return Request::with(['status', 'detail', 'user', 'offers'])->get();
     }
 
     /**
@@ -134,7 +134,7 @@ class RequestRepository
     /**
      * Create or update request detail
      */
-    public function createOrUpdateDetail(OCDRequest $request, array $data): void
+    public function createOrUpdateDetail(Request $request, array $data): void
     {
         $detailData = [];
 
@@ -153,35 +153,5 @@ class RequestRepository
         } else {
             $request->detail()->save(new Detail($detailData));
         }
-    }
-
-    /**
-     * Check if request exists and user has access
-     */
-    public function findWithAuthorization(
-        int $id,
-        ?User $user = null
-    ): ?OCDRequest {
-        $request = $this->findById($id);
-
-        if (! $request) {
-            return null;
-        }
-
-        // Check authorization
-        if ($user) {
-            if ($request->user_id === $user->id) {
-                return $request;
-            }
-
-            $publicStatuses = ['validated', 'offer_made', 'match_made', 'closed', 'in_implementation'];
-            if (in_array($request->status->status_code, $publicStatuses)) {
-                return $request;
-            }
-
-            return null;
-        }
-
-        return $request;
     }
 }
