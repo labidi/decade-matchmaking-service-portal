@@ -16,8 +16,10 @@ use App\Services\Email\RateLimiter;
 use App\Services\Email\TemplateResolver;
 use App\Services\Email\VariableValidator;
 use App\Services\SettingsService;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Log;
 use MailchimpTransactional\ApiClient;
 
 class EmailServiceProvider extends ServiceProvider
@@ -102,17 +104,15 @@ class EmailServiceProvider extends ServiceProvider
 
             // Log the configuration source for debugging
             if (config('app.debug')) {
-                if (!empty($apiKey)) {
-                    \Log::debug('Mandrill API key loaded from database settings');
-                } else {
-                    \Log::warning('Mandrill API key not configured in database - emails will fail until configured');
+                if (empty($apiKey)) {
+                    Log::warning('Mandrill API key not configured in database - emails will fail until configured');
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // During fresh installs or when database is not available, silently skip
             // The MandrillClient will throw its own exception when actually needed
             if (config('app.debug')) {
-                \Log::warning('Could not load Mandrill API key from database: ' . $e->getMessage());
+                Log::warning('Could not load Mandrill API key from database: ' . $e->getMessage());
             }
         }
     }

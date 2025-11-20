@@ -14,11 +14,18 @@ use App\Observers\UserObserver;
 use App\Policies\OfferPolicy;
 use App\Policies\OpportunityPolicy;
 use App\Policies\RequestPolicy;
+use App\Contracts\Auth\AuthenticationServiceInterface;
 use App\Services\Actions\DocumentActionProvider;
 use App\Services\Actions\RequestActionProvider;
 use App\Services\Actions\OfferActionProvider;
+use App\Services\Auth\AuthenticationService;
+use App\Services\Auth\Strategies\OAuthAuthStrategy;
+use App\Services\Auth\Strategies\OceanExpertAuthStrategy;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -34,6 +41,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(RequestActionProvider::class);
         $this->app->singleton(OfferActionProvider::class);
         $this->app->singleton(DocumentActionProvider::class);
+
+        // Register authentication services
+        $this->app->singleton(
+            AuthenticationServiceInterface::class,
+            AuthenticationService::class
+        );
+
+        // Register authentication strategies as singletons
+        $this->app->singleton(OceanExpertAuthStrategy::class);
+        $this->app->singleton(OAuthAuthStrategy::class);
     }
 
     /**
@@ -43,6 +60,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
         JsonResource::withoutWrapping();
+
+        // Configure rate limiters for authentication
+        $this->configureRateLimiting();
 
         // Register the observers
         Request::observe(RequestObserver::class);
@@ -56,6 +76,22 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Offer::class, OfferPolicy::class);
         // Note: Event listeners are automatically discovered in app/Listeners/
         // with proper handle() methods that type-hint events
+    }
+
+    /**
+     * Configure rate limiting for authentication endpoints
+     */
+    protected function configureRateLimiting(): void
+    {
+        // Authentication rate limiting: 5 attempts per minute per email
+        RateLimiter::for('authentication', function (HttpRequest $request) {
+            return Limit::perMinute(5)->by($request->input('email') ?? $request->ip());
+        });
+
+        // OAuth callback rate limiting: 10 attempts per minute per IP
+        RateLimiter::for('oauth-callback', function (HttpRequest $request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
     }
 
 }

@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Contracts\Auth\AuthenticationServiceInterface;
+use App\Exceptions\Auth\OAuthAuthenticationException;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Services\UserService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialController extends Controller
 {
     public function __construct(
-        private readonly UserService $userService
+        private readonly AuthenticationServiceInterface $authService
     ) {
     }
 
@@ -121,54 +119,26 @@ class SocialController extends Controller
     /**
      * Process OAuth user (create or update)
      */
-    protected function processOAuthUser(SocialiteUser $socialUser, string $provider): RedirectResponse
+    protected function processOAuthUser($socialUser, string $provider): RedirectResponse
     {
         try {
-            // Check if user exists with this email
-            $existingUser = User::where('email', $socialUser->getEmail())->first();
-
-            if ($existingUser) {
-                // Prepare OAuth data for update
-                $oauthData = [
-                    'provider_id' => $socialUser->getId(),
-                    'avatar' => $socialUser->getAvatar(),
-                ];
-
-                $user = $this->userService->updateUserWithOAuth($existingUser, $oauthData, $provider);
-            } else {
-                // Prepare OAuth data for new user creation
-                $oauthData = [
-                    'email' => $socialUser->getEmail(),
-                    'name' => $socialUser->getName() ?? '',
-                    'provider_id' => $socialUser->getId(),
-                    'avatar' => $socialUser->getAvatar(),
-                ];
-
-                $user = $this->userService->createUserFromOAuth($oauthData, $provider);
-            }
-
-            Auth::login($user, true);
+            $user = $this->authService->authenticateWithOAuth($socialUser, $provider);
 
             $providerName = $this->getProviderDisplayName($provider);
             $message = $user->wasRecentlyCreated
                 ? 'Welcome! Your account has been created successfully.'
                 : "Successfully signed in with {$providerName}!";
 
-            Log::info('OAuth sign-in successful', [
-                'provider' => $provider,
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'newly_created' => $user->wasRecentlyCreated,
-            ]);
-
             return redirect()->route('user.home')
                 ->with('status', $message);
+        } catch (OAuthAuthenticationException $e) {
+            return redirect()->route('sign.in')
+                ->with('error', $e->getMessage());
         } catch (Exception $e) {
             Log::error('OAuth user processing error', [
                 'provider' => $provider,
-                'email' => $socialUser->getEmail(),
+                'email' => $socialUser->getEmail() ?? 'unknown',
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('sign.in')

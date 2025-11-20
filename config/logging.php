@@ -159,6 +159,14 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'auth' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/auth.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 90, // Keep auth logs for 90 days for security auditing
+            'replace_placeholders' => true,
+        ],
+
     ],
 
 ];

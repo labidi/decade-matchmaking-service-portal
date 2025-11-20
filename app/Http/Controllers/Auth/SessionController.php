@@ -1,25 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
+use App\Contracts\Auth\AuthenticationServiceInterface;
+use App\Exceptions\Auth\OceanExpertAuthenticationException;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Services\OceanExpertAuthService;
+use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Hash;
-use App\Services\OceanExpertSearchService;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class SessionController extends Controller
 {
-
     public function __construct(
-        protected OceanExpertAuthService $oceanExpertAuthService,
-        protected OceanExpertSearchService $oceanExpertSearchService,
+        private readonly AuthenticationServiceInterface $authService
     ) {}
 
     public function create(Request $request): Response
@@ -37,57 +34,37 @@ class SessionController extends Controller
         ]);
     }
 
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'email'    => ['required', 'string', 'email'],
+            'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ]);
 
         try {
-            ['token' => $token, 'user' => $userPayload] = $this->oceanExpertAuthService->authenticate(
+            $this->authService->authenticateWithCredentials(
                 $credentials['email'],
                 $credentials['password']
             );
-            $oceanExpertProfile = $this->oceanExpertSearchService->searchByEmail(
-                $credentials['email']
-            );
 
-
-        } catch (\Exception $e) {
-            return to_route('sign.in')->with('error', 'Login failed. Your Ocean Expert account may not yet be approved, or your ID or password is incorrect.')->withInput();
+            return redirect()
+                ->intended('/home')
+                ->with('status', 'You are logged in successfully.');
+        } catch (OceanExpertAuthenticationException|Exception) {
+            return to_route('sign.in')
+                ->with('error', 'Login failed. Your Ocean Expert account may not yet be approved, or your ID or password is incorrect.')
+                ->withInput($request->only('email'));
         }
-        $user = User::updateOrCreate(
-            ['email' => $credentials['email']],
-            [
-                'name' => $oceanExpertProfile['name'] ?? $oceanExpertProfile['first_name'] . ' ' . $oceanExpertProfile['last_name'],
-                'password' => Hash::make($userPayload['password']),
-                'first_name' => $oceanExpertProfile['first_name'],
-                'last_name' => $oceanExpertProfile['last_name'],
-                'country' => $oceanExpertProfile['country'],
-                'city' => $oceanExpertProfile['city'],
-            ]
-        );
-        $remember = $request->boolean('remember', false);
-        Auth::login($user, $remember);
-        $request->session()->put('external_api_token', $token);
-        $request->session()->regenerate();
-        return redirect()->intended('/home')->with([
-            'status' => 'You are logged in successfully.',
-        ]);
     }
 
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): \Illuminate\Http\RedirectResponse
+    public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        $this->authService->logout();
 
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        return to_route('index');
+        return to_route('index')
+            ->with('status', 'You have been logged out successfully.');
     }
 }

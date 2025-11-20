@@ -33,6 +33,7 @@ class User extends Authenticatable
         'provider_id',
         'avatar',
         'is_blocked',
+        'last_login_at',
     ];
 
     /**
@@ -66,6 +67,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
             'is_blocked' => 'boolean',
         ];
