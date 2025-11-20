@@ -6,6 +6,7 @@ use App\Enums\Common\Country;
 use App\Enums\Common\Language;
 use App\Enums\Common\TargetAudience;
 use App\Enums\Common\YesNo;
+use App\Enums\Request\DeliveryFormat;
 use App\Enums\Request\SubTheme;
 use App\Enums\Request\SupportType;
 use Illuminate\Foundation\Http\FormRequest;
@@ -64,14 +65,11 @@ class StoreRequest extends FormRequest
             'delivery_format' => ['required'],
             'delivery_countries' => [
                 Rule::requiredIf(
-                    fn() => $this->input("request_link_type") !== 'Online'
+                    fn() => $this->input("delivery_format") !== DeliveryFormat::ONLINE->value
                 )
             ],
             'delivery_countries.*' => [Rule::enum(Country::class)],
             'target_audience' => [
-                Rule::requiredIf(
-                    fn() => $this->input("request_link_type") !== 'Online'
-                ),
                 'array'
             ],
             'target_audience.*' => [Rule::enum(TargetAudience::class)],
