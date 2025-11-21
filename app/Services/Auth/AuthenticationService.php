@@ -122,7 +122,8 @@ class AuthenticationService implements AuthenticationServiceInterface
     /**
      * Complete the authentication process (login, session setup)
      *
-     * @param array<string, mixed> $additionalData
+     * @param  array<string, mixed>  $additionalData
+     *
      * @throws AccountBlockedException
      */
     public function completeAuthentication(User $user, array $additionalData = []): void
@@ -140,19 +141,19 @@ class AuthenticationService implements AuthenticationServiceInterface
         Auth::login($user, remember: true);
 
         // Store additional session data AFTER regeneration
-        if (!empty($additionalData['ocean_expert_token'])) {
+        if (! empty($additionalData['ocean_expert_token'])) {
             Session::put('external_api_token', $additionalData['ocean_expert_token']);
         }
 
-        if (!empty($additionalData['oauth_provider'])) {
+        if (! empty($additionalData['oauth_provider'])) {
             Session::put('oauth_provider', $additionalData['oauth_provider']);
             Session::put('oauth_id', $additionalData['oauth_id']);
 
             // Store OAuth tokens for potential refresh capability
-            if (!empty($additionalData['oauth_token'])) {
+            if (! empty($additionalData['oauth_token'])) {
                 Session::put('oauth_token', $additionalData['oauth_token']);
             }
-            if (!empty($additionalData['oauth_refresh_token'])) {
+            if (! empty($additionalData['oauth_refresh_token'])) {
                 Session::put('oauth_refresh_token', $additionalData['oauth_refresh_token']);
             }
         }
@@ -200,8 +201,9 @@ class AuthenticationService implements AuthenticationServiceInterface
     /**
      * Execute authentication using the appropriate strategy
      *
-     * @param array<string, mixed> $credentials
+     * @param  array<string, mixed>  $credentials
      * @return array{user: User, metadata: array<string, mixed>}
+     *
      * @throws UnsupportedAuthenticationMethodException
      */
     private function authenticate(array $credentials): array
@@ -222,7 +224,7 @@ class AuthenticationService implements AuthenticationServiceInterface
      */
     private function getThrottleKey(string $email): string
     {
-        return Str::transliterate(Str::lower($email) . '|' . request()->ip());
+        return Str::transliterate(Str::lower($email).'|'.request()->ip());
     }
 
     /**
@@ -244,7 +246,7 @@ class AuthenticationService implements AuthenticationServiceInterface
      */
     private function logAuthenticationAttempt(string $email, string $method): void
     {
-        Log::channel('auth')->info('Authentication attempt', [
+        Log::channel('auth')->info('Authentication attempt with email : '.$email.' and method : '.$method, [
             'email' => $email,
             'method' => $method,
             'ip' => request()->ip(),
@@ -257,7 +259,7 @@ class AuthenticationService implements AuthenticationServiceInterface
      */
     private function logAuthenticationSuccess(User $user, string $method): void
     {
-        Log::channel('auth')->info('Authentication successful', [
+        Log::channel('auth')->info('Authentication successful with email : '.$user->email.' and method : '.$method, [
             'user_id' => $user->id,
             'email' => $user->email,
             'method' => $method,
