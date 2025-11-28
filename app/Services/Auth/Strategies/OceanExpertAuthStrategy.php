@@ -12,6 +12,7 @@ use App\Services\OceanExpertSearchService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
@@ -46,7 +47,7 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
             );
 
             // Fetch user profile from Ocean Expert Search API
-            $profile = $this->searchService->searchByEmail($email);
+            $profile = $this->searchService->searchUserByEmail($email);
 
             // Create or update local user in database transaction
             $user = $this->syncLocalUser($email, $password, $profile);
@@ -117,7 +118,7 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
                 $userData
             );
 
-            Log::channel('auth')->info('User synchronized with Ocean Expert', [
+            $this->getLogger()->info('User synchronized with Ocean Expert', [
                 'user_id' => $user->id,
                 'email' => $email,
                 'is_new' => $user->wasRecentlyCreated,
@@ -125,5 +126,10 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
 
             return $user;
         });
+    }
+
+    private function getLogger(): LoggerInterface
+    {
+        return Log::channel('auth');
     }
 }
