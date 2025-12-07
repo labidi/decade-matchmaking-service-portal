@@ -4,9 +4,11 @@ import * as Headless from '@headlessui/react'
 import React, {useState} from 'react'
 import {NavbarItem} from '@ui/primitives/navbar'
 import {Breadcrumb} from '@ui/molecules'
-import {FlashMessages} from '@ui/organisms'
+import {FlashMessages , ActionsBar} from '@ui/organisms'
 import {Sidebar} from '@ui/primitives/sidebar'
 import {SidebarContent} from '@ui/organisms/sidebar'
+import {usePage} from "@inertiajs/react";
+import {ActionButton} from "@/types";
 
 function OpenMenuIcon() {
     return (
@@ -55,7 +57,7 @@ export function SidebarLayout({
                                   children,
                               }: Readonly<React.PropsWithChildren<{}>>) {
     let [showSidebar, setShowSidebar] = useState(false)
-
+    const actions = usePage().props?.actions as ActionButton[] | undefined;
     return (
         <div
             className="relative isolate flex min-h-svh w-full bg-white max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
@@ -95,7 +97,12 @@ export function SidebarLayout({
 
                     {/* Main Content */}
                     <div className="p-6 lg:p-10">
-                        <div className="mx-auto container max-w-8xl">{children}</div>
+                        <div className="container p-4">
+                            { actions && (<ActionsBar actions={actions}/>)}
+                        </div>
+                        <div className="mx-auto container max-w-8xl">
+                            {children}
+                        </div>
                     </div>
                 </div>
             </main>

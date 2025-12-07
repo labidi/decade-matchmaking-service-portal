@@ -18,15 +18,18 @@ const FrontendLayout: React.FC<FrontendLayoutProps> = ({children}) => {
         <div className="min-h-screen flex flex-col text-gray-900 dark:text-gray-100 dark:bg-gray-900">
             <Header/>
             <BannerSection/>
-            <Breadcrumb/>
-            <main className="flex-grow container mx-auto py-8 ">
+            <main className="flex-grow container mx-auto py-4">
+                <div className="container mx-auto px-4">
+                    <Breadcrumb/>
+                </div>
                 <div className="">
                     <FlashMessages className=""/>
                 </div>
-                <div className="container shadow rounded bg-white dark:bg-gray-800 p-6">
-                    {children}
-                    <Divider className={'mt-4 mb-4'}/>
+                <div className="container p-4">
                     { actions && (<ActionsBar actions={actions}/>)}
+                </div>
+                <div className="container shadow rounded bg-white dark:bg-gray-800 p-4">
+                    {children}
                 </div>
             </main>
             <Footer/>
