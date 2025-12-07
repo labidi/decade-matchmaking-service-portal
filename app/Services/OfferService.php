@@ -165,9 +165,16 @@ class OfferService
 
     /**
      * Change offer status
+     * @throws Exception
      */
     public function changeOfferStatus(Offer $offer, RequestOfferStatus $status): Offer
     {
+        if($status == RequestOfferStatus::ACTIVE){
+            $activeOffer  = $offer->request->activeOffer;
+            if($activeOffer){
+                throw new Exception('Another active offer already exists for this request');
+            }
+        }
         $this->repository->update($offer, ['status' => $status]);
         return $offer;
     }
