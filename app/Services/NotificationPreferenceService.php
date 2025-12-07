@@ -45,6 +45,7 @@ class NotificationPreferenceService
                 'fetch',
                 $e->getMessage()
             );
+        }
     }
 
     public function createPreference(User $user, array $data): NotificationPreference
