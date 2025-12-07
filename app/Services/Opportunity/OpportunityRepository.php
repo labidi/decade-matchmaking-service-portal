@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Opportunity;
 
 use App\Enums\Opportunity\Status;
@@ -7,6 +9,7 @@ use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\LazyCollection;
 
 class OpportunityRepository
 {
@@ -130,5 +133,20 @@ class OpportunityRepository
         $query = $this->queryBuilder->buildBaseQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $filters);
         return $query->orderBy('created_at', 'desc')->get();
+    }
+
+    /**
+     * Get opportunities for CSV export with user relationship
+     *
+     * Uses cursor-based loading for memory efficiency when exporting large datasets.
+     *
+     * @return LazyCollection<int, Opportunity>
+     */
+    public function getOpportunitiesForExport(): LazyCollection
+    {
+        return Opportunity::query()
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->cursor();
     }
 }

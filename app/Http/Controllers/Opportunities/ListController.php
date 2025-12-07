@@ -38,6 +38,15 @@ class ListController extends BaseOpportunitiesController
                 'currentSearchFields' => ['user', 'title'],
                 'listRouteName' => 'admin.opportunity.list',
                 'showRouteName' => 'admin.opportunity.show',
+                'actions' =>
+                    $this->buildActions([
+                        $this->createSecondaryAction(
+                            'Export Opportunities CSV',
+                            route('admin.opportunity.export.csv'),
+                            'ArrowDownTrayIcon',
+                            'DOWNLOAD'
+                        ),
+                    ]),
             ],
             'user_own' => [
                 'component' => 'opportunity/List',
@@ -59,6 +68,11 @@ class ListController extends BaseOpportunitiesController
                         $this->createPrimaryAction(
                             'Create New Opportunity',
                             route('opportunity.create'),
+                            'PlusIcon',
+                        ),
+                        $this->createSecondaryAction(
+                            'Create New Opsportunity',
+                            route('admin.opportunity.export.csv'),
                             'PlusIcon',
                         ),
                     ]),

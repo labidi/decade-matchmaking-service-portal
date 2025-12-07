@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Opportunities\DestroyController as OpportunityDestroyController;
+use App\Http\Controllers\Opportunities\ExportController as OpportunityExportController;
 use App\Http\Controllers\Opportunities\ExtendController;
 use App\Http\Controllers\Opportunities\FormController;
 use App\Http\Controllers\Opportunities\ListController;
@@ -35,4 +36,5 @@ Route::middleware(['auth', 'role:partner'])->group(function () {
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
     Route::get('opportunity/list', ListController::class)->name('admin.opportunity.list');
     Route::get('opportunity/{id}/show', ShowController::class)->name('admin.opportunity.show');
+    Route::get('opportunity/export/csv', OpportunityExportController::class)->name('admin.opportunity.export.csv');
 });
