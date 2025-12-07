@@ -16,8 +16,7 @@ class SocialController extends Controller
 {
     public function __construct(
         private readonly AuthenticationServiceInterface $authService
-    ) {
-    }
+    ) {}
 
     /**
      * Redirect to LinkedIn for authentication
@@ -87,14 +86,14 @@ class SocialController extends Controller
                 ->user();
 
             // Validate that email is provided
-            if (!$socialUser->getEmail()) {
+            if (! $socialUser->getEmail()) {
                 Log::warning("{$provider} OAuth: Missing email", [
                     'provider' => $provider,
                     'provider_id' => $socialUser->getId(),
                 ]);
 
                 return redirect()->route('sign.in')
-                    ->with('error', 'Unable to retrieve email from ' . $this->getProviderDisplayName($provider) . '. Please try another sign-in method.');
+                    ->with('error', 'Unable to retrieve email from '.$this->getProviderDisplayName($provider).'. Please try another sign-in method.');
             }
 
             Log::info("{$provider} OAuth callback received", [
@@ -112,7 +111,7 @@ class SocialController extends Controller
             ]);
 
             return redirect()->route('sign.in')
-                ->with('error', 'Unable to authenticate with ' . $this->getProviderDisplayName($provider) . '. Please try again or use email/password.');
+                ->with('error', 'Unable to authenticate with '.$this->getProviderDisplayName($provider).'. Please try again or use email/password.');
         }
     }
 
@@ -129,7 +128,8 @@ class SocialController extends Controller
                 ? 'Welcome! Your account has been created successfully.'
                 : "Successfully signed in with {$providerName}!";
 
-            return redirect()->route('user.home')
+            return redirect()
+                ->intended('/home')
                 ->with('status', $message);
         } catch (OAuthAuthenticationException $e) {
             return redirect()->route('sign.in')
