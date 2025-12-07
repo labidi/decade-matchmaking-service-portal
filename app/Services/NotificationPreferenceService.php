@@ -17,6 +17,9 @@ use Illuminate\Validation\ValidationException;
 
 class NotificationPreferenceService
 {
+    /**
+     * @throws NotificationPreferenceException
+     */
     public function getUserPreferences(User $user, int $perPage = 15): LengthAwarePaginator
     {
         try {
@@ -31,24 +34,17 @@ class NotificationPreferenceService
 
             $preferences->toResourceCollection(NotificationPreferenceResource::class);
 
-            Log::debug('Successfully fetched notification preferences', [
-                'user_id' => $user->getAttribute('id'),
-                'total_count' => $preferences->total(),
-            ]);
-
             return $preferences;
-        } catch (Exception $e) {
+        } catch (Exception|\Throwable $e) {
             Log::error('Failed to fetch notification preferences', [
                 'user_id' => $user->getAttribute('id'),
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-
             throw NotificationPreferenceException::databaseOperationFailed(
                 'fetch',
                 $e->getMessage()
             );
-        }
     }
 
     public function createPreference(User $user, array $data): NotificationPreference
