@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { Button } from '@ui/primitives/button';
 import { ActionButton } from '@/types';
@@ -11,9 +11,39 @@ interface ActionsBarProps {
 }
 
 export function ActionsBar({ actions = [], className = '' }: ActionsBarProps) {
+    const { confirm } = useConfirmation();
+    const [downloadingActions, setDownloadingActions] = useState<Set<string>>(new Set());
+
     if (actions.length === 0) return null;
 
-    const { confirm } = useConfirmation();
+    const handleDownload = (action: ActionButton, event?: React.MouseEvent) => {
+        if (event) {
+            event.preventDefault();
+        }
+
+        const actionKey = action.href;
+        if (downloadingActions.has(actionKey)) return;
+
+        setDownloadingActions(prev => new Set(prev).add(actionKey));
+
+        try {
+            window.location.href = action.href;
+            setTimeout(() => {
+                setDownloadingActions(prev => {
+                    const next = new Set(prev);
+                    next.delete(actionKey);
+                    return next;
+                });
+            }, 1500);
+        } catch (error) {
+            console.error('Download failed:', error);
+            setDownloadingActions(prev => {
+                const next = new Set(prev);
+                next.delete(actionKey);
+                return next;
+            });
+        }
+    };
 
     const handleAction = async (action: ActionButton, event?: React.MouseEvent) => {
         // Prevent default behavior to avoid conflicts
@@ -88,6 +118,8 @@ export function ActionsBar({ actions = [], className = '' }: ActionsBarProps) {
                 const Icon = action.icon ? HeroIcons[action.icon as keyof typeof HeroIcons] : null;
                 const isGetRequest = !action.method || action.method === 'GET';
                 const isLinkAction = action.method === 'LINK';
+                const isDownloadAction = action.method === 'DOWNLOAD';
+                const isDownloading = downloadingActions.has(action.href);
 
                 // Render anchor tag for LINK method
                 if (isLinkAction) {
@@ -103,6 +135,50 @@ export function ActionsBar({ actions = [], className = '' }: ActionsBarProps) {
                             {Icon && <Icon className="size-4" data-slot="icon" />}
                             {action.label}
                         </a>
+                    );
+                }
+
+                // Render download button with loading state
+                if (isDownloadAction) {
+                    return (
+                        <Button
+                            key={action.label + index}
+                            onClick={(event: React.MouseEvent) => handleDownload(action, event)}
+                            color={getButtonColor(action.variant)}
+                            disabled={isDownloading}
+                            className={`--color-firefly-900 ${isDownloading ? 'opacity-75 cursor-wait' : ''}`}
+                        >
+                            {isDownloading ? (
+                                <>
+                                    <svg
+                                        className="animate-spin -ml-1 mr-2 h-4 w-4"
+                                        data-slot="icon"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        />
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                        />
+                                    </svg>
+                                    Downloading...
+                                </>
+                            ) : (
+                                <>
+                                    {Icon && <Icon className="size-4" data-slot="icon" />}
+                                    {action.label}
+                                </>
+                            )}
+                        </Button>
                     );
                 }
 
