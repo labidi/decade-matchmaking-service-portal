@@ -46,7 +46,7 @@ Schedule::command('opportunities:close-expired --force')
 // Send weekly opportunities newsletter every Sunday at 8:00 AM
 Schedule::command('newsletter:send-weekly')
     ->mondays()
-    ->at('12:00')
+    ->at('11:00')
     ->withoutOverlapping()
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/newsletter-opportunities.log'));
