@@ -59,9 +59,9 @@ $PHP artisan migrate -n --force
 $PHP artisan ziggy:generate
 # Laravel optimization commands
 echo "Running Laravel optimizations..."
-$PHP artisan config:cache
-$PHP artisan route:cache
-$PHP artisan view:cache
+$PHP artisan optimize:clear
+$PHP artisan optimize
+# Create storage symlink
 $PHP artisan storage:link
 
 echo "[$(date '+%F %T')] Laravel operations completed successfully"
