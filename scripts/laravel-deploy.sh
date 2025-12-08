@@ -51,6 +51,9 @@ echo "Installing composer dependencies..."
 $COMPOSER install --prefer-dist --no-interaction --optimize-autoloader
 $COMPOSER  dump-autoload
 echo "Clearing caches..."
+$PHP artisan config:clear
+$PHP artisan event:clear
+$PHP artisan route:clear
 $PHP artisan optimize:clear
 # Check if migrations are needed
 echo "Applying database migrations if needed..."
