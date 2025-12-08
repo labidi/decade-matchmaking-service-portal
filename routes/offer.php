@@ -1,5 +1,4 @@
 <?php
-
 use App\Http\Controllers\Offer\AcceptOfferController;
 use App\Http\Controllers\Offer\ClarificationRequestController;
 use App\Http\Controllers\Offer\DeleteDocumentController;
