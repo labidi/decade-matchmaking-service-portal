@@ -9,7 +9,8 @@ PHP="/usr/bin/php"
 COMPOSER="/usr/bin/composer"
 APP_DIR="$1"
 ENVIRONMENT="${2:-dev}"  # Default to 'dev' if not provided
-
+echo "Clearing caches..."
+$PHP artisan optimize:clear
 # Setup logging
 LOG_FILE="$APP_DIR/storage/logs/laravel-deploy.log"
 mkdir -p "$APP_DIR/storage/logs"
@@ -64,8 +65,5 @@ $PHP artisan route:cache
 # Generate Ziggy routes
 $PHP artisan ziggy:generate
 $PHP artisan storage:link
-
-echo "Reloading PHP-FPM service..."
-$PHP artisan reload
 
 echo "[$(date '+%F %T')] Laravel operations completed successfully"
