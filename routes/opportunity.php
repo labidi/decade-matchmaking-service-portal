@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\Opportunities\DestroyController as OpportunityDestroyController;
 use App\Http\Controllers\Opportunities\ExportController as OpportunityExportController;
 use App\Http\Controllers\Opportunities\ExtendController;
