@@ -92,6 +92,8 @@ export const partnerColumns = [
     {
         key: 'closing_date',
         label: 'Closing Date',
+        sortable: true,
+        sortField: 'created_at' as const,
         render: (opportunity: Opportunity) => (
             <div>
                 <div>{opportunity.closing_date ?
