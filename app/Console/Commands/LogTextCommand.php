@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use RuntimeException;
+use Throwable;
 
 class LogTextCommand extends Command
 {
@@ -134,7 +136,7 @@ class LogTextCommand extends Command
     }
 
     /**
-     * Write the text to the log file.
+     * Write the text to the log file using Laravel's Log facade.
      *
      * @param string $path
      * @param string $text
@@ -142,13 +144,19 @@ class LogTextCommand extends Command
      */
     private function writeToLog(string $path, string $text): void
     {
-        $timestamp = date('Y-m-d H:i:s');
-        $logEntry = "[{$timestamp}] {$text}\n";
+        try {
+            // Create a custom log channel for the specified file path
+            $logger = Log::build([
+                'driver' => 'single',
+                'path' => $path,
+                'level' => 'info',
+                'replace_placeholders' => true,
+            ]);
 
-        $result = @file_put_contents($path, $logEntry, FILE_APPEND);
-
-        if ($result === false) {
-            throw new RuntimeException('Cannot write to log file');
+            // Write the log entry with Laravel's logging system
+            $logger->info($text);
+        } catch (Throwable $e) {
+            throw new RuntimeException('Cannot write to log file: ' . $e->getMessage(), 0, $e);
         }
     }
 }
