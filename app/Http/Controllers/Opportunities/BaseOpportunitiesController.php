@@ -67,15 +67,4 @@ abstract class BaseOpportunitiesController extends Controller
             'per_page' => (int) $request->get('per_page', $perPage),
         ];
     }
-
-    protected function userPermissions(Opportunity $opportunity, ?Authenticatable $user): array
-    {
-        $isOwner = $user && $opportunity->user_id === $user->id;
-        return [
-            'canEdit' => $isOwner,
-            'canDelete' => $isOwner && $opportunity->status === Status::PENDING_REVIEW,
-            'canApply' => $opportunity->status === Status::ACTIVE && (bool) $opportunity->url,
-            'isOwner' => $isOwner,
-        ];
-    }
 }
