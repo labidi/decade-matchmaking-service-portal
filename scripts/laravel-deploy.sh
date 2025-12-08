@@ -9,8 +9,6 @@ PHP="/usr/bin/php"
 COMPOSER="/usr/bin/composer"
 APP_DIR="$1"
 ENVIRONMENT="${2:-dev}"  # Default to 'dev' if not provided
-echo "Clearing caches..."
-$PHP artisan optimize:clear
 # Setup logging
 LOG_FILE="$APP_DIR/storage/logs/laravel-deploy.log"
 mkdir -p "$APP_DIR/storage/logs"
