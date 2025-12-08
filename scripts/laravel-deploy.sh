@@ -51,17 +51,21 @@ fi
 echo "Installing composer dependencies..."
 $COMPOSER install --prefer-dist --no-interaction --optimize-autoloader
 $COMPOSER  dump-autoload
-
+echo "Clearing caches..."
+$PHP artisan optimize:clear
 # Check if migrations are needed
 echo "Applying database migrations if needed..."
 $PHP artisan migrate -n --force
-# Generate Ziggy routes
-$PHP artisan ziggy:generate
 # Laravel optimization commands
 echo "Running Laravel optimizations..."
-$PHP artisan optimize:clear
-$PHP artisan optimize
-# Create storage symlink
+$PHP artisan config:cache
+$PHP artisan event:cache
+$PHP artisan route:cache
+# Generate Ziggy routes
+$PHP artisan ziggy:generate
 $PHP artisan storage:link
+
+echo "Reloading PHP-FPM service..."
+$PHP artisan reload
 
 echo "[$(date '+%F %T')] Laravel operations completed successfully"
