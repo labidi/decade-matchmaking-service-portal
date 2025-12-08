@@ -9,12 +9,12 @@ use App\Http\Controllers\Opportunities\ShowController;
 use App\Http\Controllers\Opportunities\UpdateStatusController as OpportunityUpdateStatusController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])->group(function (){
+Route::middleware(['auth'])->group(function () {
     Route::get('opportunity/list', ListController::class)->name('opportunity.list');
     Route::get('opportunity/show/{id}', ShowController::class)->name('opportunity.show');
 });
 
-Route::middleware(['auth','role:partner'])->prefix('me')->group(function(){
+Route::middleware(['auth', 'role:partner'])->prefix('me')->group(function () {
     Route::get('opportunity/show/{id}', ShowController::class)->name('me.opportunity.show');
     Route::get('opportunity/list', ListController::class)->name('me.opportunity.list');
 });
