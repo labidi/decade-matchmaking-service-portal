@@ -70,11 +70,6 @@ class ListController extends BaseOpportunitiesController
                             route('opportunity.create'),
                             'PlusIcon',
                         ),
-                        $this->createSecondaryAction(
-                            'Create New Opsportunity',
-                            route('admin.opportunity.export.csv'),
-                            'PlusIcon',
-                        ),
                     ]),
             ],
             'public' => [
