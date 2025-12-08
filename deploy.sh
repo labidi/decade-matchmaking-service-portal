@@ -62,7 +62,7 @@ chmod +x "$SCRIPT_DIR"/*.sh
 # Execute git operations
 echo "[$(date '+%F %T')] Running git operations..."
 "$SCRIPT_DIR/git-deploy.sh" "$APP_DIR"
-
+echo "[$(date '+%F %T')] done git operations..."
 # Execute Laravel and NPM operations in parallel
 echo "[$(date '+%F %T')] Running Laravel and NPM operations in parallel..."
 
