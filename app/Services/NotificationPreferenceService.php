@@ -23,17 +23,11 @@ class NotificationPreferenceService
     public function getUserPreferences(User $user, int $perPage = 15): LengthAwarePaginator
     {
         try {
-            Log::info('Fetching notification preferences for user', [
-                'user_id' => $user->getAttribute('id'),
-                'per_page' => $perPage,
-            ]);
-
             $preferences = NotificationPreference::where('user_id', $user->getAttribute('id'))
                 ->orderBy('updated_at', 'desc')
                 ->paginate($perPage);
 
             $preferences->toResourceCollection(NotificationPreferenceResource::class);
-
             return $preferences;
         } catch (Exception|\Throwable $e) {
             Log::error('Failed to fetch notification preferences', [
@@ -53,24 +47,10 @@ class NotificationPreferenceService
         DB::beginTransaction();
 
         try {
-            // Validate entity type
             $entityType = $data['entity_type'] ?? null;
-
-            if (! $entityType || ! NotificationPreference::isValidEntityType($entityType)) {
-                throw NotificationPreferenceException::invalidEntityType($entityType ?? 'null');
-            }
-
             // Auto-set attribute_type based on entity_type
             $attributeType = $this->getAttributeTypeForEntity($entityType);
             $attributeValue = $data['attribute_value'] ?? null;
-
-            // Validate attribute value is present
-            if (! $attributeValue || trim($attributeValue) === '') {
-                throw ValidationException::withMessages([
-                    'attribute_value' => ['Attribute value is required and cannot be empty.'],
-                ]);
-            }
-
             // Check for duplicate preference
             $existingPreference = NotificationPreference::where('user_id', $user->getAttribute('id'))
                 ->where('entity_type', $entityType)
@@ -78,14 +58,8 @@ class NotificationPreferenceService
                 ->first();
 
             if ($existingPreference) {
-
-                throw NotificationPreferenceException::duplicatePreference(
-                    $user->getAttribute('id'),
-                    $entityType,
-                    $attributeValue
-                );
+                throw NotificationPreferenceException::duplicatePreference();
             }
-
             // Prepare preference data with defaults
             $preferenceData = [
                 'user_id' => $user->getAttribute('id'),
@@ -94,33 +68,11 @@ class NotificationPreferenceService
                 'attribute_value' => $attributeValue,
                 'email_notification_enabled' => true, // Always enabled
             ];
-
-            Log::info('Creating notification preference', [
-                'user_id' => $user->getAttribute('id'),
-                'entity_type' => $entityType,
-                'attribute_type' => $attributeType,
-                'attribute_value' => $attributeValue,
-            ]);
-
             $preference = NotificationPreference::create($preferenceData);
-
             DB::commit();
 
-            Log::info('Successfully created notification preference', [
-                'preference_id' => $preference->getAttribute('id'),
-                'user_id' => $user->getAttribute('id'),
-                'entity_type' => $entityType,
-                'attribute_value' => $attributeValue,
-            ]);
-
             return $preference;
-        } catch (NotificationPreferenceException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (ValidationException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (Exception $e) {
+        } catch (Exception|NotificationPreferenceException|ValidationException $e) {
             DB::rollBack();
 
             Log::error('Unexpected error creating notification preference', [
@@ -129,11 +81,7 @@ class NotificationPreferenceService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-
-            throw NotificationPreferenceException::databaseOperationFailed(
-                'create',
-                $e->getMessage()
-            );
+            throw $e;
         }
     }
 

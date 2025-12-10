@@ -14,29 +14,31 @@ class StoreController extends Controller
 {
     public function __construct(
         private readonly NotificationPreferenceService $preferenceService
-    ) {
-    }
+    ) {}
 
     /**
      * @throws NotificationPreferenceException
      */
     public function __invoke(Request $request)
     {
-        $request->validate([
-            'entity_type' => ['required', Rule::in(array_keys(NotificationPreference::ENTITY_TYPES))],
-            'attribute_value' => 'required|string|max:255',
-            'email_notification_enabled' => 'boolean',
-        ]);
+        try {
+            $request->validate([
+                'entity_type' => ['required', Rule::in(array_keys(NotificationPreference::ENTITY_TYPES))],
+                'attribute_value' => 'required|string|max:255',
+                'email_notification_enabled' => 'boolean',
+            ]);
+            $user = Auth::user();
+            $this->preferenceService->createPreference($user, [
+                'entity_type' => $request->entity_type,
+                'attribute_value' => $request->attribute_value,
+                'email_notification_enabled' => $request->boolean('email_notification_enabled', true),
+            ]);
 
-        $user = Auth::user();
+            return redirect()->back()
+                ->with('success', 'SystemNotification preference updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
 
-        $this->preferenceService->createPreference($user, [
-            'entity_type' => $request->entity_type,
-            'attribute_value' => $request->attribute_value,
-            'email_notification_enabled' => $request->boolean('email_notification_enabled', true)
-        ]);
-
-        return redirect()->back()
-            ->with('success', 'SystemNotification preference updated successfully.');
     }
 }
