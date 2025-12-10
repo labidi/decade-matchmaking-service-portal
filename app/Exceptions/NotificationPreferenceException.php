@@ -14,20 +14,20 @@ class NotificationPreferenceException extends Exception
     /**
      * Create exception for duplicate preference
      */
-    public static function duplicatePreference(int $userId, string $entityType, string $attributeValue): self
+    public static function duplicatePreference(): self
     {
         return new self(
-            "SystemNotification preference already exists for user {$userId}, entity type '{$entityType}', and attribute value '{$attributeValue}'."
+            "Notification preference already exists"
         );
     }
 
     /**
      * Create exception for invalid entity type
      */
-    public static function invalidEntityType(string $entityType): self
+    public static function invalidEntityType(): self
     {
         return new self(
-            "Invalid entity type '{$entityType}'. Allowed types: request, opportunity."
+            "Notification preference type is invalid"
         );
     }
 
