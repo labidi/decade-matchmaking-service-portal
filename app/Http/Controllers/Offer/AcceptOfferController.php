@@ -7,6 +7,7 @@ use App\Models\Request\Offer;
 use App\Models\SystemNotification;
 use App\Models\User;
 use App\Services\OfferService;
+use App\Services\SystemNotificationService;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -16,7 +17,7 @@ readonly class AcceptOfferController
 {
     public function __construct(
         private OfferService $offerService,
-        private UserService  $userService
+        private readonly SystemNotificationService $notificationService
     ) {}
 
     /**
@@ -28,6 +29,15 @@ readonly class AcceptOfferController
             $user = $request->user();
             $offer = $this->offerService->getOfferById($offerId);
             $acceptedOffer = $this->offerService->acceptOffer($offer, $user);
+            $this->notificationService->notifyAdmins(
+                'Accepted Offer',
+                sprintf(
+                    'User <span class="font-bold">%s</span> has acccepted the offer on his request <a href="%s" target="_blank" class="font-bold underline">%s</a> ',
+                    auth()->user()->name,
+                    route('request.public.show', ['id' => $offer->request->id]),
+                    $offer->request->detail->capacity_development_title
+                )
+            );
             return to_route('request.me.show', [
                 $offer->request->id,
             ])->with('success', 'Offer accepted successfully');

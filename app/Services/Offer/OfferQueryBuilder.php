@@ -128,6 +128,6 @@ class OfferQueryBuilder
      */
     public function buildBaseQuery(): Builder
     {
-        return Offer::with(['request', 'request.status', 'request.user', 'matchedPartner', 'documents']);
+        return Offer::with(['request', 'request.detail', 'request.status', 'request.user', 'matchedPartner', 'documents']);
     }
 }
