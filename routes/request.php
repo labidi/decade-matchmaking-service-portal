@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DocumentsController;
+use App\Http\Controllers\Request\ExportCsvController;
 use App\Http\Controllers\Request\ExportRequestPdfController;
 use App\Http\Controllers\Request\ExpressInterestController;
 use App\Http\Controllers\Request\ListController;
@@ -68,6 +69,6 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
 
     Route::get('request/{id}/show', [ViewController::class, 'show'])->name('admin.request.show');
 
-    // KEPT: exportCsv remains separate method (returns StreamedResponse)
-    Route::get('request/export/csv', [ListController::class, 'exportCsv'])->name('admin.request.export.csv');
+    // CSV export using dedicated controller
+    Route::get('request/export/csv', ExportCsvController::class)->name('admin.request.export.csv');
 });

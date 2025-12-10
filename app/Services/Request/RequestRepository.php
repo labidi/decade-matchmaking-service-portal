@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\LazyCollection;
 
 class RequestRepository
 {
@@ -153,5 +154,20 @@ class RequestRepository
         } else {
             $request->detail()->save(new Detail($detailData));
         }
+    }
+
+    /**
+     * Get requests for CSV export with relationships
+     *
+     * Uses cursor-based loading for memory efficiency when exporting large datasets.
+     *
+     * @return LazyCollection<int, Request>
+     */
+    public function getRequestsForExport(): LazyCollection
+    {
+        return Request::query()
+            ->with(['user', 'status', 'detail'])
+            ->orderBy('created_at', 'desc')
+            ->cursor();
     }
 }

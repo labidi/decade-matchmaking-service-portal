@@ -10,6 +10,18 @@ use App\Models\User;
 class RequestPolicy
 {
     /**
+     * Determine whether the user can view all requests (for admin CSV export).
+     */
+    public function viewAny(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasRole('administrator');
+    }
+
+    /**
      * Determine whether the user can view the request.
      */
     public function view(?User $user, Request $request): bool

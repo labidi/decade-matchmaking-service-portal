@@ -6,13 +6,11 @@ use App\Enums\Request\PublicRequestStatus;
 use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Resources\PublicRequestResource;
 use App\Http\Resources\RequestResource;
-use App\Services\ExportService;
 use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ListController extends BaseRequestController
 {
@@ -42,8 +40,11 @@ class ListController extends BaseRequestController
                 'listRouteName' => 'admin.request.list',
                 'showRouteName' => 'admin.request.show',
                 'actions' => $this->buildActions([
-                    $this->createPrimaryAction('New Request', route('request.create'), 'PlusIcon'),
-                    $this->createSecondaryAction('Export CSV', route('admin.request.export.csv'), 'ArrowDownTrayIcon'),
+                    $this->createSecondaryAction(
+                        'Export CSV',
+                        route('admin.request.export.csv'),
+                        'ArrowDownTrayIcon',
+                        'DOWNLOAD'),
                 ]),
                 'resourceClass' => RequestResource::class,
                 'serviceMethod' => 'getPaginatedRequests',
@@ -218,13 +219,5 @@ class ListController extends BaseRequestController
         }
 
         return Inertia::render($config['component'], $responseData);
-    }
-
-    /**
-     * Export requests to CSV - admin only functionality
-     */
-    public function exportCsv(ExportService $exportService): StreamedResponse
-    {
-        return $exportService->exportRequestsCsv();
     }
 }
