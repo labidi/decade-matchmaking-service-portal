@@ -19,8 +19,7 @@ class OpportunityExportService
 {
     public function __construct(
         private readonly OpportunityRepository $repository
-    ) {
-    }
+    ) {}
 
     /**
      * Export opportunities to CSV file
@@ -35,10 +34,12 @@ class OpportunityExportService
      * - title: Opportunity title
      * - type: Type label
      * - thematic_areas: Comma-separated thematic area labels
+     * - thematic_areas_other: Thematic Areas Other
      * - created_at: Creation timestamp (Y-m-d H:i:s format)
      * - coverage_activity: Coverage activity label
      * - implementation_location: Location label or "Global"
      * - target_audience: Comma-separated target audience labels
+     * - target_audience_other: Target Audience Other
      * - target_languages: Comma-separated language labels
      * - target_languages_other: Other languages text
      * - url: Opportunity URL
@@ -53,6 +54,7 @@ class OpportunityExportService
 
             if ($handle === false) {
                 Log::error('Failed to open output stream for opportunity CSV export');
+
                 return;
             }
 
@@ -82,13 +84,15 @@ class OpportunityExportService
             'Submitted date',
             'Closing date',
             'Status',
-            'Institution_Programme_Offering_this_Opportunity',
+            'Institution or programme offering this opportunity',
             'Title',
             'Type',
             'Thematic Areas',
+            'Thematic Areas Other',
             'Coverage activity',
             'Implementation location',
             'Target audience',
+            'Target audience other',
             'Target languages',
             'Target languages other',
             'Url',
@@ -99,7 +103,6 @@ class OpportunityExportService
     /**
      * Format a single opportunity row for CSV export
      *
-     * @param Opportunity $opportunity
      * @return array<int, mixed>
      */
     private function formatOpportunityRow(Opportunity $opportunity): array
@@ -110,14 +113,16 @@ class OpportunityExportService
             $opportunity->id,
             $opportunity->created_at?->format('Y-m-d H:i:s') ?? '',
             $opportunity->closing_date?->format('Y-m-d') ?? '',
-            'Digital DeEP-sea Typical Habitats (Digital DEPTH)',
             $opportunity->status?->label() ?? '',
+            $this->formatCoOrganizers($opportunity),
             $opportunity->title ?? '',
             $opportunity->type?->label() ?? '',
             $this->formatThematicAreas($opportunity),
+            $opportunity->thematic_areas_other ?? '',
             $opportunity->coverage_activity?->label() ?? '',
             $this->formatImplementationLocation($opportunity),
             $this->formatTargetAudience($opportunity),
+            $opportunity->target_audience_other ?? '',
             $this->formatTargetLanguages($opportunity),
             $opportunity->target_languages_other ?? '',
             $opportunity->url ?? '',
@@ -127,9 +132,6 @@ class OpportunityExportService
 
     /**
      * Format thematic areas as comma-separated labels
-     *
-     * @param Opportunity $opportunity
-     * @return string
      */
     private function formatThematicAreas(Opportunity $opportunity): string
     {
@@ -139,7 +141,7 @@ class OpportunityExportService
             return '';
         }
 
-        return $areas->map(fn($area) => $area->label())->implode(', ');
+        return $areas->map(fn ($area) => $area->label())->implode(', ');
     }
 
     /**
@@ -149,9 +151,6 @@ class OpportunityExportService
      * - "Global" string
      * - Country, Region, or Ocean enum with label() method
      * - Array of locations
-     *
-     * @param Opportunity $opportunity
-     * @return string
      */
     private function formatImplementationLocation(Opportunity $opportunity): string
     {
@@ -175,6 +174,7 @@ class OpportunityExportService
                 if (is_object($loc) && method_exists($loc, 'label')) {
                     return $loc->label();
                 }
+
                 return (string) $loc;
             }, $location));
         }
@@ -189,9 +189,6 @@ class OpportunityExportService
 
     /**
      * Format target audience as comma-separated labels
-     *
-     * @param Opportunity $opportunity
-     * @return string
      */
     private function formatTargetAudience(Opportunity $opportunity): string
     {
@@ -207,14 +204,11 @@ class OpportunityExportService
             return '';
         }
 
-        return implode(', ', array_map(fn($item) => $item->label(), $items));
+        return implode(', ', array_map(fn ($item) => $item->label(), $items));
     }
 
     /**
      * Format target languages as comma-separated labels
-     *
-     * @param Opportunity $opportunity
-     * @return string
      */
     private function formatTargetLanguages(Opportunity $opportunity): string
     {
@@ -230,24 +224,34 @@ class OpportunityExportService
             return '';
         }
 
-        return implode(', ', array_map(fn($item) => $item->label(), $items));
+        return implode(', ', array_map(fn ($item) => $item->label(), $items));
     }
 
     /**
      * Format keywords as comma-separated string
-     *
-     * @param Opportunity $opportunity
-     * @return string
      */
     private function formatKeywords(Opportunity $opportunity): string
     {
         $keywords = $opportunity->key_words;
 
-        if ($keywords === null || !is_array($keywords)) {
+        if ($keywords === null || ! is_array($keywords)) {
             return '';
         }
 
         return implode(', ', $keywords);
+    }
+    /**
+     * Format co organizers as comma-separated string
+     */
+    private function formatCoOrganizers(Opportunity $opportunity): string
+    {
+        $coOrganizers = $opportunity->co_organizers;
+
+        if ($coOrganizers === null || ! is_array($coOrganizers)) {
+            return '';
+        }
+
+        return implode(', ', $coOrganizers);
     }
 
     /**
@@ -259,7 +263,7 @@ class OpportunityExportService
     {
         return [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="opportunities_' . date('Y-m-d_His') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="opportunities_'.date('Y-m-d_His').'.csv"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
