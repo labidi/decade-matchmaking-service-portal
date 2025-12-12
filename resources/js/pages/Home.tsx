@@ -1,151 +1,165 @@
-import {PageProps} from '@/types';
-import {Head} from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { FrontendLayout } from '@layouts/index';
-import {Auth, User} from '@/types';
-import {usePage} from '@inertiajs/react';
-import { CardLink, SectionTitle, CardGuide } from '@features/home';
+import { Auth, User } from '@/types';
+import { Heading } from '@ui/primitives/heading';
+import { Divider } from '@ui/primitives/divider';
+import {
+    AcademicCapIcon,
+    BriefcaseIcon,
+    DocumentTextIcon,
+    ClipboardDocumentListIcon,
+    BellAlertIcon,
+} from '@heroicons/react/24/outline';
+
+import { CardGuide } from '@features/home';
+import WelcomeSection from '@features/home/components/welcome-section';
+import ActionSection, { ActionCardData } from '@features/home/components/action-section';
 
 type HomePageProps = {
     userGuide?: string;
     partnerGuide?: string;
 }
-export default function Home({userGuide, partnerGuide}: Readonly<HomePageProps>) {
 
-    const {auth} = usePage<{ auth: Auth }>().props;
-    const LinkRequestCardClassNameDisabled = "max-w-sm rounded overflow-hidden shadow-lg bg-gray-300 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-700 text-white"
-    const LinkRequestCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-900 dark:bg-firefly-950 hover:bg-firefly-600 dark:hover:bg-firefly-700 text-white"
-    const LinkOpportunityCardClassName = "max-w-sm rounded overflow-hidden shadow-lg bg-firefly-500 dark:bg-firefly-600 hover:bg-firefly-600 dark:hover:bg-firefly-700 text-white"
+export default function Home({ userGuide, partnerGuide }: Readonly<HomePageProps>) {
+    const { auth } = usePage<{ auth: Auth }>().props;
 
     // Helper function to check if user has access (either is_user or is_partner)
     const userHasAccess = (user: User): boolean => user.is_user || user.is_partner;
 
+    // Define request cards with role-based visibility
+    const requestCards: ActionCardData[] = [
+        {
+            title: 'Submit New Request',
+            description: 'Submit a new capacity development request for training and workshops.',
+            href: route('request.create'),
+            icon: AcademicCapIcon,
+            variant: 'request',
+            disabled: !userHasAccess(auth.user),
+            disabledReason: !userHasAccess(auth.user) ? 'Register as a user to submit requests' : undefined,
+            visible: true,
+        },
+        {
+            title: 'List of My Requests',
+            description: 'Track the progress and current status of your submitted requests.',
+            href: route('request.me.list'),
+            icon: DocumentTextIcon,
+            variant: 'request',
+            disabled: !userHasAccess(auth.user),
+            disabledReason: !userHasAccess(auth.user) ? 'Register as a user to view your requests' : undefined,
+            visible: true,
+        },
+        {
+            title: 'View Request for Training & Workshops',
+            description: 'Browse and explore training and workshop requests that align with your interests and expertise.',
+            href: route('request.list'),
+            icon: ClipboardDocumentListIcon,
+            variant: 'request',
+            visible: auth.user.is_partner,
+        },
+        {
+            title: 'My Matched Requests',
+            description: 'Manage training and workshop requests that you matched with as a Partner.',
+            href: route('request.me.matched-requests'),
+            icon: DocumentTextIcon,
+            variant: 'request',
+            visible: auth.user.is_partner,
+        },
+        {
+            title: 'My Subscribed Requests',
+            description: 'Manage and keep track of the requests you have subscribed to for updates and notifications.',
+            href: route('request.me.subscribed-requests'),
+            icon: BellAlertIcon,
+            variant: 'request',
+            disabled: !userHasAccess(auth.user),
+            disabledReason: !userHasAccess(auth.user) ? 'Register as a user to subscribe to requests' : undefined,
+            visible: true,
+        },
+    ];
+
+    // Define opportunity cards with role-based visibility
+    const opportunityCards: ActionCardData[] = [
+        {
+            title: 'View and Apply for Partner Opportunities',
+            description: 'Browse and apply for available capacity development opportunities offered by partners.',
+            href: route('opportunity.list'),
+            icon: BriefcaseIcon,
+            variant: 'opportunity',
+            visible: true,
+        },
+        {
+            title: 'Submit Opportunity',
+            description: 'Submit a new capacity development opportunity as a Partner.',
+            href: route('opportunity.create'),
+            icon: BriefcaseIcon,
+            variant: 'opportunity',
+            visible: auth.user.is_partner,
+        },
+        {
+            title: 'View My Submitted Opportunities',
+            description: 'View the capacity development opportunities you have submitted as a Partner.',
+            href: route('me.opportunity.list'),
+            icon: BriefcaseIcon,
+            variant: 'opportunity',
+            visible: auth.user.is_partner,
+        },
+    ];
+
+    // Check if any guides are available
+    const hasGuides = userGuide || (partnerGuide && auth.user.is_partner);
+
     return (
         <FrontendLayout>
-            <Head title="Welcome"/>
-            <section className="text-gray-600 dark:text-gray-300 body-font">
-                <div className="container px-5 py-5 mx-auto flex flex-wrap">
-                    <div className="flex flex-wrap -m-4">
-                        {auth.user.is_partner ? (
-                            <>
-                                {partnerGuide && (
-                                    <div className="p-4 lg:w-1/2 md:w-full">
+            <Head title="Welcome" />
 
-                                        <CardGuide
-                                            title="Partner guide"
-                                            description="A step-by-step guide to help Partners use the Ocean connector, review requests, and submit opportunities."
-                                            fileUrl={partnerGuide}
-                                        />
-                                    </div>
-                                )}
-                                {userGuide && (
-                                    <div className="p-4 lg:w-1/2 md:w-full">
+            <div className="space-y-10">
+                <WelcomeSection user={auth.user} />
 
-                                        <CardGuide
-                                            title="User guide"
-                                            description="A step-by-step guide to help Users navigate the Ocean connector, submit requests, and engage with partner opportunities."
-                                            fileUrl={userGuide}
-                                        />
-                                    </div>
-                                )}
-                            </>
+                {/* Getting Started Guides */}
+                {hasGuides && (
+                    <section className="space-y-6">
+                        <Heading level={2}>Getting Started</Heading>
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                            {userGuide && (
+                                <CardGuide
+                                    title="User Guide"
+                                    description="A step-by-step guide to help users navigate the Ocean Connector, submit requests, and engage with partner opportunities."
+                                    fileUrl={userGuide}
+                                />
+                            )}
+                            {partnerGuide && auth.user.is_partner && (
+                                <CardGuide
+                                    title="Partner Guide"
+                                    description="A step-by-step guide to help partners use the Ocean Connector, review requests, and submit opportunities."
+                                    fileUrl={partnerGuide}
+                                />
+                            )}
+                        </div>
+                    </section>
+                )}
 
+                <Divider className="my-10" />
 
-                        ) : (
-                            <div className="p-4 lg:w-full md:w-full">
-                                {userGuide && (
-                                    <div className="p-4 lg:w-1/2 md:w-full">
+                {/* Requests Section */}
+                <ActionSection
+                    title="Capacity Development Requests"
+                    description="Submit and manage training and workshop requests"
+                    icon={AcademicCapIcon}
+                    cards={requestCards}
+                    emptyMessage="No request actions available for your role."
+                />
 
-                                        <CardGuide
-                                            title="User guide"
-                                            description="A step-by-step guide to help Users navigate the Oceanconnector Platform, submit requests, and engage with partner opportunities."
-                                            fileUrl={userGuide}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </section>
-            <section id="features" className="px-4">
-                <div className="mx-auto text-center">
-                    <SectionTitle>Request section</SectionTitle>
+                <Divider className="my-10" />
 
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {auth.user && (
-                            <CardLink
-                                link={route('request.create')}
-                                className={userHasAccess(auth.user) ? LinkRequestCardClassName : LinkRequestCardClassNameDisabled}
-                                title="Submit New Request"
-                                text="Use this feature to submit a new capacity development request for training and workshops "
-                                disabled={!userHasAccess(auth.user)}
-                            />
-                        )}
-                        {auth.user && (
-                            <CardLink
-                                link={route('request.me.list')}
-                                className={userHasAccess(auth.user) ? LinkRequestCardClassName : LinkRequestCardClassNameDisabled}
-                                title="List of My Requests"
-                                text="Use this feature to track the progress and current status of your submitted request. "
-                                disabled={!userHasAccess(auth.user)}
-                            />
-                        )}
-                        {auth.user && auth.user.is_partner && (
-                            <CardLink
-                                link={route('request.list')}
-                                className={LinkRequestCardClassName}
-                                title="View Request for Training & Workshops"
-                                text="Browse and explore training and workshop requests that align with your interests and expertise as a Partner"
-                            />
-                        )}
-                        {auth.user && auth.user.is_partner && (
-                            <CardLink
-                                link={route('request.me.matched-requests')}
-                                className={LinkRequestCardClassName}
-                                title="My matched requests"
-                                text="Manage training and workshop requests that you matched with as a Partner "
-                            />
-                        )}
-                        {auth.user && (
-                            <CardLink
-                                link={route('request.me.subscribed-requests')}
-                                className={userHasAccess(auth.user) ? LinkRequestCardClassName : LinkRequestCardClassNameDisabled}
-                                title="My Subscribed requests"
-                                text="Manage and keep track of the requests you have subscribed to for updates and notifications."
-                                disabled={!userHasAccess(auth.user)}
-                            />
-                        )}
-                    </div>
-                    <SectionTitle>Opportunity section</SectionTitle>
-
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {auth.user && (
-                            <CardLink
-                                link={route('opportunity.list')}
-                                className={LinkOpportunityCardClassName}
-                                title="View and Apply for Partner Opportunities"
-                                text="Browse and apply for available capacity development opportunities offered by partners of CDF "
-                            />
-                        )}
-                        {auth.user && auth.user.is_partner && (
-                            <CardLink
-                                link={route('opportunity.create')}
-                                className={LinkOpportunityCardClassName}
-                                title="Submit Opportunity"
-                                text="Submit a new capacity development opportunity as a Partner."
-                            />
-                        )}
-                        {auth.user && auth.user.is_partner && (
-                            <CardLink
-                                link={route('me.opportunity.list')}
-                                className={LinkOpportunityCardClassName}
-                                title="View My Submitted Opportunities"
-                                text="View the capacity development opportunity you have submitted as a Partner "
-                            />
-                        )}
-                    </div>
-                </div>
-            </section>
+                {/* Opportunities Section */}
+                <ActionSection
+                    title="Partner Opportunities"
+                    description="Explore and manage capacity development opportunities"
+                    icon={BriefcaseIcon}
+                    cards={opportunityCards}
+                    emptyMessage="No opportunity actions available."
+                />
+            </div>
         </FrontendLayout>
     );
 }
