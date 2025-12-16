@@ -22,7 +22,7 @@ class IndexController extends Controller
      */
     public function __invoke()
     {
-        $recentOpportunities = $this->opportunityService->getRecentActiveOpportunities(10);
+        $recentOpportunities = $this->opportunityService->getRecentActiveOpportunities(200);
 
         return Inertia::render('Index', [
             'title' => 'Welcome',
