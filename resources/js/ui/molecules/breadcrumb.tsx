@@ -32,7 +32,7 @@ export function Breadcrumb({className, items}: Readonly<BreadcrumbProps>) {
                         {idx > 0 && (
                             <ChevronRightIcon
                                 data-slot="icon"
-                                className="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500"
+                                className="size-4 shrink-0 fill-white dark:fill-zinc-500"
                                 aria-hidden="true"
                             />
                         )}
@@ -40,7 +40,7 @@ export function Breadcrumb({className, items}: Readonly<BreadcrumbProps>) {
                             <Link
                                 href={item.url}
                                 className={clsx(
-                                    'text-sm/6 font-medium text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white',
+                                    'text-sm/6 font-medium text-zinc-300 hover:text-white dark:text-zinc-400 dark:hover:text-white',
                                     'transition-colors duration-200'
                                 )}
                             >
@@ -49,7 +49,7 @@ export function Breadcrumb({className, items}: Readonly<BreadcrumbProps>) {
                         ) : (
                             <Text
                                 className={clsx(
-                                    'text-sm/6 font-semibold text-zinc-950 dark:text-white',
+                                    'text-sm/6 font-semibold  text-zinc-300 hover:text-white dark:text-white',
                                     'truncate'
                                 )}
                                 aria-current="page"

@@ -131,7 +131,7 @@ export default function NavigationMenu() {
             </DropdownButton>
 
             {/* Dropdown menu with Catalyst UI styling */}
-            <DropdownMenu anchor="bottom end" className="min-w-64">
+            <DropdownMenu anchor="bottom end" className="min-w-64 z-60">
                 {navigation.items.map((item, index) =>
                     renderNavigationItem(item, index)
                 )}
