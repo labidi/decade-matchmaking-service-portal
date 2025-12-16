@@ -9,7 +9,7 @@ NPM="/usr/bin/npm"
 APP_DIR="$1"
 
 # Setup logging
-LOG_FILE="$APP_DIR/storage/logs/npm-deploy.log"
+LOG_FILE="$APP_DIR/storage/logs/deploy.log"
 mkdir -p "$APP_DIR/storage/logs"
 exec &>> "$LOG_FILE"
 

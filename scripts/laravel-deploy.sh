@@ -10,7 +10,7 @@ COMPOSER="/usr/bin/composer"
 APP_DIR="$1"
 ENVIRONMENT="${2:-dev}"  # Default to 'dev' if not provided
 # Setup logging
-LOG_FILE="$APP_DIR/storage/logs/laravel-deploy.log"
+LOG_FILE="$APP_DIR/storage/logs/deploy.log"
 mkdir -p "$APP_DIR/storage/logs"
 exec &>> "$LOG_FILE"
 
