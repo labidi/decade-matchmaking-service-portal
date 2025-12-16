@@ -19,7 +19,7 @@ export const adminColumns = [
         label: 'Title',
         render: (request: OCDRequest) => (
             <div className="max-w-xs">
-                <span className="truncate">{request.detail?.capacity_development_title || 'No Title'}</span>
+                <div className="line-clamp-2">{request.detail?.capacity_development_title || 'No Title'}</div>
             </div>
         )
     },
@@ -29,9 +29,9 @@ export const adminColumns = [
         sortable: true,
         sortField: 'user' as const,
         render: (request: OCDRequest) => (
-            <div className="flex flex-col">
-                <span className="font-medium">{request.user.name}</span>
-                <span className="text-xs text-gray-500">{request.user.email}</span>
+            <div className="flex flex-col max-w-xs">
+                <span className="font-medium truncate">{request.user.name}</span>
+                <span className="text-xs text-gray-500 truncate">{request.user.email}</span>
             </div>
         )
     },
@@ -58,9 +58,9 @@ export const userColumns = [
         key: 'title',
         label: 'Request Title',
         render: (request: OCDRequest) => (
-            <div>
-                <div className="font-medium">{request.detail?.capacity_development_title || 'No Title'}</div>
-                <div className="text-sm text-gray-500 truncate max-w-md">
+            <div className="max-w-md">
+                <div className="font-medium line-clamp-2">{request.detail?.capacity_development_title || 'No Title'}</div>
+                <div className="text-sm text-gray-500 line-clamp-2">
                     {request.detail?.gap_description}
                 </div>
             </div>

@@ -21,7 +21,7 @@ export const adminColumns = [
         sortField: 'title' as const,
         render: (opportunity: Opportunity) => (
             <div className="max-w-xs">
-                <span className="truncate font-medium text-wrap">{opportunity.title}</span>
+                <div className="line-clamp-2 font-medium">{opportunity.title}</div>
             </div>
         )
     },
@@ -40,9 +40,9 @@ export const adminColumns = [
         key: 'user',
         label: 'Submitted By',
         render: (opportunity: Opportunity) => (
-            <div className="flex flex-col">
-                <span className="font-medium">{opportunity.user?.name ?? 'N/A'}</span>
-                <span className="text-xs text-gray-500">{opportunity.user?.email ?? ''}</span>
+            <div className="flex flex-col max-w-xs">
+                <span className="font-medium truncate">{opportunity.user?.name ?? 'N/A'}</span>
+                <span className="text-xs text-gray-500 truncate">{opportunity.user?.email ?? ''}</span>
             </div>
         )
     },
@@ -72,9 +72,9 @@ export const partnerColumns = [
         key: 'title',
         label: 'Opportunity Title',
         render: (opportunity: Opportunity) => (
-            <div>
-                <div className="font-medium">{opportunity.title}</div>
-                <div className="text-sm text-gray-500 truncate max-w-md">
+            <div className="max-w-md">
+                <div className="font-medium line-clamp-2">{opportunity.title}</div>
+                <div className="text-sm text-gray-500 line-clamp-2">
                     {opportunity.summary}
                 </div>
             </div>

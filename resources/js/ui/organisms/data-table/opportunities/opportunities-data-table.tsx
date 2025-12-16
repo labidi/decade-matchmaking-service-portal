@@ -95,7 +95,7 @@ export function OpportunitiesDataTable({
                 />
             )}
 
-            <Table>
+            <Table className="[&_td]:whitespace-normal [&_td]:break-words [&_th]:whitespace-nowrap">
                 <TableHead className="text-lg">
                     <TableRow>
                         {columns.map((column) => (
