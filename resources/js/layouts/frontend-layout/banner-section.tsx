@@ -63,7 +63,7 @@ export default function BannerSection({
     return (
         <section
             style={{ backgroundImage: `url(${pageBannerConfiguration.image})` }}
-            className="relative bg-cover bg-center bg-casal-700 px-4 text-center text-white min-h-[300px]"
+            className="relative bg-cover bg-center bg-casal-700 px-4 text-center text-white min-h-[300px] inset-shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
         >
             {/* Gradient overlay for better header text contrast */}
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
@@ -74,7 +74,7 @@ export default function BannerSection({
             </div>
 
             {pageYoutubeEmbed?.src && (
-                <div className="relative z-10 max-w-5xl mx-auto">
+                <div className="relative  max-w-5xl mx-auto">
                     <div className="aspect-video">
                         <YouTube
                             videoId={pageYoutubeEmbed.src}
@@ -86,7 +86,7 @@ export default function BannerSection({
             )}
 
             {pageMetrics && (
-                <div className="relative z-10 py-10 px-4">
+                <div className="relative py-10 px-4">
                     <dl className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-10 text-white sm:mt-20 sm:grid-cols-2 sm:gap-y-16 lg:mx-0 lg:max-w-none lg:grid-cols-5">
                         <div className="flex flex-col gap-y-3 border-l border-white pl-6">
                             <span className="block text-5xl font-bold">

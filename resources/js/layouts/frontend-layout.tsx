@@ -24,7 +24,7 @@ const FrontendLayout: React.FC<FrontendLayoutProps> = ({ children }) => {
             <main
                 id="main-content"
                 className={[
-                    'flex-grow container mx-auto py-4',
+                    'flex-grow container mx-auto py-4 ',
                     !hasBanner && 'pt-20',
                 ].filter(Boolean).join(' ')}
             >
