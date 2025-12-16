@@ -4,7 +4,7 @@ import {SidebarLayout} from '@layouts/index';
 import {RequestOffer} from '@/types';
 import {useOfferForm} from '@features/offers/hooks';
 import {offerFormFields} from '@features/offers/config';
-import {Heading} from "@ui/primitives/heading";
+import {PageHeader} from "@ui/molecules/page-header";
 import {Button} from '@ui/primitives/button';
 import {ChevronLeftIcon} from '@heroicons/react/16/solid';
 import {FieldRenderer} from '@ui/organisms/forms';
@@ -72,11 +72,9 @@ export default function CreateOffer({
             <Head title={offer.id ? 'Edit Offer #' + offer.id : 'Create a new Offer'}/>
 
             <div className="space-y-6">
-                {/* Header */}
-                <Heading>
-                    {offer.id ? 'Edit Offer #' + offer.id : 'Create a new Offer'}
-                </Heading>
-                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
+                <PageHeader
+                    title={offer.id ? `Edit Offer #${offer.id}` : 'Create a new Offer'}
+                />
 
                 {/* Form */}
                 <div>

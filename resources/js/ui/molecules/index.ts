@@ -6,6 +6,10 @@
 export { Breadcrumb } from './breadcrumb';
 export type { BreadcrumbItem } from './breadcrumb';
 
+// Page layout molecules
+export { PageHeader } from './page-header';
+export type { PageHeaderProps, PageHeaderAction } from './page-header';
+
 // Data display molecules
 export { DescriptionList, DescriptionTerm, DescriptionDetails } from './description-list';
 export { TablePaginationNav } from './table-pagination-nav';

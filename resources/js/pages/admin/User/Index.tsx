@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
 import { SidebarLayout } from '@/layouts';
-import { Heading } from '@ui/primitives/heading';
+import { PageHeader } from '@ui/molecules/page-header';
 import { UsersDataTable, adminUserColumns } from '@ui/organisms/data-table/users';
 import { UserRoleDialog, UserBlockDialog, UserDetailsDialog, useUserActions } from '@features/users';
 import { UsersPagination, RoleOption, StatusOption, UserFilters, SortFilters } from '@/types';
@@ -66,28 +66,22 @@ export default function UserIndexPage({
     return (
         <SidebarLayout>
             <Head title={title} />
-            <div className="mx-auto">
-                <Heading level={1}>
-                    {title}
-                </Heading>
-                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
-            </div>
-            <div className="flex items-center justify-between">
-                <div>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        View and manage all requests submitted by users.
-                    </p>
+            <PageHeader
+                title={title}
+                subtitle="View and manage all users in the system."
+            >
+                <div className="flex justify-end">
+                    <DownloadButton
+                        url={route('admin.users.export.csv')}
+                        fileName={'Users Export.csv'}
+                        outline
+                        className="flex-1 sm:flex-initial"
+                    >
+                        <ArrowDownTrayIcon data-slot="icon" />
+                        Download
+                    </DownloadButton>
                 </div>
-                <DownloadButton
-                    url={route('admin.users.export.csv')}
-                    fileName={'Users Export.csv'}
-                    outline
-                    className="flex-1 sm:flex-initial"
-                >
-                    <ArrowDownTrayIcon data-slot="icon" />
-                    Download
-                </DownloadButton>
-            </div>
+            </PageHeader>
 
             <div className="py-8">
                 <UsersDataTable

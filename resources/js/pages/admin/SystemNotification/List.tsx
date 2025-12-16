@@ -5,7 +5,7 @@ import {SidebarLayout} from '@layouts/index'
 import {NotificationList, PaginationLinkProps} from '@/types';
 import {NotificationsDataTable} from '@ui/organisms/data-table/notifications';
 import React from "react";
-import {Heading} from "@ui/primitives/heading";
+import {PageHeader} from "@ui/molecules/page-header";
 
 interface NotificationPagination {
     current_page: number;
@@ -36,12 +36,7 @@ export default function NotificationListPage({notifications, currentSort}: Reado
     return (
         <SidebarLayout>
             <Head title="Notifications"/>
-            <div className="mx-auto">
-                <Heading level={1}>
-                    Notifications List
-                </Heading>
-                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
-            </div>
+            <PageHeader title="Notifications List" />
             <div className="py-8">
                 <NotificationsDataTable
                     notifications={notifications.data}

@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { SidebarLayout } from '@layouts/index';
-import { Heading } from '@ui/primitives/heading';
+import { PageHeader } from '@ui/molecules/page-header';
 import { Button } from '@ui/primitives/button';
 import { Text } from '@ui/primitives/text';
 import { Divider } from '@ui/primitives/divider';
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@ui/primitives/table';
-import { Badge } from '@ui/primitives/badge';
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@ui/primitives/dialog';
 import { RequestSubscription, SubscriptionStats, PageProps } from '@/types';
-import { PlusIcon, EyeIcon, TrashIcon, UsersIcon } from '@heroicons/react/16/solid';
+import { PlusIcon, TrashIcon, UsersIcon } from '@heroicons/react/16/solid';
 import { subscribeFormFields } from '@features/subscriptions/config';
 import { useSubscribeForm } from '@features/subscriptions';
 import { FieldRenderer } from '@ui/organisms/forms';
@@ -87,20 +86,17 @@ export default function AdminSubscriptionsIndex({ subscriptions, stats, users, r
             <Head title="Subscription Management" />
 
             <div className="px-4 py-8 sm:px-6 lg:px-8">
-                <div className="sm:flex sm:items-center">
-                    <div className="sm:flex-auto">
-                        <Heading>Subscription Management</Heading>
-                        <Text className="mt-2">
-                            Manage user subscriptions to capacity development requests.
-                        </Text>
-                    </div>
-                    <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                        <Button onClick={() => setShowCreateDialog(true)}>
-                            <PlusIcon data-slot="icon" />
-                            Subscribe User
-                        </Button>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Subscription Management"
+                    subtitle="Manage user subscriptions to capacity development requests."
+                    actions={{
+                        id: 'subscribe',
+                        label: 'Subscribe User',
+                        icon: PlusIcon,
+                        onClick: () => setShowCreateDialog(true)
+                    }}
+                    layout="stacked"
+                />
 
                 {/* Statistics Cards */}
                 <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

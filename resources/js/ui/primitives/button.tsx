@@ -3,6 +3,33 @@ import clsx from 'clsx'
 import React, { forwardRef } from 'react'
 import { Link } from './link'
 
+// Export button color type for use in other components
+export type ButtonColor =
+    | 'dark/zinc'
+    | 'light'
+    | 'dark/white'
+    | 'dark'
+    | 'white'
+    | 'zinc'
+    | 'indigo'
+    | 'cyan'
+    | 'red'
+    | 'orange'
+    | 'amber'
+    | 'yellow'
+    | 'lime'
+    | 'green'
+    | 'emerald'
+    | 'teal'
+    | 'sky'
+    | 'blue'
+    | 'firefly'
+    | 'violet'
+    | 'purple'
+    | 'fuchsia'
+    | 'pink'
+    | 'rose'
+
 const styles = {
   base: [
     // Base

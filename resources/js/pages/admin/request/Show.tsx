@@ -2,7 +2,7 @@ import React from 'react';
 import {OCDRequestStatus} from '@/types';
 import {SidebarLayout} from '@layouts/index'
 import {Head} from "@inertiajs/react";
-import {Heading} from "@ui/primitives/heading";
+import {PageHeader} from "@ui/molecules/page-header";
 import {UpdateStatusDialog} from "@ui/organisms/dialogs";
 
 import {OCDRequest, PageProps} from '@/types';
@@ -47,10 +47,7 @@ export default function RequestShowPage({
         <SidebarLayout>
             <Head title={`Request: ${request.detail.capacity_development_title || request.id}`} />
 
-            {/* Page Title */}
-            <Heading className="text-2xl/7 font-bold text-gray-900 dark:text-gray-100 sm:truncate sm:text-3xl sm:tracking-tight mb-6">
-                Request Details
-            </Heading>
+            <PageHeader title="Request Details" />
             <div className="mb-6">
                 <StatusBanner auth={auth} request={request} />
             </div>

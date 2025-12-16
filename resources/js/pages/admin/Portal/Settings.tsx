@@ -4,7 +4,7 @@ import { settingsFormFields } from '@features/settings/config';
 import { FieldRenderer } from '@ui/organisms/forms';
 import {Settings} from "@/types";
 import {SidebarLayout} from '@layouts/index'
-import {Heading} from "@ui/primitives/heading";
+import {PageHeader} from "@ui/molecules/page-header";
 import {Button} from "@ui/primitives/button";
 import {Text} from '@ui/primitives/text';
 import {useSettingsForm} from "@/hooks/useSettingsForm";
@@ -25,14 +25,9 @@ export default function SettingsForm({settings}: Readonly<SettingsFormProps>) {
 
     return (
         <SidebarLayout>
-            <Head title="Admin Requests List"/>
-            <div className="mx-auto">
-                <Heading level={1}>
-                    Portal Settings
-                </Heading>
-                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
-            </div>
-            <div className="">
+            <Head title="Portal Settings"/>
+            <PageHeader title="Portal Settings" />
+            <div>
                 <form onSubmit={handleSubmit}>
                     {settingsFormFields.map((step) => (
                         <div key={step.label}>

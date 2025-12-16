@@ -3,7 +3,7 @@ import {Head} from '@inertiajs/react';
 import {OpportunitiesPagination , Context} from '@/types';
 import {SidebarLayout} from '@layouts/index'
 import {OpportunitiesDataTable, adminColumns} from "@ui/organisms/data-table/opportunities";
-import {Heading} from "@ui/primitives/heading";
+import {PageHeader} from "@ui/molecules/page-header";
 import {useOpportunityActions} from '@features/opportunities/hooks';
 
 
@@ -33,12 +33,7 @@ export default function OpportunityListPage({
     return (
         <SidebarLayout>
             <Head title="Opportunities List"/>
-            <div className="mx-auto">
-                <Heading level={1}>
-                    Opportunities List
-                </Heading>
-                <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
-            </div>
+            <PageHeader title="Opportunities List" />
             <div className="py-8">
                 <OpportunitiesDataTable
                     opportunities={opportunities.data}

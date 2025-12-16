@@ -1,11 +1,10 @@
 import React from 'react';
-import {Head, router} from '@inertiajs/react';
+import {Head} from '@inertiajs/react';
 import {SidebarLayout} from '@layouts/index'
-import {RequestOfferList, PaginationLinkProps, RequestOffer} from '@/types';
+import {RequestOfferList, PaginationLinkProps} from '@/types';
 import {OffersDataTable} from '@ui/organisms/data-table/offers';
-import {Button} from '@ui/primitives/button';
 import {PlusIcon} from '@heroicons/react/16/solid';
-import {Heading} from "@ui/primitives/heading";
+import {PageHeader} from "@ui/molecules/page-header";
 import {useOfferActions} from '@features/offers/hooks';
 
 interface OffersPagination {
@@ -54,24 +53,16 @@ export default function OffersList({
             <Head title="Manage Offers"/>
 
             <div className="space-y-6">
-                {/* Header */}
-                <div className="mx-auto">
-                    <Heading level={1}>
-                        Manage Offers
-                    </Heading>
-                    <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
-                </div>
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            View and manage all capacity development offers
-                        </p>
-                    </div>
-                    <Button href={route('admin.offer.create')}>
-                        <PlusIcon data-slot="icon"/>
-                        Create New Offer
-                    </Button>
-                </div>
+                <PageHeader
+                    title="Manage Offers"
+                    subtitle="View and manage all capacity development offers"
+                    actions={{
+                        id: 'create',
+                        label: 'Create New Offer',
+                        icon: PlusIcon,
+                        href: route('admin.offer.create')
+                    }}
+                />
 
                 {/* Data Table */}
                 <div className="">

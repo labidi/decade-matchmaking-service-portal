@@ -4,7 +4,7 @@ import {SidebarLayout} from '@layouts/index';
 import {RequestOffer, User, Document} from '@/types';
 import {FormProvider} from '@ui/organisms/forms';
 import {offerFormFields} from '@features/offers/config';
-import {Heading} from "@ui/primitives/heading";
+import {PageHeader} from "@ui/molecules/page-header";
 
 interface EditOfferPageProps {
     offer: RequestOffer;
@@ -29,13 +29,7 @@ export default function EditOffer({
             <Head title={`Edit Offer #${offer.id}`}/>
 
             <div className="space-y-6">
-                {/* Header */}
-                <div className="mx-auto">
-                    <Heading level={1}>
-                        Notification Details
-                    </Heading>
-                    <hr className="my-2 border-zinc-200 dark:border-zinc-700"/>
-                </div>
+                <PageHeader title={`Edit Offer #${offer.id}`} />
 
                 {/* Offer Context */}
                 <div className="p-4">
