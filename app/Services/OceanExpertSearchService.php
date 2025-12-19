@@ -16,13 +16,8 @@ class OceanExpertSearchService
     public function searchExpertByEmail(string $email): array
     {
         $url = Config::get('services.oceanexpert.search_url');
-        $response = Http::asJson()
-            ->get($url, [
-                'action' => 'advSearch',
-                'filter[]' => 'Email contains',
-                'keywords[]' => $email,
-                'type[]' => 'experts'
-            ]);
+        $url .= '?type[]=experts&keywords[]='.$email.'&filter[]=Email contains&toggele[]=OR&type[]=institution&keywords[]='.$email.'&filter[]=Email contains&action=advSearch';
+        $response = Http::asJson()->get($url);
         $response->throw();
         $profile = [];
         if (isset($response['results']['data'][0])) {
