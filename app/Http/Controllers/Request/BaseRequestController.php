@@ -5,17 +5,46 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Request;
 
 use App\Http\Controllers\Controller;
-use App\Models\Request\Status;
+use App\Models\Request as OCDRequest;
+use App\Models\User;
+use App\Services\Request\RequestActionProvider;
 use App\Services\Request\RequestContextService;
-use App\Services\RequestService;
 use Illuminate\Http\Request;
-
 
 abstract class BaseRequestController extends Controller
 {
     public function __construct(
-        protected readonly RequestContextService $contextService
-    ) {
+        protected readonly RequestContextService $contextService,
+        protected readonly ?RequestActionProvider $actionProvider = null
+    ) {}
+
+    /**
+     * Get actions for a request with optional exclusions.
+     *
+     * @param  OCDRequest  $request  The request entity
+     * @param  User|null  $user  The current user
+     * @param  string  $context  The UI context
+     * @param  array<string>  $exclude  Action keys to exclude
+     * @return array<int, array<string, mixed>>
+     */
+    protected function getActions(
+        OCDRequest $request,
+        ?User $user,
+        string $context,
+        array $exclude = []
+    ): array {
+        $actions = $this->actionProvider->getActions($request, $user, $context);
+
+        if (empty($exclude)) {
+            return $actions;
+        }
+
+        return array_values(
+            array_filter(
+                $actions,
+                fn (array $action) => ! in_array($action['key'], $exclude, true)
+            )
+        );
     }
 
     /**

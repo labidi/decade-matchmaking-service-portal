@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Request;
 
 use App\Http\Resources\RequestResource;
 use App\Models\Request as OCDRequest;
+use App\Services\Request\RequestActionProvider;
 use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -17,9 +18,10 @@ class ViewController extends BaseRequestController
 {
     public function __construct(
         protected readonly RequestService $service,
+        RequestActionProvider $actionProvider,
         RequestContextService $contextService
     ) {
-        parent::__construct($contextService);
+        parent::__construct($contextService, $actionProvider);
     }
 
     /**
@@ -34,7 +36,6 @@ class ViewController extends BaseRequestController
      *
      * @param  Request  $request  HTTP request
      * @param  int|null  $id  Request ID
-     * @return Response
      *
      * @throws ModelNotFoundException
      */
@@ -56,10 +57,14 @@ class ViewController extends BaseRequestController
         // Get context from route name (pure route-based resolution)
         $context = $this->getRouteContext();
 
+        // Transform request data and merge actions into it
+        $requestData = (new RequestResource($userRequest))->toArray($request);
+        $requestData['actions'] = $this->getActions($userRequest, $request->user(), $context, exclude: ['view']);
+
         // Build base view data
         $viewData = [
             'title' => $requestTitle,
-            'request' => new RequestResource($userRequest, $context),
+            'request' => $requestData,
         ];
 
         // Add context-specific data
@@ -74,5 +79,4 @@ class ViewController extends BaseRequestController
 
         return Inertia::render($this->getViewPrefix().'request/Show', $viewData);
     }
-
 }

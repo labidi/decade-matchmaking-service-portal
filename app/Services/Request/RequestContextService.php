@@ -26,6 +26,40 @@ class RequestContextService
     public const CONTEXT_SUBSCRIBED = 'subscribed';
 
     /**
+     * Get all valid contexts.
+     *
+     * @return array<string>
+     */
+    public static function getValidContexts(): array
+    {
+        return [
+            self::CONTEXT_ADMIN,
+            self::CONTEXT_USER_OWN,
+            self::CONTEXT_PUBLIC,
+            self::CONTEXT_MATCHED,
+            self::CONTEXT_SUBSCRIBED,
+        ];
+    }
+
+    /**
+     * Validate a context string.
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function validateContext(string $context): void
+    {
+        if (! in_array($context, self::getValidContexts(), true)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Invalid context "%s". Valid contexts are: %s',
+                    $context,
+                    implode(', ', self::getValidContexts())
+                )
+            );
+        }
+    }
+
+    /**
      * Get context-specific banner configuration for detail view
      *
      * @param  string  $context  The context identifier

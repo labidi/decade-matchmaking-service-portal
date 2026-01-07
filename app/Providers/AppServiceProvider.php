@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Listeners\Opportunity\NotifyAdminAboutOpportunityActivity;
+use App\Contracts\Auth\AuthenticationServiceInterface;
 use App\Models\Opportunity;
 use App\Models\Request;
 use App\Models\Request\Offer;
@@ -14,21 +14,19 @@ use App\Observers\UserObserver;
 use App\Policies\OfferPolicy;
 use App\Policies\OpportunityPolicy;
 use App\Policies\RequestPolicy;
-use App\Contracts\Auth\AuthenticationServiceInterface;
 use App\Services\Actions\DocumentActionProvider;
-use App\Services\Actions\RequestActionProvider;
 use App\Services\Actions\OfferActionProvider;
 use App\Services\Auth\AuthenticationService;
 use App\Services\Auth\Strategies\OAuthAuthStrategy;
 use App\Services\Auth\Strategies\OceanExpertAuthStrategy;
+use App\Services\Request\RequestActionProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 class AppServiceProvider extends ServiceProvider
 {

@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Request;
 
 use App\Enums\Request\PublicRequestStatus;
 use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Resources\PublicRequestResource;
 use App\Http\Resources\RequestResource;
+use App\Services\Request\RequestActionProvider;
 use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
@@ -18,9 +21,10 @@ class ListController extends BaseRequestController
 
     public function __construct(
         private readonly RequestService $service,
+        RequestActionProvider $actionProvider,
         RequestContextService $contextService
     ) {
-        parent::__construct($contextService);
+        parent::__construct($contextService,$actionProvider);
     }
 
     /**
@@ -39,7 +43,7 @@ class ListController extends BaseRequestController
                 'currentSearchFields' => ['user', 'title'],
                 'listRouteName' => 'admin.request.list',
                 'showRouteName' => 'admin.request.show',
-                'actions' => $this->buildActions([
+                'pageActions' => $this->buildActions([
                     $this->createSecondaryAction(
                         'Export CSV',
                         route('admin.request.export.csv'),
@@ -65,7 +69,7 @@ class ListController extends BaseRequestController
                 'listRouteName' => 'request.me.list',
                 'showRouteName' => 'request.show',
                 'routeName' => 'request.me.list',
-                'actions' => $this->buildActions([
+                'pageActions' => $this->buildActions([
                     $this->createPrimaryAction('Submit new request', route('request.create'), 'PlusIcon'),
                 ]),
                 'resourceClass' => RequestResource::class,
@@ -165,6 +169,7 @@ class ListController extends BaseRequestController
     {
         $context = $this->getRouteContext();
         $config = $this->getContextConfiguration($context);
+        $user = $httpRequest->user();
 
         $searchFilters = $this->buildSearchFilters($httpRequest, $config['searchFields']);
         $sortFilters = $this->buildSortFilters($httpRequest);
@@ -173,16 +178,26 @@ class ListController extends BaseRequestController
         $requests = $this->getRequestsForContext(
             $context,
             $config,
-            $httpRequest->user(),
+            $user,
             $searchFilters,
             $sortFilters
         );
 
-        // Transform to appropriate resource with explicit context
+        // Transform each entity and attach its actions
         $resourceClass = $config['resourceClass'];
-        $requests->getCollection()->transform(function ($request) use ($resourceClass, $context) {
-            return new $resourceClass($request, $context);
-        });
+        if ($resourceClass === RequestResource::class) {
+            // RequestResource: transform data + attach actions per row
+            $requests->getCollection()->transform(function ($request) use ($user, $context) {
+                $data = (new RequestResource($request))->toArray(request());
+                $data['actions'] = $this->getActions($request, $user, $context);
+                return $data;
+            });
+        } else {
+            // Other resources (PublicRequestResource) use standard instantiation
+            $requests->getCollection()->transform(
+                fn ($request) => new $resourceClass($request, $context)
+            );
+        }
 
         // Build response data
         $responseData = [
@@ -196,7 +211,7 @@ class ListController extends BaseRequestController
             'listRouteName' => $config['listRouteName'],
             'showRouteName' => $config['showRouteName'] ?? null,
             'searchFields' => $config['searchFields'] ?? [],
-            'actions' => $config['actions'] ?? [],
+            'actions' => $config['pageActions'] ?? [],
             'context' => $context,
         ];
 

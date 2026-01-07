@@ -13,6 +13,7 @@ use App\Exceptions\Auth\UnsupportedAuthenticationMethodException;
 use App\Models\User;
 use App\Services\Auth\Strategies\OAuthAuthStrategy;
 use App\Services\Auth\Strategies\OceanExpertAuthStrategy;
+use App\Services\Auth\Strategies\OtpAuthStrategy;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
@@ -30,11 +31,13 @@ class AuthenticationService implements AuthenticationServiceInterface
 
     public function __construct(
         OceanExpertAuthStrategy $oceanExpertStrategy,
-        OAuthAuthStrategy $oAuthStrategy
+        OAuthAuthStrategy $oAuthStrategy,
+        OtpAuthStrategy $otpAuthStrategy
     ) {
         $this->strategies = [
             $oceanExpertStrategy,
             $oAuthStrategy,
+            $otpAuthStrategy,
         ];
     }
 

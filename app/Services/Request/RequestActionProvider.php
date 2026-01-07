@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Actions;
+namespace App\Services\Request;
 
 use App\Contracts\Actions\ActionProviderInterface;
 use App\Models\Request;
 use App\Models\User;
-use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 
 /**
  * Provides available actions for requests.
  */
-class RequestActionProvider implements ActionProviderInterface
+readonly class RequestActionProvider implements ActionProviderInterface
 {
     public function __construct(
-        private readonly RequestService $requestService
+        private RequestService $requestService
     ) {}
 
     /**

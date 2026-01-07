@@ -19,6 +19,18 @@ return [
     |
     */
     'templates' => [
+        // Authentication Events
+        'auth.otp' => [
+            'template_name' => 'ocd-auth-otp',
+            'subject' => 'Your Ocean Decade Portal Login Code',
+            'variables' => [
+                'user_name' => 'required|string',
+                'otp_code' => 'required|string',
+                'expires_in_minutes' => 'required|integer',
+            ],
+            'tags' => ['auth', 'otp', 'login'],
+        ],
+
         // User Events
         'user.registered' => [
             'template_name' => 'ocd-welcome',
