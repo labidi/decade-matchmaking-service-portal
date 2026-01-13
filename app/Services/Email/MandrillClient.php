@@ -66,6 +66,11 @@ class MandrillClient
 
             $result = $response[0];
 
+            // Convert stdClass to array if needed (Mailchimp library returns stdClass from json_decode)
+            if ($result instanceof \stdClass) {
+                $result = (array) $result;
+            }
+
             // Check for rejection
             if ($result['status'] === 'rejected' || $result['status'] === 'invalid') {
                 throw MandrillApiException::fromApiError(

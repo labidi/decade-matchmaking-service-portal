@@ -44,21 +44,88 @@ class SendTransactionalEmail implements ShouldQueue
     public int $maxExceptions = 3;
 
     /**
+     * The recipient User model (when passed as User)
+     */
+    public ?User $recipient = null;
+
+    /**
+     * Recipient data when passed as array (email, name)
+     *
+     * @var array{email: string, name: string}|null
+     */
+    public ?array $recipientData = null;
+
+    /**
+     * @param User|array{email: string, name?: string} $recipient User model or array with email/name
      * @param array<string, mixed> $variables Template variables
      * @param array<string, mixed> $options Additional options
      */
     public function __construct(
         public string $eventName,
-        public User $recipient,
+        User|array $recipient,
         public array $variables,
         public array $options = []
     ) {
+        // Handle both User model and array recipient
+        if ($recipient instanceof User) {
+            $this->recipient = $recipient;
+            $this->recipientData = null;
+        } else {
+            $this->recipient = null;
+            $this->recipientData = [
+                'email' => $recipient['email'],
+                'name' => $recipient['name'] ?? 'User',
+            ];
+        }
         // Load configuration
         $this->tries = Config::get('mail-templates.queue.max_attempts', 3);
         $this->backoff = Config::get('mail-templates.queue.backoff', [60, 300, 900]);
         // Set queue connection and name
         $this->onConnection(Config::get('mail-templates.queue.connection', 'database'));
         $this->onQueue(Config::get('mail-templates.queue.queue_name', 'emails'));
+    }
+
+    /**
+     * Get the recipient email address
+     */
+    public function getRecipientEmail(): string
+    {
+        return $this->recipient?->email ?? $this->recipientData['email'];
+    }
+
+    /**
+     * Get the recipient name
+     */
+    public function getRecipientName(): string
+    {
+        return $this->recipient?->name ?? $this->recipientData['name'] ?? 'User';
+    }
+
+    /**
+     * Get the recipient ID (0 for array recipients)
+     */
+    public function getRecipientId(): int
+    {
+        return $this->recipient?->id ?? 0;
+    }
+
+    /**
+     * Get or create a User object for the email service
+     * Creates a temporary User when recipient was passed as array
+     */
+    protected function getRecipientUser(): User
+    {
+        if ($this->recipient !== null) {
+            return $this->recipient;
+        }
+
+        // Create a temporary User object for the email service
+        $tempUser = new User();
+        $tempUser->email = $this->recipientData['email'];
+        $tempUser->name = $this->recipientData['name'];
+        $tempUser->id = 0;
+
+        return $tempUser;
     }
 
     /**
@@ -71,13 +138,13 @@ class SendTransactionalEmail implements ShouldQueue
         try {
             Log::info('Processing transactional email job', [
                 'event' => $this->eventName,
-                'recipient' => $this->recipient->email,
+                'recipient' => $this->getRecipientEmail(),
                 'attempt' => $this->attempts(),
             ]);
 
             $result = $emailService->send(
                 $this->eventName,
-                $this->recipient,
+                $this->getRecipientUser(),
                 $this->variables,
                 $this->options
             );
@@ -85,13 +152,13 @@ class SendTransactionalEmail implements ShouldQueue
             if ($result->success) {
                 Log::info('Email sent successfully', [
                     'event' => $this->eventName,
-                    'recipient' => $this->recipient->email,
+                    'recipient' => $this->getRecipientEmail(),
                     'mandrill_id' => $result->mandrillId,
                 ]);
             } else {
                 Log::warning('Email send failed', [
                     'event' => $this->eventName,
-                    'recipient' => $this->recipient->email,
+                    'recipient' => $this->getRecipientEmail(),
                     'error' => $result->error,
                 ]);
 
@@ -103,7 +170,7 @@ class SendTransactionalEmail implements ShouldQueue
         } catch (MandrillApiException $e) {
             Log::error('Mandrill API error in email job', [
                 'event' => $this->eventName,
-                'recipient' => $this->recipient->email,
+                'recipient' => $this->getRecipientEmail(),
                 'error' => $e->getMessage(),
                 'mandrill_code' => $e->getMandrillCode(),
                 'attempt' => $this->attempts(),
@@ -116,7 +183,7 @@ class SendTransactionalEmail implements ShouldQueue
 
                 Log::info('Retrying email job after delay', [
                     'event' => $this->eventName,
-                    'recipient' => $this->recipient->email,
+                    'recipient' => $this->getRecipientEmail(),
                     'delay' => $delay,
                     'next_attempt' => $this->attempts() + 1,
                 ]);
@@ -130,7 +197,7 @@ class SendTransactionalEmail implements ShouldQueue
         } catch (Throwable $e) {
             Log::error('Unexpected error in email job', [
                 'event' => $this->eventName,
-                'recipient' => $this->recipient->email,
+                'recipient' => $this->getRecipientEmail(),
                 'error' => $e->getMessage(),
                 'class' => get_class($e),
                 'attempt' => $this->attempts(),
@@ -149,8 +216,8 @@ class SendTransactionalEmail implements ShouldQueue
         // Log the failure with comprehensive details
         Log::channel('email_errors')->error('Email job permanently failed', [
             'event' => $this->eventName,
-            'recipient' => $this->recipient->email,
-            'recipient_id' => $this->recipient->id,
+            'recipient' => $this->getRecipientEmail(),
+            'recipient_id' => $this->getRecipientId(),
             'error' => $exception?->getMessage(),
             'error_class' => $exception ? get_class($exception) : null,
             'attempts' => $this->attempts(),
@@ -164,7 +231,7 @@ class SendTransactionalEmail implements ShouldQueue
         // Dispatch failure event
         event(new EmailFailed(
             $this->eventName,
-            $this->recipient,
+            $this->getRecipientUser(),
             $exception?->getMessage() ?? 'Unknown error',
             $this->attempts()
         ));
@@ -185,9 +252,9 @@ class SendTransactionalEmail implements ShouldQueue
     {
         try {
             // Find the most recent log entry for this email
-            $emailLog = EmailLog::where('user_id', $this->recipient->id)
+            $emailLog = EmailLog::where('user_id', $this->getRecipientId())
                 ->where('event_name', $this->eventName)
-                ->where('recipient_email', $this->recipient->email)
+                ->where('recipient_email', $this->getRecipientEmail())
                 ->whereIn('status', [EmailLog::STATUS_QUEUED, EmailLog::STATUS_SENDING])
                 ->latest()
                 ->first();
@@ -208,7 +275,7 @@ class SendTransactionalEmail implements ShouldQueue
             Log::error('Failed to update email log for failure', [
                 'error' => $e->getMessage(),
                 'event' => $this->eventName,
-                'recipient' => $this->recipient->email,
+                'recipient' => $this->getRecipientEmail(),
             ]);
         }
     }
@@ -246,8 +313,8 @@ class SendTransactionalEmail implements ShouldQueue
         try {
             $errorDetails = [
                 'Event' => $this->eventName,
-                'Recipient' => $this->recipient->email,
-                'User ID' => $this->recipient->id,
+                'Recipient' => $this->getRecipientEmail(),
+                'User ID' => $this->getRecipientId(),
                 'Error' => $exception?->getMessage() ?? 'Unknown error',
                 'Attempts' => $this->attempts(),
                 'Time' => now()->toIso8601String(),
@@ -276,7 +343,7 @@ class SendTransactionalEmail implements ShouldQueue
             Log::critical('Failed to send admin notification for critical email failure', [
                 'error' => $e->getMessage(),
                 'original_event' => $this->eventName,
-                'original_recipient' => $this->recipient->email,
+                'original_recipient' => $this->getRecipientEmail(),
             ]);
         }
     }
@@ -293,7 +360,7 @@ class SendTransactionalEmail implements ShouldQueue
 
             $failures[] = [
                 'event' => $this->eventName,
-                'recipient' => $this->recipient->email,
+                'recipient' => $this->getRecipientEmail(),
                 'error' => $exception?->getMessage(),
                 'timestamp' => now()->timestamp,
             ];
@@ -342,7 +409,7 @@ class SendTransactionalEmail implements ShouldQueue
         return [
             'email',
             'event:' . $this->eventName,
-            'user:' . $this->recipient->id,
+            'user:' . $this->getRecipientId(),
         ];
     }
 
@@ -362,7 +429,7 @@ class SendTransactionalEmail implements ShouldQueue
         return sprintf(
             'Send %s email to %s',
             $this->eventName,
-            $this->recipient->email
+            $this->getRecipientEmail()
         );
     }
 }

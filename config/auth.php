@@ -112,4 +112,22 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | OTP Authentication Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for One-Time Password (OTP) authentication via email.
+    |
+    */
+
+    'otp' => [
+        'enabled' => env('OTP_AUTH_ENABLED', true),
+        'code_length' => 5,
+        'expiration_minutes' => 10,
+        'max_requests_per_hour' => 5,
+        'max_attempts' => 5,
+        'cooldown_seconds' => 60,
+    ],
+
 ];

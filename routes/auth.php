@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\SocialController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,25 @@ Route::middleware('guest')->group(function () {
     Route::get('auth/google/callback', [SocialController::class, 'googleCallback'])
         ->middleware('throttle:oauth-callback')
         ->name('auth.google.callback');
+
+    // OTP Authentication Routes
+    Route::get('otp', [OtpController::class, 'showRequestForm'])
+        ->name('otp.request');
+
+    Route::post('otp/send', [OtpController::class, 'sendOtp'])
+        ->middleware('throttle:5,1')
+        ->name('otp.send');
+
+    Route::get('otp/verify', [OtpController::class, 'showVerifyForm'])
+        ->name('otp.verify');
+
+    Route::post('otp/verify', [OtpController::class, 'verify'])
+        ->middleware('throttle:10,1')
+        ->name('otp.verify.submit');
+
+    Route::post('otp/resend', [OtpController::class, 'resend'])
+        ->middleware('throttle:3,1')
+        ->name('otp.resend');
 });
 
 Route::middleware('auth')->group(function () {
