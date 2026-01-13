@@ -129,7 +129,7 @@ class OtpController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'OTP verified successfully.',
-                'redirect' => route('home'),
+                'redirect' => route('user.home'),
             ]);
         } catch (OtpAuthenticationException $e) {
             // Let the exception render itself

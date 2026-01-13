@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\SocialController;
+use App\Http\Controllers\InvitationAcceptController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -41,12 +42,21 @@ Route::middleware('guest')->group(function () {
         ->name('otp.verify');
 
     Route::post('otp/verify', [OtpController::class, 'verify'])
-        ->middleware('throttle:10,1')
+//        ->middleware('throttle:10,1')
         ->name('otp.verify.submit');
 
     Route::post('otp/resend', [OtpController::class, 'resend'])
         ->middleware('throttle:3,1')
         ->name('otp.resend');
+
+    // Invitation Routes
+    Route::get('invitation/{token}', [InvitationAcceptController::class, 'show'])
+        ->middleware('throttle:10,1')
+        ->name('invitation.show');
+
+    Route::post('invitation/{token}/accept', [InvitationAcceptController::class, 'accept'])
+        ->middleware('throttle:5,1')
+        ->name('invitation.accept');
 });
 
 Route::middleware('auth')->group(function () {

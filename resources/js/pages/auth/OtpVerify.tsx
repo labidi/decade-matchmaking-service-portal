@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, FormEvent, KeyboardEvent, ClipboardEvent } from 'react';
+import { useState, useRef, useEffect, FormEvent, ChangeEvent } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { FrontendLayout } from '@layouts/index';
 import { Button } from '@ui/primitives/button';
@@ -15,18 +15,17 @@ interface OtpVerifyProps {
 }
 
 export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProps>) {
-    const [digits, setDigits] = useState<string[]>(['', '', '', '', '']);
+    const [code, setCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isResending, setIsResending] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
     const [resendCooldown, setResendCooldown] = useState(0);
-    const [autoSubmitting, setAutoSubmitting] = useState(false);
-    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        inputRefs.current[0]?.focus();
+        inputRef.current?.focus();
     }, []);
 
     useEffect(() => {
@@ -36,45 +35,28 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
         }
     }, [resendCooldown]);
 
-    const handleDigitChange = (index: number, value: string) => {
-        if (!/^\d*$/.test(value)) return;
-
-        const newDigits = [...digits];
-        newDigits[index] = value.slice(-1);
-        setDigits(newDigits);
-
-        if (value && index < 4) {
-            inputRefs.current[index + 1]?.focus();
+    // Refocus when code is cleared (e.g., after error)
+    useEffect(() => {
+        if (code === '') {
+            inputRef.current?.focus();
         }
+    }, [code]);
 
-        if (newDigits.every(d => d) && newDigits.join('').length === 5) {
-            handleSubmit(newDigits.join(''));
-        }
-    };
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        // Only allow digits, max 5 characters
+        const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+        setCode(value);
 
-    const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Backspace' && !digits[index] && index > 0) {
-            inputRefs.current[index - 1]?.focus();
+        // Auto-submit when 5 digits entered
+        if (value.length === 5) {
+            handleSubmit(value);
         }
     };
 
-    const handlePaste = (e: ClipboardEvent) => {
-        e.preventDefault();
-        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 5);
+    const handleSubmit = async (otpCode?: string) => {
+        const codeToSubmit = otpCode || code;
 
-        if (pastedData.length === 5) {
-            const newDigits = pastedData.split('');
-            setDigits(newDigits);
-            inputRefs.current[4]?.focus();
-            setAutoSubmitting(true);
-            handleSubmit(pastedData);
-        }
-    };
-
-    const handleSubmit = async (code?: string) => {
-        const otpCode = code || digits.join('');
-
-        if (otpCode.length !== 5) {
+        if (codeToSubmit.length !== 5) {
             setError('Please enter all 5 digits');
             return;
         }
@@ -84,7 +66,7 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
 
         try {
             const response = await axios.post(route('otp.verify.submit'), {
-                code: otpCode,
+                code: codeToSubmit,
             });
 
             if (response.data.success && response.data.redirect) {
@@ -106,9 +88,7 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
                 setError(data?.message || 'Invalid code');
             }
 
-            setDigits(['', '', '', '', '']);
-            setAutoSubmitting(false);
-            inputRefs.current[0]?.focus();
+            setCode('');
         } finally {
             setIsLoading(false);
         }
@@ -177,37 +157,30 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
                         </div>
                     )}
 
-                    {/* OTP Input Fields */}
-                    <div className="flex justify-center gap-2 sm:gap-3">
-                        {digits.map((digit, index) => (
-                            <Input
-                                key={index}
-                                ref={(el) => { inputRefs.current[index] = el; }}
-                                type="text"
-                                inputMode="numeric"
-                                pattern="\d*"
-                                maxLength={1}
-                                value={digit}
-                                onChange={(e) => handleDigitChange(index, e.target.value)}
-                                onKeyDown={(e) => handleKeyDown(index, e)}
-                                onPaste={handlePaste}
-                                className={`w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-mono ${
-                                    error ? 'border-red-500' : ''
-                                } ${autoSubmitting && !error ? 'border-green-500 ring-2 ring-green-200' : ''}`}
-                                disabled={isLoading || showSuccess}
-                                aria-label={`Digit ${index + 1}`}
-                            />
-                        ))}
+                    {/* Single OTP Input */}
+                    <div className="flex justify-center">
+                        <Input
+                            ref={inputRef}
+                            type="text"
+                            inputMode="numeric"
+                            pattern="\d*"
+                            maxLength={5}
+                            value={code}
+                            onChange={handleChange}
+                            placeholder="00000"
+                            className={`w-48 sm:w-52 h-14 sm:h-16 text-center text-2xl sm:text-3xl font-mono tracking-[0.5em] placeholder:tracking-[0.5em] ${
+                                error ? 'border-red-500' : ''
+                            }`}
+                            disabled={isLoading || showSuccess}
+                            aria-label="Enter 5-digit verification code"
+                            aria-describedby={error ? 'otp-error' : undefined}
+                        />
                     </div>
-
-                    {/* Paste Hint */}
-                    <Text className="text-xs text-gray-500 text-center">
-                        Tip: You can paste the entire code
-                    </Text>
 
                     {/* Error Message */}
                     {error && (
                         <div
+                            id="otp-error"
                             role="alert"
                             aria-live="polite"
                             className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-center transition-opacity duration-200"
@@ -235,7 +208,7 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
                     <div className="flex justify-center">
                         <Button
                             type="submit"
-                            disabled={isLoading || digits.some(d => !d) || showSuccess}
+                            disabled={isLoading || code.length !== 5 || showSuccess}
                             color="firefly"
                         >
                             {isLoading ? (

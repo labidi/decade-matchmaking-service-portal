@@ -95,6 +95,7 @@ class OtpService
         return [
             'success' => true,
             'message' => 'If an account exists with this email, an OTP has been sent.',
+            'code'=>$code
         ];
     }
 

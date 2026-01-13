@@ -55,4 +55,12 @@ class UserPolicy
     {
         return $user->hasRole('administrator');
     }
+
+    /**
+     * Determine if user can invite new users
+     */
+    public function invite(User $user): bool
+    {
+        return $user->hasRole('administrator');
+    }
 }

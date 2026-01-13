@@ -3,10 +3,11 @@ import { Head } from '@inertiajs/react';
 import { SidebarLayout } from '@/layouts';
 import { PageHeader } from '@ui/molecules/page-header';
 import { UsersDataTable, adminUserColumns } from '@ui/organisms/data-table/users';
-import { UserRoleDialog, UserBlockDialog, UserDetailsDialog, useUserActions } from '@features/users';
+import { UserRoleDialog, UserBlockDialog, UserDetailsDialog, UserInvitationForm, useUserActions } from '@features/users';
 import { UsersPagination, RoleOption, StatusOption, UserFilters, SortFilters } from '@/types';
-import {ArrowDownTrayIcon} from "@heroicons/react/16/solid";
+import { ArrowDownTrayIcon } from "@heroicons/react/16/solid";
 import { DownloadButton } from '@/components/ui/download-button';
+import { FlashMessages } from '@ui/organisms/flash-messages';
 
 interface UserIndexPageProps {
     title: string;
@@ -84,6 +85,12 @@ export default function UserIndexPage({
             </PageHeader>
 
             <div className="py-8">
+                {/* Flash Messages */}
+                <FlashMessages className="mb-6" />
+
+                {/* Invitation Form Section */}
+                <UserInvitationForm className="mb-8" />
+
                 <UsersDataTable
                     users={users.data}
                     currentSort={{

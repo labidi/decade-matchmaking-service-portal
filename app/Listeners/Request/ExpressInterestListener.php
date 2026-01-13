@@ -32,15 +32,6 @@ readonly class ExpressInterestListener implements ShouldQueue
                     $partner->name ?? 'Unknown Partner'
                 )
             );
-            dispatch(new SendTransactionalEmail(
-                'request.express-interest.partner',
-                $partner,
-                [
-                    'Request_Title' => $request->detail->capacity_development_title ?? 'N/A',
-                    'UNSUB' => route('unsubscribe.show', $partner->id),
-                    'UPDATE_PROFILE' => route('notification.preferences.index'),
-                ]
-            ));
         } catch (Exception $exception) {
             Log::error('Error during handling partner express interest', [
                 'request_id' => $request->id,

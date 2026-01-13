@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, KeyboardEvent, ClipboardEvent, FormEvent } from 'react';
+import React, { useRef, useEffect, FormEvent, ChangeEvent } from 'react';
 import { Button } from '@ui/primitives/button';
 import { Input } from '@ui/primitives/input';
 import { Text } from '@ui/primitives/text';
@@ -8,7 +8,7 @@ interface OtpVerifyStepProps {
     maskedEmail: string;
     code: string;
     onCodeChange: (code: string) => void;
-    onSubmit: () => void;
+    onSubmit: (code?: string) => void;
     onResend: () => void;
     onBack: () => void;
     isProcessing: boolean;
@@ -29,71 +29,36 @@ export function OtpVerifyStep({
     remainingAttempts,
     resendCooldown,
 }: Readonly<OtpVerifyStepProps>) {
-    const [digits, setDigits] = useState<string[]>(['', '', '', '', '']);
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [autoSubmitting, setAutoSubmitting] = useState(false);
-    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    // Focus first input on mount
+    // Focus input on mount
     useEffect(() => {
-        inputRefs.current[0]?.focus();
+        inputRef.current?.focus();
     }, []);
 
-    // Sync digits from external code prop
+    // Refocus when code is cleared (e.g., after error)
     useEffect(() => {
         if (code === '') {
-            setDigits(['', '', '', '', '']);
-            setAutoSubmitting(false);
-            inputRefs.current[0]?.focus();
+            inputRef.current?.focus();
         }
     }, [code]);
 
-    const handleDigitChange = (index: number, value: string) => {
-        if (!/^\d*$/.test(value)) return;
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        // Only allow digits, max 5 characters
+        const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+        onCodeChange(value);
 
-        const newDigits = [...digits];
-        newDigits[index] = value.slice(-1);
-        setDigits(newDigits);
-
-        // Update parent code
-        const newCode = newDigits.join('');
-        onCodeChange(newCode);
-
-        // Move to next input
-        if (value && index < 4) {
-            inputRefs.current[index + 1]?.focus();
-        }
-
-        // Auto-submit when all 5 digits entered
-        if (newDigits.every(d => d) && newDigits.join('').length === 5) {
-            setAutoSubmitting(true);
-            onSubmit();
-        }
-    };
-
-    const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Backspace' && !digits[index] && index > 0) {
-            inputRefs.current[index - 1]?.focus();
-        }
-    };
-
-    const handlePaste = (e: ClipboardEvent) => {
-        e.preventDefault();
-        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 5);
-
-        if (pastedData.length === 5) {
-            const newDigits = pastedData.split('');
-            setDigits(newDigits);
-            onCodeChange(pastedData);
-            inputRefs.current[4]?.focus();
-            setAutoSubmitting(true);
-            onSubmit();
+        // Auto-submit when 5 digits entered
+        if (value.length === 5) {
+            onSubmit(value);
         }
     };
 
     const handleFormSubmit = (e: FormEvent) => {
         e.preventDefault();
-        onSubmit();
+        if (code.length === 5) {
+            onSubmit(code);
+        }
     };
 
     return (
@@ -106,49 +71,30 @@ export function OtpVerifyStep({
                 </Text>
             </div>
 
-            {/* Success State */}
-            {showSuccess && (
-                <div
-                    role="status"
-                    className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-center transition-opacity duration-200"
-                >
-                    <Text className="text-sm text-green-600 dark:text-green-400">
-                        Verified! Redirecting...
-                    </Text>
-                </div>
-            )}
-
-            {/* OTP Input Fields */}
-            <div className="flex justify-center gap-2 sm:gap-3">
-                {digits.map((digit, index) => (
-                    <Input
-                        key={index}
-                        ref={(el) => { inputRefs.current[index] = el; }}
-                        type="text"
-                        inputMode="numeric"
-                        pattern="\d*"
-                        maxLength={1}
-                        value={digit}
-                        onChange={(e) => handleDigitChange(index, e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(index, e)}
-                        onPaste={handlePaste}
-                        className={`w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-mono ${
-                            error ? 'border-red-500' : ''
-                        } ${autoSubmitting && !error ? 'border-green-500 ring-2 ring-green-200' : ''}`}
-                        disabled={isProcessing || showSuccess}
-                        aria-label={`Digit ${index + 1}`}
-                    />
-                ))}
+            {/* Single OTP Input */}
+            <div className="flex justify-center">
+                <Input
+                    ref={inputRef}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="\d*"
+                    maxLength={5}
+                    value={code}
+                    onChange={handleChange}
+                    placeholder="00000"
+                    className={`w-48 sm:w-52 text-center text-2xl sm:text-3xl font-mono tracking-[0.5em] placeholder:tracking-[0.5em] ${
+                        error ? 'border-red-500' : ''
+                    }`}
+                    disabled={isProcessing}
+                    aria-label="Enter 5-digit verification code"
+                    aria-describedby={error ? 'otp-error' : undefined}
+                />
             </div>
-
-            {/* Paste Hint */}
-            <Text className="text-xs text-gray-500 text-center">
-                Tip: You can paste the entire code
-            </Text>
 
             {/* Error Message */}
             {error && (
                 <div
+                    id="otp-error"
                     role="alert"
                     aria-live="polite"
                     className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-center transition-opacity duration-200"
@@ -176,7 +122,7 @@ export function OtpVerifyStep({
             <div className="flex justify-center">
                 <Button
                     type="submit"
-                    disabled={isProcessing || digits.some(d => !d) || showSuccess}
+                    disabled={isProcessing || code.length !== 5}
                     color="firefly"
                 >
                     {isProcessing ? (

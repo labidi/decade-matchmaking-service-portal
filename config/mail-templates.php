@@ -21,7 +21,7 @@ return [
     'templates' => [
         // Authentication Events
         'auth.otp' => [
-            'template_name' => 'ocd-auth-otp',
+            'template_name' => 'cdf-otp-information',
             'subject' => 'Your Ocean Decade Portal Login Code',
             'variables' => [
                 'user_name' => 'required|string',
@@ -29,6 +29,19 @@ return [
                 'expires_in_minutes' => 'required|integer',
             ],
             'tags' => ['auth', 'otp', 'login'],
+        ],
+
+        // User Invitation
+        'user.invitation' => [
+            'template_name' => 'cdf-invitation-link',
+            'subject' => 'You have been invited to join Ocean Decade Portal',
+            'variables' => [
+                'user_name' => 'required|string',
+                'Link' => 'required|url',
+                'inviter_name' => 'required|string',
+                'expires_at' => 'required|string',
+            ],
+            'tags' => ['user', 'invitation'],
         ],
 
         // User Events

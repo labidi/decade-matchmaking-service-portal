@@ -34,6 +34,7 @@ class User extends Authenticatable
         'avatar',
         'is_blocked',
         'last_login_at',
+        'email_verified_at',
     ];
 
     /**
