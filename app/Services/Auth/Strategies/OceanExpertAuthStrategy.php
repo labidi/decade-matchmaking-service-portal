@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Auth\Strategies;
 
 use App\Contracts\Auth\AuthenticationStrategyInterface;
+use App\DTOs\Auth\AuthenticationResult;
 use App\Exceptions\Auth\OceanExpertAuthenticationException;
 use App\Models\User;
 use App\Services\OceanExpertAuthService;
@@ -12,7 +13,6 @@ use App\Services\OceanExpertSearchService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Psr\Log\LoggerInterface;
 use Throwable;
 
 class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
@@ -26,13 +26,13 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
      * Authenticate user against Ocean Expert API
      *
      * @param array{email: string, password: string} $credentials
-     * @return array{user: User, metadata: array<string, mixed>}
+     *
      * @throws OceanExpertAuthenticationException
      */
-    public function authenticate(array $credentials): array
+    public function authenticate(array $credentials): AuthenticationResult
     {
         // Validate required credentials
-        if (!isset($credentials['email'], $credentials['password'])) {
+        if (! isset($credentials['email'], $credentials['password'])) {
             throw OceanExpertAuthenticationException::invalidCredentials();
         }
 
@@ -52,14 +52,11 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
             // Create or update local user in database transaction
             $user = $this->syncLocalUser($email, $password, $profile);
 
-            return [
-                'user' => $user,
-                'metadata' => [
-                    'ocean_expert_token' => $token,
-                    'auth_method' => 'ocean_expert',
-                    'profile_data' => $profile,
-                ],
-            ];
+            return new AuthenticationResult(
+                user: $user,
+                authMethod: 'ocean_expert',
+                externalToken: $token,
+            );
         } catch (OceanExpertAuthenticationException $e) {
             // Re-throw our custom exceptions
             throw $e;
@@ -89,7 +86,7 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
     public function supports(array $credentials): bool
     {
         return isset($credentials['email'], $credentials['password'])
-            && !isset($credentials['socialite_user']);
+            && ! isset($credentials['socialite_user']);
     }
 
     /**
@@ -98,7 +95,7 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
      * @param string $email User email
      * @param string $password User password
      * @param array<string, mixed> $profile Ocean Expert profile data
-     * @return User
+     *
      * @throws Throwable
      */
     private function syncLocalUser(string $email, string $password, array $profile): User
@@ -113,23 +110,10 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
                 'city' => $profile['city'] ?? null,
             ];
 
-            $user = User::updateOrCreate(
+            return User::updateOrCreate(
                 ['email' => $email],
                 $userData
             );
-
-            $this->getLogger()->info('User synchronized with Ocean Expert', [
-                'user_id' => $user->id,
-                'email' => $email,
-                'is_new' => $user->wasRecentlyCreated,
-            ]);
-
-            return $user;
         });
-    }
-
-    private function getLogger(): LoggerInterface
-    {
-        return Log::channel('auth');
     }
 }

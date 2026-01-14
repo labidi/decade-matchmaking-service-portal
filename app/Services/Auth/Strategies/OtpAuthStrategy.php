@@ -5,35 +5,53 @@ declare(strict_types=1);
 namespace App\Services\Auth\Strategies;
 
 use App\Contracts\Auth\AuthenticationStrategyInterface;
+use App\DTOs\Auth\AuthenticationResult;
 use App\Exceptions\Auth\OtpAuthenticationException;
 use App\Models\User;
-use App\Services\Auth\OtpService;
 use Illuminate\Support\Facades\Log;
+use Spatie\OneTimePasswords\Enums\ConsumeOneTimePasswordResult;
 
 class OtpAuthStrategy implements AuthenticationStrategyInterface
 {
-    public function __construct(
-        private readonly OtpService $otpService
-    ) {}
-
     /**
      * Authenticate user with OTP credentials
      *
      * @param array{email: string, otp_code: string, ip_address?: string} $credentials
-     * @return array{user: User, metadata: array<string, mixed>}
+     *
      * @throws OtpAuthenticationException
      */
-    public function authenticate(array $credentials): array
+    public function authenticate(array $credentials): AuthenticationResult
     {
-        if (!isset($credentials['email'], $credentials['otp_code'])) {
+        if (! isset($credentials['email'], $credentials['otp_code'])) {
             throw OtpAuthenticationException::notFound();
         }
 
-        $email = $credentials['email'];
+        $email = strtolower(trim($credentials['email']));
         $otpCode = $credentials['otp_code'];
         $ipAddress = $credentials['ip_address'] ?? null;
 
-        $user = $this->otpService->verifyOtp($email, $otpCode, $ipAddress);
+        // Find user
+        $user = User::where('email', $email)->first();
+
+        if (! $user) {
+            Log::channel('auth')->info('OTP authentication failed: user not found', [
+                'email_hash' => hash('sha256', $email),
+                'ip_address' => $ipAddress,
+            ]);
+            throw OtpAuthenticationException::notFound();
+        }
+
+        // Verify OTP using Spatie's native method
+        $result = $user->consumeOneTimePassword($otpCode);
+
+        if (! $result->isOk()) {
+            Log::channel('auth')->info('OTP authentication failed', [
+                'user_id' => $user->id,
+                'result' => $result->value,
+                'ip_address' => $ipAddress,
+            ]);
+            throw $this->mapResultToException($result);
+        }
 
         Log::channel('auth')->info('OTP authentication successful', [
             'user_id' => $user->id,
@@ -41,12 +59,31 @@ class OtpAuthStrategy implements AuthenticationStrategyInterface
             'ip_address' => $ipAddress,
         ]);
 
-        return [
-            'user' => $user,
-            'metadata' => [
-                'auth_method' => 'otp',
-            ],
-        ];
+        return new AuthenticationResult(
+            user: $user,
+            authMethod: 'otp',
+        );
+    }
+
+    /**
+     * Map ConsumeOneTimePasswordResult to appropriate OtpAuthenticationException
+     */
+    private function mapResultToException(ConsumeOneTimePasswordResult $result): OtpAuthenticationException
+    {
+        return match ($result) {
+            ConsumeOneTimePasswordResult::NoOneTimePasswordsFound => OtpAuthenticationException::notFound(),
+            ConsumeOneTimePasswordResult::IncorrectOneTimePassword => OtpAuthenticationException::invalidCode(0),
+            ConsumeOneTimePasswordResult::OneTimePasswordExpired => OtpAuthenticationException::expired(),
+            ConsumeOneTimePasswordResult::RateLimitExceeded => OtpAuthenticationException::maxAttemptsExceeded(),
+            ConsumeOneTimePasswordResult::DifferentOrigin => new OtpAuthenticationException(
+                'Security check failed. Please request a new code.',
+                'origin_mismatch'
+            ),
+            default => new OtpAuthenticationException(
+                'Authentication failed.',
+                'unknown_error'
+            ),
+        };
     }
 
     /**
@@ -57,7 +94,7 @@ class OtpAuthStrategy implements AuthenticationStrategyInterface
     public function supports(array $credentials): bool
     {
         return isset($credentials['email'], $credentials['otp_code'])
-            && !isset($credentials['password'])
-            && !isset($credentials['socialite_user']);
+            && ! isset($credentials['password'])
+            && ! isset($credentials['socialite_user']);
     }
 }

@@ -32,7 +32,7 @@ export default function SignInDialog() {
 
         return {
             title: 'Verify Your Email',
-            description: `We sent a 5-digit code to your email. Please enter it below.`,
+            description: `We sent a 6-digit code to your email. Please enter it below.`,
         };
     };
 
@@ -117,7 +117,6 @@ export default function SignInDialog() {
                                 onBack={otpForm.handleBack}
                                 isProcessing={otpForm.form.processing}
                                 error={otpForm.form.errors.code}
-                                remainingAttempts={otpForm.remainingAttempts}
                                 resendCooldown={otpForm.resendCooldown}
                             />
                         )}

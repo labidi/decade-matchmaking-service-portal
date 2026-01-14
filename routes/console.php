@@ -30,6 +30,13 @@ Schedule::command('queue:prune-failed --hours=168')
     ->daily()
     ->at('02:00');
 
+// Prune expired one-time passwords (Spatie OTP)
+Schedule::command('model:prune', [
+    '--model' => [\Spatie\OneTimePasswords\Models\OneTimePassword::class],
+])
+    ->daily()
+    ->at('02:30');
+
 // Queue health check every 5 minutes
 Schedule::command('queue:health-check')
     ->everyFiveMinutes()

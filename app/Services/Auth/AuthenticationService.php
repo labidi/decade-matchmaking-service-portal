@@ -6,9 +6,11 @@ namespace App\Services\Auth;
 
 use App\Contracts\Auth\AuthenticationServiceInterface;
 use App\Contracts\Auth\AuthenticationStrategyInterface;
+use App\DTOs\Auth\AuthenticationResult;
 use App\Events\Auth\UserAuthenticated;
 use App\Exceptions\Auth\AccountBlockedException;
 use App\Exceptions\Auth\OceanExpertAuthenticationException;
+use App\Exceptions\Auth\OtpAuthenticationException;
 use App\Exceptions\Auth\UnsupportedAuthenticationMethodException;
 use App\Models\User;
 use App\Services\Auth\Strategies\OAuthAuthStrategy;
@@ -44,8 +46,12 @@ class AuthenticationService implements AuthenticationServiceInterface
     /**
      * Authenticate user with email/password credentials
      *
+     * @param string $email
+     * @param string $password
+     * @return User
+     * @throws AccountBlockedException
      * @throws OceanExpertAuthenticationException
-     * @throws ValidationException
+     * @throws UnsupportedAuthenticationMethodException
      */
     public function authenticateWithCredentials(string $email, string $password): User
     {
@@ -76,11 +82,11 @@ class AuthenticationService implements AuthenticationServiceInterface
             // Clear rate limit on success
             RateLimiter::clear($throttleKey);
 
-            $this->completeAuthentication($result['user'], $result['metadata']);
+            $this->completeAuthentication($result->user, $result);
 
-            $this->logAuthenticationSuccess($result['user'], 'credentials');
+            $this->logAuthenticationSuccess($result->user, $result->authMethod);
 
-            return $result['user'];
+            return $result->user;
         } catch (OceanExpertAuthenticationException $e) {
             // Increment rate limit on failure
             RateLimiter::hit($throttleKey);
@@ -95,10 +101,28 @@ class AuthenticationService implements AuthenticationServiceInterface
      * Authenticate user with OAuth provider
      *
      * @throws \App\Exceptions\Auth\OAuthAuthenticationException
+     * @throws ValidationException When rate limited
      */
     public function authenticateWithOAuth(SocialiteUser $socialUser, string $provider): User
     {
-        $this->logAuthenticationAttempt($socialUser->getEmail() ?? 'unknown', $provider);
+        $email = $socialUser->getEmail() ?? 'unknown';
+        $throttleKey = $this->getThrottleKey($email);
+
+        $this->logAuthenticationAttempt($email, $provider);
+
+        // Rate limiting check (10 attempts per minute for OAuth)
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            $this->logAuthenticationFailure($email, $provider, 'rate_limited');
+
+            throw ValidationException::withMessages([
+                'oauth' => trans('auth.throttle', [
+                    'seconds' => $seconds,
+                    'minutes' => ceil($seconds / 60),
+                ]),
+            ]);
+        }
 
         try {
             $result = $this->authenticate([
@@ -106,14 +130,20 @@ class AuthenticationService implements AuthenticationServiceInterface
                 'provider' => $provider,
             ]);
 
-            $this->completeAuthentication($result['user'], $result['metadata']);
+            // Clear rate limit on success
+            RateLimiter::clear($throttleKey);
 
-            $this->logAuthenticationSuccess($result['user'], $provider);
+            $this->completeAuthentication($result->user, $result);
 
-            return $result['user'];
+            $this->logAuthenticationSuccess($result->user, $result->authMethod);
+
+            return $result->user;
         } catch (\Exception $e) {
+            // Increment rate limit on failure
+            RateLimiter::hit($throttleKey);
+
             $this->logAuthenticationFailure(
-                $socialUser->getEmail() ?? 'unknown',
+                $email,
                 $provider,
                 $e->getMessage()
             );
@@ -123,13 +153,45 @@ class AuthenticationService implements AuthenticationServiceInterface
     }
 
     /**
-     * Complete the authentication process (login, session setup)
+     * Authenticate user with OTP code
      *
-     * @param  array<string, mixed>  $additionalData
+     * @param string $email User email address
+     * @param string $code OTP code to verify
+     * @param string|null $ipAddress Client IP address for logging
+     * @return User Authenticated user instance
+     * @throws OtpAuthenticationException
+     * @throws AccountBlockedException
+     * @throws UnsupportedAuthenticationMethodException
+     */
+    public function authenticateWithOtp(string $email, string $code, ?string $ipAddress = null): User
+    {
+        $this->logAuthenticationAttempt($email, 'otp');
+
+        try {
+            $result = $this->authenticate([
+                'email' => $email,
+                'otp_code' => $code,
+                'ip_address' => $ipAddress,
+            ]);
+
+            $this->completeAuthentication($result->user, $result);
+
+            $this->logAuthenticationSuccess($result->user, $result->authMethod);
+
+            return $result->user;
+        } catch (\Exception $e) {
+            $this->logAuthenticationFailure($email, 'otp', $e->getMessage());
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Complete the authentication process (login, session setup)
      *
      * @throws AccountBlockedException
      */
-    public function completeAuthentication(User $user, array $additionalData = []): void
+    public function completeAuthentication(User $user, AuthenticationResult $result): void
     {
         // Security check: Ensure user is not blocked
         $this->ensureUserIsActive($user);
@@ -143,21 +205,23 @@ class AuthenticationService implements AuthenticationServiceInterface
         // Login the user
         Auth::login($user, remember: true);
 
-        // Store additional session data AFTER regeneration
-        if (! empty($additionalData['ocean_expert_token'])) {
-            Session::put('external_api_token', $additionalData['ocean_expert_token']);
+        // Store external token (Ocean Expert)
+        if ($result->hasExternalToken()) {
+            Session::put('external_api_token', $result->externalToken);
         }
 
-        if (! empty($additionalData['oauth_provider'])) {
-            Session::put('oauth_provider', $additionalData['oauth_provider']);
-            Session::put('oauth_id', $additionalData['oauth_id']);
+        // Store OAuth metadata
+        if ($result->hasOAuthMetadata()) {
+            $oauth = $result->oauthMetadata;
+            Session::put('oauth_provider', $oauth->provider);
+            Session::put('oauth_id', $oauth->providerId);
 
             // Store OAuth tokens for potential refresh capability
-            if (! empty($additionalData['oauth_token'])) {
-                Session::put('oauth_token', $additionalData['oauth_token']);
+            if ($oauth->accessToken) {
+                Session::put('oauth_token', $oauth->accessToken);
             }
-            if (! empty($additionalData['oauth_refresh_token'])) {
-                Session::put('oauth_refresh_token', $additionalData['oauth_refresh_token']);
+            if ($oauth->refreshToken) {
+                Session::put('oauth_refresh_token', $oauth->refreshToken);
             }
         }
 
@@ -165,8 +229,7 @@ class AuthenticationService implements AuthenticationServiceInterface
         $user->update(['last_login_at' => now()]);
 
         // Fire custom authentication event
-        $method = $additionalData['auth_method'] ?? 'credentials';
-        event(new UserAuthenticated($user, $additionalData, $method));
+        event(new UserAuthenticated($user, $result->authMethod));
     }
 
     /**
@@ -205,11 +268,10 @@ class AuthenticationService implements AuthenticationServiceInterface
      * Execute authentication using the appropriate strategy
      *
      * @param  array<string, mixed>  $credentials
-     * @return array{user: User, metadata: array<string, mixed>}
      *
      * @throws UnsupportedAuthenticationMethodException
      */
-    private function authenticate(array $credentials): array
+    private function authenticate(array $credentials): AuthenticationResult
     {
         foreach ($this->strategies as $strategy) {
             if ($strategy->supports($credentials)) {
@@ -249,7 +311,7 @@ class AuthenticationService implements AuthenticationServiceInterface
      */
     private function logAuthenticationAttempt(string $email, string $method): void
     {
-        Log::channel('auth')->info('Authentication attempt with email : '.$email.' and method : '.$method, [
+        Log::channel('auth')->info("Authentication attempt with email: {$email} and method: {$method}", [
             'email' => $email,
             'method' => $method,
             'ip' => request()->ip(),
@@ -262,7 +324,7 @@ class AuthenticationService implements AuthenticationServiceInterface
      */
     private function logAuthenticationSuccess(User $user, string $method): void
     {
-        Log::channel('auth')->info('Authentication successful with email : '.$user->email.' and method : '.$method, [
+        Log::channel('auth')->info("Authentication successful with email: {$user->email} and method: {$method}", [
             'user_id' => $user->id,
             'email' => $user->email,
             'method' => $method,

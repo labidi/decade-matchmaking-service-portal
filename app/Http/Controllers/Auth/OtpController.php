@@ -9,17 +9,17 @@ use App\Exceptions\Auth\OtpAuthenticationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\OtpRequestRequest;
 use App\Http\Requests\Auth\OtpVerifyRequest;
-use App\Services\Auth\OtpService;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class OtpController extends Controller
 {
     public function __construct(
-        private readonly OtpService $otpService,
         private readonly AuthenticationServiceInterface $authService
     ) {}
 
@@ -47,25 +47,45 @@ class OtpController extends Controller
      */
     public function sendOtp(OtpRequestRequest $request): JsonResponse
     {
-        $result = $this->otpService->sendOtp(
-            $request->validated('email'),
-            $request->ip()
-        );
+        $email = strtolower(trim($request->validated('email')));
+        $ipAddress = $request->ip();
 
-        if (!$result['success'] && isset($result['error'])) {
-            $statusCode = match ($result['error']) {
-                'rate_limited' => 429,
-                'user_blocked' => 403,
-                default => 422,
-            };
+        // Find user
+        $user = User::where('email', $email)->first();
 
-            return response()->json($result, $statusCode);
+        if (! $user) {
+            $this->logOtpAction($email, 'user_not_found', $ipAddress);
+
+            // Return success to prevent email enumeration
+            return response()->json([
+                'success' => true,
+                'message' => 'If an account exists with this email, an OTP has been sent.',
+            ]);
         }
 
-        // Store email in session for verification step
-        $request->session()->put('otp_email', $request->validated('email'));
+        // Check if user is blocked
+        if ($user->isBlocked()) {
+            $this->logOtpAction($email, 'user_blocked', $ipAddress);
 
-        return response()->json($result);
+            return response()->json([
+                'success' => false,
+                'message' => 'This account has been blocked. Please contact support.',
+                'error' => 'user_blocked',
+            ], 403);
+        }
+
+        // Send OTP using Spatie's native method
+        $user->sendOneTimePassword();
+
+        $this->logOtpAction($email, 'requested', $ipAddress);
+
+        // Store email in session for verification step
+        $request->session()->put('otp_email', $email);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'If an account exists with this email, an OTP has been sent.',
+        ]);
     }
 
     /**
@@ -75,7 +95,7 @@ class OtpController extends Controller
     {
         $email = $request->session()->get('otp_email');
 
-        if (!$email) {
+        if (! $email) {
             return redirect()->route('otp.request')
                 ->with('error', 'Please enter your email first.');
         }
@@ -85,7 +105,7 @@ class OtpController extends Controller
             'maskedEmail' => $this->maskEmail($email),
             'banner' => [
                 'title' => 'Enter Verification Code',
-                'description' => 'We sent a 5-digit code to your email.',
+                'description' => 'We sent a 6-digit code to your email.',
                 'image' => '/assets/img/sidebar.png',
             ],
             'breadcrumbs' => [
@@ -101,9 +121,10 @@ class OtpController extends Controller
      */
     public function verify(OtpVerifyRequest $request): JsonResponse
     {
+        // Session email validation stays in controller
         $email = $request->session()->get('otp_email') ?? $request->validated('email');
 
-        if (!$email) {
+        if (! $email) {
             return response()->json([
                 'success' => false,
                 'message' => 'No email address in session. Please start over.',
@@ -111,19 +132,17 @@ class OtpController extends Controller
             ], 400);
         }
 
+        $email = strtolower(trim($email));
+
         try {
-            $user = $this->otpService->verifyOtp(
-                $email,
-                $request->validated('code'),
-                $request->ip()
+            // Delegate ALL authentication logic to the service
+            $this->authService->authenticateWithOtp(
+                email: $email,
+                code: $request->validated('code'),
+                ipAddress: $request->ip()
             );
 
-            // Complete authentication using the auth service
-            $this->authService->completeAuthentication($user, [
-                'auth_method' => 'otp',
-            ]);
-
-            // Clear OTP session data
+            // Clear session on success
             $request->session()->forget('otp_email');
 
             return response()->json([
@@ -132,7 +151,7 @@ class OtpController extends Controller
                 'redirect' => route('user.home'),
             ]);
         } catch (OtpAuthenticationException $e) {
-            // Let the exception render itself
+            // Laravel auto-renders via exception's render() method
             throw $e;
         }
     }
@@ -144,23 +163,44 @@ class OtpController extends Controller
     {
         $email = $request->session()->get('otp_email');
 
-        if (!$email) {
+        if (! $email) {
             return response()->json([
                 'success' => false,
                 'message' => 'No email address in session.',
             ], 400);
         }
 
-        $result = $this->otpService->resendOtp($email, $request->ip());
+        $email = strtolower(trim($email));
+        $ipAddress = $request->ip();
 
-        if (!$result['success'] && isset($result['error'])) {
-            $statusCode = match ($result['error']) {
-                'rate_limited' => 429,
-                default => 422,
-            };
+        // Find user
+        $user = User::where('email', $email)->first();
 
-            return response()->json($result, $statusCode);
+        if (! $user) {
+            $this->logOtpAction($email, 'user_not_found', $ipAddress);
+
+            // Return success to prevent email enumeration
+            return response()->json([
+                'success' => true,
+                'message' => 'A new OTP has been sent to your email.',
+            ]);
         }
+
+        // Check if user is blocked
+        if ($user->isBlocked()) {
+            $this->logOtpAction($email, 'user_blocked', $ipAddress);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'This account has been blocked. Please contact support.',
+                'error' => 'user_blocked',
+            ], 403);
+        }
+
+        // Send OTP using Spatie's native method
+        $user->sendOneTimePassword();
+
+        $this->logOtpAction($email, 'resent', $ipAddress);
 
         return response()->json([
             'success' => true,
@@ -182,5 +222,17 @@ class OtpController extends Controller
             str_repeat('*', max(0, strlen($name) - $visibleLength));
 
         return $masked . '@' . $domain;
+    }
+
+    /**
+     * Log OTP action for audit trail.
+     */
+    private function logOtpAction(string $email, string $action, ?string $ipAddress = null): void
+    {
+        Log::channel('auth')->info('OTP action', [
+            'email_hash' => hash('sha256', $email),
+            'action' => $action,
+            'ip_address' => $ipAddress,
+        ]);
     }
 }

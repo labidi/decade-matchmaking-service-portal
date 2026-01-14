@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Contracts\Auth;
 
+use App\DTOs\Auth\AuthenticationResult;
 use App\Exceptions\Auth\OAuthAuthenticationException;
 use App\Exceptions\Auth\OceanExpertAuthenticationException;
+use App\Exceptions\Auth\OtpAuthenticationException;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
@@ -37,10 +39,21 @@ interface AuthenticationServiceInterface
      * Complete the authentication process (login, session setup)
      *
      * @param User $user User to authenticate
-     * @param array<string, mixed> $additionalData Additional metadata to store in session
+     * @param AuthenticationResult $result Authentication result with metadata
      * @return void
      */
-    public function completeAuthentication(User $user, array $additionalData = []): void;
+    public function completeAuthentication(User $user, AuthenticationResult $result): void;
+
+    /**
+     * Authenticate user with OTP code
+     *
+     * @param string $email User email address
+     * @param string $code OTP code to verify
+     * @param string|null $ipAddress Client IP address for logging
+     * @return User Authenticated user instance
+     * @throws OtpAuthenticationException
+     */
+    public function authenticateWithOtp(string $email, string $code, ?string $ipAddress = null): User;
 
     /**
      * Logout the authenticated user

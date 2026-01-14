@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Auth\Strategies;
 
 use App\Contracts\Auth\AuthenticationStrategyInterface;
+use App\DTOs\Auth\AuthenticationResult;
+use App\DTOs\Auth\OAuthMetadata;
 use App\Exceptions\Auth\OAuthAuthenticationException;
 use App\Models\User;
 use App\Services\UserService;
@@ -23,12 +25,12 @@ class OAuthAuthStrategy implements AuthenticationStrategyInterface
      * Authenticate user with OAuth provider
      *
      * @param array{socialite_user: SocialiteUser, provider: string} $credentials
-     * @return array{user: User, metadata: array<string, mixed>}
+     *
      * @throws OAuthAuthenticationException
      */
-    public function authenticate(array $credentials): array
+    public function authenticate(array $credentials): AuthenticationResult
     {
-        if (!isset($credentials['socialite_user'], $credentials['provider'])) {
+        if (! isset($credentials['socialite_user'], $credentials['provider'])) {
             throw OAuthAuthenticationException::missingCredentials();
         }
 
@@ -37,7 +39,7 @@ class OAuthAuthStrategy implements AuthenticationStrategyInterface
         $provider = $credentials['provider'];
 
         // Validate email presence
-        if (!$socialiteUser->getEmail()) {
+        if (! $socialiteUser->getEmail()) {
             throw OAuthAuthenticationException::missingEmail($provider);
         }
 
@@ -67,17 +69,16 @@ class OAuthAuthStrategy implements AuthenticationStrategyInterface
                 ], $provider);
             });
 
-            return [
-                'user' => $user,
-                'metadata' => [
-                    'oauth_provider' => $provider,
-                    'oauth_id' => $socialiteUser->getId(),
-                    'oauth_token' => $socialiteUser->token ?? null,
-                    'oauth_refresh_token' => $socialiteUser->refreshToken ?? null,
-                    'oauth_expires_in' => $socialiteUser->expiresIn ?? null,
-                    'auth_method' => $provider,
-                ],
-            ];
+            return new AuthenticationResult(
+                user: $user,
+                authMethod: $provider,
+                oauthMetadata: new OAuthMetadata(
+                    provider: $provider,
+                    providerId: $socialiteUser->getId(),
+                    accessToken: $socialiteUser->token ?? null,
+                    refreshToken: $socialiteUser->refreshToken ?? null,
+                ),
+            );
         } catch (Throwable $e) {
             Log::channel('auth')->error('OAuth authentication failed', [
                 'provider' => $provider,

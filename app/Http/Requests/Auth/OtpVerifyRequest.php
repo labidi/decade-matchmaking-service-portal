@@ -23,8 +23,15 @@ class OtpVerifyRequest extends FormRequest
      */
     public function rules(): array
     {
+        $codeLength = (int) config('one-time-passwords.password_length', 6);
+
         return [
-            'code' => ['required', 'string', 'size:5', 'regex:/^\d{5}$/'],
+            'code' => [
+                'required',
+                'string',
+                "size:{$codeLength}",
+                "regex:/^\d{{$codeLength}}$/",
+            ],
             'email' => ['sometimes', 'string', 'email'],
         ];
     }
@@ -36,9 +43,11 @@ class OtpVerifyRequest extends FormRequest
      */
     public function messages(): array
     {
+        $codeLength = (int) config('one-time-passwords.password_length', 6);
+
         return [
             'code.required' => 'Please enter the OTP code.',
-            'code.size' => 'The OTP code must be exactly 5 digits.',
+            'code.size' => "The OTP code must be exactly {$codeLength} digits.",
             'code.regex' => 'The OTP code must contain only numbers.',
         ];
     }

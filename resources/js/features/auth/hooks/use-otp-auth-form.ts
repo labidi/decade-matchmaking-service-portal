@@ -21,7 +21,6 @@ interface OtpApiResponse {
     redirect?: string;
     error?: string;
     error_code?: string;
-    remaining_attempts?: number;
     retry_after?: number;
 }
 
@@ -29,7 +28,6 @@ interface OtpApiErrorResponse {
     message?: string;
     error?: string;
     error_code?: string;
-    remaining_attempts?: number;
     retry_after?: number;
     errors?: {
         email?: string[];
@@ -48,7 +46,6 @@ export function useOtpAuthForm() {
     const [step, setStep] = useState<OtpStep>('email');
     const [stepDirection, setStepDirection] = useState<StepDirection>('forward');
     const [maskedEmail, setMaskedEmail] = useState('');
-    const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
     const [resendCooldown, setResendCooldown] = useState(0);
 
     // Countdown timer for resend cooldown
@@ -136,19 +133,34 @@ export function useOtpAuthForm() {
             const axiosError = err as AxiosError<OtpApiErrorResponse>;
             const responseData = axiosError.response?.data;
 
-            if (responseData?.remaining_attempts !== undefined) {
-                setRemainingAttempts(responseData.remaining_attempts);
-            }
-
-            if (responseData?.error_code === 'expired' || responseData?.error_code === 'max_attempts') {
-                setErrors({ code: responseData.message || 'Code expired or too many attempts.' });
-            } else if (responseData?.error_code === 'not_found' || responseData?.error_code === 'no_email') {
-                // Session expired, need to start over
-                setErrors({ code: responseData.message || 'Session expired. Please start over.' });
-                setStepDirection('backward');
-                setStep('email');
-            } else {
-                setErrors({ code: responseData?.message || 'Invalid code. Please try again.' });
+            // Handle specific error codes from Spatie OTP
+            switch (responseData?.error_code) {
+                case 'expired':
+                    setErrors({ code: responseData.message || 'Code has expired. Please request a new one.' });
+                    break;
+                case 'rate_limited':
+                    setErrors({ code: responseData.message || 'Too many attempts. Please try again later.' });
+                    if (responseData?.retry_after) {
+                        setResendCooldown(responseData.retry_after);
+                    }
+                    break;
+                case 'not_found':
+                case 'no_email':
+                    // Session expired, need to start over
+                    setErrors({ code: responseData.message || 'Session expired. Please start over.' });
+                    setStepDirection('backward');
+                    setStep('email');
+                    break;
+                case 'origin_mismatch':
+                    // Security check failed
+                    setErrors({ code: responseData.message || 'Security verification failed. Please start over.' });
+                    setStepDirection('backward');
+                    setStep('email');
+                    break;
+                case 'invalid_code':
+                default:
+                    setErrors({ code: responseData?.message || 'Invalid code. Please try again.' });
+                    break;
             }
 
             // Clear code on error
@@ -165,7 +177,6 @@ export function useOtpAuthForm() {
         try {
             await axios.post<OtpApiResponse>(route('otp.resend'));
             setResendCooldown(60);
-            setRemainingAttempts(null);
             setData(prev => ({ ...prev, code: '' }));
         } catch (err) {
             const axiosError = err as AxiosError<OtpApiErrorResponse>;
@@ -195,14 +206,12 @@ export function useOtpAuthForm() {
         setStep('email');
         setData(prev => ({ ...prev, code: '' }));
         setErrors({});
-        setRemainingAttempts(null);
     }, []);
 
     const reset = useCallback(() => {
         setStep('email');
         setStepDirection('forward');
         setMaskedEmail('');
-        setRemainingAttempts(null);
         setResendCooldown(0);
         setData({ email: '', code: '' });
         setErrors({});
@@ -223,7 +232,6 @@ export function useOtpAuthForm() {
         step,
         stepDirection,
         maskedEmail,
-        remainingAttempts,
         resendCooldown,
         setResendCooldown,
         handleSendOtp,

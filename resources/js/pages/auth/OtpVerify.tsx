@@ -9,6 +9,8 @@ import { Heading } from '@ui/primitives/heading';
 import { ChevronLeftIcon, EnvelopeIcon } from '@heroicons/react/20/solid';
 import axios from 'axios';
 
+const CODE_LENGTH = 6;
+
 interface OtpVerifyProps {
     email: string;
     maskedEmail: string;
@@ -20,7 +22,6 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
     const [isResending, setIsResending] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
     const [resendCooldown, setResendCooldown] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -43,12 +44,12 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
     }, [code]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        // Only allow digits, max 5 characters
-        const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+        // Only allow digits, max CODE_LENGTH characters
+        const value = e.target.value.replace(/\D/g, '').slice(0, CODE_LENGTH);
         setCode(value);
 
-        // Auto-submit when 5 digits entered
-        if (value.length === 5) {
+        // Auto-submit when all digits entered
+        if (value.length === CODE_LENGTH) {
             handleSubmit(value);
         }
     };
@@ -56,8 +57,8 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
     const handleSubmit = async (otpCode?: string) => {
         const codeToSubmit = otpCode || code;
 
-        if (codeToSubmit.length !== 5) {
-            setError('Please enter all 5 digits');
+        if (codeToSubmit.length !== CODE_LENGTH) {
+            setError(`Please enter all ${CODE_LENGTH} digits`);
             return;
         }
 
@@ -76,16 +77,29 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
         } catch (err: any) {
             const data = err.response?.data;
 
-            if (data?.remaining_attempts !== undefined) {
-                setRemainingAttempts(data.remaining_attempts);
-            }
-
-            if (data?.error_code === 'expired' || data?.error_code === 'max_attempts') {
-                setError(data.message);
-            } else if (data?.error_code === 'not_found' || data?.error_code === 'no_email') {
-                router.visit(route('otp.request'));
-            } else {
-                setError(data?.message || 'Invalid code');
+            // Handle specific error codes from Spatie OTP
+            switch (data?.error_code) {
+                case 'expired':
+                    setError(data.message || 'Code has expired. Please request a new one.');
+                    break;
+                case 'rate_limited':
+                    setError(data.message || 'Too many attempts. Please try again later.');
+                    if (data?.retry_after) {
+                        setResendCooldown(data.retry_after);
+                    }
+                    break;
+                case 'not_found':
+                case 'no_email':
+                    router.visit(route('otp.request'));
+                    return;
+                case 'origin_mismatch':
+                    setError(data.message || 'Security verification failed. Please start over.');
+                    setTimeout(() => router.visit(route('otp.request')), 2000);
+                    break;
+                case 'invalid_code':
+                default:
+                    setError(data?.message || 'Invalid code. Please try again.');
+                    break;
             }
 
             setCode('');
@@ -101,7 +115,6 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
         try {
             await axios.post(route('otp.resend'));
             setResendCooldown(60);
-            setRemainingAttempts(null);
         } catch (err: any) {
             if (err.response?.status === 429) {
                 const retryAfter = err.response.data.retry_after;
@@ -139,7 +152,7 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
                     <div className="flex items-center justify-center gap-2 mt-2">
                         <EnvelopeIcon className="h-5 w-5 text-gray-400" />
                         <Text className="text-gray-600 dark:text-gray-400">
-                            We sent a 5-digit code to {maskedEmail}
+                            We sent a {CODE_LENGTH}-digit code to {maskedEmail}
                         </Text>
                     </div>
                 </div>
@@ -164,15 +177,15 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
                             type="text"
                             inputMode="numeric"
                             pattern="\d*"
-                            maxLength={5}
+                            maxLength={CODE_LENGTH}
                             value={code}
                             onChange={handleChange}
-                            placeholder="00000"
-                            className={`w-48 sm:w-52 h-14 sm:h-16 text-center text-2xl sm:text-3xl font-mono tracking-[0.5em] placeholder:tracking-[0.5em] ${
+                            placeholder="000000"
+                            className={`w-56 sm:w-64 h-14 sm:h-16 text-center text-2xl sm:text-3xl font-mono tracking-[0.4em] placeholder:tracking-[0.4em] ${
                                 error ? 'border-red-500' : ''
                             }`}
                             disabled={isLoading || showSuccess}
-                            aria-label="Enter 5-digit verification code"
+                            aria-label={`Enter ${CODE_LENGTH}-digit verification code`}
                             aria-describedby={error ? 'otp-error' : undefined}
                         />
                     </div>
@@ -191,24 +204,11 @@ export default function OtpVerify({ email, maskedEmail }: Readonly<OtpVerifyProp
                         </div>
                     )}
 
-                    {/* Remaining Attempts Warning */}
-                    {remainingAttempts !== null && remainingAttempts > 0 && (
-                        <Text
-                            className={`text-sm text-center ${
-                                remainingAttempts <= 2
-                                    ? 'text-red-600 dark:text-red-400 font-medium'
-                                    : 'text-amber-600 dark:text-amber-400'
-                            }`}
-                        >
-                            {remainingAttempts} attempt{remainingAttempts !== 1 ? 's' : ''} remaining
-                        </Text>
-                    )}
-
                     {/* Submit Button */}
                     <div className="flex justify-center">
                         <Button
                             type="submit"
-                            disabled={isLoading || code.length !== 5 || showSuccess}
+                            disabled={isLoading || code.length !== CODE_LENGTH || showSuccess}
                             color="firefly"
                         >
                             {isLoading ? (

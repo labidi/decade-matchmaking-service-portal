@@ -17,12 +17,10 @@ class UserAuthenticated
      * Create a new event instance
      *
      * @param User $user The authenticated user
-     * @param array<string, mixed> $metadata Authentication metadata (tokens, provider info, etc.)
-     * @param string $method Authentication method (credentials, google, linkedin)
+     * @param string $method Authentication method (ocean_expert, google, linkedin, otp)
      */
     public function __construct(
         public readonly User $user,
-        public readonly array $metadata,
         public readonly string $method
     ) {}
 

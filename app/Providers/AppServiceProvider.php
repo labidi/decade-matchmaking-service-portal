@@ -17,10 +17,12 @@ use App\Policies\RequestPolicy;
 use App\Services\Actions\DocumentActionProvider;
 use App\Services\Actions\OfferActionProvider;
 use App\Services\Auth\AuthenticationService;
+use App\Channels\MandrillChannel;
 use App\Services\Auth\Strategies\OAuthAuthStrategy;
 use App\Services\Auth\Strategies\OceanExpertAuthStrategy;
 use App\Services\Request\RequestActionProvider;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
@@ -58,6 +60,11 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
         JsonResource::withoutWrapping();
+
+        // Register custom notification channels
+        Notification::extend('mandrill', function ($app) {
+            return new MandrillChannel();
+        });
 
         // Configure rate limiters for authentication
         $this->configureRateLimiting();

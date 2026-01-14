@@ -4,6 +4,8 @@ import { Input } from '@ui/primitives/input';
 import { Text } from '@ui/primitives/text';
 import { EnvelopeIcon } from '@heroicons/react/20/solid';
 
+const CODE_LENGTH = 6;
+
 interface OtpVerifyStepProps {
     maskedEmail: string;
     code: string;
@@ -13,7 +15,6 @@ interface OtpVerifyStepProps {
     onBack: () => void;
     isProcessing: boolean;
     error?: string;
-    remainingAttempts: number | null;
     resendCooldown: number;
 }
 
@@ -26,7 +27,6 @@ export function OtpVerifyStep({
     onBack,
     isProcessing,
     error,
-    remainingAttempts,
     resendCooldown,
 }: Readonly<OtpVerifyStepProps>) {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -44,19 +44,19 @@ export function OtpVerifyStep({
     }, [code]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        // Only allow digits, max 5 characters
-        const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+        // Only allow digits, max CODE_LENGTH characters
+        const value = e.target.value.replace(/\D/g, '').slice(0, CODE_LENGTH);
         onCodeChange(value);
 
-        // Auto-submit when 5 digits entered
-        if (value.length === 5) {
+        // Auto-submit when all digits entered
+        if (value.length === CODE_LENGTH) {
             onSubmit(value);
         }
     };
 
     const handleFormSubmit = (e: FormEvent) => {
         e.preventDefault();
-        if (code.length === 5) {
+        if (code.length === CODE_LENGTH) {
             onSubmit(code);
         }
     };
@@ -78,15 +78,15 @@ export function OtpVerifyStep({
                     type="text"
                     inputMode="numeric"
                     pattern="\d*"
-                    maxLength={5}
+                    maxLength={CODE_LENGTH}
                     value={code}
                     onChange={handleChange}
-                    placeholder="00000"
-                    className={`w-48 sm:w-52 text-center text-2xl sm:text-3xl font-mono tracking-[0.5em] placeholder:tracking-[0.5em] ${
+                    placeholder="000000"
+                    className={`w-56 sm:w-64 text-center text-2xl sm:text-3xl font-mono tracking-[0.4em] placeholder:tracking-[0.4em] ${
                         error ? 'border-red-500' : ''
                     }`}
                     disabled={isProcessing}
-                    aria-label="Enter 5-digit verification code"
+                    aria-label={`Enter ${CODE_LENGTH}-digit verification code`}
                     aria-describedby={error ? 'otp-error' : undefined}
                 />
             </div>
@@ -105,24 +105,11 @@ export function OtpVerifyStep({
                 </div>
             )}
 
-            {/* Remaining Attempts Warning */}
-            {remainingAttempts !== null && remainingAttempts > 0 && (
-                <Text
-                    className={`text-sm text-center ${
-                        remainingAttempts <= 2
-                            ? 'text-red-600 dark:text-red-400 font-medium'
-                            : 'text-amber-600 dark:text-amber-400'
-                    }`}
-                >
-                    {remainingAttempts} attempt{remainingAttempts !== 1 ? 's' : ''} remaining
-                </Text>
-            )}
-
             {/* Verify Button */}
             <div className="flex justify-center">
                 <Button
                     type="submit"
-                    disabled={isProcessing || code.length !== 5}
+                    disabled={isProcessing || code.length !== CODE_LENGTH}
                     color="firefly"
                 >
                     {isProcessing ? (
