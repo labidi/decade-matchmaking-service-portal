@@ -41,4 +41,11 @@ class OneTimePasswordNotification extends SpatieOneTimePasswordNotification impl
             ],
         ];
     }
+
+    public function viaQueues(): array
+    {
+        return [
+            'mandrill' => 'otp-notification',
+        ];
+    }
 }

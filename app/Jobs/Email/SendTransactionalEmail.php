@@ -56,9 +56,9 @@ class SendTransactionalEmail implements ShouldQueue
     public ?array $recipientData = null;
 
     /**
-     * @param User|array{email: string, name?: string} $recipient User model or array with email/name
-     * @param array<string, mixed> $variables Template variables
-     * @param array<string, mixed> $options Additional options
+     * @param  User|array{email: string, name?: string}  $recipient  User model or array with email/name
+     * @param  array<string, mixed>  $variables  Template variables
+     * @param  array<string, mixed>  $options  Additional options
      */
     public function __construct(
         public string $eventName,
@@ -82,7 +82,7 @@ class SendTransactionalEmail implements ShouldQueue
         $this->backoff = Config::get('mail-templates.queue.backoff', [60, 300, 900]);
         // Set queue connection and name
         $this->onConnection(Config::get('mail-templates.queue.connection', 'database'));
-        $this->onQueue(Config::get('mail-templates.queue.queue_name', 'emails'));
+        $this->onQueue($options['queue'] ?? Config::get('mail-templates.queue.queue_name', 'emails'));
     }
 
     /**
@@ -120,7 +120,7 @@ class SendTransactionalEmail implements ShouldQueue
         }
 
         // Create a temporary User object for the email service
-        $tempUser = new User();
+        $tempUser = new User;
         $tempUser->email = $this->recipientData['email'];
         $tempUser->name = $this->recipientData['name'];
         $tempUser->id = 0;
@@ -306,6 +306,7 @@ class SendTransactionalEmail implements ShouldQueue
 
         if (empty($adminEmails)) {
             Log::warning('No admin emails configured for critical email failure notifications');
+
             return;
         }
 
@@ -330,7 +331,7 @@ class SendTransactionalEmail implements ShouldQueue
             foreach ($adminEmails as $adminEmail) {
                 Mail::raw($message, function ($mail) use ($adminEmail) {
                     $mail->to($adminEmail)
-                        ->subject('[URGENT] Critical Email Delivery Failure - ' . Config::get('app.name'))
+                        ->subject('[URGENT] Critical Email Delivery Failure - '.Config::get('app.name'))
                         ->priority(1); // Highest priority
                 });
             }
@@ -355,7 +356,7 @@ class SendTransactionalEmail implements ShouldQueue
     {
         try {
             // Store metrics in cache for monitoring dashboards
-            $cacheKey = 'email_failures:' . date('Y-m-d:H');
+            $cacheKey = 'email_failures:'.date('Y-m-d:H');
             $failures = cache()->get($cacheKey, []);
 
             $failures[] = [
@@ -369,7 +370,7 @@ class SendTransactionalEmail implements ShouldQueue
             cache()->put($cacheKey, $failures, 86400);
 
             // Increment failure counter
-            $failureCountKey = 'email_failure_count:' . $this->eventName;
+            $failureCountKey = 'email_failure_count:'.$this->eventName;
             cache()->increment($failureCountKey);
 
             // Check if we've exceeded failure threshold
@@ -408,8 +409,8 @@ class SendTransactionalEmail implements ShouldQueue
     {
         return [
             'email',
-            'event:' . $this->eventName,
-            'user:' . $this->getRecipientId(),
+            'event:'.$this->eventName,
+            'user:'.$this->getRecipientId(),
         ];
     }
 

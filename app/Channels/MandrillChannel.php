@@ -67,7 +67,8 @@ class MandrillChannel
         SendTransactionalEmail::dispatch(
             $data['template'],
             $notifiable,
-            $data['variables'] ?? []
+            $data['variables'] ?? [],
+            ['queue'=>'otp-mail']
         );
 
         Log::info('MandrillChannel: Email dispatched successfully', [
