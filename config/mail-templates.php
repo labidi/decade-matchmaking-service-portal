@@ -52,6 +52,15 @@ return [
             'tags' => ['user', 'registration', 'roles update'],
         ],
 
+        'user.invitation' => [
+            'template_name' => 'cdf-invitation-link',
+            'subject' => 'You\'ve Been Invited to Ocean Decade Portal',
+            'variables' => [
+                'Link' => 'required|url'
+            ],
+            'tags' => ['user', 'invitation'],
+        ],
+
         'user.email_verified' => [
             'template_name' => 'ocd-email-verified',
             'subject' => 'Email Verified Successfully',

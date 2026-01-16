@@ -113,3 +113,32 @@ export interface SortFilters {
     direction?: 'asc' | 'desc';
     per_page?: number;
 }
+
+// User Invitation Types
+export interface InvitationResult {
+    success: boolean;
+    message: string;
+    name?: string;
+    email?: string;
+}
+
+export interface UserInvitationFormProps {
+    onSuccess?: (result: InvitationResult) => void;
+    onError?: (error: InvitationResult) => void;
+    className?: string;
+    title?: string;
+    description?: string;
+    inviteRoute?: string;
+    showCard?: boolean;
+}
+
+export interface InvitationErrorResponse {
+    response?: {
+        status?: number;
+        data?: {
+            message?: string;
+            error?: string;
+            errors?: Record<string, string[]>;
+        };
+    };
+}

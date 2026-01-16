@@ -252,7 +252,9 @@ class SendTransactionalEmail implements ShouldQueue
     {
         try {
             // Find the most recent log entry for this email
-            $emailLog = EmailLog::where('user_id', $this->getRecipientId())
+            // For non-user recipients (id=0), query by null user_id
+            $userId = $this->recipient?->id;
+            $emailLog = EmailLog::where('user_id', $userId)
                 ->where('event_name', $this->eventName)
                 ->where('recipient_email', $this->getRecipientEmail())
                 ->whereIn('status', [EmailLog::STATUS_QUEUED, EmailLog::STATUS_SENDING])

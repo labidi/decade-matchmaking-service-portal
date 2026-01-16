@@ -38,8 +38,12 @@ class EmailLogger
             return 0;
         }
 
+        // Only use user_id if the user exists in the database (has a valid positive id)
+        // Temporary User objects created for non-user recipients have id=0
+        $userId = ($user !== null && $user->exists && $user->id > 0) ? $user->id : null;
+
         $logId = $this->insertDatabaseLog([
-            'user_id' => $user?->id,
+            'user_id' => $userId,
             'recipient_email' => $recipientEmail,
             'recipient_name' => $user?->name ?? $metadata['recipient_name'] ?? null,
             'event_name' => $eventName,
