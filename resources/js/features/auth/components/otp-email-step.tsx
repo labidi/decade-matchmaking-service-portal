@@ -41,8 +41,11 @@ export function OtpEmailStep({
                     autoComplete="email"
                     className={error ? 'border-red-500' : ''}
                 />
-                <Description>
-                    We&apos;ll send a 5-digit code to this email.
+                <Description className="text-center" aria-hidden="true">
+                    If you have never logged into Ocean Connector, OTP will not work
+                </Description>
+                <Description className="text-center" aria-hidden="true">
+                    We&apos;ll send a 6-digit code to this email.
                 </Description>
             </Field>
 

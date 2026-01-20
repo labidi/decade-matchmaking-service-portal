@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { FrontendLayout } from '@layouts/index';
 import { Button } from '@ui/primitives/button';
@@ -83,8 +83,11 @@ export default function OtpRequest({ status }: Readonly<OtpRequestProps>) {
                             autoComplete="email"
                             className={error ? 'border-red-500' : ''}
                         />
-                        <Description>
-                            We&apos;ll send a 5-digit code to this email.
+                        <Description className="text-center" aria-hidden="true">
+                            If you have never logged into Ocean Connector, OTP will not work
+                        </Description>
+                        <Description className="text-center" aria-hidden="true">
+                            We&apos;ll send a 6-digit code to this email.
                         </Description>
                     </Field>
 
