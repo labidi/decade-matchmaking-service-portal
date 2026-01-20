@@ -75,7 +75,7 @@ export default function InvitationAccept({ invitation, token }: Readonly<Invitat
                                 Invited By
                             </Text>
                             <Text className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                                {invitation.inviter_name}
+                                Decade Coordination Unit
                             </Text>
                         </div>
                     </div>
