@@ -38,6 +38,11 @@ Schedule::command('queue:prune-failed --hours=168')
     ->daily()
     ->at('02:00');
 
+// Prune Telescope entries (older than 7 days)
+Schedule::command('telescope:prune --hours=168')
+    ->daily()
+    ->at('02:15');
+
 // Prune expired one-time passwords (Spatie OTP)
 Schedule::command('model:prune', [
     '--model' => [OneTimePassword::class],
