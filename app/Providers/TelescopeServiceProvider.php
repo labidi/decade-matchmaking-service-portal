@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
+use Laravel\Telescope\EntryType;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
@@ -26,14 +27,17 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
                 return true;
             }
 
-            // In production, only record important entries
+            // In production, record important entries plus all events and jobs
             return $entry->isReportableException() ||
+                    $entry->isException() ||
                    $entry->isFailedRequest() ||
                    $entry->isFailedJob() ||
                    $entry->isScheduledTask() ||
                    $entry->hasMonitoredTag() ||
-                   $entry->type === 'mail' ||
-                   ($entry->type === 'query' && ($entry->content['slow'] ?? false));
+                   $entry->type === EntryType::MAIL ||
+                   $entry->type === EntryType::EVENT ||
+                   $entry->type === EntryType::JOB ||
+                   ($entry->type === EntryType::QUERY && ($entry->content['slow'] ?? false));
         });
     }
 
