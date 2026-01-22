@@ -34,6 +34,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
                    $entry->isFailedJob() ||
                    $entry->isScheduledTask() ||
                    $entry->hasMonitoredTag() ||
+                   $entry->isRequest() ||
+                   $entry->isLog() ||
+                   $entry->type === EntryType::CLIENT_REQUEST ||
                    $entry->type === EntryType::MAIL ||
                    $entry->type === EntryType::EVENT ||
                    $entry->type === EntryType::JOB ||
