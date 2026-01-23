@@ -11,6 +11,7 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::post('users/{user}/block', [UserController::class, 'toggleBlock'])->name('users.block.toggle');
 
     // Invitation routes
+    Route::get('invitations', [InvitationController::class, 'index'])->name('admin.invitations.index');
     Route::post('users/invite', [InvitationController::class, 'store'])->name('admin.users.invite');
     Route::post('invitations/{invitation}/resend', [InvitationController::class, 'resend'])->name('admin.invitations.resend');
     Route::delete('invitations/{invitation}', [InvitationController::class, 'destroy'])->name('admin.invitations.destroy');

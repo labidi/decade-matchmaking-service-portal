@@ -17,7 +17,8 @@ import {
     ArrowLeftStartOnRectangleIcon,
     PresentationChartBarIcon,
     UserIcon,
-    TagIcon
+    TagIcon,
+    EnvelopeIcon
 } from '@heroicons/react/16/solid'
 
 
@@ -55,6 +56,10 @@ export function SidebarContent() {
                     <SidebarItem href={route('admin.users.index')}>
                         <UserIcon/>
                         <SidebarLabel>Users</SidebarLabel>
+                    </SidebarItem>
+                    <SidebarItem href={route('admin.invitations.index')}>
+                        <EnvelopeIcon/>
+                        <SidebarLabel>Invitations</SidebarLabel>
                     </SidebarItem>
                     <SidebarItem href={route('admin.settings.index')}>
                         <Cog6ToothIcon/>

@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\Invitation\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SendInvitationRequest;
+use App\Http\Resources\Admin\InvitationResource;
 use App\Models\User;
 use App\Models\UserInvitation;
 use App\Services\InvitationService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use Inertia\Response;
 use Throwable;
 
 class InvitationController extends Controller
@@ -19,6 +24,70 @@ class InvitationController extends Controller
     public function __construct(
         private readonly InvitationService $invitationService
     ) {}
+
+    /**
+     * Display a listing of invitations
+     */
+    public function index(Request $request): Response
+    {
+        Gate::authorize('invite', User::class);
+
+        $searchFilters = $request->only(['name', 'email', 'status', 'inviter', 'search']);
+        $sortFilters = [
+            'field' => $request->input('sort', 'created_at'),
+            'order' => $request->input('order', 'desc'),
+            'per_page' => $request->input('per_page', 15),
+        ];
+
+        $invitations = $this->invitationService->getInvitationsPaginated($searchFilters, $sortFilters);
+        $invitations->toResourceCollection(InvitationResource::class);
+        $statistics = $this->invitationService->getStatistics();
+
+        return Inertia::render('admin/Invitation/List', [
+            'invitations' => $invitations,
+            'statistics' => $statistics,
+            'searchFields' => $this->getSearchFields(),
+            'currentSort' => [
+                'field' => $sortFilters['field'],
+                'order' => $sortFilters['order'],
+            ],
+            'currentSearch' => array_filter($searchFilters),
+        ]);
+    }
+
+    /**
+     * Get search field configurations
+     */
+    private function getSearchFields(): array
+    {
+        return [
+            [
+                'id' => 'name',
+                'type' => 'text',
+                'label' => 'Name',
+                'placeholder' => 'Search by invitee name...',
+            ],
+            [
+                'id' => 'email',
+                'type' => 'text',
+                'label' => 'Email',
+                'placeholder' => 'Search by email...',
+            ],
+            [
+                'id' => 'status',
+                'type' => 'select',
+                'label' => 'Status',
+                'placeholder' => 'All statuses',
+                'options' => Status::getOptions(),
+            ],
+            [
+                'id' => 'inviter',
+                'type' => 'text',
+                'label' => 'Invited By',
+                'placeholder' => 'Search by inviter...',
+            ],
+        ];
+    }
 
     /**
      * Send invitation to a new user

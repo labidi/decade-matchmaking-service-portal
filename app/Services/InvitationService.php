@@ -7,6 +7,8 @@ namespace App\Services;
 use App\Jobs\Email\SendTransactionalEmail;
 use App\Models\User;
 use App\Models\UserInvitation;
+use App\Services\Invitation\InvitationRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -14,6 +16,28 @@ use Illuminate\Support\Str;
 class InvitationService
 {
     private const EXPIRATION_DAYS = 7;
+
+    public function __construct(
+        private readonly InvitationRepository $repository
+    ) {}
+
+    /**
+     * Get paginated invitations with search and sorting
+     */
+    public function getInvitationsPaginated(array $searchFilters = [], array $sortFilters = []): LengthAwarePaginator
+    {
+        return $this->repository->getPaginated($searchFilters, $sortFilters);
+    }
+
+    /**
+     * Get invitation statistics
+     *
+     * @return array{total: int, pending: int, accepted: int, expired: int}
+     */
+    public function getStatistics(): array
+    {
+        return $this->repository->getStatistics();
+    }
 
     /**
      * Create an invitation (user account created on acceptance)
