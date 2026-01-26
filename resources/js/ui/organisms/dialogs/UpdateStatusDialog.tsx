@@ -82,6 +82,7 @@ export function UpdateStatusDialog({
                             value={selectedStatus}
                             onChange={setSelectedStatus}
                             placeholder="Select a new status"
+                            portal={true}
                         >
                             {availableStatuses.map((status) => (
                                 <ListboxOption key={status.id} value={status}>

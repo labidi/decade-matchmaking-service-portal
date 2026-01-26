@@ -10,6 +10,7 @@ export function Listbox<T>({
   autoFocus,
   'aria-label': ariaLabel,
   children: options,
+  portal = false,
   ...props
 }: {
   className?: string
@@ -17,6 +18,7 @@ export function Listbox<T>({
   autoFocus?: boolean
   'aria-label'?: string
   children?: React.ReactNode
+  portal?: boolean
 } & Omit<Headless.ListboxProps<typeof Fragment, T>, 'as' | 'multiple'>) {
   return (
     <Headless.Listbox {...props} multiple={false}>
@@ -76,6 +78,7 @@ export function Listbox<T>({
         </span>
       </Headless.ListboxButton>
       <Headless.ListboxOptions
+        portal={portal}
         transition
         anchor="selection start"
         className={clsx(
@@ -83,6 +86,8 @@ export function Listbox<T>({
           '[--anchor-offset:-1.625rem] [--anchor-padding:--spacing(4)] sm:[--anchor-offset:-1.375rem]',
           // Base styles
           'isolate w-max min-w-[calc(var(--button-width)+1.75rem)] scroll-py-1 rounded-xl p-1 select-none',
+          // Z-index to ensure it appears above dialogs (z-50)
+          'z-[60]',
           // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
           'outline outline-transparent focus:outline-hidden',
           // Handle scrolling when menu won't fit in viewport
