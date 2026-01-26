@@ -1,9 +1,70 @@
 import { usePage } from '@inertiajs/react';
 import React, { useState } from 'react';
 import YouTube from 'react-youtube';
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/16/solid';
 import { OpportunitiesDialog } from '@features/opportunities';
 import { Opportunity } from '@/types';
 import { Breadcrumb } from '@ui/molecules';
+
+interface MetricCardProps {
+    value: string | number;
+    label: string;
+    onClick?: () => void;
+    isClickable?: boolean;
+}
+
+function MetricCard({ value, label, onClick, isClickable = false }: Readonly<MetricCardProps>) {
+    const baseClasses = `
+        backdrop-blur-sm bg-white/10 rounded-2xl p-6
+        shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+        transition-all duration-300
+        text-left
+        relative
+    `;
+
+    const interactiveClasses = isClickable
+        ? `
+            border-2 border-white/40
+            hover:bg-white/20 hover:scale-105
+            hover:shadow-[0_12px_48px_rgba(255,255,255,0.2)]
+            cursor-pointer
+            group
+        `
+        : 'border border-white/20 hover:bg-white/15';
+
+    if (isClickable) {
+        return (
+            <button
+                type="button"
+                className={`${baseClasses} ${interactiveClasses} w-full`}
+                onClick={onClick}
+            >
+                {/* Corner icon indicator */}
+                <ArrowTopRightOnSquareIcon
+                    className="absolute top-4 right-4 w-5 h-5 text-white/60 group-hover:text-white transition-colors"
+                    aria-hidden="true"
+                />
+                <span className="block text-5xl font-extrabold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+                    {value}
+                </span>
+                <span className="mt-3 block text-lg font-medium text-white/90 leading-tight">
+                    {label}
+                </span>
+            </button>
+        );
+    }
+
+    return (
+        <div className={`${baseClasses} ${interactiveClasses}`}>
+            <span className="block text-5xl font-extrabold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+                {value}
+            </span>
+            <span className="mt-3 block text-lg font-medium text-white/90 leading-tight">
+                {label}
+            </span>
+        </div>
+    );
+}
 
 export interface Banner {
     title: string;
@@ -87,55 +148,35 @@ export default function BannerSection({
 
             {pageMetrics && (
                 <div className="relative py-10 px-4">
-                    <dl className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-10 text-white sm:mt-20 sm:grid-cols-2 sm:gap-y-16 lg:mx-0 lg:max-w-none lg:grid-cols-5">
-                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
-                            <span className="block text-5xl font-bold">
-                                {pageMetrics.number_successful_matches}
-                            </span>
-                            <span className="mt-2 text-2xl">Successful Matches</span>
-                        </div>
-                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
-                            <span className="block text-5xl font-bold">
-                                {pageMetrics.number_fully_closed_matches}
-                            </span>
-                            <span className="mt-2 text-2xl">
-                                Completed Trainings & Workshops
-                            </span>
-                        </div>
-                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
-                            <span className="block text-5xl font-bold">
-                                {pageMetrics.number_user_requests_in_implementation}
-                            </span>
-                            <span className="mt-2 text-2xl">
-                                Requests in Implementation
-                            </span>
-                        </div>
-                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
-                            <span className="block text-5xl font-bold">
-                                {new Intl.NumberFormat('en-US', {
-                                    style: 'currency',
-                                    currency: 'USD',
-                                    maximumFractionDigits: 0,
-                                }).format(pageMetrics.committed_funding_amount)}
-                            </span>
-                            <span className="mt-2 text-2xl">Committed Funding</span>
-                        </div>
-                        <div className="flex flex-col gap-y-3 border-l border-white pl-6">
-                            <button
-                                onClick={() => setShowOpportunitiesDialog(true)}
-                                className="hover:opacity-80 transition-opacity"
-                                title="Click here to preview open capacity development opportunities"
-                            >
-                                <span className="block text-5xl font-bold">
-                                    {pageMetrics.number_of_open_partner_opportunities}
-                                </span>
-                                <span className="mt-2 text-2xl">
-                                    <span aria-hidden="true">→</span> Click here to
-                                    preview open capacity development opportunities
-                                </span>
-                            </button>
-                        </div>
-                    </dl>
+                    {/* Row 1: 3 cards */}
+                    <div className="mx-auto max-w-6xl grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+                        <MetricCard
+                            value={pageMetrics.number_successful_matches}
+                            label="Successful Matches"
+                        />
+                        <MetricCard
+                            value={pageMetrics.number_fully_closed_matches}
+                            label="Completed Trainings & Workshops"
+                        />
+                        <MetricCard
+                            value={pageMetrics.number_user_requests_in_implementation}
+                            label="Requests in Implementation"
+                        />
+                        <MetricCard
+                            value={new Intl.NumberFormat('en-US', {
+                                style: 'currency',
+                                currency: 'USD',
+                                maximumFractionDigits: 0,
+                            }).format(pageMetrics.committed_funding_amount)}
+                            label="Committed Funding"
+                        />
+                        <MetricCard
+                            value={pageMetrics.number_of_open_partner_opportunities}
+                            label="Open Opportunities"
+                            onClick={() => setShowOpportunitiesDialog(true)}
+                            isClickable={true}
+                        />
+                    </div>
                 </div>
             )}
 
