@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AssignRolesRequest;
 use App\Http\Requests\Admin\BlockUserRequest;
+use App\Http\Requests\Admin\UserSearchRequest;
 use App\Http\Resources\Admin\UserResource;
 use App\Models\User;
 use App\Services\User\UserExportService;
 use App\Services\UserService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -95,8 +97,18 @@ class UserController extends Controller
     }
 
     /**
-     * Export users to CSV file
+     * Search users by name or email for autocomplete
      */
+    public function search(UserSearchRequest $request): JsonResponse
+    {
+        $query = $request->validated('query');
+        $users = $this->userService->searchUsers($query, 20);
+
+        return response()->json([
+            'data' => UserResource::collection($users),
+        ]);
+    }
+
     public function exportCsv(UserExportService $exportService): StreamedResponse|RedirectResponse
     {
         try {

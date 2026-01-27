@@ -89,6 +89,11 @@ readonly class UserService
         ];
     }
 
+    public function searchUsers(string $query, int $limit = 20): Collection
+    {
+        return $this->repository->searchByQuery($query, $limit);
+    }
+
     public function getAllAdmins(): Collection
     {
         return User::role('administrator')->get();

@@ -64,6 +64,14 @@ class UserRepository
         return User::role($roleName)->get();
     }
 
+    public function searchByQuery(string $query, int $limit = 20): Collection
+    {
+        $builder = $this->queryBuilder->buildBaseQuery();
+        $builder = $this->queryBuilder->applySearchFilters($builder, ['search' => $query]);
+
+        return $builder->limit($limit)->get();
+    }
+
     /**
      * Get all users for export with relationships
      * Uses cursor for memory-efficient streaming

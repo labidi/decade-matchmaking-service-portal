@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
+    Route::get('users/search', [UserController::class, 'search'])->name('admin.users.search');
     Route::get('users/', [UserController::class, 'index'])->name('admin.users.index');
     Route::get('users/export/csv', [UserController::class, 'exportCsv'])->name('admin.users.export.csv');
     Route::post('users/{user}/roles', [UserController::class, 'assignRoles'])->name('users.roles.assign');
