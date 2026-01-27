@@ -185,19 +185,12 @@ class ListController extends BaseRequestController
 
         // Transform each entity and attach its actions
         $resourceClass = $config['resourceClass'];
-        if ($resourceClass === RequestResource::class) {
-            // RequestResource: transform data + attach actions per row
-            $requests->getCollection()->transform(function ($request) use ($user, $context) {
-                $data = (new RequestResource($request))->toArray(request());
-                $data['actions'] = $this->getActions($request, $user, $context);
-                return $data;
-            });
-        } else {
-            // Other resources (PublicRequestResource) use standard instantiation
-            $requests->getCollection()->transform(
-                fn ($request) => new $resourceClass($request, $context)
-            );
-        }
+        $requests->getCollection()->transform(function ($request) use ($user, $context, $resourceClass) {
+            $data = (new $resourceClass($request))->toArray(request());
+            $data['actions'] = $this->getActions($request, $user, $context);
+
+            return $data;
+        });
 
         // Build response data
         $responseData = [
