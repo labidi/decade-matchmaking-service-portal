@@ -29,16 +29,6 @@ class SubscriptionController extends Controller
         $subscriptions = $this->subscriptionService->getAllSubscriptions();
         $stats = $this->subscriptionService->getSubscriptionStats();
 
-        // Format users for SelectField dropdown
-        $users = User::select('id', 'name', 'email')
-            ->where('is_blocked', false)
-            ->orderBy('name')
-            ->get()
-            ->map(fn($user) => [
-                'value' => $user->id,
-                'label' => "{$user->name} ({$user->email})"
-            ]);
-
         // Format requests for SelectField dropdown
         $requests = OCDRequest::select('id', 'status_id', 'user_id')
             ->with([
@@ -60,7 +50,6 @@ class SubscriptionController extends Controller
         return Inertia::render('admin/Subscriptions/Index', [
             'subscriptions' => $subscriptions,
             'stats' => $stats,
-            'users' => $users,
             'requests' => $requests,
         ]);
     }

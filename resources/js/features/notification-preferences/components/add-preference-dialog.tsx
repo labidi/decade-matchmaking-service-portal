@@ -104,6 +104,7 @@ export default function AddPreferenceDialog({
                                     displayValue={(option) => option?.label ?? ''}
                                     placeholder="Select notification type..."
                                     options={entityTypeOptions}
+                                    portal={true}
                                 >
                                     {(option) => (
                                         <ComboboxOption key={option.value} value={option}>
@@ -128,6 +129,7 @@ export default function AddPreferenceDialog({
                                         displayValue={(option) => option?.label ?? ''}
                                         placeholder={`Select ${data.entity_type === 'request' ? 'subtheme' : 'opportunity type'}...`}
                                         options={currentOptions}
+                                        portal={true}
                                     >
                                         {(option) => (
                                             <ComboboxOption key={option.value} value={option}>

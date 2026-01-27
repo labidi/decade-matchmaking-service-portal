@@ -9,20 +9,24 @@ export function Combobox<T>({
   displayValue,
   filter,
   anchor = 'bottom',
+  portal = false,
   className,
   placeholder,
   autoFocus,
   'aria-label': ariaLabel,
+  onInputChange,
   children,
   ...props
 }: {
   options: T[]
   displayValue: (value: T | null) => string | undefined
   filter?: (value: T, query: string) => boolean
+  portal?: boolean
   className?: string
   placeholder?: string
   autoFocus?: boolean
   'aria-label'?: string
+  onInputChange?: (query: string) => void
   children: (value: NonNullable<T>) => React.ReactElement
 } & Omit<Headless.ComboboxProps<T, false>, 'as' | 'multiple' | 'children'> & { anchor?: 'top' | 'bottom' }) {
   const [query, setQuery] = useState('')
@@ -59,7 +63,10 @@ export function Combobox<T>({
           data-slot="control"
           aria-label={ariaLabel}
           displayValue={(option: T) => displayValue(option) ?? ''}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value)
+            onInputChange?.(event.target.value)
+          }}
           placeholder={placeholder}
           className={clsx([
             className,
@@ -96,13 +103,14 @@ export function Combobox<T>({
         </Headless.ComboboxButton>
       </span>
       <Headless.ComboboxOptions
+        portal={portal}
         transition
         anchor={anchor}
         className={clsx(
           // Anchor positioning
           '[--anchor-gap:--spacing(2)] [--anchor-padding:--spacing(4)] sm:data-[anchor~=start]:[--anchor-offset:-4px]',
           // Base styles,
-          'isolate min-w-[calc(var(--input-width)+8px)] scroll-py-1 rounded-xl p-1 select-none empty:invisible',
+          'z-[60] isolate min-w-[calc(var(--input-width)+8px)] scroll-py-1 rounded-xl p-1 select-none empty:invisible',
           // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
           'outline outline-transparent focus:outline-hidden',
           // Handle scrolling when menu won't fit in viewport

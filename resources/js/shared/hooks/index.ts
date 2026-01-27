@@ -3,3 +3,4 @@
 // Custom React hooks used across features
 
 export { useIsMobile } from './use-mobile';
+export { useAsyncSearch } from './use-async-search';

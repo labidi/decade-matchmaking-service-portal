@@ -18,7 +18,6 @@ import { PageProps, UIField } from '@/types';
 interface AdminSubscriptionsIndexProps extends PageProps {
     subscriptions: SubscriptionsPagination;
     stats: SubscriptionStats;
-    users: SubscriptionFormOptions['users'];
     requests: SubscriptionFormOptions['requests'];
     searchFields?: UIField[];
     currentSort?: {
@@ -31,7 +30,6 @@ interface AdminSubscriptionsIndexProps extends PageProps {
 export default function AdminSubscriptionsIndex({
     subscriptions,
     stats,
-    users,
     requests,
     searchFields = [],
     currentSort = { field: 'created_at', order: 'desc' },
@@ -92,7 +90,6 @@ export default function AdminSubscriptionsIndex({
                 <CreateSubscriptionDialog
                     isOpen={isCreateDialogOpen}
                     onClose={closeCreateDialog}
-                    users={users}
                     requests={requests}
                 />
             </div>
