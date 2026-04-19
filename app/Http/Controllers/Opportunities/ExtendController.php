@@ -13,9 +13,8 @@ class ExtendController extends Controller
     {
     }
 
-    public function __invoke(Request $request, ?int $id)
+    public function __invoke(Request $request, Opportunity $opportunity)
     {
-        $opportunity = $this->opportunityService->findOpportunity($id);
         if (!$request->user()->can('extend', [Opportunity::class, $opportunity])) {
             return back()->with('error', 'You do not have permission to extend this opportunity.');
         }

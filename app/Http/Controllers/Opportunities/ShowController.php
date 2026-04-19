@@ -5,11 +5,7 @@ namespace App\Http\Controllers\Opportunities;
 use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
-use App\Services\Opportunity\EnhancerService;
-use App\Services\OpportunityService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,16 +13,11 @@ class ShowController extends BaseOpportunitiesController
 {
     use HasPageActions;
 
-    public function __construct(private readonly OpportunityService $opportunityService)
-    {
-    }
-
     /**
      * @throws \Throwable
      */
-    public function __invoke(Request $request, int $id): Response
+    public function __invoke(Request $request, Opportunity $opportunity): Response
     {
-        $opportunity = $this->opportunityService->findOpportunity($id);
         $actions = [];
 
         if ($this->getRouteContext() === 'user_own' && $request->user()->can('create', Opportunity::class)) {
@@ -45,7 +36,7 @@ class ShowController extends BaseOpportunitiesController
         if($this->getRouteContext() === 'public' && $request->user()->can('apply', [Opportunity::class, $opportunity])) {
             $actions[] = $this->createLink(
                 'Apply for opportunity',
-                $opportunity->url,
+                route('opportunity.go', ['identifier' => $opportunity->public_id]),
                 'primary'
             );
         }

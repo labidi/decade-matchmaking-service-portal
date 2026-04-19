@@ -51,9 +51,24 @@ class OpportunityPostRequest extends FormRequest
                 'string'
             ],
             'summary' => ['required'],
-            'url' => ['required'],
+            'url' => ['required', 'string', 'max:2048', 'url:http,https'],
             'key_words' => ['required', 'array'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $raw = $this->input('url');
+
+        if (!is_string($raw)) {
+            return;
+        }
+
+        $normalized = \App\Support\UrlNormalizer::normalize($raw);
+
+        if ($normalized !== null && $normalized !== $raw) {
+            $this->merge(['url' => $normalized]);
+        }
     }
 
     /**

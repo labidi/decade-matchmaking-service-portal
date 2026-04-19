@@ -13,6 +13,7 @@ use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
 use App\Http\Requests\OpportunityPostRequest;
 use App\Http\Resources\OpportunityResource;
+use App\Models\Opportunity;
 use App\Services\OpportunityService;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -27,11 +28,11 @@ class FormController extends BaseOpportunitiesController
     /**
      * @throws Throwable
      */
-    public function form(?int $id = null): Response
+    public function form(?Opportunity $opportunity = null): Response
     {
         $pageProps = [];
-        if ($id) {
-            $opportunity = $this->opportunityService->findOpportunity($id);
+
+        if ($opportunity !== null && $opportunity->exists) {
             $pageProps['title'] = 'Edit Opportunity: ' . $opportunity->title;
             $pageProps['banner'] = $this->buildBanner('Edit Opportunity', 'Edit the details of your opportunity.');
             $pageProps['opportunity'] = $opportunity->toResource(OpportunityResource::class);
@@ -57,16 +58,19 @@ class FormController extends BaseOpportunitiesController
         return Inertia::render('opportunity/Create', $pageProps);
     }
 
-    public function store(OpportunityPostRequest $request, ?int $id = null): \Illuminate\Http\RedirectResponse
+    public function store(OpportunityPostRequest $request, ?Opportunity $opportunity = null): \Illuminate\Http\RedirectResponse
     {
         $validatedData = $request->validated();
+        $isUpdate = $opportunity !== null && $opportunity->exists;
+
         try {
             $this->opportunityService->storeOpportunity(
                 $request->user(),
                 $validatedData,
-                $id ? $this->opportunityService->findOpportunity($id) : null
+                $isUpdate ? $opportunity : null
             );
-            if ($id) {
+
+            if ($isUpdate) {
                 return to_route('me.opportunity.list')->with('success', 'Opportunity updated successfully');
             } else {
                 return to_route('me.opportunity.list')->with('success', 'Opportunity submitted successfully');

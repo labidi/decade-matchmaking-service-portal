@@ -28,6 +28,7 @@ export interface Opportunity {
     target_languages_other: string;
     summary: string;
     url: string;
+    apply_url: string;
     created_at: string;
     updated_at: string;
     user_id: string;

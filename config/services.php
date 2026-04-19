@@ -48,4 +48,8 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET','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'),
         'redirect' => env('GOOGLE_REDIRECT_URI', 'http://localhost:8888/auth/google/callback'),
     ],
+
+    'opportunity_click' => [
+        'ip_pepper' => env('OPPORTUNITY_CLICK_IP_PEPPER', ''),
+    ],
 ];

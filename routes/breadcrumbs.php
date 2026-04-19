@@ -68,17 +68,17 @@ try {
     Breadcrumbs::for('me.opportunity.show', function (BreadcrumbTrail $trail) {
         $trail->parent('user.home');
         $trail->push('My submitted opportunities', route('me.opportunity.list'));
-        $trail->push('My Opportunity details', route('me.opportunity.show', request('id')));
+        $trail->push('My Opportunity details', route('me.opportunity.show', request('opportunity')));
     });
     Breadcrumbs::for('opportunity.show', function (BreadcrumbTrail $trail) {
         $trail->parent('user.home');
         $trail->push('View and Apply for Partner Opportunities', route('opportunity.list'));
-        $trail->push('Opportunity details', route('opportunity.show', request('id')));
+        $trail->push('Opportunity details', route('opportunity.show', request('opportunity')));
     });
     Breadcrumbs::for('opportunity.edit', function (BreadcrumbTrail $trail) {
         $trail->parent('user.home');
         $trail->push('My submitted opportunities', route('me.opportunity.list'));
-        $trail->push('Edit Opportunity', route('opportunity.edit', request('id')));
+        $trail->push('Edit Opportunity', route('opportunity.edit', request('opportunity')));
     });
 } catch (\Diglactic\Breadcrumbs\Exceptions\DuplicateBreadcrumbException $e) {
 

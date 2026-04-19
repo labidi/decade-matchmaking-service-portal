@@ -103,18 +103,12 @@ readonly class OpportunityService
      * Update opportunity status
      * @throws Exception
      */
-    public function updateOpportunityStatus(int $opportunityId, int $statusCode, User $user): array
+    public function updateOpportunityStatus(Opportunity $opportunity, int $statusCode, User $user): array
     {
-        $opportunity = $this->findOpportunity($opportunityId);
-        if (!$opportunity) {
-            throw new Exception('Opportunity not found', 404);
-        }
         // Validate status
         if (!in_array($statusCode, array_column(Status::cases(), 'value'))) {
             throw new Exception('Invalid status code', 422);
         }
-
-        $oldStatus = $opportunity->status;
 
         return DB::transaction(function () use ($opportunity, $statusCode) {
             $this->repository->update($opportunity, ['status' => $statusCode]);
@@ -133,14 +127,8 @@ readonly class OpportunityService
     /**
      * Delete opportunity with validation
      */
-    public function deleteOpportunity(int $opportunityId, User $user): bool
+    public function deleteOpportunity(Opportunity $opportunity, User $user): bool
     {
-        $opportunity = $this->findOpportunity($opportunityId);
-
-        if (!$opportunity) {
-            throw new Exception('Opportunity not found', 404);
-        }
-
         // Check ownership
         if ($opportunity->user_id !== $user->id) {
             throw new Exception('Unauthorized to delete this opportunity', 403);
@@ -155,7 +143,7 @@ readonly class OpportunityService
 
         if ($deleted) {
             Log::info('Opportunity deleted', [
-                'opportunity_id' => $opportunityId,
+                'opportunity_id' => $opportunity->id,
                 'user_id' => $user->id,
                 'title' => $opportunity->title
             ]);

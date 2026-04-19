@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\Opportunity\CoverageActivity;
 use App\Enums\Opportunity\Status;
 use App\Enums\Opportunity\Type;
 use App\Models\Opportunity;
@@ -29,6 +30,7 @@ class OpportunityFactory extends Factory
             'type' => $this->faker->randomElement(Type::cases()),
             'status' => Status::ACTIVE,
             'closing_date' => $this->faker->dateTimeBetween('+1 week', '+3 months'),
+            'coverage_activity' => $this->faker->randomElement(CoverageActivity::cases()),
             'summary' => $this->faker->paragraph(),
             'url' => $this->faker->url(),
             'user_id' => User::factory(),

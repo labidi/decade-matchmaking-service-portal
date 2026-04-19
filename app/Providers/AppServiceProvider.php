@@ -81,6 +81,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Offer::class, OfferPolicy::class);
         // Note: Event listeners are automatically discovered in app/Listeners/
         // with proper handle() methods that type-hint events
+
+        if (app()->environment('production') && config('services.opportunity_click.ip_pepper') === '') {
+            \Log::warning('OPPORTUNITY_CLICK_IP_PEPPER is empty in production; opportunity click IP hashes are not peppered.');
+        }
     }
 
     /**

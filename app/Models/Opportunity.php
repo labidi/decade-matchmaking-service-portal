@@ -11,13 +11,17 @@ use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 
 class Opportunity extends Model
 {
+    use HasFactory;
+
     protected $table = 'opportunities';
     protected $primaryKey = 'id';
 
@@ -33,6 +37,7 @@ class Opportunity extends Model
             'implementation_location' => DynamicLocationCast::class,
             'target_languages' => AsEnumArrayObject::of(Language::class),
             'thematic_areas' => AsEnumCollection::of(ThematicAreas::class),
+            'url' => \App\Casts\UrlNormalizerCast::class,
             'closing_date' => 'datetime:Y-m-d',
             'key_words' => 'array',
             'co_organizers' => 'array',
@@ -45,6 +50,7 @@ class Opportunity extends Model
     }
 
     protected $fillable = [
+        'public_id',
         'title',
         'type',
         'closing_date',
@@ -61,8 +67,17 @@ class Opportunity extends Model
         'key_words',
         'co_organizers',
         'user_id',
-        'status'
+        'status',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $opportunity): void {
+            if (empty($opportunity->public_id)) {
+                $opportunity->public_id = (string) Str::ulid();
+            }
+        });
+    }
 
     public function user(): BelongsTo
     {

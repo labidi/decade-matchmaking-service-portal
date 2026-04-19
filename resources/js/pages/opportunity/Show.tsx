@@ -136,7 +136,7 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                         <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900 dark:text-gray-100">Application site URL</dt>
                             <dd className="mt-1 text-sm/6 text-gray-700 dark:text-gray-300 sm:mt-2">
-                                <a href={opportunity.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline">
+                                <a href={opportunity.apply_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline">
                                     {opportunity.url}
                                 </a>
                             </dd>
