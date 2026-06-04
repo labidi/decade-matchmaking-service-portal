@@ -17,7 +17,7 @@ Schedule::command('queue:work --queue=default database --stop-when-empty --max-j
 
 
 // Process OTP mail and notifications
-Schedule::command('queue:work database --queue=otp-notification,otp-mail --stop-when-empty --max-jobs=50 --max-time=50')
+Schedule::command('queue:work database --queue=otp-mail --stop-when-empty --max-jobs=50 --max-time=50')
     ->everyFiveSeconds()
     ->withoutOverlapping()
     ->runInBackground();
