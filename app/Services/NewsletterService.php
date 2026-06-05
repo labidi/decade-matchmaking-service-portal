@@ -133,7 +133,6 @@ class NewsletterService
      */
     private function aggregateOpportunitiesForUser(User $user): array
     {
-        $weekAgo = Carbon::now()->subWeek();
         $preferences = $user->notificationPreferences;
         $matchingOpportunities = collect();
 
@@ -145,7 +144,6 @@ class NewsletterService
 
         foreach ($opportunityPreferences as $preference) {
             $opportunities = Opportunity::where('type', $preference->attribute_value)
-                ->where('created_at', '>=', $weekAgo)
                 ->where('status', \App\Enums\Opportunity\Status::ACTIVE)
                 ->get();
 
