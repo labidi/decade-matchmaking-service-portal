@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\SystemNotification;
-use App\Models\User;
+use App\Notifications\System\SystemActivityNotification;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * Service for managing system notifications.
@@ -29,14 +29,10 @@ class SystemNotificationService
     public function notifyAdmins(string $title, string $description): void
     {
         try {
-            foreach ($this->userService->getAllAdmins() as $admin) {
-                SystemNotification::create([
-                    'user_id' => $admin->id,
-                    'title' => $title,
-                    'description' => $description,
-                    'is_read' => false,
-                ]);
-            }
+            Notification::send(
+                $this->userService->getAllAdmins(),
+                new SystemActivityNotification($title, $description)
+            );
         } catch (\Exception $e) {
             Log::error('Failed to create admin notifications', [
                 'title' => $title,

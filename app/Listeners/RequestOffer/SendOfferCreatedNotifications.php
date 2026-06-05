@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\RequestOffer;
 
 use App\Events\RequestOffer\OfferCreated;
-use App\Jobs\Email\SendTransactionalEmail;
+use App\Notifications\RequestOffer\OfferCreatedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -34,19 +34,7 @@ class SendOfferCreatedNotifications implements ShouldQueue
         try {
             // Notify request owner
             if ($offer->request && $offer->request->user) {
-                dispatch(new SendTransactionalEmail(
-                    'offer.created',
-                    $offer->request->user,
-                    [
-                        'Offer_ID' => $offer->id,
-                        'Request_Title' => $offer->request->capacity_development_title ?? 'N/A',
-                        'Request_Link' => route('request.show', $offer->request_id),
-                        'Partner_Name' => $offer->matchedPartner?->name ?? 'Unknown Partner',
-                        'user_name' => $offer->request->user->name,
-                        'UNSUB' => route('unsubscribe.show', $offer->request->user->id),
-                        'UPDATE_PROFILE' => route('notification.preferences.index'),
-                    ]
-                ));
+                $offer->request->user->notify(new OfferCreatedNotification($offer));
             }
 
             Log::info('Offer created notifications sent', [

@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\Request;
 
 use App\Events\Request\RequestSubmitted;
-use App\Jobs\Email\SendTransactionalEmail;
-use App\Models\SystemNotification;
+use App\Notifications\Request\RequestCreatedNotification;
 use App\Services\SystemNotificationService;
 use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -46,17 +45,7 @@ readonly class SendRequestCreatedNotifications implements ShouldQueue
 
             // Send confirmation email to requester
             if ($request->user) {
-                dispatch(new SendTransactionalEmail(
-                    'request.created',
-                    $request->user,
-                    [
-                        'Request_Title' => $request->detail->getAttribute('capacity_development_title') ?? 'N/A',
-                        'Request_Link' => route('request.me.show', $request->id),
-                        'user_name' => $request->user->name,
-                        'UNSUB' => route('unsubscribe.show', $request->user->id),
-                        'UPDATE_PROFILE' => route('notification.preferences.index'),
-                    ]
-                ));
+                $request->user->notify(new RequestCreatedNotification($request));
             }
             Log::info('Request created notifications sent', [
                 'request_id' => $request->id,

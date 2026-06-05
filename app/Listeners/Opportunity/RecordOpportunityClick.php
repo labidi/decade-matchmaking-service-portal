@@ -14,7 +14,6 @@ class RecordOpportunityClick implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    public string $connection = 'database';
     public string $queue = 'default';
     public int $tries = 3;
 

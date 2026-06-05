@@ -3,7 +3,7 @@
 namespace App\Listeners\Request;
 
 use App\Events\Request\RequestExpressInterest;
-use App\Jobs\Email\SendTransactionalEmail;
+use App\Notifications\Request\ExpressInterestNotification;
 use App\Services\SystemNotificationService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -32,15 +32,7 @@ readonly class ExpressInterestListener implements ShouldQueue
                     $partner->name ?? 'Unknown Partner'
                 )
             );
-            dispatch(new SendTransactionalEmail(
-                'request.express-interest.partner',
-                $partner,
-                [
-                    'Request_Title' => $request->detail->capacity_development_title ?? 'N/A',
-                    'UNSUB' => route('unsubscribe.show', $partner->id),
-                    'UPDATE_PROFILE' => route('notification.preferences.index'),
-                ]
-            ));
+            $partner->notify(new ExpressInterestNotification($request));
         } catch (Exception $exception) {
             Log::error('Error during handling partner express interest', [
                 'request_id' => $request->id,

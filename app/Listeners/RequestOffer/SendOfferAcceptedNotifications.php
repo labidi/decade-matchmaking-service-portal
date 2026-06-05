@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Listeners\RequestOffer;
 
 use App\Events\OfferAccepted;
-use App\Jobs\Email\SendTransactionalEmail;
-use App\Models\User;
+use App\Notifications\RequestOffer\OfferAcceptedNotification;
 use App\Services\SystemNotificationService;
+use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -22,7 +22,8 @@ use Illuminate\Support\Facades\Log;
 class SendOfferAcceptedNotifications implements ShouldQueue
 {
     public function __construct(
-        private readonly SystemNotificationService $systemNotificationService
+        private readonly SystemNotificationService $systemNotificationService,
+        private readonly UserService $userService
     )
     {
     }
@@ -54,7 +55,7 @@ class SendOfferAcceptedNotifications implements ShouldQueue
             $recipients = [];
 
             // Notify administrators
-            $admins = User::where('administrator', true)->get();
+            $admins = $this->userService->getAllAdmins();
             foreach ($admins as $admin) {
                 $recipients[] = [
                     'user' => $admin,
@@ -80,21 +81,9 @@ class SendOfferAcceptedNotifications implements ShouldQueue
 
             // Send emails to all recipients
             foreach ($recipients as $recipient) {
-                dispatch(new SendTransactionalEmail(
-                    'offer.accepted',
-                    $recipient['user'],
-                    [
-                        'Offer_ID' => $offer->id,
-                        'Request_Title' => $offer->request->capacity_development_title ?? 'N/A',
-                        'Request_Link' => route('request.public.show', $offer->request_id),
-                        'Partner_Name' => $offer->matchedPartner?->name ?? 'N/A',
-                        'Accepted_By' => $acceptedBy->name ?? 'N/A',
-                        'user_name' => $recipient['user']->name,
-                        'recipient_type' => $recipient['type'],
-                        'UNSUB' => route('unsubscribe.show', $recipient['user']->id),
-                        'UPDATE_PROFILE' => route('notification.preferences.index'),
-                    ]
-                ));
+                $recipient['user']->notify(
+                    new OfferAcceptedNotification($offer, $acceptedBy, $recipient['type'])
+                );
             }
         } catch (\Exception $e) {
             Log::error('Failed to send offer accepted notifications', [

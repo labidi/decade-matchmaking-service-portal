@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\RequestOffer;
 
 use App\Events\RequestOffer\OfferRejected;
-use App\Jobs\Email\SendTransactionalEmail;
+use App\Notifications\RequestOffer\OfferRejectedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -31,19 +31,7 @@ class SendOfferRejectedNotifications implements ShouldQueue
         try {
             // Notify the partner who made the offer
             if ($offer->matchedPartner) {
-                dispatch(new SendTransactionalEmail(
-                    'offer.rejected',
-                    $offer->matchedPartner,
-                    [
-                        'Offer_ID' => $offer->id,
-                        'Request_Title' => $offer->request->capacity_development_title ?? 'N/A',
-                        'Request_Link' => route('request.show', $offer->request_id),
-                        'Rejected_By' => $rejectedBy->name ?? 'Request Owner',
-                        'user_name' => $offer->matchedPartner->name,
-                        'UNSUB' => route('unsubscribe.show', $offer->matchedPartner->id),
-                        'UPDATE_PROFILE' => route('notification.preferences.index'),
-                    ]
-                ));
+                $offer->matchedPartner->notify(new OfferRejectedNotification($offer, $rejectedBy));
             }
 
             Log::info('Offer rejected notifications sent', [

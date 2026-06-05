@@ -22,12 +22,6 @@ Schedule::command('queue:work database --queue=otp-mail --stop-when-empty --max-
     ->withoutOverlapping()
     ->runInBackground();
 
-// Process high-priority mail queue
-Schedule::command('queue:work database --queue=mail-priority --stop-when-empty --max-jobs=50 --max-time=50')
-    ->everyMinute()
-    ->withoutOverlapping()
-    ->runInBackground();
-
 // Restart queue workers daily to prevent memory leaks
 Schedule::command('queue:restart')
     ->daily()
