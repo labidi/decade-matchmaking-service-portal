@@ -64,7 +64,7 @@ class RequestPolicy
             return false;
         }
         // also allow subscribers
-        if ($user->id === $request->user_id || $user->id === $request->activeOffer?->matchedPartner?->id || $request->subscribers->contains($user)) {
+        if ($user->id === $request->user_id || $user->id === $request->activeOffer?->matchedPartner?->id || $request->subscribers()->where('users.id', $user->id)->exists()) {
             return true;
         }
 
