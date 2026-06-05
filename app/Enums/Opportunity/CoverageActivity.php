@@ -14,7 +14,7 @@ enum CoverageActivity: string
         return match ($this) {
             self::GLOBAL => 'Global',
             self::REGIONS => 'Regions',
-            self::COUNTRY => 'Country',
+            self::COUNTRY => 'Countries or Areas',
             self::OCEANBASED => 'Ocean-based',
         };
     }
