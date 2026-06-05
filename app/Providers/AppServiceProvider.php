@@ -18,6 +18,7 @@ use App\Services\Actions\DocumentActionProvider;
 use App\Services\Actions\OfferActionProvider;
 use App\Services\Auth\AuthenticationService;
 use App\Channels\MandrillChannel;
+use App\Channels\SystemNotificationChannel;
 use App\Services\Auth\Strategies\OAuthAuthStrategy;
 use App\Services\Auth\Strategies\OceanExpertAuthStrategy;
 use App\Services\Request\RequestActionProvider;
@@ -64,6 +65,10 @@ class AppServiceProvider extends ServiceProvider
         // Register custom notification channels
         Notification::extend('mandrill', function ($app) {
             return new MandrillChannel();
+        });
+
+        Notification::extend('system', function ($app) {
+            return new SystemNotificationChannel();
         });
 
         // Configure rate limiters for authentication
