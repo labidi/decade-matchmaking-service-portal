@@ -10,7 +10,7 @@ COMPOSER="/usr/bin/composer"
 APP_DIR="$1"
 ENVIRONMENT="${2:-dev}"  # Default to 'dev' if not provided
 # Setup logging
-LOG_FILE="$APP_DIR/storage/logs/deploy.log"
+LOG_FILE="$APP_DIR/storage/logs/laravel-deploy.log"
 mkdir -p "$APP_DIR/storage/logs"
 exec &>> "$LOG_FILE"
 
@@ -61,10 +61,12 @@ $PHP artisan migrate -n --force
 # Laravel optimization commands
 echo "Running Laravel optimizations..."
 # Rebuild config and route caches for production performance
-$PHP artisan config:cache
-$PHP artisan route:cache
+#$PHP artisan config:cache
+#$PHP artisan route:cache
 # Generate Ziggy routes
 $PHP artisan ziggy:generate
 $PHP artisan storage:link
+# Restart queue workers so they pick up the newly deployed code
+$PHP artisan queue:restart
 
 echo "[$(date '+%F %T')] Laravel operations completed successfully"
