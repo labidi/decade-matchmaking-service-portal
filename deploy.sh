@@ -42,16 +42,17 @@ echo "[$(date '+%F %T')] Deploy start"
 # Configuration based on environment
 if [[ "$ENVIRONMENT" == "prod" ]]; then
     APP_DIR="/var/www/html/decade-matchmaking-service-portal"
+    BRANCH="main"
 else
     APP_DIR="/var/www/html/decade-matchmaking-service-portal_dev"
+    BRANCH="develop"
 fi
 
-BRANCH="main"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts"
 
 echo "Environment: $ENVIRONMENT"
 
-printf "deploying $BRANCH in $APP_DIR \n"
+printf 'deploying %s in %s \n' "$BRANCH" "$APP_DIR"
 
 # sanity check
 [[ -d "$APP_DIR/.git" ]] || { echo "Not a git repo: $APP_DIR"; exit 1; }
@@ -61,7 +62,19 @@ chmod +x "$SCRIPT_DIR"/*.sh
 
 # Execute git operations
 echo "[$(date '+%F %T')] Running git operations..."
-"$SCRIPT_DIR/git-deploy.sh" "$APP_DIR"
+set +e
+"$SCRIPT_DIR/git-deploy.sh" "$APP_DIR" "$BRANCH"
+GIT_EXIT_CODE=$?
+set -e
+
+if [[ $GIT_EXIT_CODE -eq 200 ]]; then
+  echo "[$(date '+%F %T')] No changes to deploy — skipping Laravel/NPM steps."
+  echo "[$(date '+%F %T')] Deploy finished OK (no-op)"
+  exit 0
+elif [[ $GIT_EXIT_CODE -ne 0 ]]; then
+  echo "[$(date '+%F %T')] Git operations FAILED with exit code $GIT_EXIT_CODE"
+  exit $GIT_EXIT_CODE
+fi
 echo "[$(date '+%F %T')] done git operations..."
 # Execute Laravel and NPM operations in parallel
 echo "[$(date '+%F %T')] Running Laravel and NPM operations in parallel..."

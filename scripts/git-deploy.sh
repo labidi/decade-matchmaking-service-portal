@@ -6,8 +6,8 @@
 set -euo pipefail
 
 REMOTE="origin"
-BRANCH="main"
 APP_DIR="$1"
+BRANCH="${2:-main}"
 
 # Setup logging
 LOG_FILE="$APP_DIR/storage/logs/git-deploy.log"
@@ -30,8 +30,8 @@ REMOTE_BRANCH=$(git rev-parse "$REMOTE/$BRANCH")
 echo "remote $REMOTE/$BRANCH: $REMOTE_BRANCH"
 
 if [[ "$LOCAL" == "$REMOTE_BRANCH" ]]; then
-  echo "[$(date '+%F %T')] No changes detected on $REMOTE/$BRANCH — exiting."
-  exit 1  # Exit with code 1 to signal no changes to main script
+  echo "[$(date '+%F %T')] No changes detected on $REMOTE/$BRANCH — nothing to deploy."
+  exit 200  # sentinel: "no changes" (distinct from a real git failure)
 else
   echo "[$(date '+%F %T')] Changes detected on $REMOTE/$BRANCH — proceeding with deployment…"
 fi
