@@ -60,6 +60,9 @@ echo "Applying database migrations if needed..."
 $PHP artisan migrate -n --force
 # Laravel optimization commands
 echo "Running Laravel optimizations..."
+# Rebuild config and route caches for production performance
+$PHP artisan config:cache
+$PHP artisan route:cache
 # Generate Ziggy routes
 $PHP artisan ziggy:generate
 $PHP artisan storage:link
