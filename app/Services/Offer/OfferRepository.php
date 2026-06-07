@@ -2,6 +2,7 @@
 
 namespace App\Services\Offer;
 
+use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request\Offer;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -15,12 +16,29 @@ class OfferRepository
     }
 
     /**
-     * Find offer by ID with relationships
+     * Find offer by ID with relationships.
      */
     public function findById(int $id): ?Offer
     {
         return Offer::with(['request', 'request.status', 'request.user', 'matchedPartner', 'documents'])
             ->find($id);
+    }
+
+    /**
+     * Find the active offer for a request with relationships.
+     */
+    public function findActiveOfferForRequest(int $requestId): ?Offer
+    {
+        return Offer::with([
+            'request.user',
+            'request.status',
+            'request.detail',
+            'matchedPartner',
+            'documents',
+        ])
+            ->where('request_id', $requestId)
+            ->where('status', RequestOfferStatus::ACTIVE)
+            ->first();
     }
 
     /**

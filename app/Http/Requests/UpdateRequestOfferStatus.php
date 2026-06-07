@@ -31,8 +31,7 @@ class UpdateRequestOfferStatus extends BaseOfferRequest
     {
         return [
             'status.required' => 'The status is required.',
-            'status.integer' => 'The status must be a valid integer.',
-            'status.in' => 'The selected status is invalid.',
+            'status.enum' => 'The selected status is invalid.',
         ];
     }
 
