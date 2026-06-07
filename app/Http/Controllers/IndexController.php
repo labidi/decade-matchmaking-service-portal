@@ -29,7 +29,7 @@ class IndexController extends Controller
             'description' => "",
             'banner' => [
                 'title' => 'Connect for a Sustainable Ocean',
-                'description' => "The Ocean Decade Capacity Development Platformm",
+                'description' => "The Ocean Decade Capacity Development Platform",
                 'image' => '/assets/img/sidebar.png'
             ],
             'YoutubeEmbed' => [
