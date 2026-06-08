@@ -31,7 +31,10 @@ echo "Environment: $ENVIRONMENT (using $ENV_SOURCE)"
 # Merge .env.db with environment-specific file
 echo "Merging .env.db with $ENV_SOURCE"
 if [[ -f .env.db && -f "$ENV_SOURCE" ]]; then
-  cat .env.db >> "$ENV_SOURCE"
+  # Prepend a newline so .env.db's first line (DB_CONNECTION) can't glue onto a
+  # non-newline-terminated last line of $ENV_SOURCE. Without this, a missing
+  # trailing newline swallows DB_CONNECTION and Laravel falls back to sqlite.
+  { echo; cat .env.db; } >> "$ENV_SOURCE"
   echo "✓ .env.db merged with $ENV_SOURCE"
 else
   echo "No .env.db file to merge or $ENV_SOURCE file missing, skipping merge step"
