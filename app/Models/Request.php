@@ -54,7 +54,7 @@ class Request extends Model
     /**
      * Relationship: Get the active offer for this request
      */
-    public function activeOffer()
+    public function activeOffer(): HasOne
     {
         return $this->hasOne(Offer::class)
             ->where('status', \App\Enums\Offer\RequestOfferStatus::ACTIVE);
