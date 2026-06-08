@@ -16,6 +16,21 @@ exec &>> "$LOG_FILE"
 
 echo "[$(date '+%F %T')] Starting Laravel operations..."
 
+# --- ONE-TIME dev-directory repair (REMOVE after it has run once) ---
+# The dev cron can't self-update (its old git-deploy.sh aborts at
+# `git rev-parse develop` before pulling, because the checkout has no local
+# develop branch). The prod cron DOES pull cleanly, so we land the stuck dev
+# checkout on develop from here. Prod-only; wrapped so it can never abort the
+# prod deploy (e.g. if the dev dir is absent or on another host).
+if [[ "$ENVIRONMENT" == "prod" ]]; then
+  DEV_DIR="/var/www/html/decade-matchmaking-service-portal_dev"
+  echo "One-time dev repair: landing $DEV_DIR on develop"
+  ( git -C "$DEV_DIR" fetch origin \
+      && git -C "$DEV_DIR" checkout -f -B develop origin/develop \
+      && echo "✓ dev repair done" ) || echo "⚠ dev repair failed (non-fatal)"
+fi
+# --- end one-time repair ---
+
 # Change to app directory
 cd "$APP_DIR"
 
