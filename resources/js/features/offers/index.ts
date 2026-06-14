@@ -2,11 +2,10 @@
 // Exports: offer management, offer forms, offer review components
 
 // Hooks
-export { useOfferForm, useOfferActions, useOffersDialog } from './hooks';
-export type { UseOfferActionsReturn } from './hooks';
+export { useOfferForm, useOffersDialog } from './hooks';
 
-// Services
-export { OfferActionService } from './services';
+// Components
+export { OfferActionButtons, OfferDropdownActions } from './components';
 
 // Types
-export type { RequestOffer, RequestOfferList, RequestOfferPermissions } from './types';
+export type { RequestOffer, RequestOfferList } from './types';

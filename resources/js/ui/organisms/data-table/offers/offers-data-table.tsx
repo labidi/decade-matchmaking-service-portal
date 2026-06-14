@@ -7,7 +7,7 @@ import {TablePaginationNav} from '@ui/molecules';
 import {formatDate, offerStatusBadgeRenderer} from '@shared/utils';
 import {router} from '@inertiajs/react';
 import {TableSearch} from '@ui/organisms/data-table/search';
-import {DataTableActionsColumn, DataTableAction} from '@ui/organisms/data-table/common';
+import {OfferDropdownActions} from '@features/offers/components';
 
 // Types and Interfaces
 interface PaginationData {
@@ -52,7 +52,6 @@ interface OffersDataTableProps {
     searchFields?: UIField[];
     columns?: TableColumn[];
     routeName?: string;
-    getActionsForOffer: (offer: RequestOffer) => DataTableAction<RequestOffer>[];
     showSearch?: boolean;
     showActions?: boolean;
 }
@@ -67,7 +66,6 @@ export function OffersDataTable({
                                     searchFields = [],
                                     columns,
                                     routeName = 'admin.offer.list',
-                                    getActionsForOffer,
                                     showSearch = true,
                                     showActions = true
                                 }: Readonly<OffersDataTableProps>) {
@@ -230,10 +228,7 @@ export function OffersDataTable({
                                 ))}
                                 {showActions && (
                                     <TableCell className="text-right">
-                                        <DataTableActionsColumn
-                                            row={offer}
-                                            actions={getActionsForOffer(offer)}
-                                        />
+                                        <OfferDropdownActions offer={offer} />
                                     </TableCell>
                                 )}
                             </TableRow>

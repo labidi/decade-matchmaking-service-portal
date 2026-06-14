@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Actions;
 
 use App\Contracts\Actions\ActionProviderInterface;
+use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request\Offer;
 use App\Models\User;
 
@@ -23,7 +24,7 @@ class OfferActionProvider implements ActionProviderInterface
      */
     public function getActions(mixed $entity, ?User $user = null, ?string $context = null): array
     {
-        if (!$entity instanceof Offer) {
+        if (! $entity instanceof Offer) {
             return [];
         }
         $actions = [];
@@ -99,11 +100,7 @@ class OfferActionProvider implements ActionProviderInterface
                 'route' => route('offer.documents.upload', ['id' => $entity->id, 'type' => 'lesson_learned']),
                 'method' => 'POST',
                 'enabled' => true,
-                'style' => [
-                    'color' => 'blue',
-                    'icon' => 'document-arrow-up',
-                    'variant' => 'outline',
-                ],
+                'style' => [],
                 'metadata' => [
                     'handler' => 'dialog',
                     'dialog_component' => 'FileUploadDialogProps',
@@ -112,7 +109,7 @@ class OfferActionProvider implements ActionProviderInterface
                         'maxSize' => 10,  // MB
                         'multiple' => false,
                         'endpoint' => route('offer.documents.upload', ['id' => $entity->id, 'type' => 'lesson_learned']),
-                        'documentType' => 'financial_breakdown',
+                        'documentType' => 'lesson_learned',
                         'title' => 'Upload Lesson Learned report',
                         'description' => 'Please Upload Lesson Learned report document (PDF, Excel, or CSV format)',
                         'validationRules' => [
@@ -128,6 +125,17 @@ class OfferActionProvider implements ActionProviderInterface
         // Admin actions
         if ($context === 'admin' && $user) {
             // Edit Offer
+            if ($user->can('view', $entity)) {
+                $actions[] = [
+                    'key' => 'view',
+                    'label' => 'View details',
+                    'route' => route('admin.offer.show', ['id' => $entity->id]),
+                    'method' => 'GET',
+                    'enabled' => true,
+                    'style' => [],
+                ];
+            }
+            // Edit Offer
             if ($user->can('update', $entity)) {
                 $actions[] = [
                     'key' => 'edit',
@@ -135,29 +143,23 @@ class OfferActionProvider implements ActionProviderInterface
                     'route' => route('admin.offer.edit', ['id' => $entity->id]),
                     'method' => 'GET',
                     'enabled' => true,
-                    'style' => [
-                        'color' => 'blue',
-                        'icon' => 'pencil-square',
-                        'variant' => 'outline',
-                    ],
+                    'style' => [],
                 ];
             }
 
             // Enable/Disable Offer
             if ($user->can('canEnableOrDisable', $entity)) {
-                $isActive = $entity->status === 'active';
-                
+                $isActive = $entity->status === RequestOfferStatus::ACTIVE;
+                $targetStatus = $isActive ? RequestOfferStatus::INACTIVE : RequestOfferStatus::ACTIVE;
+
                 $actions[] = [
                     'key' => $isActive ? 'disable' : 'enable',
                     'label' => $isActive ? 'Disable Offer' : 'Enable Offer',
-//                    'route' => route('admin.offer.toggle', ['id' => $entity->id]),
+                    'route' => route('admin.offer.update-status', ['id' => $entity->id]),
                     'method' => 'POST',
+                    'data' => ['status' => $targetStatus->value],
                     'enabled' => true,
-                    'style' => [
-                        'color' => $isActive ? 'yellow' : 'green',
-                        'icon' => $isActive ? 'pause' : 'play',
-                        'variant' => 'outline',
-                    ],
+                    'style' => [],
                 ];
             }
 
@@ -169,12 +171,18 @@ class OfferActionProvider implements ActionProviderInterface
                     'route' => route('admin.offer.destroy', ['id' => $entity->id]),
                     'method' => 'DELETE',
                     'enabled' => true,
-                    'style' => [
-                        'color' => 'red',
-                        'icon' => 'trash',
-                        'variant' => 'outline',
-                    ],
+                    'style' => [],
                     'confirm' => 'This action cannot be undone. Are you sure you want to delete this offer?',
+                ];
+            }
+            if($user->can('view', $entity->request)){
+                $actions[] = [
+                    'key' => 'view_request',
+                    'label' => 'View Offer Request',
+                    'route' => route('admin.request.show', ['id' => $entity->request->id]),
+                    'method' => 'GET',
+                    'enabled' => true,
+                    'style' => [],
                 ];
             }
 

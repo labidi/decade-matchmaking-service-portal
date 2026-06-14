@@ -2,7 +2,7 @@ export {
     OCDRequest, OCDRequestList, RequestPermissions, OCDRequestStatus,
     RequestSubscription, SubscriptionStats
 } from "@/features/requests";
-export {RequestOffer, RequestOfferList, RequestOfferPermissions} from "@/types/offer";
+export {RequestOffer, RequestOfferList} from "@/types/offer";
 export {Opportunity, OpportunitiesList, OpportunityFormOptions, OpportunitiesPagination} from "@/types/opportunity";
 export type {EntityAction} from "@/types/actions";
 export {

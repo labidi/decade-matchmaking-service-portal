@@ -27,11 +27,19 @@ class OfferService
     ) {}
 
     /**
-     * Get paginated offers with search and sorting
+     * Get paginated offers with search and sorting.
      */
     public function getPaginatedOffers(array $searchFilters = [], array $sortFilters = []): AbstractPaginator
     {
         return $this->repository->getPaginated($searchFilters, $sortFilters)->withQueryString();
+    }
+
+    /**
+     * Get the active offer for a request.
+     */
+    public function getActiveOfferForRequest(Request $request): ?Offer
+    {
+        return $this->repository->findActiveOfferForRequest($request->id);
     }
 
     /**
