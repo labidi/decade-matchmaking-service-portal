@@ -49,6 +49,7 @@ class OpportunityResource extends JsonResource
             'target_languages_other' => $opportunity->target_languages_other,
             'summary' => $opportunity->summary,
             'url' => $opportunity->url,
+            'apply_url' => route('opportunity.go', ['identifier' => $opportunity->public_id]),
             'created_at' => $opportunity->created_at,
             'updated_at' => $opportunity->updated_at,
             'key_words' => $opportunity->key_words,
