@@ -30,7 +30,7 @@ export function ActionButton({
     className,
     onDialogOpen,
 }: Readonly<ActionButtonProps>) {
-    const Icon = getIconComponent(action.style.icon);
+    const Icon = action.style?.icon ? getIconComponent(action.style.icon) : null;
 
     const handleClick = () => {
         // Handle dialog actions
@@ -80,8 +80,8 @@ export function ActionButton({
     };
 
     // Determine button props based on variant
-    const isOutline = action.style.variant === 'outline';
-    const isPlain = action.style.variant === 'plain';
+    const isOutline = action.style?.variant === 'outline';
+    const isPlain = action.style?.variant === 'plain';
 
     // Button props - plain buttons don't use color prop
     const buttonProps: any = {
@@ -98,14 +98,14 @@ export function ActionButton({
         buttonProps.plain = true;
     } else if (isOutline) {
         buttonProps.outline = true;
-        buttonProps.color = action.style.color;
-    } else {
+        buttonProps.color = action.style?.color;
+    } else if (action.style?.color) {
         buttonProps.color = action.style.color;
     }
 
     return (
         <Button {...buttonProps}>
-            <Icon data-slot="icon" />
+            {Icon && <Icon data-slot="icon" />}
             {action.label}
         </Button>
     );

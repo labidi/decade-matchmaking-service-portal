@@ -29,17 +29,11 @@ class RequestResource extends JsonResource
     public function toArray(Request $request): array
     {
         // Eager load relationships to avoid N+1 queries
-        $this->resource->loadMissing(['activeOffer', 'matchedPartner', 'user', 'offers']);
-        $user = $request->user();
-
+        $this->resource->loadMissing(['user']);
         return [
             'id' => $this->id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            // Relationships
-            'active_offer' => $user?->can('viewActiveOffer', $this->resource)
-                ? $this->whenLoaded('activeOffer', fn ($offer) => new OfferResource($offer))
-                : null,
             'status' => $this->whenLoaded('status'),
             'user' => $this->whenLoaded('user'),
             'matched_partner' => $this->whenLoaded('matchedPartner'),
@@ -47,13 +41,13 @@ class RequestResource extends JsonResource
             'detail' => new DetailResource($this->whenLoaded('detail')),
             'subscriptions' => $this->whenLoaded('subscriptions'),
             'subscribers' => $this->whenLoaded('subscribers'),
-            // NO 'actions' key - handled by controller
         ];
     }
 
     /**
      * Get offers that the current user is authorized to view.
      *
+     * @param Request $request
      * @return AnonymousResourceCollection|null
      */
     private function getAuthorizedOffers(Request $request): ?AnonymousResourceCollection

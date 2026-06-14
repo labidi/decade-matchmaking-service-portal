@@ -7,22 +7,22 @@ namespace App\Http\Resources;
 use App\Models\Document;
 use App\Services\Actions\DocumentActionProvider;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 
 /**
  * @mixin Document
  */
-class DocumentResource extends JsonResource
+class DocumentResource extends BaseResource
 {
-    public static $wrap = null;
+    protected function actionProvider(): ?string
+    {
+        return DocumentActionProvider::class;
+    }
 
     /**
-     * Transform the resource into an array.
-     *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    protected function fields(Request $request): array
     {
         return [
             'id' => $this->id,
@@ -48,12 +48,6 @@ class DocumentResource extends JsonResource
             'uploader' => $this->whenLoaded('uploader', function () {
                 return new UserResource($this->uploader);
             }),
-
-            // Actions
-            'actions' => app(DocumentActionProvider::class)->getActions(
-                $this->resource,
-                $request->user()
-            ),
         ];
     }
 

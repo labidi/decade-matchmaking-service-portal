@@ -177,8 +177,9 @@ export interface EntityAction {
     route: string | null;
     method: HttpMethod;
     enabled: boolean;
-    style: ActionStyle;
+    style?: ActionStyle;
     confirm?: string;
+    data?: Record<string, unknown>;
     metadata?: HandlerMetadata;
 }
 
