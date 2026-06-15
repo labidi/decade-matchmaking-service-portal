@@ -32,6 +32,7 @@ class OpportunityExportService
      * - closing_date: Closing date (Y-m-d format)
      * - status: Status label
      * - title: Opportunity title
+     * - summary: Opportunity summary text
      * - type: Type label
      * - thematic_areas: Comma-separated thematic area labels
      * - thematic_areas_other: Thematic Areas Other
@@ -86,6 +87,7 @@ class OpportunityExportService
             'Status',
             'Institution or programme offering this opportunity',
             'Title',
+            'Summary',
             'Type',
             'Thematic Areas',
             'Thematic Areas Other',
@@ -116,6 +118,7 @@ class OpportunityExportService
             $opportunity->status?->label() ?? '',
             $this->formatCoOrganizers($opportunity),
             $opportunity->title ?? '',
+            $opportunity->summary ?? '',
             $opportunity->type?->label() ?? '',
             $this->formatThematicAreas($opportunity),
             $opportunity->thematic_areas_other ?? '',
