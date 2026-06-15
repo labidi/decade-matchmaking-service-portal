@@ -31,7 +31,7 @@ class ListController extends BaseOpportunitiesController
                 'title' => 'Opportunities',
                 'searchFields' => [
                     ['name' => 'user', 'label' => 'User', 'type' => 'text'],
-                    ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['name' => 'title', 'label' => 'Title or keywords', 'type' => 'text'],
                     ['name' => 'type', 'label' => 'Type', 'type' => 'select', 'options' => Opportunity::getTypeOptions()],
                     ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => Status::getOptions()],
                 ],
@@ -56,7 +56,7 @@ class ListController extends BaseOpportunitiesController
                     'description' => 'Manage your submitted opportunities here.'
                 ],
                 'searchFields' => [
-                    ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['name' => 'title', 'label' => 'Title or keywords', 'type' => 'text'],
                     ['name' => 'type', 'label' => 'Type', 'type' => 'select', 'options' => Type::getOptions()],
                     ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => Status::getOptions()],
                 ],
@@ -80,7 +80,7 @@ class ListController extends BaseOpportunitiesController
                     'description' => 'Browse and view opportunities submitted by CDF partners here.'
                 ],
                 'searchFields' => [
-                    ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['name' => 'title', 'label' => 'Title or keywords', 'type' => 'text'],
                     ['name' => 'type', 'label' => 'Type', 'type' => 'select', 'options' => Type::getOptions()],
                     ['name' => 'thematic_areas', 'label' => 'Thematic areas', 'type' => 'select', 'options' => ThematicAreas::getOptions()],
                 ],

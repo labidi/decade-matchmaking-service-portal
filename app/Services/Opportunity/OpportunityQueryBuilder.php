@@ -17,7 +17,11 @@ class OpportunityQueryBuilder
     public function applySearchFilters(Builder $query, array $searchFilters): Builder
     {
         if (!empty($searchFilters['title'])) {
-            $query->where('title', 'like', '%' . $searchFilters['title'] . '%');
+            $term = $searchFilters['title'];
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'like', '%' . $term . '%')
+                    ->orWhere('key_words', 'like', '%' . $term . '%');
+            });
         }
 
         if (!empty($searchFilters['type'])) {
@@ -105,7 +109,7 @@ class OpportunityQueryBuilder
         $query->where(function ($q) use ($searchTerm) {
             $q->where('title', 'like', '%' . $searchTerm . '%')
                 ->orWhere('summary', 'like', '%' . $searchTerm . '%')
-                ->orWhere('keywords', 'like', '%' . $searchTerm . '%');
+                ->orWhere('key_words', 'like', '%' . $searchTerm . '%');
         });
     }
 
