@@ -62,8 +62,8 @@ export default function OpportunityListPage({
                         {
                             id: 'title',
                             type: 'text',
-                            label: 'Title',
-                            placeholder: 'Search by opportunity title...'
+                            label: 'Title or keywords',
+                            placeholder: 'Search by title or keywords...'
                         }
                     ]}
                     showSearch={true}
