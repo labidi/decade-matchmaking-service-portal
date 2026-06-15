@@ -1,6 +1,7 @@
 import React from 'react';
 import { Opportunity } from '@/types';
 import { formatDate, opportunityStatusBadgeRenderer } from '@shared/utils';
+import { Badge } from '@ui/primitives/badge';
 
 
 // Column configuration for Admin interface
@@ -81,6 +82,23 @@ export const partnerColumns = [
         )
     },
     {
+        key: 'key_words',
+        label: 'Keywords',
+        render: (opportunity: Opportunity) => (
+            opportunity.key_words?.length ? (
+                <div className="flex flex-col items-start gap-1 max-w-xs">
+                    {opportunity.key_words.slice(0, 3).map((keyword: string) => (
+                        <Badge key={keyword} color="blue">
+                            {keyword}
+                        </Badge>
+                    ))}
+                </div>
+            ) : (
+                <span className="text-zinc-500">—</span>
+            )
+        )
+    },
+    {
         key: 'type',
         label: 'Type',
         render: (opportunity: Opportunity) => (
@@ -108,25 +126,6 @@ export const partnerColumns = [
                         {new Date(opportunity.closing_date) > new Date() ? 'Open' : 'Closed'}
                     </div>
                 )}
-            </div>
-        )
-    },
-    {
-        key: 'created_at',
-        label: 'Published',
-        sortable: true,
-        sortField: 'created_at' as const,
-        render: (opportunity: Opportunity) => (
-            <div>
-                <div>{formatDate(opportunity.created_at, 'en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                })}</div>
-                <div className="text-gray-500 text-xs">{formatDate(opportunity.created_at, 'en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}</div>
             </div>
         )
     },
