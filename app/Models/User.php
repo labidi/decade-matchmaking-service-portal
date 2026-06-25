@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Opportunity\Type;
+use App\Enums\Request\SubTheme;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -35,6 +37,8 @@ class User extends Authenticatable
         'avatar',
         'is_blocked',
         'last_login_at',
+        'email_notifications_enabled',
+        'notification_opt_outs',
     ];
 
     /**
@@ -71,6 +75,8 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'password' => 'hashed',
             'is_blocked' => 'boolean',
+            'email_notifications_enabled' => 'boolean',
+            'notification_opt_outs' => 'array',
         ];
     }
 
@@ -95,11 +101,6 @@ class User extends Authenticatable
     public function notifications(): HasMany
     {
         return $this->hasMany(SystemNotification::class);
-    }
-
-    public function notificationPreferences(): HasMany
-    {
-        return $this->hasMany(NotificationPreference::class);
     }
 
     public function requestSubscriptions(): HasMany
@@ -151,5 +152,70 @@ class User extends Authenticatable
     public function isActive(): bool
     {
         return ! $this->isBlocked() && $this->hasVerifiedEmail();
+    }
+
+    /**
+     * Whether the user receives email notifications at all (master switch).
+     * Defaults to true (opt-out model) when the column is unset.
+     */
+    public function isSubscribedToEmails(): bool
+    {
+        return $this->email_notifications_enabled ?? true;
+    }
+
+    /**
+     * Whether a given taxonomy value for an entity is enabled for this user.
+     * A value is enabled unless the master switch is off or it is listed in
+     * the user's opt-outs for that entity.
+     *
+     * @param  string  $entity  'opportunity' | 'request'
+     */
+    public function notificationEnabledFor(string $entity, string $value): bool
+    {
+        if (! $this->isSubscribedToEmails()) {
+            return false;
+        }
+
+        $optOuts = $this->notification_opt_outs[$entity] ?? [];
+
+        return ! in_array($value, $optOuts, true);
+    }
+
+    /**
+     * The opportunity type values this user currently receives.
+     *
+     * @return array<int, string>
+     */
+    public function enabledOpportunityTypes(): array
+    {
+        if (! $this->isSubscribedToEmails()) {
+            return [];
+        }
+
+        $optOuts = $this->notification_opt_outs['opportunity'] ?? [];
+
+        return array_values(array_filter(
+            array_map(fn ($case) => $case->value, Type::cases()),
+            fn ($value) => ! in_array($value, $optOuts, true)
+        ));
+    }
+
+    /**
+     * The request subtheme values this user currently receives.
+     *
+     * @return array<int, string>
+     */
+    public function enabledRequestSubthemes(): array
+    {
+        if (! $this->isSubscribedToEmails()) {
+            return [];
+        }
+
+        $optOuts = $this->notification_opt_outs['request'] ?? [];
+
+        return array_values(array_filter(
+            array_map(fn ($case) => $case->value, SubTheme::cases()),
+            fn ($value) => ! in_array($value, $optOuts, true)
+        ));
     }
 }

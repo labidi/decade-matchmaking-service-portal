@@ -6,7 +6,6 @@ namespace App\Listeners\Request;
 
 use App\Events\Request\RequestValidated;
 use App\Jobs\Email\SendTransactionalEmail;
-use App\Models\NotificationPreference;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
@@ -44,12 +43,21 @@ class SendRequestValidatedNotifications implements ShouldQueue
                 return;
             }
 
-            // Fetch users who have matching subtheme preferences
-            $matchingUsers = User::whereHas('notificationPreferences', function ($query) use ($requestSubthemes) {
-                $query->where('entity_type', NotificationPreference::ENTITY_TYPE_REQUEST)
-                    ->where('email_notification_enabled', true)
-                    ->whereIn('attribute_value', $requestSubthemes);
-            })->get();
+            // Opt-out model: notify partners who are subscribed (master switch on)
+            // and have not opted out of at least one of this request's subthemes.
+            $matchingUsers = User::role('partner')
+                ->where('email_notifications_enabled', true)
+                ->where('is_blocked', false)
+                ->get()
+                ->filter(function (User $user) use ($requestSubthemes) {
+                    foreach ($requestSubthemes as $subtheme) {
+                        if ($user->notificationEnabledFor('request', $subtheme)) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                });
 
             if ($matchingUsers->isEmpty()) {
                 Log::info('No users with matching subtheme preferences found', [
@@ -93,7 +101,17 @@ class SendRequestValidatedNotifications implements ShouldQueue
                 $sentCount++;
             }
 
+            Log::info('Request validated notifications dispatched', [
+                'request_id' => $request->id,
+                'sent' => $sentCount,
+                'skipped' => $skippedCount,
+            ]);
         } catch (\Exception $e) {
+            Log::error('Failed to send request validated notifications', [
+                'request_id' => $request->id ?? null,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
 }

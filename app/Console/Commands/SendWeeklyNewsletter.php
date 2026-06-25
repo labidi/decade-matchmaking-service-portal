@@ -97,7 +97,7 @@ class SendWeeklyNewsletter extends Command
         $this->table(
             ['Metric', 'Value'],
             [
-                ['Active Opportunity Subscribers', $stats['active_opportunity_subscribers'] ?? 0],
+                ['Subscribed Users', $stats['subscribed_users'] ?? 0],
                 ['Last Send', $stats['last_send'] ? $stats['last_send']->diffForHumans() : 'Never'],
             ]
         );

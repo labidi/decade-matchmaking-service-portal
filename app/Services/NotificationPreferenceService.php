@@ -4,196 +4,118 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exceptions\NotificationPreferenceException;
-use App\Http\Resources\NotificationPreferenceResource;
-use App\Models\NotificationPreference;
+use App\Enums\Opportunity\Type;
+use App\Enums\Request\SubTheme;
 use App\Models\RequestSubscription;
 use App\Models\User;
-use Exception;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 
+/**
+ * Manages a user's notification settings under the opt-out model.
+ *
+ * There is no per-preference entity: every taxonomy value is enabled by
+ * default. State lives on the user as a master switch
+ * (`email_notifications_enabled`) plus a set of disabled values
+ * (`notification_opt_outs`), grouped by entity.
+ */
 class NotificationPreferenceService
 {
+    public const ENTITY_OPPORTUNITY = 'opportunity';
+    public const ENTITY_REQUEST = 'request';
+
     /**
-     * @throws NotificationPreferenceException
+     * Build the toggle matrix shown on the preferences page.
+     *
+     * The opportunity card is available to every user; the request card only
+     * to partners (mirrors who can receive request notifications).
+     *
+     * @return array{
+     *     master_enabled: bool,
+     *     opportunity: array<int, array{value: string, label: string, enabled: bool}>,
+     *     request: array<int, array{value: string, label: string, enabled: bool}>|null
+     * }
      */
-    public function getUserPreferences(User $user, int $perPage = 15): LengthAwarePaginator
+    public function getSettings(User $user): array
     {
-        try {
-            $preferences = NotificationPreference::where('user_id', $user->getAttribute('id'))
-                ->orderBy('updated_at', 'desc')
-                ->paginate($perPage);
-
-            $preferences->toResourceCollection(NotificationPreferenceResource::class);
-            return $preferences;
-        } catch (Exception|\Throwable $e) {
-            Log::error('Failed to fetch notification preferences', [
-                'user_id' => $user->getAttribute('id'),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            throw NotificationPreferenceException::databaseOperationFailed(
-                'fetch',
-                $e->getMessage()
-            );
-        }
+        return [
+            'master_enabled' => $user->isSubscribedToEmails(),
+            'opportunity' => $this->buildCard($user, self::ENTITY_OPPORTUNITY, Type::getOptions()),
+            'request' => $user->is_partner
+                ? $this->buildCard($user, self::ENTITY_REQUEST, SubTheme::getOptions())
+                : null,
+        ];
     }
 
-    public function createPreference(User $user, array $data): NotificationPreference
+    /**
+     * Set a single taxonomy value to the desired enabled state (idempotent).
+     *
+     * Calling this method twice with the same `$enabled` value has no additional
+     * effect — it is safe against rapid-click races. Enabling any value also
+     * re-asserts the master switch so a globally-unsubscribed user can resume
+     * notifications from the preferences page.
+     *
+     * @return bool The resulting enabled state of the value.
+     */
+    public function toggle(User $user, string $entity, string $value, bool $enabled): bool
     {
-        DB::beginTransaction();
+        $this->assertValidEntity($entity);
+        $this->assertValidValue($entity, $value);
 
-        try {
-            $entityType = $data['entity_type'] ?? null;
-            // Auto-set attribute_type based on entity_type
-            $attributeType = $this->getAttributeTypeForEntity($entityType);
-            $attributeValue = $data['attribute_value'] ?? null;
-            // Check for duplicate preference
-            $existingPreference = NotificationPreference::where('user_id', $user->getAttribute('id'))
-                ->where('entity_type', $entityType)
-                ->where('attribute_value', $attributeValue)
-                ->first();
+        $optOuts = $user->notification_opt_outs ?? [];
+        $entityOptOuts = $optOuts[$entity] ?? [];
 
-            if ($existingPreference) {
-                throw NotificationPreferenceException::duplicatePreference();
+        if ($enabled) {
+            // Desired state: enabled — remove from opt-outs and resume master switch.
+            $entityOptOuts = array_values(array_filter(
+                $entityOptOuts,
+                fn ($v) => $v !== $value
+            ));
+            $user->email_notifications_enabled = true;
+        } else {
+            // Desired state: disabled — add to opt-outs (idempotent: check first).
+            if (! in_array($value, $entityOptOuts, true)) {
+                $entityOptOuts[] = $value;
             }
-            // Prepare preference data with defaults
-            $preferenceData = [
-                'user_id' => $user->getAttribute('id'),
-                'entity_type' => $entityType,
-                'attribute_type' => $attributeType,
-                'attribute_value' => $attributeValue,
-                'email_notification_enabled' => true, // Always enabled
-            ];
-            $preference = NotificationPreference::create($preferenceData);
-            DB::commit();
-
-            return $preference;
-        } catch (Exception|NotificationPreferenceException|ValidationException $e) {
-            DB::rollBack();
-
-            Log::error('Unexpected error creating notification preference', [
-                'user_id' => $user->getAttribute('id'),
-                'data' => $data,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            throw $e;
         }
-    }
 
-    public function toggleEmailNotification(NotificationPreference $preference): NotificationPreference
-    {
-        DB::beginTransaction();
-
-        try {
-            $currentStatus = $preference->getAttribute('email_notification_enabled');
-            $newStatus = ! $currentStatus;
-
-            Log::info('Toggling email notification status', [
-                'preference_id' => $preference->getAttribute('id'),
-                'user_id' => $preference->getAttribute('user_id'),
-                'from' => $currentStatus,
-                'to' => $newStatus,
-            ]);
-
-            $preference->update(['email_notification_enabled' => $newStatus]);
-
-            DB::commit();
-
-            Log::info('Successfully toggled email notification status', [
-                'preference_id' => $preference->getAttribute('id'),
-                'user_id' => $preference->getAttribute('user_id'),
-                'new_status' => $newStatus,
-            ]);
-
-            return $preference->fresh();
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            Log::error('Failed to toggle email notification status', [
-                'preference_id' => $preference->getAttribute('id'),
-                'user_id' => $preference->getAttribute('user_id'),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            throw NotificationPreferenceException::databaseOperationFailed(
-                'toggle email notification',
-                $e->getMessage()
-            );
+        if (empty($entityOptOuts)) {
+            unset($optOuts[$entity]);
+        } else {
+            $optOuts[$entity] = array_values($entityOptOuts);
         }
+
+        $user->notification_opt_outs = empty($optOuts) ? null : $optOuts;
+        $user->save();
+
+        return $enabled;
     }
 
-    public function deletePreference(NotificationPreference $preference): bool
+    /**
+     * Re-enable all email notifications for the user.
+     *
+     * Symmetric counterpart to {@see unsubscribeFromAllNotifications()}: it
+     * flips the master switch back on without touching per-value opt-outs, so a
+     * globally-unsubscribed user can resume emails from the preferences page.
+     */
+    public function resubscribe(User $user): void
     {
-        DB::beginTransaction();
-
-        try {
-            Log::info('Deleting notification preference', [
-                'preference_id' => $preference->getAttribute('id'),
-                'user_id' => $preference->getAttribute('user_id'),
-                'entity_type' => $preference->getAttribute('entity_type'),
-                'attribute_value' => $preference->getAttribute('attribute_value'),
-            ]);
-
-            $result = $preference->delete();
-
-            DB::commit();
-
-            Log::info('Successfully deleted notification preference', [
-                'preference_id' => $preference->getAttribute('id'),
-                'user_id' => $preference->getAttribute('user_id'),
-            ]);
-
-            return $result;
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            Log::error('Failed to delete notification preference', [
-                'preference_id' => $preference->getAttribute('id'),
-                'user_id' => $preference->getAttribute('user_id'),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            throw NotificationPreferenceException::databaseOperationFailed(
-                'delete',
-                $e->getMessage()
-            );
-        }
+        $user->email_notifications_enabled = true;
+        $user->save();
     }
 
-    public function preferenceExists(User $user, string $entityType, string $attributeValue): bool
-    {
-        return NotificationPreference::where('user_id', $user->getAttribute('id'))
-            ->where('entity_type', $entityType)
-            ->where('attribute_value', $attributeValue)
-            ->exists();
-    }
-
-    private function getAttributeTypeForEntity(string $entityType): string
-    {
-        return match ($entityType) {
-            NotificationPreference::ENTITY_TYPE_REQUEST => 'subtheme',
-            NotificationPreference::ENTITY_TYPE_OPPORTUNITY => 'type',
-            default => throw NotificationPreferenceException::invalidEntityType($entityType)
-        };
-    }
-
+    /**
+     * Globally unsubscribe the user from all email notifications.
+     * Optionally also removes their request subscriptions.
+     */
     public function unsubscribeFromAllNotifications(User $user, bool $removeSubscriptions = false): bool
     {
         DB::beginTransaction();
 
         try {
-            // Disable all notification preferences for the user
-            $updatedCount = NotificationPreference::where('user_id', $user->id)
-                ->update(['email_notification_enabled' => false]);
+            $user->email_notifications_enabled = false;
+            $user->save();
 
-            // Optionally remove all request subscriptions
             if ($removeSubscriptions) {
                 RequestSubscription::where('user_id', $user->id)->delete();
             }
@@ -212,6 +134,44 @@ class NotificationPreferenceService
             ]);
 
             throw $e;
+        }
+    }
+
+    /**
+     * Map a taxonomy option list to {value, label, enabled} for a user.
+     *
+     * @param  array<int, array{value: string, label: string}>  $options
+     * @return array<int, array{value: string, label: string, enabled: bool}>
+     */
+    private function buildCard(User $user, string $entity, array $options): array
+    {
+        $optOuts = $user->notification_opt_outs[$entity] ?? [];
+
+        return array_map(
+            fn (array $option) => [
+                'value' => $option['value'],
+                'label' => $option['label'],
+                'enabled' => ! in_array($option['value'], $optOuts, true),
+            ],
+            $options
+        );
+    }
+
+    private function assertValidEntity(string $entity): void
+    {
+        if (! in_array($entity, [self::ENTITY_OPPORTUNITY, self::ENTITY_REQUEST], true)) {
+            abort(422, "Invalid notification entity: {$entity}");
+        }
+    }
+
+    private function assertValidValue(string $entity, string $value): void
+    {
+        $valid = $entity === self::ENTITY_OPPORTUNITY
+            ? Type::tryFrom($value)
+            : SubTheme::tryFrom($value);
+
+        if ($valid === null) {
+            abort(422, "Invalid notification value: {$value}");
         }
     }
 }

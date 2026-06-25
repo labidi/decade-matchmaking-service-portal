@@ -5,31 +5,41 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Jobs\Email\SendTransactionalEmail;
-use App\Models\NotificationPreference;
-use App\Models\Opportunity;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Services\Opportunity\OpportunityQueryBuilder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Newsletter Service for sending weekly opportunity newsletters
+ * Newsletter Service for sending weekly opportunity newsletters.
  *
- * This service handles sending weekly newsletters to users about new opportunities
- * matching their notification preferences. Request notifications are now event-driven
- * and handled separately.
+ * Opt-out model: every non-blocked user with the master email switch enabled
+ * receives the weekly email. By default it lists the top 15 currently-open
+ * opportunities by closest closing date; users who have opted out of specific
+ * opportunity types receive only the types they still allow.
+ *
+ * Scaling design: the full open-opportunity pool is fetched ONCE per run and
+ * held in memory. Per-user filtering is done in-process on the collection.
+ * Rendered HTML is memoised by the user's opt-out "signature" so that users
+ * sharing the same opt-out set (the common case) reuse a single Blade render.
+ * Users are streamed in chunks of 500 to keep peak memory bounded.
  */
 class NewsletterService
 {
+    /**
+     * Maximum number of opportunities included in a single email.
+     */
+    public const MAX_OPPORTUNITIES = 15;
+
     public function __construct(
-        private readonly NotificationPreferenceService $preferenceService
+        private readonly OpportunityQueryBuilder $opportunityQueryBuilder
     ) {
     }
 
     /**
-     * Send weekly opportunity newsletter to all subscribed users
+     * Send weekly opportunity newsletter to all subscribed users.
      *
-     * @return array{processed: int, sent: int, failed: int}
+     * @return array{processed: int, sent: int, failed: int, errors: array}
      */
     public function sendWeeklyNewsletter(): array
     {
@@ -43,56 +53,119 @@ class NewsletterService
                 'errors' => [],
             ];
 
-            // Get users with active opportunity preferences
-            $users = $this->getUsersWithOpportunityPreferences();
-            $stats['processed'] = $users->count();
+            // A1: Load the open-opportunity pool exactly once for the whole run.
+            $pool = $this->opportunityQueryBuilder
+                ->buildActiveOpenByClosingDateQuery()
+                ->get();
 
-            Log::info('[NewsletterService] Found users for opportunity newsletter', [
-                'count' => $stats['processed'],
+            Log::info('[NewsletterService] Loaded open opportunity pool', [
+                'pool_size' => $pool->count(),
             ]);
 
-            foreach ($users as $user) {
-                try {
-                    // Aggregate opportunities matching user's preferences
-                    $opportunities = $this->aggregateOpportunitiesForUser($user);
+            // A2: In-process render cache keyed by the user's opt-out signature.
+            // Each entry: ['html' => string, 'total' => int, 'count' => int]
+            $renderCache = [];
 
-                    // Only send if there are matching opportunities
-                    if (!empty($opportunities)) {
-                        $this->dispatchNewsletterEmail($user, $opportunities);
-                        $stats['sent']++;
+            // A3: Stream subscribers in bounded chunks — no full table load.
+            User::query()
+                ->where('email_notifications_enabled', true)
+                ->where('is_blocked', false)
+                ->chunkById(500, function (Collection $users) use ($pool, &$renderCache, &$stats): void {
+                    foreach ($users as $user) {
+                        $stats['processed']++;
 
-                        Log::debug('[NewsletterService] Opportunity newsletter dispatched', [
-                            'user_id' => $user->id,
-                            'email' => $user->email,
-                            'opportunity_count' => count($opportunities),
-                        ]);
-                    } else {
-                        Log::debug('[NewsletterService] No opportunities for user, skipping', [
-                            'user_id' => $user->id,
-                            'email' => $user->email,
-                        ]);
+                        try {
+                            $enabledTypes = $user->enabledOpportunityTypes();
+
+                            // User opted out of every type — skip entirely.
+                            if (empty($enabledTypes)) {
+                                Log::debug('[NewsletterService] No opportunities for user, skipping', [
+                                    'user_id' => $user->id,
+                                    'email' => $user->email,
+                                ]);
+
+                                continue;
+                            }
+
+                            // Derive a stable cache key from the user's enabled-type set.
+                            $sortedTypes = $enabledTypes;
+                            sort($sortedTypes);
+                            $sig = implode(',', $sortedTypes);
+
+                            if (! isset($renderCache[$sig])) {
+                                $filtered = $pool->filter(
+                                    fn ($o) => in_array(
+                                        $o->type instanceof \App\Enums\Opportunity\Type
+                                            ? $o->type->value
+                                            : $o->type,
+                                        $enabledTypes,
+                                        true
+                                    )
+                                );
+
+                                $total = $filtered->count();
+                                $items = $filtered->take(self::MAX_OPPORTUNITIES)->values();
+
+                                $viewAllUrl = route('opportunity.list');
+                                $html = $items->isNotEmpty()
+                                    ? view('emails.newsletter.opportunities', [
+                                        'opportunities' => $items->toArray(),
+                                        'total' => $total,
+                                        'shown' => $items->count(),
+                                        'view_all_url' => $viewAllUrl,
+                                    ])->render()
+                                    : '';
+
+                                $renderCache[$sig] = [
+                                    'html' => $html,
+                                    'total' => $total,
+                                    'count' => $items->count(),
+                                ];
+                            }
+
+                            $cached = $renderCache[$sig];
+
+                            if ($cached['count'] === 0) {
+                                Log::debug('[NewsletterService] No matching opportunities for user, skipping', [
+                                    'user_id' => $user->id,
+                                    'email' => $user->email,
+                                ]);
+
+                                continue;
+                            }
+
+                            $this->dispatchNewsletterEmail($user, $cached['html'], $cached['count'], $cached['total']);
+                            $stats['sent']++;
+
+                            Log::debug('[NewsletterService] Opportunity newsletter dispatched', [
+                                'user_id' => $user->id,
+                                'email' => $user->email,
+                                'opportunity_count' => $cached['count'],
+                                'total_open' => $cached['total'],
+                            ]);
+                        } catch (\Exception $e) {
+                            $stats['failed']++;
+                            $stats['errors'][] = [
+                                'user_id' => $user->id,
+                                'email' => $user->email,
+                                'error' => $e->getMessage(),
+                            ];
+
+                            Log::error('[NewsletterService] Failed to send newsletter to user', [
+                                'user_id' => $user->id,
+                                'email' => $user->email,
+                                'error' => $e->getMessage(),
+                                'trace' => $e->getTraceAsString(),
+                            ]);
+                        }
                     }
-                } catch (\Exception $e) {
-                    $stats['failed']++;
-                    $stats['errors'][] = [
-                        'user_id' => $user->id,
-                        'email' => $user->email,
-                        'error' => $e->getMessage(),
-                    ];
-
-                    Log::error('[NewsletterService] Failed to send newsletter to user', [
-                        'user_id' => $user->id,
-                        'email' => $user->email,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
-                }
-            }
+                });
 
             Log::info('[NewsletterService] Weekly opportunity newsletter send completed', [
                 'processed' => $stats['processed'],
                 'sent' => $stats['sent'],
                 'failed' => $stats['failed'],
+                'render_cache_entries' => count($renderCache),
             ]);
 
             return $stats;
@@ -107,74 +180,24 @@ class NewsletterService
     }
 
     /**
-     * Get users with active email preferences for opportunities
+     * Dispatch newsletter email job to queue with pre-rendered HTML.
      *
-     * @return Collection<User>
+     * The HTML is rendered once per opt-out signature and reused across all
+     * users who share the same signature. Per-user personalisation
+     * (UNSUB, UPDATE_PROFILE, user_name) lives in Mandrill template variables,
+     * not in the HTML block.
      */
-    private function getUsersWithOpportunityPreferences(): Collection
+    private function dispatchNewsletterEmail(User $user, string $opportunitiesHtml, int $opportunityCount, int $total): void
     {
-        return User::whereHas('notificationPreferences', function ($query) {
-            $query->where('email_notification_enabled', true)
-                ->where('entity_type', NotificationPreference::ENTITY_TYPE_OPPORTUNITY);
-        })
-            ->with(['notificationPreferences' => function ($query) {
-                $query->where('email_notification_enabled', true)
-                    ->where('entity_type', NotificationPreference::ENTITY_TYPE_OPPORTUNITY);
-            }])
-            ->get()
-            ->unique('id');
-    }
+        $viewAllUrl = route('opportunity.list');
 
-    /**
-     * Aggregate opportunities from the last week matching user's preferences
-     *
-     * @param User $user
-     * @return array
-     */
-    private function aggregateOpportunitiesForUser(User $user): array
-    {
-        $preferences = $user->notificationPreferences;
-        $matchingOpportunities = collect();
-
-        // Get opportunity preferences (type-based)
-        $opportunityPreferences = $preferences->where(
-            'entity_type',
-            NotificationPreference::ENTITY_TYPE_OPPORTUNITY
-        );
-
-        foreach ($opportunityPreferences as $preference) {
-            $opportunities = Opportunity::where('type', $preference->attribute_value)
-                ->where('status', \App\Enums\Opportunity\Status::ACTIVE)
-                ->get();
-
-            $matchingOpportunities = $matchingOpportunities->merge($opportunities);
-        }
-
-        // Remove duplicates and return as array
-        return $matchingOpportunities->unique('id')->values()->toArray();
-    }
-
-    /**
-     * Dispatch newsletter email job to queue
-     *
-     * @param User $user
-     * @param array $opportunities
-     * @return void
-     */
-    private function dispatchNewsletterEmail(User $user, array $opportunities): void
-    {
-        // Prepare variables for email template
         $variables = [
             'UNSUB' => route('unsubscribe.show', $user->id),
             'UPDATE_PROFILE' => route('notification.preferences.index'),
             'user_name' => $user->name ?? $user->email,
-            'opportunity_count' => count($opportunities),
+            'opportunity_count' => $opportunityCount,
+            'view_all_url' => $viewAllUrl,
         ];
-
-        // Render HTML content for opportunities
-        $opportunitiesHtml = view('emails.newsletter.opportunities', [
-            'opportunities' => $opportunities,
-        ])->render();
 
         $options = [
             'template_content' => [
@@ -182,7 +205,6 @@ class NewsletterService
             ],
         ];
 
-        // Dispatch the email job
         SendTransactionalEmail::dispatch(
             'opportunity.newsletter.weekly',
             $user,
@@ -193,25 +215,26 @@ class NewsletterService
         Log::info('[NewsletterService] Opportunity newsletter email dispatched to queue', [
             'user_id' => $user->id,
             'email' => $user->email,
-            'opportunity_count' => count($opportunities),
+            'opportunity_count' => $opportunityCount,
+            'total_open' => $total,
             'template' => 'opportunity.newsletter.weekly',
         ]);
     }
 
     /**
-     * Get newsletter statistics for monitoring
+     * Get newsletter statistics for monitoring.
      *
-     * @return array
+     * @return array{subscribed_users: int, last_send: mixed, last_send_stats: array}
      */
     public function getNewsletterStats(): array
     {
-        $activeOpportunitySubscribers = User::whereHas('notificationPreferences', function ($query) {
-            $query->where('email_notification_enabled', true)
-                ->where('entity_type', NotificationPreference::ENTITY_TYPE_OPPORTUNITY);
-        })->count();
+        $subscribedUsers = User::query()
+            ->where('email_notifications_enabled', true)
+            ->where('is_blocked', false)
+            ->count();
 
         return [
-            'active_opportunity_subscribers' => $activeOpportunitySubscribers,
+            'subscribed_users' => $subscribedUsers,
             'last_send' => cache()->get('newsletter:last_send_date'),
             'last_send_stats' => cache()->get('newsletter:last_send_stats', []),
         ];

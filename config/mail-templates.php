@@ -185,6 +185,7 @@ return [
                 'UPDATE_PROFILE' => 'string',
                 'user_name' => 'string',
                 'opportunity_count' => 'integer',
+                'view_all_url' => 'string',
             ],
             'tags' => ['opportunity', 'newsletter', 'weekly'],
         ],

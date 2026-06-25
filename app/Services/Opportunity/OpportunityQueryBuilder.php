@@ -132,6 +132,20 @@ class OpportunityQueryBuilder
     }
 
     /**
+     * Build query for active opportunities that are still open (closing date in
+     * the future), ordered by soonest closing date first. Used by the weekly
+     * newsletter to surface the most urgent opportunities.
+     */
+    public function buildActiveOpenByClosingDateQuery(): Builder
+    {
+        return Opportunity::query()
+            ->where('status', Status::ACTIVE)
+            ->whereNotNull('closing_date')
+            ->whereDate('closing_date', '>=', now()->toDateString())
+            ->orderBy('closing_date', 'asc');
+    }
+
+    /**
      * Build query for public opportunities (excluding user's own)
      */
     public function buildPublicOpportunitiesQuery(int $excludeUserId): Builder
