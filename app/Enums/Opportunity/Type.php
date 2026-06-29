@@ -20,35 +20,43 @@ enum Type: string
     case WEBINAR = 'webinar';
     case ACCESS_EQUIPMENT = 'access-equipment';
     case CONFERENCE_FORUMS = 'conference-forums';
+    case ONLINE_COURSES = 'online-courses';
+    case TECHNICAL_ASSISTANCE = 'technical-assistance-advisory-support';
 
     public function label(): string
     {
         return match ($this) {
-            self::TRAINING => 'Training/Workshop',
-            self::ONBOARDING_EXPEDITIONS => 'Onboarding Expeditions, Research & Training',
+            self::TRAINING => 'Blended or In-Person Training Programmes/Workshops',
+            self::ONBOARDING_EXPEDITIONS => 'Onboarding Expeditions, Research and Training Opportunities',
             self::FELLOWSHIPS => 'Fellowships',
-            self::INTERNSHIPS_JOBS_CONSULTANCIES => 'Internship/Jobs/Consultancies',
+            self::INTERNSHIPS_JOBS_CONSULTANCIES => 'Internships and Jobs',
             self::MENTORSHIPS => 'Mentorships',
-            self::VISITING_LECTURERS => 'Visiting Lecturers/Scholars',
+            self::VISITING_LECTURERS => 'Visiting Lecturers and Scholars Programmes',
             self::TRAVEL_GRANTS => 'Travel Grants',
             self::AWARDS => 'Awards',
-            self::RESEARCH_FUNDING => 'Fundings/ Grants/ Scolarships',
+            self::RESEARCH_FUNDING => 'Funding, Grants and Scholarships',
             self::ACCESS_INFRASTRUCTURE => 'Access to Infrastructure',
-            self::OCEAN_DATA => 'Ocean Data, Information and Documentation',
-            self::NETWORKS_COMMUNITY => 'Professional Networks & Community Building',
-            self::OCEAN_LITERACY => 'Ocean Literacy, Public Information and Communication',
-            self::WEBINAR => 'Webinar',
+            self::OCEAN_DATA => 'Ocean Data, Information and Documentation Resources',
+            self::NETWORKS_COMMUNITY => 'Professional Networks and Community Building Opportunities',
+            self::OCEAN_LITERACY => 'Ocean Literacy, Public Information and Communication Activities',
+            self::WEBINAR => 'Webinars',
             self::ACCESS_EQUIPMENT => 'Access to Equipment',
-            self::CONFERENCE_FORUMS => 'Conferences/ Forums',
+            self::CONFERENCE_FORUMS => 'Conferences and Forums',
+            self::ONLINE_COURSES => 'Online Courses',
+            self::TECHNICAL_ASSISTANCE => 'Technical Assistance/Advisory Support',
         };
     }
 
     public static function getOptions(): array
     {
-        return array_map(
+        $options = array_map(
             fn($case) => ['value' => $case->value, 'label' => $case->label()],
             self::cases()
         );
+
+        usort($options, fn(array $a, array $b): int => strcmp($a['label'], $b['label']));
+
+        return $options;
     }
 
     public static function getLabelByValue(string $value): ?string
