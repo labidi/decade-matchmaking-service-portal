@@ -376,7 +376,7 @@ export default function List({ settings }: Readonly<NotificationPreferencesPageP
                     {local.request !== null && (
                         <NotificationCard
                             title="Request notifications"
-                            description="New capacity development requests by sub-theme."
+                            description="New capacity development requests by Decade Challenge."
                             icon={<InboxArrowDownIcon data-slot="icon" className="size-5" />}
                             options={local.request}
                             entityType="request"

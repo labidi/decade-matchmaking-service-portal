@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\Request\DecadeChallenge;
 use App\Models\Request\Detail;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -36,6 +37,7 @@ class DetailResource extends JsonResource
             'capacity_development_title' => $this->capacity_development_title,
             'related_activity' => $this->related_activity,
             'delivery_format' => $this->delivery_format,
+            'decade_challenges' => $this->transformRankedChallenges($this->decade_challenges),
             'subthemes' => $this->transformEnumArray($this->subthemes),
             'subthemes_other' => $this->subthemes_other,
             'support_types' => $this->transformEnumArray($this->support_types),
@@ -83,6 +85,44 @@ class DetailResource extends JsonResource
         }
 
         return $publicAttributes;
+    }
+
+    /**
+     * Transform the ranked Decade Challenges into {rank => {value, label}|null}.
+     *
+     * @param mixed $challenges Raw `decade_challenges` array from the model cast
+     * @return array{
+     *     primary: array{value: string, label: string}|null,
+     *     secondary: array{value: string, label: string}|null,
+     *     tertiary: array{value: string, label: string}|null
+     * }
+     */
+    private function transformRankedChallenges(mixed $challenges): array
+    {
+        $transformed = [
+            'primary' => null,
+            'secondary' => null,
+            'tertiary' => null,
+        ];
+
+        if (!is_array($challenges)) {
+            return $transformed;
+        }
+
+        foreach (array_keys($transformed) as $rank) {
+            $value = $challenges[$rank] ?? null;
+
+            if (!is_string($value) || $value === '') {
+                continue;
+            }
+
+            $transformed[$rank] = [
+                'value' => $value,
+                'label' => DecadeChallenge::getLabelByValue($value) ?? $value,
+            ];
+        }
+
+        return $transformed;
     }
 
     /**

@@ -7,8 +7,35 @@ export interface RequestDetailsSectionProps {
     request: OCDRequest;
 }
 
+const RANKED_POS = ['Primary', 'Secondary', 'Tertiary'] as const;
+
+const isRankedChallenges = (value: any): boolean =>
+    !!value && typeof value === 'object' && !Array.isArray(value) &&
+    ('primary' in value || 'secondary' in value || 'tertiary' in value);
+
 // Helper function to render field values (extracted to reduce nesting)
 const renderFieldValue = (value: any, fieldKey: string) => {
+    if (isRankedChallenges(value)) {
+        const ranks = ['primary', 'secondary', 'tertiary'] as const;
+        const entries = ranks
+            .map((rank, index) => ({rank: RANKED_POS[index], entry: value?.[rank]}))
+            .filter((r) => r.entry && (r.entry.label || r.entry.value));
+
+        if (entries.length === 0) {
+            return <span className="text-firefly-900/80">None specified</span>;
+        }
+
+        return (
+            <ul className="mt-1 ml-4 list-disc list-inside">
+                {entries.map(({rank, entry}) => (
+                    <li key={rank} className="text-firefly-900/80 py-1">
+                        {rank}: {entry.label || entry.value}
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+
     if (Array.isArray(value)) {
         if (value.length === 0) {
             return <span className="text-firefly-900/80">None specified</span>;

@@ -6,11 +6,12 @@ use App\Enums\Common\Country;
 use App\Enums\Common\Language;
 use App\Enums\Common\TargetAudience;
 use App\Enums\Common\YesNo;
+use App\Enums\Request\DecadeChallenge;
 use App\Enums\Request\DeliveryFormat;
-use App\Enums\Request\SubTheme;
 use App\Enums\Request\SupportType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreRequest extends FormRequest
 {
@@ -83,8 +84,19 @@ class StoreRequest extends FormRequest
                 Rule::excludeIf(fn() => !in_array(Language::OTHER->value, $this->input('target_languages', []))),
                 'string'
             ],
-            'subthemes' => ['required'],
-            'subthemes.*' => [Rule::enum(SubTheme::class)],
+            'decade_challenges' => ['required', 'array'],
+            'decade_challenges.primary' => ['required', Rule::enum(DecadeChallenge::class)],
+            'decade_challenges.secondary' => [
+                'nullable',
+                Rule::enum(DecadeChallenge::class),
+                'different:decade_challenges.primary',
+            ],
+            'decade_challenges.tertiary' => [
+                'nullable',
+                Rule::enum(DecadeChallenge::class),
+                'different:decade_challenges.primary',
+                'different:decade_challenges.secondary',
+            ],
             'support_types' => ['required', 'array'],
             'support_types.*' => [Rule::enum(SupportType::class)],
             'gap_description' => ['required', 'string'],
@@ -111,6 +123,71 @@ class StoreRequest extends FormRequest
         ]);
     }
 
+    /**
+     * Cross-field checks for the ranked Decade Challenges and error surfacing.
+     *
+     * Enforces contiguous ranks (tertiary requires secondary) and distinct
+     * values across ranks, then mirrors any nested `decade_challenges.*`
+     * message onto the base `decade_challenges` key so the frontend field
+     * (which reads a single error key) always displays one message.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($this->input('mode') === 'draft') {
+                return;
+            }
+
+            $challenges = $this->input('decade_challenges');
+
+            if (is_array($challenges)) {
+                $secondary = $challenges['secondary'] ?? null;
+                $tertiary = $challenges['tertiary'] ?? null;
+
+                if ($tertiary !== null && $secondary === null) {
+                    $validator->errors()->add(
+                        'decade_challenges.tertiary',
+                        'A tertiary Decade Challenge requires a secondary one: please rank your selections contiguously.'
+                    );
+                }
+
+                $selected = array_filter([
+                    $challenges['primary'] ?? null,
+                    $secondary,
+                    $tertiary,
+                ], fn ($value) => $value !== null);
+
+                if (count($selected) !== count(array_unique($selected))) {
+                    $validator->errors()->add(
+                        'decade_challenges',
+                        'Each Decade Challenge may only be selected once across the primary, secondary and tertiary ranks.'
+                    );
+                }
+            }
+
+            $this->mirrorNestedChallengeErrors($validator);
+        });
+    }
+
+    private function mirrorNestedChallengeErrors(Validator $validator): void
+    {
+        $errors = $validator->errors();
+
+        if ($errors->has('decade_challenges')) {
+            return;
+        }
+
+        foreach (['primary', 'secondary', 'tertiary'] as $rank) {
+            $key = "decade_challenges.{$rank}";
+
+            if ($errors->has($key)) {
+                $errors->add('decade_challenges', $errors->first($key));
+
+                return;
+            }
+        }
+    }
+
     private function getBaseValidationRules()
     {
         return [
@@ -131,8 +208,10 @@ class StoreRequest extends FormRequest
             'target_languages' => [],
             'target_languages.*' => [],
             'target_languages_other' => [],
-            'subthemes' => [],
-            'subthemes.*' => [],
+            'decade_challenges' => [],
+            'decade_challenges.primary' => [],
+            'decade_challenges.secondary' => [],
+            'decade_challenges.tertiary' => [],
             'support_types' => [],
             'support_types.*' => [],
             'gap_description' => [],

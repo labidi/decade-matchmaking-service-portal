@@ -10,6 +10,7 @@ import CSVUpload from './csv-upload';
 import SelectField from './SelectField';
 import MultiSelectField from './MultiSelectField';
 import KeywordsField from './KeywordsField';
+import RankedChallengeField from './RankedChallengeField';
 
 interface FieldRendererProps {
     name: string;
@@ -307,6 +308,25 @@ export default function FieldRenderer({
                     showChips={true}
                     maxSelections={field.max}
                     {...getAriaAttributes(field, error)}
+                />
+            );
+        case 'ranked-challenge':
+            return (
+                <RankedChallengeField
+                    key={name}
+                    id={field.id}
+                    name={name}
+                    value={value}
+                    onChange={(v) => onChange(name, v)}
+                    options={field.options as {value: string; label: string}[]}
+                    required={field.required}
+                    disabled={field.disabled || disabled}
+                    readOnly={field.readOnly}
+                    error={error}
+                    label={field.label}
+                    description={field.description}
+                    image={field.image}
+                    className="mt-8"
                 />
             );
         case 'radio':

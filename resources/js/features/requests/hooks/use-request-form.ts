@@ -23,8 +23,11 @@ export function useRequestForm(request?: OCDRequest) {
         project_stage: '',
         project_url: '',
         related_activity: '',
-        subthemes: [] ,
-        subthemes_other: '',
+        decade_challenges: {primary: null, secondary: null, tertiary: null} as {
+            primary: string | null;
+            secondary: string | null;
+            tertiary: string | null;
+        },
         support_types: [] ,
         support_types_other: '',
         gap_description: '',
@@ -96,7 +99,7 @@ export function useRequestForm(request?: OCDRequest) {
             Object.entries(request.detail).forEach(([key, value]) => {
                 if (key in form.data && key !== 'id') {
                     // Handle array fields that come as objects with value/label pairs
-                    if (Array.isArray(value) && ['subthemes', 'support_types', 'target_audience', 'target_languages'].includes(key)) {
+                    if (Array.isArray(value) && ['support_types', 'target_audience', 'target_languages'].includes(key)) {
                         // Convert array of objects to array of values
                         const arrayValues = value.map(item =>
                             typeof item === 'object' && item !== null && 'value' in item
@@ -113,6 +116,22 @@ export function useRequestForm(request?: OCDRequest) {
                                 : String(item)
                         ).filter(Boolean);
                         form.setData(key as FormDataKeys, countryValues);
+                    }
+                    // Handle the ranked decade_challenges object (read shape -> form write shape)
+                    else if (key === 'decade_challenges' && value && typeof value === 'object' && !Array.isArray(value)) {
+                        const source = value as Record<'primary' | 'secondary' | 'tertiary', unknown>;
+                        const pick = (rank: 'primary' | 'secondary' | 'tertiary'): string | null => {
+                            const entry = source[rank];
+                            if (entry && typeof entry === 'object' && 'value' in entry) {
+                                return String((entry as {value: unknown}).value);
+                            }
+                            return typeof entry === 'string' && entry.length > 0 ? entry : null;
+                        };
+                        form.setData('decade_challenges', {
+                            primary: pick('primary'),
+                            secondary: pick('secondary'),
+                            tertiary: pick('tertiary'),
+                        });
                     }
                     // Handle primitive values (strings, numbers, booleans)
                     else if (value !== null && value !== undefined) {

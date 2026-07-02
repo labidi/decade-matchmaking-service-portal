@@ -164,6 +164,26 @@
     <div class="section">
         <h2>Support Requirements</h2>
         <table>
+            @php
+                $decadeChallenges = is_array($ocdRequest->detail->decade_challenges) ? $ocdRequest->detail->decade_challenges : [];
+                $rankedChallenges = collect(['primary' => 'Primary', 'secondary' => 'Secondary', 'tertiary' => 'Tertiary'])
+                    ->map(fn ($rankLabel, $rank) => isset($decadeChallenges[$rank]) && is_string($decadeChallenges[$rank])
+                        ? ['rank' => $rankLabel, 'label' => \App\Enums\Request\DecadeChallenge::getLabelByValue($decadeChallenges[$rank]) ?? $decadeChallenges[$rank]]
+                        : null)
+                    ->filter();
+            @endphp
+            @if($rankedChallenges->isNotEmpty())
+            <tr>
+                <th>Decade Challenges</th>
+                <td>
+                    <ul>
+                        @foreach($rankedChallenges as $challenge)
+                            <li><strong>{{ $challenge['rank'] }}:</strong> {{ $challenge['label'] }}</li>
+                        @endforeach
+                    </ul>
+                </td>
+            </tr>
+            @endif
             @if($ocdRequest->detail->subthemes && count($ocdRequest->detail->subthemes) > 0)
             <tr>
                 <th>Subthemes</th>

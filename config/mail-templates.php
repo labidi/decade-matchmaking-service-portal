@@ -214,7 +214,7 @@ return [
                 'request_title' => 'required|string',
                 'request_description' => 'required|string',
                 'request_url' => 'required|url',
-                'subtheme' => 'required|string',
+                'Request_Challenges' => 'required|string',
                 'location' => 'optional|string',
                 'UNSUB' => 'required|string',
                 'UPDATE_PROFILE' => 'required|string',

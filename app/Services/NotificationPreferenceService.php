@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\Opportunity\Type;
-use App\Enums\Request\SubTheme;
+use App\Enums\Request\DecadeChallenge;
 use App\Models\RequestSubscription;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +42,7 @@ class NotificationPreferenceService
             'master_enabled' => $user->isSubscribedToEmails(),
             'opportunity' => $this->buildCard($user, self::ENTITY_OPPORTUNITY, Type::getOptions()),
             'request' => $user->is_partner
-                ? $this->buildCard($user, self::ENTITY_REQUEST, SubTheme::getOptions())
+                ? $this->buildCard($user, self::ENTITY_REQUEST, DecadeChallenge::getOptions())
                 : null,
         ];
     }
@@ -168,7 +168,7 @@ class NotificationPreferenceService
     {
         $valid = $entity === self::ENTITY_OPPORTUNITY
             ? Type::tryFrom($value)
-            : SubTheme::tryFrom($value);
+            : DecadeChallenge::tryFrom($value);
 
         if ($valid === null) {
             abort(422, "Invalid notification value: {$value}");

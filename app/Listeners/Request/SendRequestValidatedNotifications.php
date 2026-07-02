@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  * Listener for RequestValidated event.
  *
  * This listener handles instant email notifications when a request is validated/approved.
- * It sends emails to users who have matching subtheme preferences.
+ * It sends emails to users who have matching Decade Challenge preferences.
  *
  * NOTE: This is separate from the weekly newsletter system. This sends instant
  * notifications for validated requests matching user preferences.
@@ -33,25 +33,25 @@ class SendRequestValidatedNotifications implements ShouldQueue
         $request = $event->request;
 
         try {
-            // Get request subthemes (stored as JSON array)
-            $requestSubthemes = $request->request_data['subthemes'] ?? [];
+            // Ranked Decade Challenges from the normalized store (authoritative).
+            $requestChallenges = $this->extractChallengeValues($request->detail?->decade_challenges);
 
-            if (empty($requestSubthemes)) {
-                Log::info('Request has no subthemes, skipping instant notifications', [
+            if (empty($requestChallenges)) {
+                Log::info('Request has no Decade Challenges, skipping instant notifications', [
                     'request_id' => $request->id,
                 ]);
                 return;
             }
 
             // Opt-out model: notify partners who are subscribed (master switch on)
-            // and have not opted out of at least one of this request's subthemes.
+            // and have not opted out of at least one of this request's challenges.
             $matchingUsers = User::role('partner')
                 ->where('email_notifications_enabled', true)
                 ->where('is_blocked', false)
                 ->get()
-                ->filter(function (User $user) use ($requestSubthemes) {
-                    foreach ($requestSubthemes as $subtheme) {
-                        if ($user->notificationEnabledFor('request', $subtheme)) {
+                ->filter(function (User $user) use ($requestChallenges) {
+                    foreach ($requestChallenges as $challenge) {
+                        if ($user->notificationEnabledFor('request', $challenge)) {
                             return true;
                         }
                     }
@@ -60,9 +60,9 @@ class SendRequestValidatedNotifications implements ShouldQueue
                 });
 
             if ($matchingUsers->isEmpty()) {
-                Log::info('No users with matching subtheme preferences found', [
+                Log::info('No users with matching Decade Challenge preferences found', [
                     'request_id' => $request->id,
-                    'subthemes' => $requestSubthemes,
+                    'decade_challenges' => $requestChallenges,
                 ]);
                 return;
             }
@@ -92,7 +92,7 @@ class SendRequestValidatedNotifications implements ShouldQueue
                         'Request_Title' => $request->capacity_development_title ?? 'N/A',
                         'Request_Link' => route('request.show', $request->id),
                         'user_name' => $user->name,
-                        'Request_Subthemes' => implode(', ', $requestSubthemes),
+                        'Request_Challenges' => implode(', ', $requestChallenges),
                         'UNSUB' => route('unsubscribe.show', $user->id),
                         'UPDATE_PROFILE' => route('notification.preferences.index'),
                     ]
@@ -113,5 +113,25 @@ class SendRequestValidatedNotifications implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         }
+    }
+
+    /**
+     * Flatten the ranked {primary, secondary, tertiary} object into the
+     * list of non-null challenge values, in rank order.
+     *
+     * @param mixed $challenges Raw `decade_challenges` value from the detail model
+     * @return array<int, string>
+     */
+    private function extractChallengeValues(mixed $challenges): array
+    {
+        if (! is_array($challenges)) {
+            return [];
+        }
+
+        return array_values(array_filter([
+            $challenges['primary'] ?? null,
+            $challenges['secondary'] ?? null,
+            $challenges['tertiary'] ?? null,
+        ], fn ($value) => is_string($value) && $value !== ''));
     }
 }

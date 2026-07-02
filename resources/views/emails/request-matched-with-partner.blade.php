@@ -53,7 +53,21 @@
     </div>
     @endif
     
-    @if($request->subthemes && is_array($request->subthemes))
+    @if(isset($request->decade_challenges) && is_array($request->decade_challenges))
+    <div class="detail-item">
+        <span class="detail-label">Decade Challenges:</span>
+        <ul>
+            @foreach(['primary' => 'Primary', 'secondary' => 'Secondary', 'tertiary' => 'Tertiary'] as $rank => $rankLabel)
+                @if(!empty($request->decade_challenges[$rank]))
+                    <li><strong>{{ $rankLabel }}:</strong> {{ \App\Enums\Request\DecadeChallenge::getLabelByValue($request->decade_challenges[$rank]) ?? $request->decade_challenges[$rank] }}</li>
+                @endif
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+    {{-- Legacy requests submitted before the Decade Challenge taxonomy --}}
+    @if(isset($request->subthemes) && $request->subthemes && is_array($request->subthemes))
     <div class="detail-item">
         <span class="detail-label">Sub-themes:</span>
         <ul>

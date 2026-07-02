@@ -8,8 +8,8 @@ use App\Enums\Common\TargetAudience;
 use App\Enums\Common\YesNo;
 use App\Enums\Request\DeliveryFormat;
 use App\Enums\Request\ProjectStage;
+use App\Enums\Request\DecadeChallenge;
 use App\Enums\Request\RelatedActivity;
-use App\Enums\Request\SubTheme;
 use App\Enums\Request\SupportType;
 use App\Events\Request\RequestSubmitted;
 use App\Http\Controllers\Traits\HasPageActions;
@@ -53,7 +53,7 @@ class RequestFormController extends BaseRequestController
         }
         $data = [
             'formOptions' => [
-                'subthemes' => SubTheme::getOptions(),
+                'decade_challenges' => DecadeChallenge::getOptions(),
                 'support_types' => SupportType::getOptions(),
                 'related_activity' => RelatedActivity::getOptions(),
                 'delivery_format' => DeliveryFormat::getOptions(),

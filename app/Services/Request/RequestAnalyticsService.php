@@ -44,7 +44,7 @@ class RequestAnalyticsService
         // Add normalized analytics if available
         if (Schema::hasTable('request_details')) {
             $analytics['requests_by_activity'] = $this->getRequestsByActivity();
-            $analytics['popular_subthemes'] = $this->getPopularSubthemes();
+            $analytics['popular_challenges'] = $this->getPopularChallenges();
             $analytics['support_type_distribution'] = $this->getSupportTypeDistribution();
         }
 
@@ -78,21 +78,25 @@ class RequestAnalyticsService
     }
 
     /**
-     * Get most popular subthemes
+     * Get most popular Decade Challenges across all ranks
      */
-    public function getPopularSubthemes(): array
+    public function getPopularChallenges(): array
     {
-        $subthemes = Detail::select('subthemes')
-            ->whereNotNull('subthemes')
-            ->where('subthemes', '!=', '[]')
+        return Detail::select('decade_challenges')
+            ->whereNotNull('decade_challenges')
             ->get()
-            ->pluck('subthemes')
-            ->flatten()
+            ->pluck('decade_challenges')
+            ->flatMap(fn ($challenges) => is_array($challenges)
+                ? array_filter([
+                    $challenges['primary'] ?? null,
+                    $challenges['secondary'] ?? null,
+                    $challenges['tertiary'] ?? null,
+                ])
+                : [])
             ->countBy()
             ->sortDesc()
-            ->take(10);
-
-        return $subthemes->toArray();
+            ->take(10)
+            ->toArray();
     }
 
     /**

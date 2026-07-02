@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Request;
 
+use App\Enums\Request\DecadeChallenge;
 use App\Models\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -85,6 +86,9 @@ class RequestExportService
             'Delivery Format',
             'Delivery Countries',
             // Thematic areas
+            'Primary Decade Challenge',
+            'Secondary Decade Challenge',
+            'Tertiary Decade Challenge',
             'Subthemes',
             'Subthemes Other',
             'Support Types',
@@ -153,6 +157,9 @@ class RequestExportService
             $detail?->delivery_format ?? '',
             $this->formatEnumArray($detail?->delivery_countries),
             // Thematic areas
+            $this->formatChallengeLabel($detail?->decade_challenges, 'primary'),
+            $this->formatChallengeLabel($detail?->decade_challenges, 'secondary'),
+            $this->formatChallengeLabel($detail?->decade_challenges, 'tertiary'),
             $this->formatEnumArray($detail?->subthemes),
             $detail?->subthemes_other ?? '',
             $this->formatEnumArray($detail?->support_types),
@@ -185,6 +192,27 @@ class RequestExportService
             $detail?->success_metrics ?? '',
             $detail?->long_term_impact ?? '',
         ];
+    }
+
+    /**
+     * Resolve a ranked Decade Challenge value to its label for export
+     *
+     * @param mixed $challenges Raw `decade_challenges` array from the detail model
+     * @param string $rank One of 'primary', 'secondary', 'tertiary'
+     */
+    private function formatChallengeLabel(mixed $challenges, string $rank): string
+    {
+        if (! is_array($challenges)) {
+            return '';
+        }
+
+        $value = $challenges[$rank] ?? null;
+
+        if (! is_string($value) || $value === '') {
+            return '';
+        }
+
+        return DecadeChallenge::getLabelByValue($value) ?? $value;
     }
 
     /**

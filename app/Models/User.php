@@ -4,7 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Opportunity\Type;
-use App\Enums\Request\SubTheme;
+use App\Enums\Request\DecadeChallenge;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -201,11 +201,11 @@ class User extends Authenticatable
     }
 
     /**
-     * The request subtheme values this user currently receives.
+     * The request Decade Challenge values this user currently receives.
      *
      * @return array<int, string>
      */
-    public function enabledRequestSubthemes(): array
+    public function enabledRequestChallenges(): array
     {
         if (! $this->isSubscribedToEmails()) {
             return [];
@@ -214,7 +214,7 @@ class User extends Authenticatable
         $optOuts = $this->notification_opt_outs['request'] ?? [];
 
         return array_values(array_filter(
-            array_map(fn ($case) => $case->value, SubTheme::cases()),
+            array_map(fn ($case) => $case->value, DecadeChallenge::cases()),
             fn ($value) => ! in_array($value, $optOuts, true)
         ));
     }

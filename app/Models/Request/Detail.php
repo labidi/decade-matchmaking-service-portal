@@ -34,6 +34,7 @@ class Detail extends Model
         'delivery_format',
         'delivery_countries',
         'subthemes',
+        'decade_challenges',
         'support_types',
         'target_audience',
         'target_languages',
@@ -64,6 +65,7 @@ class Detail extends Model
     {
         return [
             'subthemes' => AsEnumArrayObject::of(SubTheme::class),
+            'decade_challenges' => 'array',
             'support_types' => AsEnumArrayObject::of(SupportType::class),
             'target_audience' => AsEnumArrayObject::of(TargetAudience::class),
             'target_languages' => AsEnumArrayObject::of(Language::class),
