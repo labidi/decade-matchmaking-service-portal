@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Log;
  * Manages a user's notification settings under the opt-out model.
  *
  * There is no per-preference entity: every taxonomy value is enabled by
- * default. State lives on the user as a master switch
- * (`email_notifications_enabled`) plus a set of disabled values
- * (`notification_opt_outs`), grouped by entity.
+ * default. State lives in the user's {@see \App\Models\UserNotificationSetting}
+ * row as a master switch (`email_notifications_enabled`) plus a set of disabled
+ * values per entity column (`opportunity`, `request`).
  */
 class NotificationPreferenceService
 {
@@ -62,31 +62,34 @@ class NotificationPreferenceService
         $this->assertValidEntity($entity);
         $this->assertValidValue($entity, $value);
 
-        $optOuts = $user->notification_opt_outs ?? [];
-        $entityOptOuts = $optOuts[$entity] ?? [];
+        DB::transaction(function () use ($user, $entity, $value, $enabled): void {
+            // Lock the settings row so concurrent toggles cannot lose an update.
+            $setting = $user->notificationSetting()
+                ->lockForUpdate()
+                ->firstOrCreate([], ['email_notifications_enabled' => true]);
 
-        if ($enabled) {
-            // Desired state: enabled — remove from opt-outs and resume master switch.
-            $entityOptOuts = array_values(array_filter(
-                $entityOptOuts,
-                fn ($v) => $v !== $value
-            ));
-            $user->email_notifications_enabled = true;
-        } else {
-            // Desired state: disabled — add to opt-outs (idempotent: check first).
-            if (! in_array($value, $entityOptOuts, true)) {
-                $entityOptOuts[] = $value;
+            $entityOptOuts = $setting->{$entity} ?? [];
+
+            if ($enabled) {
+                // Desired state: enabled — remove from opt-outs and resume master switch.
+                $entityOptOuts = array_values(array_filter(
+                    $entityOptOuts,
+                    fn ($v) => $v !== $value
+                ));
+                $setting->email_notifications_enabled = true;
+            } else {
+                // Desired state: disabled — add to opt-outs (idempotent: check first).
+                if (! in_array($value, $entityOptOuts, true)) {
+                    $entityOptOuts[] = $value;
+                }
             }
-        }
 
-        if (empty($entityOptOuts)) {
-            unset($optOuts[$entity]);
-        } else {
-            $optOuts[$entity] = array_values($entityOptOuts);
-        }
+            // Collapse an empty set to null so "no opt-outs" has one representation.
+            $setting->{$entity} = empty($entityOptOuts) ? null : array_values($entityOptOuts);
+            $setting->save();
 
-        $user->notification_opt_outs = empty($optOuts) ? null : $optOuts;
-        $user->save();
+            $user->setRelation('notificationSetting', $setting);
+        });
 
         return $enabled;
     }
@@ -100,8 +103,13 @@ class NotificationPreferenceService
      */
     public function resubscribe(User $user): void
     {
-        $user->email_notifications_enabled = true;
-        $user->save();
+        $setting = $user->notificationSetting()
+            ->firstOrCreate([], ['email_notifications_enabled' => true]);
+
+        $setting->email_notifications_enabled = true;
+        $setting->save();
+
+        $user->setRelation('notificationSetting', $setting);
     }
 
     /**
@@ -113,8 +121,13 @@ class NotificationPreferenceService
         DB::beginTransaction();
 
         try {
-            $user->email_notifications_enabled = false;
-            $user->save();
+            $setting = $user->notificationSetting()
+                ->firstOrCreate([], ['email_notifications_enabled' => true]);
+
+            $setting->email_notifications_enabled = false;
+            $setting->save();
+
+            $user->setRelation('notificationSetting', $setting);
 
             if ($removeSubscriptions) {
                 RequestSubscription::where('user_id', $user->id)->delete();
@@ -145,7 +158,7 @@ class NotificationPreferenceService
      */
     private function buildCard(User $user, string $entity, array $options): array
     {
-        $optOuts = $user->notification_opt_outs[$entity] ?? [];
+        $optOuts = $user->notificationSetting?->{$entity} ?? [];
 
         return array_map(
             fn (array $option) => [

@@ -46,8 +46,9 @@ class SendRequestValidatedNotifications implements ShouldQueue
             // Opt-out model: notify partners who are subscribed (master switch on)
             // and have not opted out of at least one of this request's challenges.
             $matchingUsers = User::role('partner')
-                ->where('email_notifications_enabled', true)
+                ->whereHas('notificationSetting', fn ($q) => $q->where('email_notifications_enabled', true))
                 ->where('is_blocked', false)
+                ->with('notificationSetting')
                 ->get()
                 ->filter(function (User $user) use ($requestChallenges) {
                     foreach ($requestChallenges as $challenge) {

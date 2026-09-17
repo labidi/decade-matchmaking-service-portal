@@ -9,6 +9,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\OneTimePasswords\Models\Concerns\HasOneTimePasswords;
@@ -37,8 +38,6 @@ class User extends Authenticatable
         'avatar',
         'is_blocked',
         'last_login_at',
-        'email_notifications_enabled',
-        'notification_opt_outs',
     ];
 
     /**
@@ -75,8 +74,6 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'password' => 'hashed',
             'is_blocked' => 'boolean',
-            'email_notifications_enabled' => 'boolean',
-            'notification_opt_outs' => 'array',
         ];
     }
 
@@ -106,6 +103,11 @@ class User extends Authenticatable
     public function requestSubscriptions(): HasMany
     {
         return $this->hasMany(RequestSubscription::class);
+    }
+
+    public function notificationSetting(): HasOne
+    {
+        return $this->hasOne(UserNotificationSetting::class);
     }
 
     public function subscribedRequests(): BelongsToMany
@@ -160,7 +162,7 @@ class User extends Authenticatable
      */
     public function isSubscribedToEmails(): bool
     {
-        return $this->email_notifications_enabled ?? true;
+        return $this->notificationSetting?->email_notifications_enabled ?? true;
     }
 
     /**
@@ -176,7 +178,7 @@ class User extends Authenticatable
             return false;
         }
 
-        $optOuts = $this->notification_opt_outs[$entity] ?? [];
+        $optOuts = $this->notificationSetting?->{$entity} ?? [];
 
         return ! in_array($value, $optOuts, true);
     }
@@ -192,7 +194,7 @@ class User extends Authenticatable
             return [];
         }
 
-        $optOuts = $this->notification_opt_outs['opportunity'] ?? [];
+        $optOuts = $this->notificationSetting?->opportunity ?? [];
 
         return array_values(array_filter(
             array_map(fn ($case) => $case->value, Type::cases()),
@@ -211,7 +213,7 @@ class User extends Authenticatable
             return [];
         }
 
-        $optOuts = $this->notification_opt_outs['request'] ?? [];
+        $optOuts = $this->notificationSetting?->request ?? [];
 
         return array_values(array_filter(
             array_map(fn ($case) => $case->value, DecadeChallenge::cases()),

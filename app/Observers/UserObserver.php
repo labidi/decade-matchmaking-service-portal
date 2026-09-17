@@ -25,6 +25,13 @@ class UserObserver
      */
     public function created(User $user): void
     {
+        // Every user has exactly one notification settings row (opt-out model:
+        // defaults to subscribed with no opt-outs). Keeps audience `whereHas`
+        // queries free of a "row missing = subscribed" branch.
+        $user->notificationSetting()->firstOrCreate([], [
+            'email_notifications_enabled' => true,
+        ]);
+
         UserRegistered::dispatch($user);
     }
 
