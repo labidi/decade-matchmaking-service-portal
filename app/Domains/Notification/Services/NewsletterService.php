@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Domains\Notification\Services;
 
+use App\Domains\Opportunity\Enums\Type;
+use App\Domains\Opportunity\Services\OpportunityQueryBuilder;
 use App\Domains\User\Models\User;
-use App\Enums\Opportunity\Type;
 use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
-use App\Services\Opportunity\OpportunityQueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -124,7 +124,7 @@ class NewsletterService
     /**
      * Resolve the opportunity block for a user, reusing the per-signature cache.
      *
-     * @param  Collection<int, \App\Models\Opportunity>  $pool
+     * @param  Collection<int, \App\Domains\Opportunity\Models\Opportunity>  $pool
      * @param  array<string, array{html: string, count: int, total: int}>  $renderCache
      * @return array{html: string, count: int, total: int}|null Null when the user gets no email.
      */
@@ -149,7 +149,7 @@ class NewsletterService
      * Filter the pool to a set of allowed types and render the email block.
      *
      * @param  array<int, string>  $enabledTypes
-     * @param  Collection<int, \App\Models\Opportunity>  $pool
+     * @param  Collection<int, \App\Domains\Opportunity\Models\Opportunity>  $pool
      * @return array{html: string, count: int, total: int}
      */
     private function renderForTypes(array $enabledTypes, Collection $pool): array

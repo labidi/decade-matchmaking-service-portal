@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Opportunity\Resources\OpportunityResource;
+use App\Domains\Opportunity\Services\OpportunityService;
 use App\Domains\Settings\Models\Setting;
 use App\Domains\Settings\Services\SettingsService;
-use App\Http\Resources\OpportunityResource;
-use App\Services\OpportunityService;
 use Inertia\Inertia;
 
 class IndexController extends Controller

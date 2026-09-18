@@ -2,9 +2,9 @@
 
 namespace App\Domains\User\Controllers;
 
+use App\Domains\Opportunity\Models\Opportunity;
 use App\Domains\User\Models\User;
 use App\Http\Controllers\Controller;
-use App\Models\Opportunity;
 use App\Models\Request as RequestModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

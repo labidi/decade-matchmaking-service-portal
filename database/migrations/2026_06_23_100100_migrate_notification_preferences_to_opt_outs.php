@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\Opportunity\Type;
+use App\Domains\Opportunity\Enums\Type;
 use App\Enums\Request\SubTheme;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;

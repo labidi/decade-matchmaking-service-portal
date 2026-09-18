@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Domains\Opportunity\Enums\CoverageActivity;
+use App\Domains\Opportunity\Enums\Status;
+use App\Domains\Opportunity\Enums\Type;
+use App\Domains\Opportunity\Models\Opportunity;
 use App\Domains\User\Models\User;
-use App\Enums\Opportunity\CoverageActivity;
-use App\Enums\Opportunity\Status;
-use App\Enums\Opportunity\Type;
-use App\Models\Opportunity;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Opportunity>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Domains\Opportunity\Models\Opportunity>
  */
 class OpportunityFactory extends Factory
 {

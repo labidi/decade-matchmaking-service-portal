@@ -12,6 +12,11 @@ use App\Domains\Notification\Channels\SystemNotificationChannel;
 use App\Domains\Notification\Models\RequestSubscription;
 use App\Domains\Notification\Models\SystemNotification;
 use App\Domains\Notification\Models\UserNotificationSetting;
+use App\Domains\Opportunity\Events\OpportunityClicked;
+use App\Domains\Opportunity\Listeners\RecordOpportunityClick;
+use App\Domains\Opportunity\Models\Opportunity;
+use App\Domains\Opportunity\Observers\OpportunityObserver;
+use App\Domains\Opportunity\Policies\OpportunityPolicy;
 use App\Domains\ReferenceData\Models\IOCPlatform;
 use App\Domains\ReferenceData\Models\Organization;
 use App\Domains\Settings\Models\Setting;
@@ -26,16 +31,13 @@ use App\Domains\User\Policies\UserPolicy;
 use App\Infrastructure\Email\Channels\MandrillChannel;
 use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use App\Infrastructure\Email\Models\EmailLog;
-use App\Models\Opportunity;
 use App\Models\Request;
 use App\Models\Request\Detail as RequestDetail;
 use App\Models\Request\Offer;
 use App\Models\Request\Status as RequestStatus;
-use App\Observers\OpportunityObserver;
 use App\Observers\RequestObserver;
 use App\Observers\RequestOfferObserver;
 use App\Policies\OfferPolicy;
-use App\Policies\OpportunityPolicy;
 use App\Policies\RequestPolicy;
 use App\Services\Actions\OfferActionProvider;
 use App\Services\Request\RequestActionProvider;
@@ -108,8 +110,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Opportunity::class, OpportunityPolicy::class);
         Gate::policy(Offer::class, OfferPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
-        // Note: Event listeners are automatically discovered in app/Listeners/
-        // with proper handle() methods that type-hint events
+        // Event listeners are discovered from app/Domains/*/Listeners and app/Infrastructure/*/Listeners
+        // (see bootstrap/app.php); commands from app/Domains/*/Console and app/Infrastructure/*/Console.
 
         if (app()->environment('production') && config('services.opportunity_click.ip_pepper') === '') {
             \Log::warning('OPPORTUNITY_CLICK_IP_PEPPER is empty in production; opportunity click IP hashes are not peppered.');
@@ -142,6 +144,10 @@ class AppServiceProvider extends ServiceProvider
             'App\\Listeners\\User\\NotifyAdminsWhenNewUserRegistred' => NotifyAdminsWhenNewUserRegistred::class,
             'App\\Events\\User\\UserRoleChanged' => UserRoleChanged::class,
             'App\\Events\\User\\UserRegistered' => UserRegistered::class,
+            // step 5 (2026-09-18) - load-bearing: RecordOpportunityClick is queued and OpportunityClicked carries an Opportunity
+            'App\\Models\\Opportunity' => Opportunity::class,
+            'App\\Listeners\\Opportunity\\RecordOpportunityClick' => RecordOpportunityClick::class,
+            'App\\Events\\Opportunity\\OpportunityClicked' => OpportunityClicked::class,
         ];
     }
 
