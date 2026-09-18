@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Domains\User\Models\User;
 use App\Enums\Opportunity\CoverageActivity;
 use App\Enums\Opportunity\Status;
 use App\Enums\Opportunity\Type;
 use App\Models\Opportunity;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

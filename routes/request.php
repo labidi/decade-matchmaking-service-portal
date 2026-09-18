@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\DocumentsController;
+use App\Domains\Document\Controllers\DocumentsController;
 use App\Http\Controllers\Request\ExportCsvController;
 use App\Http\Controllers\Request\ExportRequestPdfController;
 use App\Http\Controllers\Request\ExpressInterestController;

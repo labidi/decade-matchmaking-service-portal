@@ -1,17 +1,20 @@
 <?php
 
+use App\Domains\Document\Controllers\DocumentsController;
+use App\Domains\ReferenceData\Controllers\IOCPlatformsController;
+use App\Domains\ReferenceData\Controllers\OrganizationsController;
+use App\Domains\Settings\Controllers\SettingsController;
+use App\Domains\User\Controllers\DashboardController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\SystemNotificationsController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\IndexController;
 use App\Http\Controllers\UserGuideController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
-Route::get('organizations', [\App\Http\Controllers\OrganizationsController::class, 'index'])->name('organizations.index');
-Route::get('ioc-platforms', [\App\Http\Controllers\IOCPlatformsController::class, 'index'])->name('ioc-platforms.index');
+Route::get('/', IndexController::class)->name('index');
+Route::get('organizations', [OrganizationsController::class, 'index'])->name('organizations.index');
+Route::get('ioc-platforms', [IOCPlatformsController::class, 'index'])->name('ioc-platforms.index');
 
 // Email Unsubscribe routes (public - no auth required for email links)
 

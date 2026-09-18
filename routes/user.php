@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\InvitationController;
-use App\Http\Controllers\Admin\UserController;
+use App\Domains\User\Controllers\Admin\InvitationController;
+use App\Domains\User\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {
