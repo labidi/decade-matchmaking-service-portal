@@ -1,41 +1,59 @@
-import {usePage} from '@inertiajs/react';
-import {PortalGuide} from '@/types';
+import { PortalGuide } from '@/types';
+import { BookOpenIcon, StarIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/16/solid';
+import React from 'react';
 
-interface UserGuideSectionProps {
+const SUCCESS_STORIES_URL = 'https://oceandecade.org/capacity-development-facility/';
+
+interface PortalGuideSectionProps {
     portalGuide: PortalGuide;
 }
 
-export default function PortalGuideSection({portalGuide}: Readonly<UserGuideSectionProps>) {
+interface LinkRowProps {
+    href: string;
+    title: string;
+    description: string;
+    icon: React.ComponentType<{ className?: string }>;
+}
+
+function LinkRow({ href, title, description, icon: Icon }: Readonly<LinkRowProps>) {
     return (
-        <section className="bg-casal-900 py-20 px-4 text-center text-white shadow-lg rounded-xl">
-            <div className="max-w-4xl mx-auto">
-                        <span className="text-2xl mb-8">
-                            <a href={portalGuide.url} target="_blank"
-                               className="text-white underline hover:text-casal-300">
-                                New to the platform? Read this to see how it works and how you can get involved.
-                            </a>
-                        </span>
-            </div>
-            <section className="max-w-6xl mx-auto py-10">
-                <div className=" bg-firefly-900">
-                    <div
-                        className="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
-                        title="Woman holding a mug">
-                    </div>
-                    <div className=" p-4 flex flex-col leading-normal">
-                        <div className="mb-8">
-                            <p className="text-white text-2xl">
-                                Want to see success stories from completed matches, trainings, and workshops supported
-                                through the CDF? You can also access lessons-learned reports from the workshops and
-                                trainings
-                                <a href={'https://oceandecade.org/capacity-development-facility/'}
-                                   target='_blank' className='inline underline underline-offset-4'> here </a>.
-                                <br/>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-4 rounded-xl border border-gray-200 bg-white px-5 py-4 text-inherit no-underline transition-colors hover:border-firefly-300 hover:bg-firefly-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-firefly-500 focus-visible:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-firefly-700 dark:hover:bg-gray-700/60 dark:focus-visible:ring-offset-gray-900"
+        >
+            <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-firefly-100 text-firefly-700 dark:bg-firefly-900/40 dark:text-firefly-300">
+                <Icon className="h-5 w-5" aria-hidden="true" data-slot="icon" />
+            </span>
+            <span className="flex flex-grow flex-col gap-0.5">
+                <span className="text-base font-semibold text-gray-900 dark:text-gray-100">{title}</span>
+                <span className="text-sm leading-5 text-gray-500 dark:text-gray-400">{description}</span>
+            </span>
+            <ArrowTopRightOnSquareIcon
+                className="h-4 w-4 flex-shrink-0 text-gray-400 transition-colors group-hover:text-firefly-700 dark:text-gray-500 dark:group-hover:text-firefly-300"
+                aria-hidden="true"
+            />
+        </a>
+    );
+}
+
+export default function PortalGuideSection({ portalGuide }: Readonly<PortalGuideSectionProps>) {
+    return (
+        <section aria-label="Guides and success stories" className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <LinkRow
+                href={portalGuide.url}
+                title="New to the platform?"
+                description="Read the portal guide to see how it works and how you can get involved."
+                icon={BookOpenIcon}
+            />
+            <LinkRow
+                href={SUCCESS_STORIES_URL}
+                title="Success stories and lessons learned"
+                description="Completed matches, trainings and workshops supported through the CDF."
+                icon={StarIcon}
+            />
         </section>
     );
 }
