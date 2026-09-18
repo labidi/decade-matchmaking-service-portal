@@ -3,36 +3,41 @@
 namespace App\Providers;
 
 use App\Channels\SystemNotificationChannel;
-use App\Contracts\Auth\AuthenticationServiceInterface;
+use App\Domains\Auth\Contracts\AuthenticationServiceInterface;
+use App\Domains\Auth\Services\AuthenticationService;
+use App\Domains\Auth\Services\Strategies\OAuthAuthStrategy;
+use App\Domains\Auth\Services\Strategies\OceanExpertAuthStrategy;
+use App\Domains\Document\Actions\DocumentActionProvider;
+use App\Domains\Document\Models\Document;
+use App\Domains\ReferenceData\Models\IOCPlatform;
+use App\Domains\ReferenceData\Models\Organization;
+use App\Domains\Settings\Models\Setting;
+use App\Domains\User\Events\UserRegistered;
+use App\Domains\User\Events\UserRoleChanged;
+use App\Domains\User\Listeners\NotifyAdminsWhenNewUserRegistred;
+use App\Domains\User\Listeners\SendMailUserRolesUpdates;
+use App\Domains\User\Models\User;
+use App\Domains\User\Models\UserInvitation;
+use App\Domains\User\Observers\UserObserver;
+use App\Domains\User\Policies\UserPolicy;
 use App\Infrastructure\Email\Channels\MandrillChannel;
+use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use App\Infrastructure\Email\Models\EmailLog;
-use App\Models\Document;
-use App\Models\IOCPlatform;
 use App\Models\Opportunity;
-use App\Models\Organization;
 use App\Models\Request;
 use App\Models\Request\Detail as RequestDetail;
 use App\Models\Request\Offer;
 use App\Models\Request\Status as RequestStatus;
 use App\Models\RequestSubscription;
-use App\Models\Setting;
 use App\Models\SystemNotification;
-use App\Models\User;
-use App\Models\UserInvitation;
 use App\Models\UserNotificationSetting;
 use App\Observers\OpportunityObserver;
 use App\Observers\RequestObserver;
 use App\Observers\RequestOfferObserver;
-use App\Observers\UserObserver;
 use App\Policies\OfferPolicy;
 use App\Policies\OpportunityPolicy;
 use App\Policies\RequestPolicy;
-use App\Policies\UserPolicy;
-use App\Services\Actions\DocumentActionProvider;
 use App\Services\Actions\OfferActionProvider;
-use App\Services\Auth\AuthenticationService;
-use App\Services\Auth\Strategies\OAuthAuthStrategy;
-use App\Services\Auth\Strategies\OceanExpertAuthStrategy;
 use App\Services\Request\RequestActionProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -52,6 +57,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->registerLegacyClassAliases();
+
         // Register simplified Action Provider Pattern services
         $this->app->singleton(RequestActionProvider::class);
         $this->app->singleton(OfferActionProvider::class);
@@ -106,6 +113,44 @@ class AppServiceProvider extends ServiceProvider
 
         if (app()->environment('production') && config('services.opportunity_click.ip_pepper') === '') {
             \Log::warning('OPPORTUNITY_CLICK_IP_PEPPER is empty in production; opportunity click IP hashes are not peppered.');
+        }
+    }
+
+    /**
+     * Transitional aliases for classes moved during the 2026-09 restructuring.
+     *
+     * Queue payloads (jobs.payload, failed_jobs) and SerializesModels store the FQCN,
+     * so anything queued before a deploy still references the old name. Keep each
+     * alias for one release after the move, then delete it.
+     *
+     * @return array<string, class-string> old FQCN => current class
+     */
+    private static function legacyClassAliases(): array
+    {
+        return [
+            // step 1 (2026-09-18)
+            'App\\Jobs\\Email\\SendTransactionalEmail' => SendTransactionalEmail::class,
+            // step 2 (2026-09-18) - belt and braces only: none of these models is carried in a queued payload
+            'App\\Models\\Document' => Document::class,
+            'App\\Models\\Organization' => Organization::class,
+            'App\\Models\\IOCPlatform' => IOCPlatform::class,
+            'App\\Models\\Setting' => Setting::class,
+            // step 3 (2026-09-18) - load-bearing: User is carried by queued notifications/listeners
+            'App\\Models\\User' => User::class,
+            'App\\Models\\UserInvitation' => UserInvitation::class,
+            'App\\Listeners\\User\\SendMailUserRolesUpdates' => SendMailUserRolesUpdates::class,
+            'App\\Listeners\\User\\NotifyAdminsWhenNewUserRegistred' => NotifyAdminsWhenNewUserRegistred::class,
+            'App\\Events\\User\\UserRoleChanged' => UserRoleChanged::class,
+            'App\\Events\\User\\UserRegistered' => UserRegistered::class,
+        ];
+    }
+
+    protected function registerLegacyClassAliases(): void
+    {
+        foreach (self::legacyClassAliases() as $old => $current) {
+            if (! class_exists($old, false)) {
+                class_alias($current, $old);
+            }
         }
     }
 

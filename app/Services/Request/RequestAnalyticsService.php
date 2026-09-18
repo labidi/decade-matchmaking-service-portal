@@ -2,9 +2,9 @@
 
 namespace App\Services\Request;
 
+use App\Domains\User\Models\User;
 use App\Models\Request as OCDRequest;
 use App\Models\Request\Detail;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 

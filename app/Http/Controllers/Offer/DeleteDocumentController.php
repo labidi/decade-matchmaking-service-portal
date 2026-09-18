@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Offer;
 
-use App\Models\Document;
+use App\Domains\Document\Models\Document;
 use App\Models\Request\Offer;
 use App\Services\OfferService;
 use Exception;

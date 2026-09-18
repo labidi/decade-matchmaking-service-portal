@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Support;
 
-use App\Models\User;
+use App\Domains\User\Models\User;
 
 class NavigationService
 {

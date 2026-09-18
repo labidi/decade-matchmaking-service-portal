@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Domains\User\Models\User;
 use App\Exceptions\Request\RequestAuthorizationException;
 use App\Exceptions\Request\RequestNotFoundException;
 use App\Exceptions\Request\RequestStorageException;
 use App\Exceptions\Request\RequestValidationException;
 use App\Models\Request;
 use App\Models\Request\Status;
-use App\Models\User;
 use App\Services\Request\RequestLogger;
 use App\Services\Request\RequestRepository;
 use Illuminate\Database\Eloquent\Collection;
@@ -31,7 +31,7 @@ readonly class RequestService
      * @param  User  $user  The user creating/updating the request
      * @param  array<string, mixed>  $data  The request data
      * @param  Request|null  $request  Existing request for updates
-     * @param string $mode  Operation mode: 'draft' or 'submit'
+     * @param  string  $mode  Operation mode: 'draft' or 'submit'
      * @return Request The created or updated request
      *
      * @throws RequestValidationException If mode is invalid
@@ -114,8 +114,7 @@ readonly class RequestService
     /**
      * Update request status
      *
-     * @param Request $request
-     * @param string $statusCode The new status code
+     * @param  string  $statusCode  The new status code
      * @return Request The updated request
      *
      * @throws RequestStorageException If database update fails

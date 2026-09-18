@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Domains\User\Models\User;
 use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
-use App\Models\User;
 
 class OpportunityPolicy
 {

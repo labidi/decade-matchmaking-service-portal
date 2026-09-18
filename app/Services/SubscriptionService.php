@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Domains\User\Models\User;
 use App\Models\Request;
 use App\Models\RequestSubscription;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 
 class SubscriptionService
 {
@@ -72,7 +71,7 @@ class SubscriptionService
      */
     public function adminSubscribeUser(User $admin, User $targetUser, Request $request): RequestSubscription
     {
-        if (!$admin->hasRole('administrator')) {
+        if (! $admin->hasRole('administrator')) {
             throw new \Exception('Only administrators can subscribe users to requests.');
         }
 

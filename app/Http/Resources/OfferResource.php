@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Domains\Document\Resources\DocumentResource;
 use App\Models\Request\Offer;
 use App\Services\Actions\OfferActionProvider;
 use App\Shared\Http\BaseResource;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domains\User\Models\User;
 use App\Models\Request\Detail;
 use App\Models\Request\Offer;
 use App\Models\Request\Status;
@@ -11,16 +12,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-
 class Request extends Model
 {
     protected $table = 'requests';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'status_id',
         'user_id',
-        'matched_partner_id'
+        'matched_partner_id',
     ];
 
     protected $hidden = ['updated_at'];

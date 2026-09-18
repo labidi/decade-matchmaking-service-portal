@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Request;
 
+use App\Domains\User\Models\User;
 use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
-use App\Models\User;
 use App\Services\Request\RequestActionProvider;
 use App\Services\Request\RequestContextService;
 use Illuminate\Http\Request;
@@ -97,7 +97,7 @@ abstract class BaseRequestController extends Controller
         $filters = [];
 
         foreach ($fields as $field) {
-            if (!is_array($field) || !isset($field['name'])) {
+            if (! is_array($field) || ! isset($field['name'])) {
                 continue;
             }
 
@@ -137,6 +137,7 @@ abstract class BaseRequestController extends Controller
         foreach ($fields as $field) {
             $currentSearch[$field] = $searchFilters[$field] ?? '';
         }
+
         return $currentSearch;
     }
 }

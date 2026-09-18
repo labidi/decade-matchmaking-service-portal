@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
+use App\Domains\Settings\Services\SettingsService;
 use App\Infrastructure\Email\Services\EmailLogger;
 use App\Infrastructure\Email\Services\EmailTemplateService;
 use App\Infrastructure\Email\Services\HealthCheckService;
@@ -12,7 +12,6 @@ use App\Infrastructure\Email\Services\MandrillClient;
 use App\Infrastructure\Email\Services\RateLimiter;
 use App\Infrastructure\Email\Services\TemplateResolver;
 use App\Infrastructure\Email\Services\VariableValidator;
-use App\Services\SettingsService;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
@@ -44,12 +43,6 @@ class EmailServiceProvider extends ServiceProvider
         $this->app->singleton(RateLimiter::class);
         $this->app->singleton(HealthCheckService::class);
 
-        // Transitional alias so jobs queued before the move to App\Infrastructure\Email
-        // (database queue payloads store the FQCN) still unserialise. Remove one release
-        // after 2026-09-18 once the jobs/failed_jobs tables no longer hold the old name.
-        if (! class_exists('App\\Jobs\\Email\\SendTransactionalEmail', false)) {
-            class_alias(SendTransactionalEmail::class, 'App\\Jobs\\Email\\SendTransactionalEmail');
-        }
     }
 
     /**

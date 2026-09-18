@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Domains\User\Models\User;
 use App\Enums\Opportunity\Status;
 use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
-use App\Models\User;
 use App\Services\Opportunity\OpportunityAnalyticsService;
 use App\Services\Opportunity\OpportunityRepository;
 use Exception;
@@ -22,11 +22,11 @@ readonly class OpportunityService
     public function __construct(
         private OpportunityRepository $repository,
         private OpportunityAnalyticsService $analytics
-    ) {
-    }
+    ) {}
 
     /**
      * Create a new opportunity
+     *
      * @throws Throwable
      */
     public function storeOpportunity(User $user, array $data, ?Opportunity $opportunity): Opportunity
@@ -34,7 +34,7 @@ readonly class OpportunityService
         return DB::transaction(function () use ($data, $user, $opportunity) {
             $data += [
                 'status' => Status::PENDING_REVIEW,
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ];
             if ($opportunity) {
                 $this->repository->update($opportunity, $data);
@@ -49,6 +49,7 @@ readonly class OpportunityService
 
     /**
      * Get paginated opportunities submitted by a specific user
+     *
      * @throws Throwable
      */
     public function getUserOpportunitiesPaginated(
@@ -58,9 +59,9 @@ readonly class OpportunityService
     ): LengthAwarePaginator {
         $opportunities = $this->repository->getUserOpportunitiesPaginated($user, $searchFilters, $sortFilters);
         $opportunities->toResourceCollection(OpportunityResource::class);
+
         return $opportunities;
     }
-
 
     /**
      * @throws Throwable
@@ -71,11 +72,13 @@ readonly class OpportunityService
     ): LengthAwarePaginator {
         $opportunities = $this->repository->getPaginated($searchFilters, $sortFilters);
         $opportunities->toResourceCollection(OpportunityResource::class);
+
         return $opportunities;
     }
 
     /**
      * Get paginated active opportunities (active status only)
+     *
      * @throws Throwable
      */
     public function getActiveOpportunitiesPaginated(
@@ -84,6 +87,7 @@ readonly class OpportunityService
     ): LengthAwarePaginator {
         $opportunities = $this->repository->getActiveOpportunitiesPaginated($searchFilters, $sortFilters);
         $opportunities->toResourceCollection(OpportunityResource::class);
+
         return $opportunities;
     }
 
@@ -93,20 +97,22 @@ readonly class OpportunityService
     public function findOpportunity(int $id): ?Opportunity
     {
         $opportunity = $this->repository->findById($id);
-        if (!$opportunity) {
+        if (! $opportunity) {
             return null;
         }
+
         return $opportunity;
     }
 
     /**
      * Update opportunity status
+     *
      * @throws Exception
      */
     public function updateOpportunityStatus(Opportunity $opportunity, int $statusCode, User $user): array
     {
         // Validate status
-        if (!in_array($statusCode, array_column(Status::cases(), 'value'))) {
+        if (! in_array($statusCode, array_column(Status::cases(), 'value'))) {
             throw new Exception('Invalid status code', 422);
         }
 
@@ -117,9 +123,9 @@ readonly class OpportunityService
             return [
                 'opportunity' => $opportunity,
                 'status' => [
-                    'status_code' => (string)$statusCode,
-                    'status_label' => Status::tryFrom($statusCode) ?? ''
-                ]
+                    'status_code' => (string) $statusCode,
+                    'status_label' => Status::tryFrom($statusCode) ?? '',
+                ],
             ];
         });
     }
@@ -145,7 +151,7 @@ readonly class OpportunityService
             Log::info('Opportunity deleted', [
                 'opportunity_id' => $opportunity->id,
                 'user_id' => $user->id,
-                'title' => $opportunity->title
+                'title' => $opportunity->title,
             ]);
         }
 
@@ -172,6 +178,7 @@ readonly class OpportunityService
     {
         $closingDate = $newClosingDate ?? $opportunity->closing_date->addWeeks(2);
         $this->repository->update($opportunity, ['closing_date' => $closingDate]);
+
         return $opportunity->fresh();
     }
 
@@ -208,6 +215,7 @@ readonly class OpportunityService
 
     /**
      * Close all expired opportunities and return results summary
+     *
      * @throws Throwable
      */
     public function closeExpiredOpportunities(): array
@@ -217,7 +225,7 @@ readonly class OpportunityService
             'closed' => 0,
             'failed' => 0,
             'errors' => [],
-            'closed_opportunities' => []
+            'closed_opportunities' => [],
         ];
 
         return DB::transaction(function () use (&$results) {
@@ -226,6 +234,7 @@ readonly class OpportunityService
 
             if ($expiredOpportunities->isEmpty()) {
                 Log::info('[OpportunityService] No expired opportunities found');
+
                 return $results;
             }
 
@@ -247,7 +256,7 @@ readonly class OpportunityService
                         'id' => $opportunity->id,
                         'title' => $opportunity->title,
                         'previous_status' => $previousStatus,
-                        'closing_date' => $opportunity->closing_date
+                        'closing_date' => $opportunity->closing_date,
                     ];
 
                     Log::info('[OpportunityService] Opportunity auto-closed', [

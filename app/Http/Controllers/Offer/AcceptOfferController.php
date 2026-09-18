@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers\Offer;
 
-use App\Events\OfferAccepted;
 use App\Models\Request\Offer;
-use App\Models\SystemNotification;
-use App\Models\User;
 use App\Services\OfferService;
 use App\Services\SystemNotificationService;
-use App\Services\UserService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,6 +34,7 @@ readonly class AcceptOfferController
                     $offer->request->detail->capacity_development_title
                 )
             );
+
             return to_route('request.me.show', [
                 $offer->request->id,
             ])->with('success', 'Offer accepted successfully');

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Offer;
 use App\Http\Controllers\Controller;
 use App\Services\OfferService;
 use App\Services\SystemNotificationService;
-use App\Services\UserService;
 use Illuminate\Http\RedirectResponse;
 
 class ClarificationRequestController extends Controller

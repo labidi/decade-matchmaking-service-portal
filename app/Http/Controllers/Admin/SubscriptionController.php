@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Domains\User\Models\User;
 use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
-use App\Models\User;
 use App\Services\SubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,8 +18,7 @@ class SubscriptionController extends Controller
 {
     public function __construct(
         private readonly SubscriptionService $subscriptionService
-    ) {
-    }
+    ) {}
 
     /**
      * Display subscription management page
@@ -34,17 +33,16 @@ class SubscriptionController extends Controller
             ->with([
                 'detail:request_id,capacity_development_title',
                 'user:id,name',
-                'status:id,status_code'
+                'status:id,status_code',
             ])
-            ->whereHas('status', fn($q) =>
-                $q->whereNotIn('status_code', ['draft', 'deleted'])
+            ->whereHas('status', fn ($q) => $q->whereNotIn('status_code', ['draft', 'deleted'])
             )
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(fn($req) => [
+            ->map(fn ($req) => [
                 'value' => $req->id,
-                'label' => ($req->detail->capacity_development_title ?? 'Untitled') .
-                           " (by {$req->user->name})"
+                'label' => ($req->detail->capacity_development_title ?? 'Untitled').
+                           " (by {$req->user->name})",
             ]);
 
         return Inertia::render('admin/Subscriptions/Index', [
@@ -102,7 +100,7 @@ class SubscriptionController extends Controller
 
             return back()
                 ->withInput()
-                ->withErrors(['general' => 'Failed to subscribe user: ' . $e->getMessage()]);
+                ->withErrors(['general' => 'Failed to subscribe user: '.$e->getMessage()]);
         }
     }
 
@@ -122,7 +120,7 @@ class SubscriptionController extends Controller
 
             $success = $this->subscriptionService->unsubscribe($user, $ocdRequest);
 
-            if (!$success) {
+            if (! $success) {
                 return back()->with(
                     'warning',
                     'Subscription not found. The user may have already been unsubscribed.'
@@ -154,7 +152,7 @@ class SubscriptionController extends Controller
 
             return back()
                 ->withInput()
-                ->withErrors(['general' => 'Failed to unsubscribe user: ' . $e->getMessage()]);
+                ->withErrors(['general' => 'Failed to unsubscribe user: '.$e->getMessage()]);
         }
     }
 
@@ -240,7 +238,7 @@ class SubscriptionController extends Controller
 
             return back()
                 ->withInput()
-                ->withErrors(['general' => 'Failed to unsubscribe users: ' . $e->getMessage()]);
+                ->withErrors(['general' => 'Failed to unsubscribe users: '.$e->getMessage()]);
         }
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Domains\User\Services\UserService;
 use App\Notifications\System\SystemActivityNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -15,16 +16,13 @@ use Illuminate\Support\Facades\Notification;
  */
 class SystemNotificationService
 {
-    public function __construct(private readonly UserService $userService)
-    {
-    }
+    public function __construct(private readonly UserService $userService) {}
 
     /**
      * Create notifications for all administrators.
      *
-     * @param string $title The notification title
-     * @param string $description The notification description
-     * @return void
+     * @param  string  $title  The notification title
+     * @param  string  $description  The notification description
      */
     public function notifyAdmins(string $title, string $description): void
     {

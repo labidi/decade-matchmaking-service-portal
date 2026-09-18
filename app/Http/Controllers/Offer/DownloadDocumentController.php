@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Offer;
 
-use App\Models\Document;
+use App\Domains\Document\Models\Document;
+use App\Domains\Document\Services\DocumentService;
 use App\Models\Request\Offer;
-use App\Services\DocumentService;
 use App\Services\OfferService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;

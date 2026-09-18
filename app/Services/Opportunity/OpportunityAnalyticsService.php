@@ -2,9 +2,9 @@
 
 namespace App\Services\Opportunity;
 
+use App\Domains\User\Models\User;
 use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -12,8 +12,7 @@ class OpportunityAnalyticsService
 {
     public function __construct(
         private readonly OpportunityRepository $repository
-    ) {
-    }
+    ) {}
 
     /**
      * Get opportunity statistics for a specific user
@@ -45,9 +44,9 @@ class OpportunityAnalyticsService
         $startDate = Carbon::now()->subMonths($months)->startOfMonth();
 
         return Opportunity::select(
-                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-                DB::raw('COUNT(*) as count')
-            )
+            DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+            DB::raw('COUNT(*) as count')
+        )
             ->where('created_at', '>=', $startDate)
             ->groupBy('month')
             ->orderBy('month')
@@ -95,7 +94,7 @@ class OpportunityAnalyticsService
         // Map status codes to labels
         $result = [];
         foreach ($statusCounts as $status => $count) {
-            $label = match($status) {
+            $label = match ($status) {
                 Status::PENDING_REVIEW->value => 'Pending Review',
                 Status::ACTIVE->value => 'Active',
                 Status::CLOSED->value => 'Closed',
@@ -129,8 +128,8 @@ class OpportunityAnalyticsService
 
         // Calculate average time to activation for active opportunities
         $averageTimeToActivation = $activeOpportunities
-            ->filter(fn($opp) => $opp->updated_at && $opp->created_at)
-            ->map(fn($opp) => $opp->created_at->diffInDays($opp->updated_at))
+            ->filter(fn ($opp) => $opp->updated_at && $opp->created_at)
+            ->map(fn ($opp) => $opp->created_at->diffInDays($opp->updated_at))
             ->average() ?? 0;
 
         return [

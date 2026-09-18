@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Listeners\Request;
 
+use App\Domains\User\Models\User;
 use App\Events\Request\RequestValidated;
 use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
-use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;

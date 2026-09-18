@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Offer;
 
+use App\Domains\User\Models\User;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Services\OfferService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -186,7 +186,7 @@ abstract class BaseOfferController extends Controller
     protected function getOfferValidationRules(bool $isUpdate = false): array
     {
         $rules = [
-                        'description' => 'required|string|min:10',
+            'description' => 'required|string|min:10',
             'document' => 'nullable|file|mimes:pdf|max:10240', // 10MB max
         ];
 

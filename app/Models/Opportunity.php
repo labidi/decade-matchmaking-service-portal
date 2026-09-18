@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domains\User\Models\User;
 use App\Enums\Opportunity\CoverageActivity;
 use App\Enums\Opportunity\Status;
 use App\Enums\Opportunity\ThematicAreas;

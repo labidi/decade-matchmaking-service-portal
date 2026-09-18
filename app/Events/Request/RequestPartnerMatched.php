@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Events\Request;
 
+use App\Domains\User\Models\User;
 use App\Models\Request;
-use App\Models\User;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -22,12 +22,11 @@ class RequestPartnerMatched
     /**
      * Create a new event instance.
      *
-     * @param Request $request The request with a matched partner
-     * @param User $partner The user who was matched as partner
+     * @param  Request  $request  The request with a matched partner
+     * @param  User  $partner  The user who was matched as partner
      */
     public function __construct(
         public readonly Request $request,
         public readonly User $partner
-    ) {
-    }
+    ) {}
 }

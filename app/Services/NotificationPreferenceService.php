@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Domains\User\Models\User;
 use App\Enums\Opportunity\Type;
 use App\Enums\Request\DecadeChallenge;
 use App\Models\RequestSubscription;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Log;
 class NotificationPreferenceService
 {
     public const ENTITY_OPPORTUNITY = 'opportunity';
+
     public const ENTITY_REQUEST = 'request';
 
     /**

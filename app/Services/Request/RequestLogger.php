@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Request;
 
+use App\Domains\User\Models\User;
 use App\Models\Request;
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 

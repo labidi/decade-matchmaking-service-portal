@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Email\Events;
 
-use App\Models\User;
+use App\Domains\User\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;

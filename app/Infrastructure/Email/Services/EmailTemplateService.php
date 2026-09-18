@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Email\Services;
 
+use App\Domains\User\Models\User;
 use App\Infrastructure\Email\Exceptions\EmailTemplateException;
 use App\Infrastructure\Email\Exceptions\MandrillApiException;
 use App\Infrastructure\Email\Exceptions\MissingVariableException;
 use App\Infrastructure\Email\Exceptions\TemplateNotFoundException;
 use App\Infrastructure\Email\Exceptions\ValidationException;
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 

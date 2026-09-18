@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Listeners\RequestOffer;
 
+use App\Domains\User\Services\UserService;
 use App\Events\OfferAccepted;
 use App\Notifications\RequestOffer\OfferAcceptedNotification;
 use App\Services\SystemNotificationService;
-use App\Services\UserService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -24,15 +24,12 @@ class SendOfferAcceptedNotifications implements ShouldQueue
     public function __construct(
         private readonly SystemNotificationService $systemNotificationService,
         private readonly UserService $userService
-    )
-    {
-    }
+    ) {}
 
     /**
      * Handle the event.
      *
-     * @param OfferAccepted $event The offer accepted event
-     * @return void
+     * @param  OfferAccepted  $event  The offer accepted event
      */
     public function handle(OfferAccepted $event): void
     {

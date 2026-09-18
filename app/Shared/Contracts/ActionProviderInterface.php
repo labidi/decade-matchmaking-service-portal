@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Contracts;
 
-use App\Models\User;
+use App\Domains\User\Models\User;
 
 /**
  * Interface for action providers that determine available actions for entities.

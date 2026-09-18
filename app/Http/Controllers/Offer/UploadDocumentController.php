@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Offer;
 
-use App\Enums\Document\DocumentType;
+use App\Domains\Document\Enums\DocumentType;
 use App\Http\Requests\UploadDocumentRequest;
 use App\Models\Request\Offer;
 use App\Services\OfferService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
 
 class UploadDocumentController extends BaseOfferController
 {
@@ -29,8 +28,8 @@ class UploadDocumentController extends BaseOfferController
             $offer = Offer::findOrFail($offerId);
 
             // Authorize based on document type
-            if(!$this->authorizeDocumentUpload($offer, $type)){
-                return back()->with('error','You do not have permission to upload this type of document for the offer.');
+            if (! $this->authorizeDocumentUpload($offer, $type)) {
+                return back()->with('error', 'You do not have permission to upload this type of document for the offer.');
             }
             // Map type to DocumentType enum
             $documentType = $this->mapDocumentType($type);
@@ -41,9 +40,10 @@ class UploadDocumentController extends BaseOfferController
                 $documentType->value,
                 $request->user()
             );
-            return back()->with('success','Document uploaded successfully.');
+
+            return back()->with('success', 'Document uploaded successfully.');
         } catch (\Exception|\Throwable $e) {
-            return back()->with('error','fail to upload document.');
+            return back()->with('error', 'fail to upload document.');
         }
     }
 
@@ -58,7 +58,8 @@ class UploadDocumentController extends BaseOfferController
             'offer_document' => 'update',
             default => throw new \InvalidArgumentException("Invalid document type: {$type}")
         };
-        return Gate::allows($policyMethod,$offer);
+
+        return Gate::allows($policyMethod, $offer);
     }
 
     /**
@@ -69,7 +70,7 @@ class UploadDocumentController extends BaseOfferController
         return match ($type) {
             'financial_breakdown' => DocumentType::FINANCIAL_BREAKDOWN_REPORT,
             'offer_document' => DocumentType::OFFER_DOCUMENT,
-            'lesson_learned'=> DocumentType::LESSON_LEARNED_REPORT,
+            'lesson_learned' => DocumentType::LESSON_LEARNED_REPORT,
             default => throw new \InvalidArgumentException("Invalid document type: {$type}")
         };
     }

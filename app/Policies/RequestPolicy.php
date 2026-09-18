@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
+use App\Domains\User\Models\User;
 use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request;
 use App\Models\Request\Status;
-use App\Models\User;
 
 class RequestPolicy
 {

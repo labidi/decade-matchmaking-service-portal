@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Email\Channels;
 
+use App\Domains\User\Models\User;
 use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
-use App\Models\User;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;

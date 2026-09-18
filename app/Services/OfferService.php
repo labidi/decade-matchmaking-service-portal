@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\Document\DocumentType;
+use App\Domains\Document\Enums\DocumentType;
+use App\Domains\Document\Models\Document;
+use App\Domains\Document\Services\DocumentService;
+use App\Domains\User\Models\User;
 use App\Enums\Offer\RequestOfferStatus;
 use App\Events\OfferAccepted;
-use App\Models\Document;
 use App\Models\Request;
 use App\Models\Request\Offer;
-use App\Models\User;
 use App\Services\Offer\OfferRepository;
 use Exception;
 use Illuminate\Http\UploadedFile;
@@ -134,6 +135,7 @@ class OfferService
 
     /**
      * Delete an offer
+     *
      * @throws Throwable
      */
     public function deleteOffer(int $offerId): bool
@@ -173,17 +175,19 @@ class OfferService
 
     /**
      * Change offer status
+     *
      * @throws Exception
      */
     public function changeOfferStatus(Offer $offer, RequestOfferStatus $status): Offer
     {
-        if($status == RequestOfferStatus::ACTIVE){
-            $activeOffer  = $offer->request->activeOffer;
-            if($activeOffer){
+        if ($status == RequestOfferStatus::ACTIVE) {
+            $activeOffer = $offer->request->activeOffer;
+            if ($activeOffer) {
                 throw new Exception('Another active offer already exists for this request');
             }
         }
         $this->repository->update($offer, ['status' => $status]);
+
         return $offer;
     }
 
@@ -192,7 +196,7 @@ class OfferService
      *
      * @throws Throwable
      */
-    public function  acceptOffer(Offer $offer, User $acceptedBy): Offer
+    public function acceptOffer(Offer $offer, User $acceptedBy): Offer
     {
         DB::beginTransaction();
 
@@ -216,7 +220,8 @@ class OfferService
                 'is_accepted' => true,
             ]);
             DB::commit();
-            OfferAccepted::dispatch($offer,$acceptedBy);
+            OfferAccepted::dispatch($offer, $acceptedBy);
+
             return $offer->fresh();
         } catch (Exception $e) {
             DB::rollBack();
@@ -227,6 +232,7 @@ class OfferService
 
     /**
      * Upload a document for an offer
+     *
      * @throws Throwable
      */
     public function uploadDocument(UploadedFile $file, Offer $offer, string $documentType, User $uploader): Document
@@ -261,6 +267,7 @@ class OfferService
 
     /**
      * Delete a document from an offer
+     *
      * @throws Throwable
      */
     public function deleteDocument(Document $document): bool

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Domains\User\Models\User;
 use App\Enums\Opportunity\Type;
 use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
-use App\Models\User;
 use App\Services\Opportunity\OpportunityQueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;

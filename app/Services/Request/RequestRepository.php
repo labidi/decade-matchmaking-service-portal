@@ -2,10 +2,10 @@
 
 namespace App\Services\Request;
 
+use App\Domains\User\Models\User;
 use App\Models\Request;
 use App\Models\Request\Detail;
 use App\Models\Request\Status;
-use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractPaginator;

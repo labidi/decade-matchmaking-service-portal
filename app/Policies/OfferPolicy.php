@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Domains\User\Models\User;
 use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request\Offer;
-use App\Models\User;
 
 class OfferPolicy
 {

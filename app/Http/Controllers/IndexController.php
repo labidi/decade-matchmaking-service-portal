@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\SettingsService;
-use App\Services\OpportunityService;
+use App\Domains\Settings\Models\Setting;
+use App\Domains\Settings\Services\SettingsService;
 use App\Http\Resources\OpportunityResource;
+use App\Services\OpportunityService;
 use Inertia\Inertia;
-use App\Models\Setting;
 
 class IndexController extends Controller
 {
-
     public function __construct(
         private readonly SettingsService $settingsService,
         private readonly OpportunityService $opportunityService
-    ) {
-    }
+    ) {}
 
     /**
      * @throws \Throwable
@@ -26,26 +24,26 @@ class IndexController extends Controller
 
         return Inertia::render('Index', [
             'title' => 'Welcome',
-            'description' => "",
+            'description' => '',
             'banner' => [
                 'title' => 'Connect for a Sustainable Ocean',
-                'description' => "The Ocean Decade Capacity Development Platform",
-                'image' => '/assets/img/sidebar.png'
+                'description' => 'The Ocean Decade Capacity Development Platform',
+                'image' => '/assets/img/sidebar.png',
             ],
             'YoutubeEmbed' => [
-                'src' => $this->settingsService->getSetting(setting::HOMEPAGE_YOUTUBE_VIDEO),
-                'title' => 'Connect for a Sustainable Ocean'
+                'src' => $this->settingsService->getSetting(Setting::HOMEPAGE_YOUTUBE_VIDEO),
+                'title' => 'Connect for a Sustainable Ocean',
             ],
             'portalGuide' => [
                 'description' => 'A user guide to help you navigate the platform.',
-                'url' => $this->settingsService->getSetting(setting::PORTAL_GUIDE),
+                'url' => $this->settingsService->getSetting(Setting::PORTAL_GUIDE),
             ],
             'metrics' => [
-                'number_of_open_partner_opportunities' => $this->settingsService->getSetting(setting::OPEN_PARTNER_OPPORTUNITIES_METRIC) ?? 0,
-                'number_successful_matches' =>  $this->settingsService->getSetting(setting::SUCCESSFUL_MATCHES_METRIC) ?? 0,
-                'number_fully_closed_matches' => $this->settingsService->getSetting(setting::FULLY_CLOSED_MATCHES_METRIC) ?? 0,
-                'number_user_requests_in_implementation' => $this->settingsService->getSetting(setting::REQUEST_IN_IMPLEMENTATION_METRIC) ?? 0,
-                'committed_funding_amount' => $this->settingsService->getSetting(setting::COMMITTED_FUNDING_METRIC) ?? 0,
+                'number_of_open_partner_opportunities' => $this->settingsService->getSetting(Setting::OPEN_PARTNER_OPPORTUNITIES_METRIC) ?? 0,
+                'number_successful_matches' => $this->settingsService->getSetting(Setting::SUCCESSFUL_MATCHES_METRIC) ?? 0,
+                'number_fully_closed_matches' => $this->settingsService->getSetting(Setting::FULLY_CLOSED_MATCHES_METRIC) ?? 0,
+                'number_user_requests_in_implementation' => $this->settingsService->getSetting(Setting::REQUEST_IN_IMPLEMENTATION_METRIC) ?? 0,
+                'committed_funding_amount' => $this->settingsService->getSetting(Setting::COMMITTED_FUNDING_METRIC) ?? 0,
             ],
             'recentOpportunities' => $recentOpportunities->toResourceCollection(OpportunityResource::class),
         ]);

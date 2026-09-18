@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Email\Jobs;
 
+use App\Domains\User\Models\User;
 use App\Infrastructure\Email\Events\EmailFailed;
 use App\Infrastructure\Email\Exceptions\MandrillApiException;
 use App\Infrastructure\Email\Models\EmailLog;
 use App\Infrastructure\Email\Services\EmailTemplateService;
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

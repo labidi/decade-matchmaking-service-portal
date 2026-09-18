@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Email\Services;
 
+use App\Domains\User\Models\User;
 use App\Infrastructure\Email\Exceptions\RateLimitExceededException;
-use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 

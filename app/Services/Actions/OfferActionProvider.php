@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\Actions;
 
+use App\Domains\User\Models\User;
 use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request\Offer;
-use App\Models\User;
 use App\Shared\Contracts\ActionProviderInterface;
 
 /**

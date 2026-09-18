@@ -2,9 +2,9 @@
 
 namespace App\Services\Offer;
 
+use App\Domains\User\Models\User;
 use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request\Offer;
-use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -12,8 +12,7 @@ class OfferRepository
 {
     public function __construct(
         private readonly OfferQueryBuilder $queryBuilder
-    ) {
-    }
+    ) {}
 
     /**
      * Find offer by ID with relationships.
@@ -52,7 +51,7 @@ class OfferRepository
             'request.user',
             'matchedPartner',
             'documents',
-            'request.detail'
+            'request.detail',
         ])->findOrFail($id);
     }
 
@@ -88,6 +87,7 @@ class OfferRepository
         $query = $this->queryBuilder->buildBaseQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -102,6 +102,7 @@ class OfferRepository
         $query = $this->queryBuilder->buildUserOffersQuery($user->id);
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -116,6 +117,7 @@ class OfferRepository
         $query = $this->queryBuilder->buildRequestOffersQuery($user->id);
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -126,6 +128,7 @@ class OfferRepository
     {
         $query = $this->queryBuilder->buildBaseQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $filters);
+
         return $query->orderBy('created_at', 'desc')->get();
     }
 }

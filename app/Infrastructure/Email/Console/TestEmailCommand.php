@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Email\Console;
 
+use App\Domains\User\Models\User;
 use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use App\Infrastructure\Email\Services\EmailTemplateService;
-use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Email\Services;
 
-use App\Models\User;
+use App\Domains\User\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;

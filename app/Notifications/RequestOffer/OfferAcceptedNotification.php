@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Notifications\RequestOffer;
 
+use App\Domains\User\Models\User;
 use App\Models\Request\Offer;
-use App\Models\User;
 use App\Notifications\AbstractMandrillNotification;
 
 /**
@@ -21,8 +21,7 @@ class OfferAcceptedNotification extends AbstractMandrillNotification
         private readonly Offer $offer,
         private readonly User $acceptedBy,
         private readonly string $recipientType
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{template: string, variables: array<string, mixed>}

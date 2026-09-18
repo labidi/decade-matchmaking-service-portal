@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\Opportunity;
 
+use App\Domains\User\Models\User;
 use App\Enums\Opportunity\Status;
 use App\Models\Opportunity;
-use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\LazyCollection;
@@ -15,8 +15,7 @@ class OpportunityRepository
 {
     public function __construct(
         private readonly OpportunityQueryBuilder $queryBuilder
-    ) {
-    }
+    ) {}
 
     /**
      * Create a new opportunity
@@ -25,6 +24,7 @@ class OpportunityRepository
     {
         $opportunity = new Opportunity($data);
         $opportunity->save();
+
         return $opportunity;
     }
 
@@ -95,6 +95,7 @@ class OpportunityRepository
         $query = $this->queryBuilder->buildBaseQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -109,6 +110,7 @@ class OpportunityRepository
         $query = $this->queryBuilder->buildUserOpportunitiesQuery($user->id);
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -122,6 +124,7 @@ class OpportunityRepository
         $query = $this->queryBuilder->buildActiveOpportunitiesQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $searchFilters);
         $query = $this->queryBuilder->applySorting($query, $sortFilters);
+
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
@@ -132,6 +135,7 @@ class OpportunityRepository
     {
         $query = $this->queryBuilder->buildBaseQuery();
         $query = $this->queryBuilder->applySearchFilters($query, $filters);
+
         return $query->orderBy('created_at', 'desc')->get();
     }
 
