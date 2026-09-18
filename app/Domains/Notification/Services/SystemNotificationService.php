@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Domains\Notification\Services;
 
+use App\Domains\Notification\Notifications\SystemActivityNotification;
 use App\Domains\User\Services\UserService;
-use App\Notifications\System\SystemActivityNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 

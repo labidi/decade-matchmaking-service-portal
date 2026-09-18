@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Notifications\Request;
 
+use App\Infrastructure\Email\Notifications\AbstractMandrillNotification;
 use App\Models\Request;
-use App\Notifications\AbstractMandrillNotification;
 
 /**
  * Confirms to the requester that their request was created.
  */
 class RequestCreatedNotification extends AbstractMandrillNotification
 {
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(private readonly Request $request) {}
 
     /**
      * @return array{template: string, variables: array<string, mixed>}

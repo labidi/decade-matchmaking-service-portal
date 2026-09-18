@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domains\Notification\Models\RequestSubscription;
 use App\Domains\User\Models\User;
 use App\Models\Request\Detail;
 use App\Models\Request\Offer;
@@ -63,7 +64,7 @@ class Request extends Model
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(\App\Models\RequestSubscription::class);
+        return $this->hasMany(RequestSubscription::class);
     }
 
     public function subscribers(): BelongsToMany

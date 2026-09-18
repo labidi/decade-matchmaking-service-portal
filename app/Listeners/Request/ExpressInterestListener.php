@@ -2,9 +2,9 @@
 
 namespace App\Listeners\Request;
 
+use App\Domains\Notification\Services\SystemNotificationService;
 use App\Events\Request\RequestExpressInterest;
 use App\Notifications\Request\ExpressInterestNotification;
-use App\Services\SystemNotificationService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -15,10 +15,6 @@ readonly class ExpressInterestListener implements ShouldQueue
         private SystemNotificationService $systemNotificationService
     ) {}
 
-    /**
-     * @param RequestExpressInterest $event
-     * @return void
-     */
     public function handle(RequestExpressInterest $event): void
     {
         try {

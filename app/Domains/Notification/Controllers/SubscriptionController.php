@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Domains\Notification\Controllers;
 
+use App\Domains\Notification\Services\SubscriptionService;
+use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
-use App\Services\SubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,8 +14,7 @@ class SubscriptionController extends Controller
 {
     public function __construct(
         private readonly SubscriptionService $subscriptionService
-    ) {
-    }
+    ) {}
 
     /**
      * Subscribe to a request

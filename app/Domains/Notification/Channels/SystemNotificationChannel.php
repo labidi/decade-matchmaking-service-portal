@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Channels;
+namespace App\Domains\Notification\Channels;
 
-use App\Models\SystemNotification;
+use App\Domains\Notification\Models\SystemNotification;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Log;
  *     return ['title' => 'Title', 'description' => 'Description'];
  * }
  *
- * @see \App\Contracts\Notifications\InAppNotification
+ * @see \App\Domains\Notification\Contracts\InAppNotification
  */
 class SystemNotificationChannel
 {
@@ -35,7 +35,7 @@ class SystemNotificationChannel
      */
     public function send(object $notifiable, Notification $notification): void
     {
-        if (!method_exists($notification, 'toSystem')) {
+        if (! method_exists($notification, 'toSystem')) {
             Log::warning('SystemNotificationChannel: Notification does not implement toSystem()', [
                 'notification' => get_class($notification),
             ]);
@@ -45,7 +45,7 @@ class SystemNotificationChannel
 
         $data = $notification->toSystem($notifiable);
 
-        if (!isset($data['title'], $data['description'])) {
+        if (! isset($data['title'], $data['description'])) {
             Log::warning('SystemNotificationChannel: Missing title/description in notification data', [
                 'notification' => get_class($notification),
             ]);

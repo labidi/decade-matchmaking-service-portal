@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\User\Notifications;
 
-use App\Notifications\AbstractMandrillNotification;
+use App\Infrastructure\Email\Notifications\AbstractMandrillNotification;
 
 /**
  * Notifies a user that their roles have changed.

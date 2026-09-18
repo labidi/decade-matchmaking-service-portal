@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Notifications\RequestOffer;
 
+use App\Infrastructure\Email\Notifications\AbstractMandrillNotification;
 use App\Models\Request\Offer;
-use App\Notifications\AbstractMandrillNotification;
 
 /**
  * Notifies a request owner that a new offer was made on their request.
  */
 class OfferCreatedNotification extends AbstractMandrillNotification
 {
-    public function __construct(private readonly Offer $offer)
-    {
-    }
+    public function __construct(private readonly Offer $offer) {}
 
     /**
      * @return array{template: string, variables: array<string, mixed>}

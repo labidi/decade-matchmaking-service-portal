@@ -2,13 +2,16 @@
 
 namespace App\Providers;
 
-use App\Channels\SystemNotificationChannel;
 use App\Domains\Auth\Contracts\AuthenticationServiceInterface;
 use App\Domains\Auth\Services\AuthenticationService;
 use App\Domains\Auth\Services\Strategies\OAuthAuthStrategy;
 use App\Domains\Auth\Services\Strategies\OceanExpertAuthStrategy;
 use App\Domains\Document\Actions\DocumentActionProvider;
 use App\Domains\Document\Models\Document;
+use App\Domains\Notification\Channels\SystemNotificationChannel;
+use App\Domains\Notification\Models\RequestSubscription;
+use App\Domains\Notification\Models\SystemNotification;
+use App\Domains\Notification\Models\UserNotificationSetting;
 use App\Domains\ReferenceData\Models\IOCPlatform;
 use App\Domains\ReferenceData\Models\Organization;
 use App\Domains\Settings\Models\Setting;
@@ -28,9 +31,6 @@ use App\Models\Request;
 use App\Models\Request\Detail as RequestDetail;
 use App\Models\Request\Offer;
 use App\Models\Request\Status as RequestStatus;
-use App\Models\RequestSubscription;
-use App\Models\SystemNotification;
-use App\Models\UserNotificationSetting;
 use App\Observers\OpportunityObserver;
 use App\Observers\RequestObserver;
 use App\Observers\RequestOfferObserver;

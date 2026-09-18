@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Domains\Notification\Controllers\Admin;
 
+use App\Domains\Notification\Models\SystemNotification;
 use App\Http\Controllers\Controller;
-use App\Models\SystemNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;

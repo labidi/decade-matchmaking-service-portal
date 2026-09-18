@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Auth\Notifications;
 
-use App\Contracts\Notifications\MandrillNotification;
+use App\Infrastructure\Email\Contracts\MandrillNotification;
 use Spatie\OneTimePasswords\Notifications\OneTimePasswordNotification as SpatieOneTimePasswordNotification;
 
 /**

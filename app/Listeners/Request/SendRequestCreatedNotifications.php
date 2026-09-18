@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Listeners\Request;
 
+use App\Domains\Notification\Services\SystemNotificationService;
 use App\Domains\User\Services\UserService;
 use App\Events\Request\RequestSubmitted;
 use App\Notifications\Request\RequestCreatedNotification;
-use App\Services\SystemNotificationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 

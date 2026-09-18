@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Notifications\RequestOffer;
 
 use App\Domains\User\Models\User;
+use App\Infrastructure\Email\Notifications\AbstractMandrillNotification;
 use App\Models\Request\Offer;
-use App\Notifications\AbstractMandrillNotification;
 
 /**
  * Notifies a recipient (admin, partner, or requester) that an offer was accepted.

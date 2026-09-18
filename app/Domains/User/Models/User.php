@@ -2,13 +2,13 @@
 
 namespace App\Domains\User\Models;
 
+use App\Domains\Notification\Models\RequestSubscription;
+use App\Domains\Notification\Models\SystemNotification;
+use App\Domains\Notification\Models\UserNotificationSetting;
 use App\Enums\Opportunity\Type;
 use App\Enums\Request\DecadeChallenge;
 use App\Models\Opportunity;
 use App\Models\Request;
-use App\Models\RequestSubscription;
-use App\Models\SystemNotification;
-use App\Models\UserNotificationSetting;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

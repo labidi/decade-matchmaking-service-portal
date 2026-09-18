@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Contracts\Notifications;
+namespace App\Infrastructure\Email\Contracts;
 
 /**
  * Contract for notifications delivered through the custom Mandrill channel.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Notifications;
+namespace App\Infrastructure\Email\Notifications;
 
-use App\Contracts\Notifications\MandrillNotification;
+use App\Infrastructure\Email\Contracts\MandrillNotification;
 use Illuminate\Notifications\Notification;
 
 /**

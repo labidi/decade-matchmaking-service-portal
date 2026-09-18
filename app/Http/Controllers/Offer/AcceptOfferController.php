@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Offer;
 
+use App\Domains\Notification\Services\SystemNotificationService;
 use App\Models\Request\Offer;
 use App\Services\OfferService;
-use App\Services\SystemNotificationService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

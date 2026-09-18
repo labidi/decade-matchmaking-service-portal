@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\Notifications\ListController;
-use App\Http\Controllers\Notifications\ResubscribeController;
-use App\Http\Controllers\Notifications\ToggleController;
-use Illuminate\Support\Facades\Route;
+use App\Domains\Notification\Controllers\ListController;
+use App\Domains\Notification\Controllers\ResubscribeController;
+use App\Domains\Notification\Controllers\ToggleController;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('notification-preferences', [ListController::class, 'list'])
@@ -17,7 +17,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('notification-preferences/resubscribe', ResubscribeController::class)
         ->name('notification.preferences.resubscribe');
 });
-
 
 Breadcrumbs::for('notification.preferences.index', function (BreadcrumbTrail $trail) {
     $trail->parent('user.home');

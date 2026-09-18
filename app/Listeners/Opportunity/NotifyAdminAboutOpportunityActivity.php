@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Listeners\Opportunity;
 
+use App\Domains\Notification\Services\SystemNotificationService;
 use App\Events\Opportunity\OpportunityClosingDateExtended;
 use App\Events\Opportunity\OpportunityCreated;
 use App\Events\Opportunity\OpportunityDeleted;
 use App\Events\Opportunity\OpportunityStatusChanged;
 use App\Events\Opportunity\OpportunityUpdated;
 use App\Models\Opportunity;
-use App\Services\SystemNotificationService;
-use Carbon\Carbon;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Listener for opportunity activity events.
@@ -32,14 +30,10 @@ class NotifyAdminAboutOpportunityActivity
      */
     public function __construct(
         private readonly SystemNotificationService $notificationService
-    ) {
-    }
+    ) {}
 
     /**
      * Register the listeners for the subscriber.
-     *
-     * @param Dispatcher $events
-     * @return void
      */
     public function subscribe(Dispatcher $events): void
     {
@@ -71,9 +65,6 @@ class NotifyAdminAboutOpportunityActivity
 
     /**
      * Handle opportunity created event.
-     *
-     * @param OpportunityCreated $event
-     * @return void
      */
     public function handleOpportunityCreated(OpportunityCreated $event): void
     {
@@ -89,9 +80,6 @@ class NotifyAdminAboutOpportunityActivity
 
     /**
      * Handle opportunity updated event.
-     *
-     * @param OpportunityUpdated $event
-     * @return void
      */
     public function handleOpportunityUpdated(OpportunityUpdated $event): void
     {
@@ -106,9 +94,6 @@ class NotifyAdminAboutOpportunityActivity
 
     /**
      * Handle closing date extended event.
-     *
-     * @param OpportunityClosingDateExtended $event
-     * @return void
      */
     public function handleClosingDateExtended(OpportunityClosingDateExtended $event): void
     {
@@ -128,9 +113,6 @@ class NotifyAdminAboutOpportunityActivity
 
     /**
      * Handle opportunity deleted event.
-     *
-     * @param OpportunityDeleted $event
-     * @return void
      */
     public function handleOpportunityDeleted(OpportunityDeleted $event): void
     {
@@ -145,9 +127,6 @@ class NotifyAdminAboutOpportunityActivity
 
     /**
      * Handle status changed event.
-     *
-     * @param OpportunityStatusChanged $event
-     * @return void
      */
     public function handleStatusChanged(OpportunityStatusChanged $event): void
     {

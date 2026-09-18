@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * @see \App\Contracts\Notifications\MandrillNotification
+ * @see \App\Infrastructure\Email\Contracts\MandrillNotification
  */
 class MandrillChannel
 {

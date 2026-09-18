@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Domains\Notification\Services;
 
 use App\Domains\User\Models\User;
 use App\Enums\Opportunity\Type;

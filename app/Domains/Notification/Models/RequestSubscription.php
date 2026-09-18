@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Domains\Notification\Models;
 
 use App\Domains\User\Models\User;
+use App\Models\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

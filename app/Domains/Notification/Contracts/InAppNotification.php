@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Contracts\Notifications;
+namespace App\Domains\Notification\Contracts;
 
 /**
  * Contract for notifications delivered through the custom in-app "system" channel.
@@ -10,9 +10,9 @@ namespace App\Contracts\Notifications;
  * Any notification that lists 'system' in its via() method should implement this
  * interface. The channel persists a SystemNotification row from the payload returned
  * by toSystem(). Named InAppNotification to avoid clashing with the
- * App\Models\SystemNotification model.
+ * App\Domains\Notification\Models\SystemNotification model.
  *
- * @see \App\Channels\SystemNotificationChannel
+ * @see \App\Domains\Notification\Channels\SystemNotificationChannel
  */
 interface InAppNotification
 {

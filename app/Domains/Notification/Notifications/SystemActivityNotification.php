@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Notifications\System;
+namespace App\Domains\Notification\Notifications;
 
-use App\Contracts\Notifications\InAppNotification;
+use App\Domains\Notification\Contracts\InAppNotification;
 use Illuminate\Notifications\Notification;
 
 /**
@@ -24,8 +24,7 @@ class SystemActivityNotification extends Notification implements InAppNotificati
     public function __construct(
         private readonly string $title,
         private readonly string $description
-    ) {
-    }
+    ) {}
 
     /**
      * Get the notification's delivery channels.

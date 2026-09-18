@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Notifications\Request;
 
+use App\Infrastructure\Email\Notifications\AbstractMandrillNotification;
 use App\Models\Request;
-use App\Notifications\AbstractMandrillNotification;
 
 /**
  * Notifies a partner that their expression of interest was recorded.
  */
 class ExpressInterestNotification extends AbstractMandrillNotification
 {
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(private readonly Request $request) {}
 
     /**
      * @return array{template: string, variables: array<string, mixed>}

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Domains\Notification\Services;
 
+use App\Domains\Notification\Models\RequestSubscription;
 use App\Domains\User\Models\User;
 use App\Enums\Opportunity\Type;
 use App\Enums\Request\DecadeChallenge;
-use App\Models\RequestSubscription;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  * Manages a user's notification settings under the opt-out model.
  *
  * There is no per-preference entity: every taxonomy value is enabled by
- * default. State lives in the user's {@see \App\Models\UserNotificationSetting}
+ * default. State lives in the user's {@see \App\Domains\Notification\Models\UserNotificationSetting}
  * row as a master switch (`email_notifications_enabled`) plus a set of disabled
  * values per entity column (`opportunity`, `request`).
  */

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domains\User\Listeners;
 
+use App\Domains\Notification\Services\SystemNotificationService;
 use App\Domains\User\Events\UserRegistered;
-use App\Services\SystemNotificationService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;

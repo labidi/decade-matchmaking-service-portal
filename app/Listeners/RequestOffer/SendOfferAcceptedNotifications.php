@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Listeners\RequestOffer;
 
+use App\Domains\Notification\Services\SystemNotificationService;
 use App\Domains\User\Services\UserService;
 use App\Events\OfferAccepted;
 use App\Notifications\RequestOffer\OfferAcceptedNotification;
-use App\Services\SystemNotificationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 

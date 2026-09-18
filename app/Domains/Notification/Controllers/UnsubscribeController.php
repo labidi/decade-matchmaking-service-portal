@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Domains\Notification\Controllers;
 
+use App\Domains\Notification\Services\NotificationPreferenceService;
 use App\Domains\User\Models\User;
-use App\Services\NotificationPreferenceService;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Admin;
+namespace App\Domains\Notification\Controllers\Admin;
 
+use App\Domains\Notification\Services\SubscriptionService;
 use App\Domains\User\Models\User;
 use App\Http\Controllers\Controller;
 use App\Models\Request as OCDRequest;
-use App\Services\SubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -180,65 +180,5 @@ class SubscriptionController extends Controller
             'user' => $user,
             'subscriptions' => $subscriptions,
         ]);
-    }
-
-    /**
-     * Bulk unsubscribe users from a request
-     */
-    public function bulkUnsubscribe(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'request_id' => 'required|exists:requests,id',
-            'user_ids' => 'required|array|min:1',
-            'user_ids.*' => 'exists:users,id',
-        ]);
-
-        try {
-            $ocdRequest = OCDRequest::findOrFail($validated['request_id']);
-            $admin = auth()->user();
-            $userIds = $validated['user_ids'];
-
-            $unsubscribedCount = $this->subscriptionService->bulkUnsubscribeFromRequest(
-                $admin,
-                $ocdRequest,
-                $userIds
-            );
-
-            if ($unsubscribedCount === 0) {
-                return back()->with(
-                    'warning',
-                    'No users were unsubscribed. They may have already been unsubscribed.'
-                );
-            }
-
-            // Log the bulk admin action
-            Log::info('Admin bulk unsubscribed users', [
-                'admin_id' => $admin->id,
-                'request_id' => $ocdRequest->id,
-                'user_ids' => $userIds,
-                'unsubscribed_count' => $unsubscribedCount,
-            ]);
-
-            return to_route('admin.subscriptions.index')->with(
-                'success',
-                sprintf(
-                    'Successfully unsubscribed %d user%s from request "%s".',
-                    $unsubscribedCount,
-                    $unsubscribedCount !== 1 ? 's' : '',
-                    $ocdRequest->detail->capacity_development_title ?? 'Untitled Request'
-                )
-            );
-        } catch (\Exception $e) {
-            Log::error('Failed to bulk unsubscribe users', [
-                'admin_id' => auth()->id(),
-                'request_id' => $validated['request_id'] ?? null,
-                'user_ids' => $validated['user_ids'] ?? [],
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()
-                ->withInput()
-                ->withErrors(['general' => 'Failed to unsubscribe users: '.$e->getMessage()]);
-        }
     }
 }

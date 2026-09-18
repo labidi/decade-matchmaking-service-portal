@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Notifications\Opportunity;
 
 use App\Enums\Opportunity\Status;
+use App\Infrastructure\Email\Notifications\AbstractMandrillNotification;
 use App\Models\Opportunity;
-use App\Notifications\AbstractMandrillNotification;
 
 /**
  * Notifies an opportunity creator that the status of their opportunity changed.
@@ -17,8 +17,7 @@ class OpportunityStatusChangedNotification extends AbstractMandrillNotification
         private readonly Opportunity $opportunity,
         private readonly mixed $previousStatus,
         private readonly Status $newStatus
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{template: string, variables: array<string, mixed>}

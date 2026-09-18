@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace App\Domains\Notification\Console;
 
-use App\Services\NewsletterService;
+use App\Domains\Notification\Services\NewsletterService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -39,11 +39,12 @@ class SendWeeklyNewsletter extends Command
 
         try {
             // Check if newsletter was recently sent (within last 6 days) unless forced
-            if (!$force) {
+            if (! $force) {
                 $lastSend = Cache::get('newsletter:last_send_date');
                 if ($lastSend && now()->diffInDays($lastSend) < 6) {
                     $this->warn('⚠️  Newsletter was sent recently. Use --force to override.');
                     $this->info("Last sent: {$lastSend->diffForHumans()}");
+
                     return self::SUCCESS;
                 }
             }
@@ -120,7 +121,7 @@ class SendWeeklyNewsletter extends Command
         );
 
         // Display errors if any
-        if (!empty($stats['errors'])) {
+        if (! empty($stats['errors'])) {
             $this->newLine();
             $this->warn('⚠️  Newsletter Errors:');
             foreach ($stats['errors'] as $error) {

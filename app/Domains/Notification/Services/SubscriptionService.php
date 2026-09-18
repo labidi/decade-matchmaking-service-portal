@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Domains\Notification\Services;
 
+use App\Domains\Notification\Models\RequestSubscription;
 use App\Domains\User\Models\User;
 use App\Models\Request;
-use App\Models\RequestSubscription;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
