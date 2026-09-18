@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Request;
 
-use App\Http\Resources\OfferResource;
+use App\Domains\Offer\Resources\OfferResource;
+use App\Domains\Offer\Services\OfferService;
 use App\Http\Resources\RequestResource;
 use App\Models\Request as OCDRequest;
-use App\Services\OfferService;
 use App\Services\Request\RequestActionProvider;
 use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
@@ -89,18 +88,13 @@ class ViewController extends BaseRequestController
     /**
      * Resolve the active offer with authorization and actions.
      *
-     * @param OCDRequest $userRequest
-     * @param Request $httpRequest
-     * @param string $context
-     * @return array|null
      * @throws Throwable
      */
     private function resolveActiveOffer(
         OCDRequest $userRequest,
         Request $httpRequest,
         string $context
-    ): ?array
-    {
+    ): ?array {
         if (! $this->shouldLoadActiveOffer($context)) {
             return null;
         }

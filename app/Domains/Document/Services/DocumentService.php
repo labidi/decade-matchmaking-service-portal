@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Domains\Document\Services;
 
 use App\Domains\Document\Models\Document;
+use App\Domains\Offer\Models\Offer;
 use App\Domains\User\Models\User;
-use App\Models\Request\Offer;
 use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;

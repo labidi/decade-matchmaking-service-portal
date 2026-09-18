@@ -12,6 +12,16 @@ use App\Domains\Notification\Channels\SystemNotificationChannel;
 use App\Domains\Notification\Models\RequestSubscription;
 use App\Domains\Notification\Models\SystemNotification;
 use App\Domains\Notification\Models\UserNotificationSetting;
+use App\Domains\Offer\Actions\OfferActionProvider;
+use App\Domains\Offer\Events\OfferAccepted;
+use App\Domains\Offer\Events\OfferCreated;
+use App\Domains\Offer\Events\OfferRejected;
+use App\Domains\Offer\Listeners\SendOfferAcceptedNotifications;
+use App\Domains\Offer\Listeners\SendOfferCreatedNotifications;
+use App\Domains\Offer\Listeners\SendOfferRejectedNotifications;
+use App\Domains\Offer\Models\Offer;
+use App\Domains\Offer\Observers\OfferObserver;
+use App\Domains\Offer\Policies\OfferPolicy;
 use App\Domains\Opportunity\Events\OpportunityClicked;
 use App\Domains\Opportunity\Listeners\RecordOpportunityClick;
 use App\Domains\Opportunity\Models\Opportunity;
@@ -33,13 +43,9 @@ use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use App\Infrastructure\Email\Models\EmailLog;
 use App\Models\Request;
 use App\Models\Request\Detail as RequestDetail;
-use App\Models\Request\Offer;
 use App\Models\Request\Status as RequestStatus;
 use App\Observers\RequestObserver;
-use App\Observers\RequestOfferObserver;
-use App\Policies\OfferPolicy;
 use App\Policies\RequestPolicy;
-use App\Services\Actions\OfferActionProvider;
 use App\Services\Request\RequestActionProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -101,7 +107,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Register the observers
         Request::observe(RequestObserver::class);
-        Offer::observe(RequestOfferObserver::class);
+        Offer::observe(OfferObserver::class);
         Opportunity::observe(OpportunityObserver::class);
         User::observe(UserObserver::class);
 
@@ -148,6 +154,14 @@ class AppServiceProvider extends ServiceProvider
             'App\\Models\\Opportunity' => Opportunity::class,
             'App\\Listeners\\Opportunity\\RecordOpportunityClick' => RecordOpportunityClick::class,
             'App\\Events\\Opportunity\\OpportunityClicked' => OpportunityClicked::class,
+            // step 6 (2026-09-18) - load-bearing: all three offer listeners are queued and their events carry an Offer
+            'App\\Models\\Request\\Offer' => Offer::class,
+            'App\\Listeners\\RequestOffer\\SendOfferCreatedNotifications' => SendOfferCreatedNotifications::class,
+            'App\\Listeners\\RequestOffer\\SendOfferRejectedNotifications' => SendOfferRejectedNotifications::class,
+            'App\\Listeners\\RequestOffer\\SendOfferAcceptedNotifications' => SendOfferAcceptedNotifications::class,
+            'App\\Events\\RequestOffer\\OfferCreated' => OfferCreated::class,
+            'App\\Events\\RequestOffer\\OfferRejected' => OfferRejected::class,
+            'App\\Events\\OfferAccepted' => OfferAccepted::class,
         ];
     }
 

@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use App\Domains\Notification\Models\RequestSubscription;
+use App\Domains\Offer\Enums\RequestOfferStatus;
+use App\Domains\Offer\Models\Offer;
 use App\Domains\User\Models\User;
 use App\Models\Request\Detail;
-use App\Models\Request\Offer;
 use App\Models\Request\Status;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -59,7 +60,7 @@ class Request extends Model
     public function activeOffer(): HasOne
     {
         return $this->hasOne(Offer::class)
-            ->where('status', \App\Enums\Offer\RequestOfferStatus::ACTIVE);
+            ->where('status', RequestOfferStatus::ACTIVE);
     }
 
     public function subscriptions(): HasMany

@@ -2,8 +2,9 @@
 
 namespace App\Policies;
 
+use App\Domains\Offer\Enums\RequestOfferStatus;
+use App\Domains\Offer\Policies\OfferPolicy;
 use App\Domains\User\Models\User;
-use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request;
 use App\Models\Request\Status;
 
@@ -41,7 +42,7 @@ class RequestPolicy
 
     /**
      * Determine whether the user can view offers for the request.
-     * Individual offers will be filtered based on OfferPolicy::view().
+     * Individual offers will be filtered based on {@see OfferPolicy::view()}.
      */
     public function viewOffers(?User $user, Request $request): bool
     {

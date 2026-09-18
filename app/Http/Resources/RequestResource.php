@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Domains\Offer\Resources\OfferResource;
 use App\Models\Request as RequestModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -30,6 +31,7 @@ class RequestResource extends JsonResource
     {
         // Eager load relationships to avoid N+1 queries
         $this->resource->loadMissing(['user']);
+
         return [
             'id' => $this->id,
             'created_at' => $this->created_at,
@@ -46,9 +48,6 @@ class RequestResource extends JsonResource
 
     /**
      * Get offers that the current user is authorized to view.
-     *
-     * @param Request $request
-     * @return AnonymousResourceCollection|null
      */
     private function getAuthorizedOffers(Request $request): ?AnonymousResourceCollection
     {
