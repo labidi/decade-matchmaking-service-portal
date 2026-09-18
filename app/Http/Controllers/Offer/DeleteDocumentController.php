@@ -27,7 +27,7 @@ class DeleteDocumentController extends BaseOfferController
         try {
             $offer = Offer::findOrFail($offerId);
             $document = Document::where('parent_id', $offerId)
-                ->where('parent_type', Offer::class)
+                ->where('parent_type', $offer->getMorphClass())
                 ->findOrFail($documentId);
             Gate::authorize('delete-document', $document);
             // Delete the document

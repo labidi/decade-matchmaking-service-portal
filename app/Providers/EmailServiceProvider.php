@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Console\Commands\Email\ListEmailTemplatesCommand;
-use App\Console\Commands\Email\TestEmailCommand;
-use App\Console\Commands\Email\ValidateEmailTemplatesCommand;
-use App\Console\Commands\Email\EmailHealthCheckCommand;
-use App\Services\Email\EmailLogger;
-use App\Services\Email\EmailTemplateService;
-use App\Services\Email\HealthCheckService;
-use App\Services\Email\MandrillClient;
-use App\Services\Email\RateLimiter;
-use App\Services\Email\TemplateResolver;
-use App\Services\Email\VariableValidator;
+use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
+use App\Infrastructure\Email\Services\EmailLogger;
+use App\Infrastructure\Email\Services\EmailTemplateService;
+use App\Infrastructure\Email\Services\HealthCheckService;
+use App\Infrastructure\Email\Services\MandrillClient;
+use App\Infrastructure\Email\Services\RateLimiter;
+use App\Infrastructure\Email\Services\TemplateResolver;
+use App\Infrastructure\Email\Services\VariableValidator;
 use App\Services\SettingsService;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
@@ -32,7 +29,7 @@ class EmailServiceProvider extends ServiceProvider
         // Register Mandrill API client as singleton
         $this->app->singleton(ApiClient::class, function (Application $app) {
             $apiKey = config('mail-templates.mandrill.api_key');
-            $client = new ApiClient();
+            $client = new ApiClient;
             $client->setApiKey($apiKey);
 
             return $client;
@@ -47,13 +44,12 @@ class EmailServiceProvider extends ServiceProvider
         $this->app->singleton(RateLimiter::class);
         $this->app->singleton(HealthCheckService::class);
 
-        // Register commands
-        $this->commands([
-            ValidateEmailTemplatesCommand::class,
-            ListEmailTemplatesCommand::class,
-            TestEmailCommand::class,
-            EmailHealthCheckCommand::class,
-        ]);
+        // Transitional alias so jobs queued before the move to App\Infrastructure\Email
+        // (database queue payloads store the FQCN) still unserialise. Remove one release
+        // after 2026-09-18 once the jobs/failed_jobs tables no longer hold the old name.
+        if (! class_exists('App\\Jobs\\Email\\SendTransactionalEmail', false)) {
+            class_alias(SendTransactionalEmail::class, 'App\\Jobs\\Email\\SendTransactionalEmail');
+        }
     }
 
     /**
@@ -67,11 +63,11 @@ class EmailServiceProvider extends ServiceProvider
         // Publish configuration
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../../config/mail-templates.php' => config_path('mail-templates.php'),
+                __DIR__.'/../../config/mail-templates.php' => config_path('mail-templates.php'),
             ], 'mail-templates');
 
             // Load migrations
-            $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+            $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
         }
 
         // Email event listeners are now auto-discovered by Laravel 12
@@ -85,7 +81,7 @@ class EmailServiceProvider extends ServiceProvider
     private function configureMandrillApiKey(): void
     {
         // Skip if running migrations to prevent errors when settings table doesn't exist yet
-        if ($this->app->runningInConsole() && !$this->app->environment('testing')) {
+        if ($this->app->runningInConsole() && ! $this->app->environment('testing')) {
             $command = $_SERVER['argv'][1] ?? '';
             if (str_contains($command, 'migrate')) {
                 return;
@@ -112,27 +108,8 @@ class EmailServiceProvider extends ServiceProvider
             // During fresh installs or when database is not available, silently skip
             // The MandrillClient will throw its own exception when actually needed
             if (config('app.debug')) {
-                Log::warning('Could not load Mandrill API key from database: ' . $e->getMessage());
+                Log::warning('Could not load Mandrill API key from database: '.$e->getMessage());
             }
         }
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array<string>
-     */
-    public function provides(): array
-    {
-        return [
-            ApiClient::class,
-            TemplateResolver::class,
-            VariableValidator::class,
-            EmailLogger::class,
-            MandrillClient::class,
-            EmailTemplateService::class,
-            RateLimiter::class,
-            HealthCheckService::class,
-        ];
     }
 }

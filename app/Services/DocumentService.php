@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\Document\DocumentType;
 use App\Models\Document;
 use App\Models\Request\Offer;
 use App\Models\User;
@@ -31,7 +30,7 @@ class DocumentService
                 'file_type' => $file->getMimeType(),
                 'document_type' => $documentType,
                 'parent_id' => $offer->id,
-                'parent_type' => Offer::class,
+                'parent_type' => $offer->getMorphClass(),
                 'uploader_id' => $user->id,
             ]);
         } catch (Exception $e) {
@@ -55,7 +54,7 @@ class DocumentService
                 'file_type' => $file->getMimeType(),
                 'document_type' => $documentType,
                 'parent_id' => $offer->id,
-                'parent_type' => Offer::class,
+                'parent_type' => $offer->getMorphClass(),
                 'uploader_id' => $user->id,
             ]);
 

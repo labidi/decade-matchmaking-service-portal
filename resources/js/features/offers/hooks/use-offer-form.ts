@@ -32,12 +32,7 @@ export function useOfferForm({partners, availableRequests, offer, isEditing = fa
         form.clearErrors();
         setErrorSteps([]);
 
-        const submitUrl = isEditing
-            ? route('admin.offer.update', { id: offer.id })
-            : route('admin.offer.store');
-        const submitMethod = isEditing ? 'put' : 'post';
-
-        form[submitMethod](submitUrl, {
+        const options = {
             onSuccess: () => {
                 // Handle successful submission
             },
@@ -54,7 +49,18 @@ export function useOfferForm({partners, availableRequests, offer, isEditing = fa
             onFinish: () => {
                 // Handle completion
             }
-        });
+        };
+
+        if (isEditing) {
+            // Use POST with Laravel method spoofing so multipart/form-data bodies
+            // (present when a supporting document file is attached) are parsed by PHP.
+            // A real PUT with a file body is dropped by PHP, losing text fields like description.
+            form
+                .transform((data) => ({ ...data, _method: 'put' }))
+                .post(route('admin.offer.update', { id: offer.id }), options);
+        } else {
+            form.post(route('admin.offer.store'), options);
+        }
     };
 
     type FormDataKeys = keyof typeof form.data;

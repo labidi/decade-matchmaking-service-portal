@@ -17,6 +17,19 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    // Domain modules live under app/Domains/<Domain>/ and app/Infrastructure/<Name>/.
+    // Laravel only auto-discovers app/Listeners and app/Console/Commands, so the
+    // per-module Listeners/ and Console/ folders are registered here.
+    ->withEvents(discover: [
+        app_path('Listeners'),
+        ...(glob(app_path('Domains/*/Listeners')) ?: []),
+        ...(glob(app_path('Infrastructure/*/Listeners')) ?: []),
+    ])
+    ->withCommands([
+        app_path('Console/Commands'),
+        ...(glob(app_path('Domains/*/Console')) ?: []),
+        ...(glob(app_path('Infrastructure/*/Console')) ?: []),
+    ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             HandleInertiaRequests::class,

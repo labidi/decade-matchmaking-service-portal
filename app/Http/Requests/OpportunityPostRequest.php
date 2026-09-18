@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\Common\Language;
-use App\Enums\Common\TargetAudience;
 use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
+use App\Shared\Enums\Language;
+use App\Shared\Enums\TargetAudience;
+use App\Shared\Support\UrlNormalizer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -29,26 +30,26 @@ class OpportunityPostRequest extends FormRequest
             'co_organizers' => ['required', 'array'],
             'title' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::enum(Type::class)],
-            'closing_date' => ['required', 'date',Rule::date()->after('today')],
+            'closing_date' => ['required', 'date', Rule::date()->after('today')],
             'coverage_activity' => ['required'],
             'implementation_location' => ['required'],
             'thematic_areas' => ['required', 'array'],
             'thematic_areas.*' => [Rule::enum(ThematicAreas::class)],
             'thematic_areas_other' => [
-                Rule::excludeIf(fn() => !in_array(ThematicAreas::OTHER->value, $this->input('thematic_areas', []))),
-                'string'
+                Rule::excludeIf(fn () => ! in_array(ThematicAreas::OTHER->value, $this->input('thematic_areas', []))),
+                'string',
             ],
             'target_audience' => ['required', 'array'],
             'target_audience.*' => [Rule::enum(TargetAudience::class)],
             'target_audience_other' => [
-                Rule::excludeIf(fn() => !in_array(TargetAudience::OTHER->value, $this->input('target_audience', []))),
-                'string'
+                Rule::excludeIf(fn () => ! in_array(TargetAudience::OTHER->value, $this->input('target_audience', []))),
+                'string',
             ],
             'target_languages' => ['required'],
             'target_languages.*' => [Rule::enum(Language::class)],
             'target_languages_other' => [
-                Rule::excludeIf(fn() => !in_array(Language::OTHER->value, $this->input('target_languages', []))),
-                'string'
+                Rule::excludeIf(fn () => ! in_array(Language::OTHER->value, $this->input('target_languages', []))),
+                'string',
             ],
             'summary' => ['required'],
             'url' => ['required', 'string', 'max:2048', 'url:http,https'],
@@ -60,11 +61,11 @@ class OpportunityPostRequest extends FormRequest
     {
         $raw = $this->input('url');
 
-        if (!is_string($raw)) {
+        if (! is_string($raw)) {
             return;
         }
 
-        $normalized = \App\Support\UrlNormalizer::normalize($raw);
+        $normalized = UrlNormalizer::normalize($raw);
 
         if ($normalized !== null && $normalized !== $raw) {
             $this->merge(['url' => $normalized]);

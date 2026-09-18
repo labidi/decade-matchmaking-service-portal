@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Resources\UserResource;
-use App\Services\NavigationService;
+use App\Shared\Support\NavigationService;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,10 +38,9 @@ class HandleInertiaRequests extends Middleware
         $navigationService = app(NavigationService::class);
 
         $user = $request->user();
-        if($user && !$user->hasAnyRole(['partner','user'])){
-            session()->flash('info','Contact cdf@unesco.org to request a User or Partner role and unlock additional functions.');
+        if ($user && ! $user->hasAnyRole(['partner', 'user'])) {
+            session()->flash('info', 'Contact cdf@unesco.org to request a User or Partner role and unlock additional functions.');
         }
-
 
         return [
             ...parent::share($request),

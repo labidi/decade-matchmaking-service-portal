@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\Opportunity\Type;
-use App\Jobs\Email\SendTransactionalEmail;
+use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use App\Models\User;
 use App\Services\Opportunity\OpportunityQueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,8 +36,7 @@ class NewsletterService
 
     public function __construct(
         private readonly OpportunityQueryBuilder $opportunityQueryBuilder
-    ) {
-    }
+    ) {}
 
     /**
      * The audience for every newsletter operation: non-blocked users whose
@@ -127,7 +126,7 @@ class NewsletterService
      *
      * @param  Collection<int, \App\Models\Opportunity>  $pool
      * @param  array<string, array{html: string, count: int, total: int}>  $renderCache
-     * @return array{html: string, count: int, total: int}|null  Null when the user gets no email.
+     * @return array{html: string, count: int, total: int}|null Null when the user gets no email.
      */
     private function contentFor(User $user, Collection $pool, array &$renderCache): ?array
     {

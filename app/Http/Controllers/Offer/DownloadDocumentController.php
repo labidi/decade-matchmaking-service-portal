@@ -22,13 +22,14 @@ class DownloadDocumentController extends BaseOfferController
 
     /**
      * Download a document
+     *
      * @throws \Exception
      */
     public function __invoke(Request $request, int $offerId, int $documentId): StreamedResponse
     {
         $offer = Offer::findOrFail($offerId);
         $document = Document::where('parent_id', $offerId)
-            ->where('parent_type', Offer::class)
+            ->where('parent_type', $offer->getMorphClass())
             ->findOrFail($documentId);
 
         return $this->documentService->getDownloadResponse($document);

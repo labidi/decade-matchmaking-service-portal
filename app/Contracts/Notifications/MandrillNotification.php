@@ -11,7 +11,7 @@ namespace App\Contracts\Notifications;
  * this interface. The channel resolves the template, variables and (optionally)
  * the target queue from the payload returned by toMandrill().
  *
- * @see \App\Channels\MandrillChannel
+ * @see \App\Infrastructure\Email\Channels\MandrillChannel
  */
 interface MandrillNotification
 {

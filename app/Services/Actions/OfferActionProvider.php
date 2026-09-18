@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Actions;
 
-use App\Contracts\Actions\ActionProviderInterface;
 use App\Enums\Offer\RequestOfferStatus;
 use App\Models\Request\Offer;
 use App\Models\User;
+use App\Shared\Contracts\ActionProviderInterface;
 
 /**
  * Provides available actions for request offers.
@@ -17,9 +17,9 @@ class OfferActionProvider implements ActionProviderInterface
     /**
      * Get available actions for an offer.
      *
-     * @param mixed $entity The offer entity
-     * @param User|null $user The current user
-     * @param string|null $context The UI context (admin, user, etc.)
+     * @param  mixed  $entity  The offer entity
+     * @param  User|null  $user  The current user
+     * @param  string|null  $context  The UI context (admin, user, etc.)
      * @return array<int, array<string, mixed>>
      */
     public function getActions(mixed $entity, ?User $user = null, ?string $context = null): array
@@ -175,7 +175,7 @@ class OfferActionProvider implements ActionProviderInterface
                     'confirm' => 'This action cannot be undone. Are you sure you want to delete this offer?',
                 ];
             }
-            if($user->can('view', $entity->request)){
+            if ($user->can('view', $entity->request)) {
                 $actions[] = [
                     'key' => 'view_request',
                     'label' => 'View Offer Request',

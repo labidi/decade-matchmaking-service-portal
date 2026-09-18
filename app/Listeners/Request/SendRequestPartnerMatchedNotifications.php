@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\Request;
 
 use App\Events\Request\RequestPartnerMatched;
-use App\Jobs\Email\SendTransactionalEmail;
+use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -21,8 +21,7 @@ class SendRequestPartnerMatchedNotifications implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param RequestPartnerMatched $event The request partner matched event
-     * @return void
+     * @param  RequestPartnerMatched  $event  The request partner matched event
      */
     public function handle(RequestPartnerMatched $event): void
     {

@@ -15,7 +15,7 @@ use Illuminate\Notifications\Notification;
  * synchronously and dispatches a single SendTransactionalEmail job, which is the
  * queued, retryable unit.
  *
- * @see \App\Channels\MandrillChannel
+ * @see \App\Infrastructure\Email\Channels\MandrillChannel
  */
 abstract class AbstractMandrillNotification extends Notification implements MandrillNotification
 {

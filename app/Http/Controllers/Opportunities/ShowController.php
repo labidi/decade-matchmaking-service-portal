@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Opportunities;
 
-use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
+use App\Shared\Http\HasPageActions;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -27,13 +27,13 @@ class ShowController extends BaseOpportunitiesController
             );
         }
 
-        if($this->getRouteContext() === 'user_own' && $request->user()->can('edit', [Opportunity::class, $opportunity])) {
+        if ($this->getRouteContext() === 'user_own' && $request->user()->can('edit', [Opportunity::class, $opportunity])) {
             $actions[] = $this->createAction(
                 'Edit Opportunity',
                 route('opportunity.edit', $opportunity->id),
             );
         }
-        if($this->getRouteContext() === 'public' && $request->user()->can('apply', [Opportunity::class, $opportunity])) {
+        if ($this->getRouteContext() === 'public' && $request->user()->can('apply', [Opportunity::class, $opportunity])) {
             $actions[] = $this->createLink(
                 'Apply for opportunity',
                 route('opportunity.go', ['identifier' => $opportunity->public_id]),
@@ -47,7 +47,7 @@ class ShowController extends BaseOpportunitiesController
                 'Browse and view opportunities submitted by CDF partners here.'
             ),
             'opportunity' => $opportunity->toResource(OpportunityResource::class),
-            'actions' => $this->buildActions($actions)
+            'actions' => $this->buildActions($actions),
         ]);
     }
 }

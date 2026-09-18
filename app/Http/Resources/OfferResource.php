@@ -6,6 +6,7 @@ namespace App\Http\Resources;
 
 use App\Models\Request\Offer;
 use App\Services\Actions\OfferActionProvider;
+use App\Shared\Http\BaseResource;
 use Illuminate\Http\Request;
 
 /**

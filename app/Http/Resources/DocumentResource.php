@@ -6,6 +6,7 @@ namespace App\Http\Resources;
 
 use App\Models\Document;
 use App\Services\Actions\DocumentActionProvider;
+use App\Shared\Http\BaseResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -64,7 +65,7 @@ class DocumentResource extends BaseResource
             // Log error but don't fail the response
             \Log::warning('Failed to get file size for document', [
                 'document_id' => $this->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
 
@@ -106,5 +107,4 @@ class DocumentResource extends BaseResource
     {
         return pathinfo($this->name, PATHINFO_EXTENSION);
     }
-
 }

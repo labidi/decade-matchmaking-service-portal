@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Request;
 
 use App\Enums\Request\PublicRequestStatus;
-use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Resources\PublicRequestResource;
 use App\Http\Resources\RequestResource;
 use App\Services\Request\RequestActionProvider;
 use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
+use App\Shared\Http\HasPageActions;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,7 +24,7 @@ class ListController extends BaseRequestController
         RequestActionProvider $actionProvider,
         RequestContextService $contextService
     ) {
-        parent::__construct($contextService,$actionProvider);
+        parent::__construct($contextService, $actionProvider);
     }
 
     /**

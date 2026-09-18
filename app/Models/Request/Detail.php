@@ -2,20 +2,20 @@
 
 namespace App\Models\Request;
 
-use App\Enums\Common\Country;
-use App\Enums\Common\Language;
-use App\Enums\Common\TargetAudience;
 use App\Enums\Request\SubTheme;
 use App\Enums\Request\SupportType;
 use App\Models\Request;
+use App\Shared\Enums\Country;
+use App\Shared\Enums\Language;
+use App\Shared\Enums\TargetAudience;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-
 class Detail extends Model
 {
     protected $table = 'request_details';
+
     protected $fillable = [
         'request_id',
         'capacity_development_title',
@@ -57,9 +57,8 @@ class Detail extends Model
         'expected_outcomes',
         'success_metrics',
         'long_term_impact',
-        'additional_data'
+        'additional_data',
     ];
-
 
     protected function casts(): array
     {
@@ -81,5 +80,4 @@ class Detail extends Model
     {
         return $this->belongsTo(Request::class);
     }
-
 }

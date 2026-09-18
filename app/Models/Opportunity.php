@@ -2,27 +2,27 @@
 
 namespace App\Models;
 
-use App\Casts\DynamicLocationCast;
-use App\Enums\Common\Language;
-use App\Enums\Common\TargetAudience;
 use App\Enums\Opportunity\CoverageActivity;
 use App\Enums\Opportunity\Status;
 use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
+use App\Shared\Casts\DynamicLocationCast;
+use App\Shared\Casts\UrlNormalizerCast;
+use App\Shared\Enums\Language;
+use App\Shared\Enums\TargetAudience;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-
 
 class Opportunity extends Model
 {
     use HasFactory;
 
     protected $table = 'opportunities';
+
     protected $primaryKey = 'id';
 
     public $timestamps = true;
@@ -37,7 +37,7 @@ class Opportunity extends Model
             'implementation_location' => DynamicLocationCast::class,
             'target_languages' => AsEnumArrayObject::of(Language::class),
             'thematic_areas' => AsEnumCollection::of(ThematicAreas::class),
-            'url' => \App\Casts\UrlNormalizerCast::class,
+            'url' => UrlNormalizerCast::class,
             'closing_date' => 'datetime:Y-m-d',
             'key_words' => 'array',
             'co_organizers' => 'array',
@@ -111,12 +111,9 @@ class Opportunity extends Model
 
     /**
      * Check if opportunity has multiple locations.
-     *
-     * @return bool
      */
     public function hasMultipleLocations(): bool
     {
         return count($this->getImplementationLocationAsArray()) > 1;
     }
-
 }

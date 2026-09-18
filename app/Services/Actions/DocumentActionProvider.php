@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Actions;
 
-use App\Contracts\Actions\ActionProviderInterface;
 use App\Models\Document;
 use App\Models\User;
+use App\Shared\Contracts\ActionProviderInterface;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
  * Provides available actions for documents.
@@ -16,14 +17,14 @@ class DocumentActionProvider implements ActionProviderInterface
     /**
      * Get available actions for a document.
      *
-     * @param mixed $entity The document entity
-     * @param User|null $user The current user
-     * @param string|null $context The UI context (admin, user, etc.)
+     * @param  mixed  $entity  The document entity
+     * @param  User|null  $user  The current user
+     * @param  string|null  $context  The UI context (admin, user, etc.)
      * @return array<int, array<string, mixed>>
      */
     public function getActions(mixed $entity, ?User $user = null, ?string $context = null): array
     {
-        if (!$entity instanceof Document) {
+        if (! $entity instanceof Document) {
             return [];
         }
 
@@ -85,7 +86,7 @@ class DocumentActionProvider implements ActionProviderInterface
         }
 
         // Request owner can download
-        if ($document->parent_type === \App\Models\Request::class) {
+        if ($document->parent_type === Relation::getMorphAlias(\App\Models\Request::class)) {
             $parent = \App\Models\Request::find($document->parent_id);
             if ($parent && $parent->user_id === $user->id) {
                 return true;
@@ -93,7 +94,7 @@ class DocumentActionProvider implements ActionProviderInterface
         }
 
         // Offer partner can download
-        if ($document->parent_type === \App\Models\Request\Offer::class) {
+        if ($document->parent_type === Relation::getMorphAlias(\App\Models\Request\Offer::class)) {
             $parent = \App\Models\Request\Offer::find($document->parent_id);
             if ($parent && $parent->matched_partner_id === $user->id) {
                 return true;
@@ -124,7 +125,7 @@ class DocumentActionProvider implements ActionProviderInterface
         }
 
         // Request owner can delete documents attached to their request
-        if ($document->parent_type === \App\Models\Request::class) {
+        if ($document->parent_type === Relation::getMorphAlias(\App\Models\Request::class)) {
             $parent = \App\Models\Request::find($document->parent_id);
             if ($parent && $parent->user_id === $user->id) {
                 return true;

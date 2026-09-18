@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\Request;
 
 use App\Events\Request\RequestValidated;
-use App\Jobs\Email\SendTransactionalEmail;
+use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
@@ -25,8 +25,7 @@ class SendRequestValidatedNotifications implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param RequestValidated $event The request validated event
-     * @return void
+     * @param  RequestValidated  $event  The request validated event
      */
     public function handle(RequestValidated $event): void
     {
@@ -40,6 +39,7 @@ class SendRequestValidatedNotifications implements ShouldQueue
                 Log::info('Request has no Decade Challenges, skipping instant notifications', [
                     'request_id' => $request->id,
                 ]);
+
                 return;
             }
 
@@ -65,6 +65,7 @@ class SendRequestValidatedNotifications implements ShouldQueue
                     'request_id' => $request->id,
                     'decade_challenges' => $requestChallenges,
                 ]);
+
                 return;
             }
 
@@ -82,6 +83,7 @@ class SendRequestValidatedNotifications implements ShouldQueue
                         'user_id' => $user->id,
                     ]);
                     $skippedCount++;
+
                     continue;
                 }
                 // Mark as sent for 24 hours
@@ -120,7 +122,7 @@ class SendRequestValidatedNotifications implements ShouldQueue
      * Flatten the ranked {primary, secondary, tertiary} object into the
      * list of non-null challenge values, in rank order.
      *
-     * @param mixed $challenges Raw `decade_challenges` value from the detail model
+     * @param  mixed  $challenges  Raw `decade_challenges` value from the detail model
      * @return array<int, string>
      */
     private function extractChallengeValues(mixed $challenges): array

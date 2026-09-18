@@ -23,11 +23,9 @@ use Illuminate\Support\Facades\Log;
  */
 abstract class BaseOfferController extends Controller
 {
-
     public function __construct(
         protected readonly OfferService $offerService
-    ) {
-    }
+    ) {}
 
     /**
      * Get the view prefix based on route context
@@ -52,7 +50,7 @@ abstract class BaseOfferController extends Controller
         return $partners->map(function ($partner) {
             return [
                 'value' => $partner->id,
-                'label' => $partner->name . ' (' . $partner->email . ')',
+                'label' => $partner->name.' ('.$partner->email.')',
             ];
         })->toArray();
     }
@@ -114,7 +112,7 @@ abstract class BaseOfferController extends Controller
             'user_id' => auth()->id(),
         ], $context);
 
-        Log::error("Offer {$operation} error: " . $exception->getMessage(), $logContext);
+        Log::error("Offer {$operation} error: ".$exception->getMessage(), $logContext);
 
         if ($this->isAdminRoute()) {
             return back()
@@ -182,19 +180,17 @@ abstract class BaseOfferController extends Controller
         return $this->jsonErrorResponse($message, $error, $statusCode);
     }
 
-
-
     /**
      * Common validation rules for offer operations
      */
     protected function getOfferValidationRules(bool $isUpdate = false): array
     {
         $rules = [
-            'description' => 'required|string|min:10',
+                        'description' => 'required|string|min:10',
             'document' => 'nullable|file|mimes:pdf|max:10240', // 10MB max
         ];
 
-        if (!$isUpdate) {
+        if (! $isUpdate) {
             $rules['request_id'] = 'required|exists:requests,id';
             $rules['partner_id'] = 'required|exists:users,id';
         }
@@ -208,7 +204,7 @@ abstract class BaseOfferController extends Controller
     protected function getOfferValidationMessages(): array
     {
         return [
-            'description.required' => 'The offer description is required.',
+            //            'description.required' => 'The offer description is required.',
             'description.min' => 'The offer description must be at least :min characters.',
             'request_id.required' => 'The request is required.',
             'request_id.exists' => 'The selected request does not exist.',

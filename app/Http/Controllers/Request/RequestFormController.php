@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Request;
 
-use App\Enums\Common\Country;
-use App\Enums\Common\Language;
-use App\Enums\Common\TargetAudience;
-use App\Enums\Common\YesNo;
+use App\Enums\Request\DecadeChallenge;
 use App\Enums\Request\DeliveryFormat;
 use App\Enums\Request\ProjectStage;
-use App\Enums\Request\DecadeChallenge;
 use App\Enums\Request\RelatedActivity;
 use App\Enums\Request\SupportType;
 use App\Events\Request\RequestSubmitted;
-use App\Http\Controllers\Traits\HasPageActions;
 use App\Http\Requests\StoreRequest;
 use App\Http\Resources\RequestResource;
 use App\Services\Request\RequestContextService;
 use App\Services\RequestService;
+use App\Shared\Enums\Country;
+use App\Shared\Enums\Language;
+use App\Shared\Enums\TargetAudience;
+use App\Shared\Enums\YesNo;
+use App\Shared\Http\HasPageActions;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;

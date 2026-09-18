@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Request;
 
-use App\Contracts\Actions\ActionProviderInterface;
 use App\Models\Request;
 use App\Models\User;
 use App\Services\RequestService;
+use App\Shared\Contracts\ActionProviderInterface;
 
 /**
  * Provides available actions for requests.
@@ -182,9 +182,6 @@ readonly class RequestActionProvider implements ActionProviderInterface
 
     /**
      * Get the appropriate view route name based on context.
-     *
-     * @param  string  $context
-     * @return string
      */
     private function getViewRouteName(string $context): string
     {

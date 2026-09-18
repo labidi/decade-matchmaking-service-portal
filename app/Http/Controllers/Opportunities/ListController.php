@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Opportunities;
 use App\Enums\Opportunity\Status;
 use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
-use App\Http\Controllers\Traits\HasPageActions;
 use App\Models\Opportunity;
 use App\Services\OpportunityService;
+use App\Shared\Http\HasPageActions;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,9 +16,7 @@ class ListController extends BaseOpportunitiesController
 {
     use HasPageActions;
 
-    public function __construct(private readonly OpportunityService $opportunityService)
-    {
-    }
+    public function __construct(private readonly OpportunityService $opportunityService) {}
 
     /**
      * Get context-specific configuration
@@ -38,22 +36,21 @@ class ListController extends BaseOpportunitiesController
                 'currentSearchFields' => ['user', 'title'],
                 'listRouteName' => 'admin.opportunity.list',
                 'showRouteName' => 'admin.opportunity.show',
-                'actions' =>
-                    $this->buildActions([
-                        $this->createSecondaryAction(
-                            'Export Opportunities CSV',
-                            route('admin.opportunity.export.csv'),
-                            'ArrowDownTrayIcon',
-                            'DOWNLOAD'
-                        ),
-                    ]),
+                'actions' => $this->buildActions([
+                    $this->createSecondaryAction(
+                        'Export Opportunities CSV',
+                        route('admin.opportunity.export.csv'),
+                        'ArrowDownTrayIcon',
+                        'DOWNLOAD'
+                    ),
+                ]),
             ],
             'user_own' => [
                 'component' => 'opportunity/List',
                 'title' => 'Opportunities',
                 'banner' => [
                     'title' => 'List of My submitted Opportunities',
-                    'description' => 'Manage your submitted opportunities here.'
+                    'description' => 'Manage your submitted opportunities here.',
                 ],
                 'searchFields' => [
                     ['name' => 'title', 'label' => 'Title or keywords', 'type' => 'text'],
@@ -63,28 +60,27 @@ class ListController extends BaseOpportunitiesController
                 'currentSearchFields' => ['type', 'status', 'title'],
                 'listRouteName' => 'me.opportunity.list',
                 'showRouteName' => 'me.opportunity.show',
-                'actions' =>
-                    $this->buildActions([
-                        $this->createPrimaryAction(
-                            'Create New Opportunity',
-                            route('opportunity.create'),
-                            'PlusIcon',
-                        ),
-                    ]),
+                'actions' => $this->buildActions([
+                    $this->createPrimaryAction(
+                        'Create New Opportunity',
+                        route('opportunity.create'),
+                        'PlusIcon',
+                    ),
+                ]),
             ],
             'public' => [
                 'component' => 'opportunity/List',
                 'title' => 'Opportunities',
                 'banner' => [
                     'title' => 'List of Opportunities',
-                    'description' => 'Browse and view opportunities submitted by CDF partners here.'
+                    'description' => 'Browse and view opportunities submitted by CDF partners here.',
                 ],
                 'searchFields' => [
                     ['name' => 'title', 'label' => 'Title or keywords', 'type' => 'text'],
                     ['name' => 'type', 'label' => 'Type', 'type' => 'select', 'options' => Type::getOptions()],
                     ['name' => 'thematic_areas', 'label' => 'Thematic areas', 'type' => 'select', 'options' => ThematicAreas::getOptions()],
                 ],
-                'currentSearchFields' => ['title', 'type','thematic_areas'],
+                'currentSearchFields' => ['title', 'type', 'thematic_areas'],
                 'routeName' => 'opportunity.list',
                 'listRouteName' => 'opportunity.list',
                 'showRouteName' => 'opportunity.show',
@@ -94,6 +90,7 @@ class ListController extends BaseOpportunitiesController
 
     /**
      * Get opportunities based on context
+     *
      * @throws \Throwable
      */
     private function getOpportunitiesForContext(string $context, $user, array $searchFilters, array $sortFilters)
@@ -114,6 +111,7 @@ class ListController extends BaseOpportunitiesController
         foreach ($fields as $field) {
             $currentSearch[$field] = $searchFilters[$field] ?? '';
         }
+
         return $currentSearch;
     }
 
@@ -152,8 +150,7 @@ class ListController extends BaseOpportunitiesController
             'showRouteName' => $config['showRouteName'],
             'currentSearch' => $this->buildCurrentSearch($searchFilters, $config['currentSearchFields']),
             'actions' => $config['actions'] ?? [],
-            'context'=> $this->getRouteContext()
+            'context' => $this->getRouteContext(),
         ]);
     }
-
 }

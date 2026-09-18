@@ -8,7 +8,7 @@ use App\Enums\Opportunity\Status;
 use App\Events\Opportunity\OpportunityClicked;
 use App\Http\Controllers\Controller;
 use App\Models\Opportunity;
-use App\Support\UrlNormalizer;
+use App\Shared\Support\UrlNormalizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -24,13 +24,13 @@ class RedirectController extends Controller
 
         $raw = $opportunity->url;
 
-        if (!is_string($raw) || trim($raw) === '') {
+        if (! is_string($raw) || trim($raw) === '') {
             abort(Response::HTTP_NOT_FOUND);
         }
 
         $normalized = UrlNormalizer::normalize($raw);
 
-        if ($normalized === null || !preg_match('#^https?://#i', $normalized)) {
+        if ($normalized === null || ! preg_match('#^https?://#i', $normalized)) {
             Log::warning('opportunity.redirect.invalid_scheme', [
                 'opportunity_id' => $opportunity->id,
                 'raw_url' => $raw,

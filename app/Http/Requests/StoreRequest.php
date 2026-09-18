@@ -2,13 +2,13 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\Common\Country;
-use App\Enums\Common\Language;
-use App\Enums\Common\TargetAudience;
-use App\Enums\Common\YesNo;
 use App\Enums\Request\DecadeChallenge;
 use App\Enums\Request\DeliveryFormat;
 use App\Enums\Request\SupportType;
+use App\Shared\Enums\Country;
+use App\Shared\Enums\Language;
+use App\Shared\Enums\TargetAudience;
+use App\Shared\Enums\YesNo;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -26,16 +26,17 @@ class StoreRequest extends FormRequest
         if ($this->input('mode') === 'draft') {
             return $rules;
         }
+
         return array_merge($rules, [
             'is_related_decade_action' => [
                 'required',
-                Rule::enum(YesNo::class)
+                Rule::enum(YesNo::class),
             ],
             'unique_related_decade_action_id' => [
                 Rule::excludeIf(
-                    fn() => $this->input("is_related_decade_action") === YesNo::NO->value
+                    fn () => $this->input('is_related_decade_action') === YesNo::NO->value
                 ),
-                'string'
+                'string',
             ],
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
@@ -43,46 +44,46 @@ class StoreRequest extends FormRequest
             'capacity_development_title' => ['required', 'string'],
             'request_link_type' => [
                 Rule::excludeIf(
-                    fn() => $this->input("is_related_decade_action") === YesNo::YES->value
+                    fn () => $this->input('is_related_decade_action') === YesNo::YES->value
                 ),
-                Rule::enum(YesNo::class)
+                Rule::enum(YesNo::class),
             ],
             'project_stage' => [
                 Rule::excludeIf(
-                    fn() => $this->input("request_link_type") === YesNo::NO->value || is_null(
-                            $this->input("request_link_type")
-                        )
+                    fn () => $this->input('request_link_type') === YesNo::NO->value || is_null(
+                        $this->input('request_link_type')
+                    )
                 ),
-                'string'
+                'string',
             ],
             'project_url' => [
                 Rule::excludeIf(
-                    fn() => $this->input("request_link_type") === YesNo::YES->value
-                        || $this->input("is_related_decade_action") === YesNo::YES->value
+                    fn () => $this->input('request_link_type') === YesNo::YES->value
+                        || $this->input('is_related_decade_action') === YesNo::YES->value
                 ),
-                'url'
+                'url',
             ],
             'related_activity' => ['required'],
             'delivery_format' => ['required'],
             'delivery_countries' => [
                 Rule::requiredIf(
-                    fn() => $this->input("delivery_format") !== DeliveryFormat::ONLINE->value
-                )
+                    fn () => $this->input('delivery_format') !== DeliveryFormat::ONLINE->value
+                ),
             ],
             'delivery_countries.*' => [Rule::enum(Country::class)],
             'target_audience' => [
-                'array'
+                'array',
             ],
             'target_audience.*' => [Rule::enum(TargetAudience::class)],
             'target_audience_other' => [
-                Rule::excludeIf(fn() => !in_array(TargetAudience::OTHER->value, $this->input('target_audience', []))),
-                'string'
+                Rule::excludeIf(fn () => ! in_array(TargetAudience::OTHER->value, $this->input('target_audience', []))),
+                'string',
             ],
             'target_languages' => ['required'],
             'target_languages.*' => [Rule::enum(Language::class)],
             'target_languages_other' => [
-                Rule::excludeIf(fn() => !in_array(Language::OTHER->value, $this->input('target_languages', []))),
-                'string'
+                Rule::excludeIf(fn () => ! in_array(Language::OTHER->value, $this->input('target_languages', []))),
+                'string',
             ],
             'decade_challenges' => ['required', 'array'],
             'decade_challenges.primary' => ['required', Rule::enum(DecadeChallenge::class)],
@@ -102,13 +103,13 @@ class StoreRequest extends FormRequest
             'gap_description' => ['required', 'string'],
             'has_partner.*' => [Rule::enum(YesNo::class)],
             'partner_name' => [
-                Rule::excludeIf(fn() => $this->input("has_partner") === YesNo::NO->value)
+                Rule::excludeIf(fn () => $this->input('has_partner') === YesNo::NO->value),
             ],
-            'partner_confirmed' => [Rule::requiredIf(fn() => $this->input("has_partner") === YesNo::YES->value)],
+            'partner_confirmed' => [Rule::requiredIf(fn () => $this->input('has_partner') === YesNo::YES->value)],
             'needs_financial_support.*' => ['required', Rule::enum(YesNo::class)],
             'budget_breakdown' => [
                 Rule::requiredIf(
-                    fn() => $this->input("needs_financial_support") === YesNo::YES->value
+                    fn () => $this->input('needs_financial_support') === YesNo::YES->value
                 ),
             ],
             'support_months' => ['required', 'numeric'],

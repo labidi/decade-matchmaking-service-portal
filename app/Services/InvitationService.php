@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Jobs\Email\SendTransactionalEmail;
+use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use App\Models\User;
 use App\Models\UserInvitation;
 use App\Services\Invitation\InvitationRepository;

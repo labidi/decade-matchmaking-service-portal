@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers\Opportunities;
 
-use App\Enums\Common\Country;
-use App\Enums\Common\Language;
-use App\Enums\Common\Ocean;
-use App\Enums\Common\Region;
-use App\Enums\Common\TargetAudience;
-use App\Enums\Common\YesNo;
 use App\Enums\Opportunity\CoverageActivity;
 use App\Enums\Opportunity\ThematicAreas;
 use App\Enums\Opportunity\Type;
@@ -15,15 +9,19 @@ use App\Http\Requests\OpportunityPostRequest;
 use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
 use App\Services\OpportunityService;
+use App\Shared\Enums\Country;
+use App\Shared\Enums\Language;
+use App\Shared\Enums\Ocean;
+use App\Shared\Enums\Region;
+use App\Shared\Enums\TargetAudience;
+use App\Shared\Enums\YesNo;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
 
 class FormController extends BaseOpportunitiesController
 {
-    public function __construct(private readonly OpportunityService $opportunityService)
-    {
-    }
+    public function __construct(private readonly OpportunityService $opportunityService) {}
 
     /**
      * @throws Throwable
@@ -33,7 +31,7 @@ class FormController extends BaseOpportunitiesController
         $pageProps = [];
 
         if ($opportunity !== null && $opportunity->exists) {
-            $pageProps['title'] = 'Edit Opportunity: ' . $opportunity->title;
+            $pageProps['title'] = 'Edit Opportunity: '.$opportunity->title;
             $pageProps['banner'] = $this->buildBanner('Edit Opportunity', 'Edit the details of your opportunity.');
             $pageProps['opportunity'] = $opportunity->toResource(OpportunityResource::class);
         } else {
@@ -78,9 +76,8 @@ class FormController extends BaseOpportunitiesController
         } catch (Throwable $e) {
             return back()->with(
                 'error',
-                'An error occurred. Error message :' . $e->getMessage()
+                'An error occurred. Error message :'.$e->getMessage()
             );
         }
     }
-
 }

@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\OpportunityController;
-use App\Http\Controllers\Webhooks\MandrillWebhookController;
+use App\Infrastructure\Email\Http\MandrillWebhookController;
 use Illuminate\Support\Facades\Route;
 
 /*

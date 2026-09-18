@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\Request;
 
 use App\Events\Request\RequestStatusChanged;
-use App\Jobs\Email\SendTransactionalEmail;
+use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 /**
