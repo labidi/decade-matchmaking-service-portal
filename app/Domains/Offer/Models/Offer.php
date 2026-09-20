@@ -4,8 +4,8 @@ namespace App\Domains\Offer\Models;
 
 use App\Domains\Document\Models\Document;
 use App\Domains\Offer\Enums\RequestOfferStatus;
+use App\Domains\Request\Models\Request;
 use App\Domains\User\Models\User;
-use App\Models\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;

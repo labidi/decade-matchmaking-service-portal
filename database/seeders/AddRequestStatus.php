@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Domains\Request\Models\Status;
 use Illuminate\Database\Seeder;
-use App\Models\Request\Status;
 
 class AddRequestStatus extends Seeder
 {

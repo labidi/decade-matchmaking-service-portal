@@ -29,6 +29,22 @@ use App\Domains\Opportunity\Observers\OpportunityObserver;
 use App\Domains\Opportunity\Policies\OpportunityPolicy;
 use App\Domains\ReferenceData\Models\IOCPlatform;
 use App\Domains\ReferenceData\Models\Organization;
+use App\Domains\Request\Actions\RequestActionProvider;
+use App\Domains\Request\Events\RequestExpressInterest;
+use App\Domains\Request\Events\RequestPartnerMatched;
+use App\Domains\Request\Events\RequestStatusChanged;
+use App\Domains\Request\Events\RequestSubmitted;
+use App\Domains\Request\Events\RequestValidated;
+use App\Domains\Request\Listeners\ExpressInterestListener;
+use App\Domains\Request\Listeners\SendRequestCreatedNotifications;
+use App\Domains\Request\Listeners\SendRequestPartnerMatchedNotifications;
+use App\Domains\Request\Listeners\SendRequestStatusChangedNotifications;
+use App\Domains\Request\Listeners\SendRequestValidatedNotifications;
+use App\Domains\Request\Models\Detail as RequestDetail;
+use App\Domains\Request\Models\Request as OCDRequest;
+use App\Domains\Request\Models\Status as RequestStatus;
+use App\Domains\Request\Observers\RequestObserver;
+use App\Domains\Request\Policies\RequestPolicy;
 use App\Domains\Settings\Models\Setting;
 use App\Domains\User\Events\UserRegistered;
 use App\Domains\User\Events\UserRoleChanged;
@@ -41,12 +57,6 @@ use App\Domains\User\Policies\UserPolicy;
 use App\Infrastructure\Email\Channels\MandrillChannel;
 use App\Infrastructure\Email\Jobs\SendTransactionalEmail;
 use App\Infrastructure\Email\Models\EmailLog;
-use App\Models\Request;
-use App\Models\Request\Detail as RequestDetail;
-use App\Models\Request\Status as RequestStatus;
-use App\Observers\RequestObserver;
-use App\Policies\RequestPolicy;
-use App\Services\Request\RequestActionProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -106,13 +116,13 @@ class AppServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         // Register the observers
-        Request::observe(RequestObserver::class);
+        OCDRequest::observe(RequestObserver::class);
         Offer::observe(OfferObserver::class);
         Opportunity::observe(OpportunityObserver::class);
         User::observe(UserObserver::class);
 
         // Register policies
-        Gate::policy(Request::class, RequestPolicy::class);
+        Gate::policy(OCDRequest::class, RequestPolicy::class);
         Gate::policy(Opportunity::class, OpportunityPolicy::class);
         Gate::policy(Offer::class, OfferPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
@@ -162,6 +172,18 @@ class AppServiceProvider extends ServiceProvider
             'App\\Events\\RequestOffer\\OfferCreated' => OfferCreated::class,
             'App\\Events\\RequestOffer\\OfferRejected' => OfferRejected::class,
             'App\\Events\\OfferAccepted' => OfferAccepted::class,
+            // step 7 (2026-09-19) - load-bearing: all five request listeners are queued and their events carry a Request
+            'App\\Models\\Request' => OCDRequest::class,
+            'App\\Listeners\\Request\\ExpressInterestListener' => ExpressInterestListener::class,
+            'App\\Listeners\\Request\\SendRequestCreatedNotifications' => SendRequestCreatedNotifications::class,
+            'App\\Listeners\\Request\\SendRequestPartnerMatchedNotifications' => SendRequestPartnerMatchedNotifications::class,
+            'App\\Listeners\\Request\\SendRequestStatusChangedNotifications' => SendRequestStatusChangedNotifications::class,
+            'App\\Listeners\\Request\\SendRequestValidatedNotifications' => SendRequestValidatedNotifications::class,
+            'App\\Events\\Request\\RequestSubmitted' => RequestSubmitted::class,
+            'App\\Events\\Request\\RequestValidated' => RequestValidated::class,
+            'App\\Events\\Request\\RequestPartnerMatched' => RequestPartnerMatched::class,
+            'App\\Events\\Request\\RequestStatusChanged' => RequestStatusChanged::class,
+            'App\\Events\\Request\\RequestExpressInterest' => RequestExpressInterest::class,
         ];
     }
 
@@ -201,7 +223,7 @@ class AppServiceProvider extends ServiceProvider
             'user' => User::class,
             'user_invitation' => UserInvitation::class,
             'user_notification_setting' => UserNotificationSetting::class,
-            'request' => Request::class,
+            'request' => OCDRequest::class,
             'request_detail' => RequestDetail::class,
             'request_status' => RequestStatus::class,
             'request_subscription' => RequestSubscription::class,

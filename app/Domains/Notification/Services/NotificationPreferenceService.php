@@ -6,8 +6,8 @@ namespace App\Domains\Notification\Services;
 
 use App\Domains\Notification\Models\RequestSubscription;
 use App\Domains\Opportunity\Enums\Type;
+use App\Domains\Request\Enums\DecadeChallenge;
 use App\Domains\User\Models\User;
-use App\Enums\Request\DecadeChallenge;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

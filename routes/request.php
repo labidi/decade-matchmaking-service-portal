@@ -1,13 +1,13 @@
 <?php
 
 use App\Domains\Document\Controllers\DocumentsController;
-use App\Http\Controllers\Request\ExportCsvController;
-use App\Http\Controllers\Request\ExportRequestPdfController;
-use App\Http\Controllers\Request\ExpressInterestController;
-use App\Http\Controllers\Request\ListController;
-use App\Http\Controllers\Request\RequestFormController;
-use App\Http\Controllers\Request\RequestManagementController;
-use App\Http\Controllers\Request\ViewController;
+use App\Domains\Request\Controllers\ExportCsvController;
+use App\Domains\Request\Controllers\ExportRequestPdfController;
+use App\Domains\Request\Controllers\ExpressInterestController;
+use App\Domains\Request\Controllers\ListController;
+use App\Domains\Request\Controllers\RequestFormController;
+use App\Domains\Request\Controllers\RequestManagementController;
+use App\Domains\Request\Controllers\ViewController;
 use Illuminate\Support\Facades\Route;
 
 /*

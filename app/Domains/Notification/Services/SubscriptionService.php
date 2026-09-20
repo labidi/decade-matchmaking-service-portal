@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Domains\Notification\Services;
 
 use App\Domains\Notification\Models\RequestSubscription;
+use App\Domains\Request\Models\Request;
 use App\Domains\User\Models\User;
-use App\Models\Request;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 

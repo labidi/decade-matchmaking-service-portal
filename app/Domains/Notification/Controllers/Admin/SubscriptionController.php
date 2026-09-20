@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Domains\Notification\Controllers\Admin;
 
 use App\Domains\Notification\Services\SubscriptionService;
+use App\Domains\Request\Models\Request as OCDRequest;
 use App\Domains\User\Models\User;
 use App\Http\Controllers\Controller;
-use App\Models\Request as OCDRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

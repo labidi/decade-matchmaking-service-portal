@@ -1,7 +1,7 @@
 <?php
 
 use App\Domains\Opportunity\Enums\Type;
-use App\Enums\Request\SubTheme;
+use App\Domains\Request\Enums\SubTheme;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;

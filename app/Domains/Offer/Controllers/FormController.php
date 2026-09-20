@@ -4,7 +4,7 @@ namespace App\Domains\Offer\Controllers;
 
 use App\Domains\Offer\Models\Offer;
 use App\Domains\Offer\Services\OfferService;
-use App\Services\RequestService;
+use App\Domains\Request\Services\RequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;

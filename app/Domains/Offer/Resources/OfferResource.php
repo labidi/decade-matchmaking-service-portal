@@ -7,7 +7,7 @@ namespace App\Domains\Offer\Resources;
 use App\Domains\Document\Resources\DocumentResource;
 use App\Domains\Offer\Actions\OfferActionProvider;
 use App\Domains\Offer\Models\Offer;
-use App\Http\Resources\RequestResource;
+use App\Domains\Request\Resources\RequestResource;
 use App\Shared\Http\BaseResource;
 use Illuminate\Http\Request;
 

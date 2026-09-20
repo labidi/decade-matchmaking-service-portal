@@ -3,9 +3,9 @@
 namespace App\Domains\User\Controllers;
 
 use App\Domains\Opportunity\Models\Opportunity;
+use App\Domains\Request\Models\Request as OCDRequest;
 use App\Domains\User\Models\User;
 use App\Http\Controllers\Controller;
-use App\Models\Request as RequestModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -23,7 +23,7 @@ class DashboardController extends Controller
         $weekAgo = Carbon::now()->subWeek();
 
         // Daily statistics
-        $dailyRequests = RequestModel::whereDate('created_at', $today)->count();
+        $dailyRequests = OCDRequest::whereDate('created_at', $today)->count();
         $dailyOpportunities = Opportunity::whereDate('created_at', $today)->count();
 
         // Weekly statistics
@@ -31,11 +31,11 @@ class DashboardController extends Controller
 
         // Total statistics
         $totalUsers = User::count();
-        $totalRequests = RequestModel::count();
+        $totalRequests = OCDRequest::count();
         $totalOpportunities = Opportunity::count();
 
         // Calculate trends (simplified - you might want to implement more sophisticated trend calculation)
-        $yesterdayRequests = RequestModel::whereDate('created_at', $yesterday)->count();
+        $yesterdayRequests = OCDRequest::whereDate('created_at', $yesterday)->count();
         $yesterdayOpportunities = Opportunity::whereDate('created_at', $yesterday)->count();
         $lastWeekRegistrations = User::whereBetween('created_at', [$weekAgo->copy()->subWeek(), $weekAgo])->count();
 

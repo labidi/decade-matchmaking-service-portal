@@ -3,8 +3,8 @@
 namespace App\Domains\Notification\Controllers;
 
 use App\Domains\Notification\Services\SubscriptionService;
+use App\Domains\Request\Models\Request as OCDRequest;
 use App\Http\Controllers\Controller;
-use App\Models\Request as OCDRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

@@ -21,7 +21,6 @@ return Application::configure(basePath: dirname(__DIR__))
     // Laravel only auto-discovers app/Listeners and app/Console/Commands, so the
     // per-module Listeners/ and Console/ folders are registered here.
     ->withEvents(discover: [
-        app_path('Listeners'),
         ...(glob(app_path('Domains/*/Listeners')) ?: []),
         ...(glob(app_path('Infrastructure/*/Listeners')) ?: []),
     ])

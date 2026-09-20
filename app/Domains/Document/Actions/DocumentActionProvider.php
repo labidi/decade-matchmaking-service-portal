@@ -6,8 +6,8 @@ namespace App\Domains\Document\Actions;
 
 use App\Domains\Document\Models\Document;
 use App\Domains\Offer\Models\Offer;
+use App\Domains\Request\Models\Request;
 use App\Domains\User\Models\User;
-use App\Models\Request;
 use App\Shared\Contracts\ActionProviderInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
