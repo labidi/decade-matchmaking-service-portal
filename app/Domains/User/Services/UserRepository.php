@@ -46,21 +46,18 @@ class UserRepository
         return $this->queryBuilder->applyPagination($query, $sortFilters);
     }
 
-    public function getActiveUsers(): Collection
+    /**
+     * Fetch users holding any of the given roles, projected for selection lists.
+     *
+     * @param  array<int, string>  $roleNames
+     * @return Collection<int, User>
+     */
+    public function getSelectionCandidatesByRoles(array $roleNames): Collection
     {
-        return User::where('is_blocked', false)
-            ->whereNotNull('email_verified_at')
+        return User::role($roleNames)
+            ->select('id', 'name', 'email', 'first_name', 'last_name')
+            ->orderBy('name')
             ->get();
-    }
-
-    public function getBlockedUsers(): Collection
-    {
-        return User::where('is_blocked', true)->get();
-    }
-
-    public function getUsersByRole(string $roleName): Collection
-    {
-        return User::role($roleName)->get();
     }
 
     public function searchByQuery(string $query, int $limit = 20): Collection

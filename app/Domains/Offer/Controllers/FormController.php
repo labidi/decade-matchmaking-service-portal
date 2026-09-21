@@ -3,8 +3,10 @@
 namespace App\Domains\Offer\Controllers;
 
 use App\Domains\Offer\Models\Offer;
+use App\Domains\Offer\Resources\PartnerOptionResource;
 use App\Domains\Offer\Services\OfferService;
 use App\Domains\Request\Services\RequestService;
+use App\Domains\User\Services\UserService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -13,6 +15,7 @@ class FormController extends BaseOfferController
 {
     public function __construct(
         private readonly RequestService $requestService,
+        private readonly UserService $userService,
         OfferService $offerService
     ) {
         parent::__construct($offerService);
@@ -33,7 +36,7 @@ class FormController extends BaseOfferController
             $offer->request_id = $selectedRequest->id;
         }
 
-        $partners = $this->getPartnersForSelection();
+        $partners = PartnerOptionResource::collection($this->userService->getPartnerCandidates())->resolve();
 
         return Inertia::render('admin/Offers/Create', [
             'formOptions' => [

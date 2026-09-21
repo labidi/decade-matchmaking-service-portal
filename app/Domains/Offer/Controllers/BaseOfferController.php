@@ -3,7 +3,6 @@
 namespace App\Domains\Offer\Controllers;
 
 use App\Domains\Offer\Services\OfferService;
-use App\Domains\User\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -17,7 +16,6 @@ use Illuminate\Support\Facades\Log;
  * - Route context detection (admin vs public routes)
  * - Common error handling and logging
  * - Standardized response formatting
- * - Partner selection utilities
  * - Breadcrumb generation
  * - Authorization patterns
  */
@@ -33,42 +31,6 @@ abstract class BaseOfferController extends Controller
     protected function getViewPrefix(): string
     {
         return $this->isAdminRoute() ? 'Admin/' : '';
-    }
-
-    /**
-     * Get partners formatted for dropdowns/selection
-     */
-    protected function getPartnersForSelection(): array
-    {
-        $partners = User::whereHas('roles', function ($query) {
-            $query->whereIn('name', ['partner', 'administrator']);
-        })
-            ->select('id', 'name', 'email', 'first_name', 'last_name')
-            ->orderBy('name')
-            ->get();
-
-        return $partners->map(function ($partner) {
-            return [
-                'value' => $partner->id,
-                'label' => $partner->name.' ('.$partner->email.')',
-            ];
-        })->toArray();
-    }
-
-    /**
-     * Get partners with full details (for admin contexts)
-     */
-    protected function getPartnersWithDetails()
-    {
-        return User::whereHas('roles', function ($query) {
-            $query->whereIn('name', ['partner', 'administrator']);
-        })
-            ->select('id', 'name', 'email')
-            ->orderBy('name')
-            ->get()
-            ->map(function ($user) {
-                return $user->makeVisible(['id']);
-            });
     }
 
     /**

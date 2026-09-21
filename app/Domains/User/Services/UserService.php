@@ -14,6 +14,8 @@ use Throwable;
 
 readonly class UserService
 {
+    private const PARTNER_CANDIDATE_ROLES = ['partner', 'administrator'];
+
     public function __construct(
         private UserRepository $repository,
         private UserAnalyticsService $analytics
@@ -97,6 +99,16 @@ readonly class UserService
     public function getAllAdmins(): Collection
     {
         return User::role('administrator')->get();
+    }
+
+    /**
+     * Get users eligible to be selected as offer partners (partners and administrators).
+     *
+     * @return Collection<int, User>
+     */
+    public function getPartnerCandidates(): Collection
+    {
+        return $this->repository->getSelectionCandidatesByRoles(self::PARTNER_CANDIDATE_ROLES);
     }
 
     /**
