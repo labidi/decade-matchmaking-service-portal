@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domains\Opportunity\Services;
 
 use App\Domains\Opportunity\Enums\Status;
+use App\Domains\Opportunity\Enums\Type;
 use App\Domains\Opportunity\Models\Opportunity;
 use App\Domains\Opportunity\Resources\OpportunityResource;
 use App\Domains\User\Models\User;
@@ -34,6 +35,15 @@ readonly class OpportunityService
                 'status' => Status::PENDING_REVIEW,
                 'user_id' => $user->id,
             ];
+
+            $type = isset($data['type']) ? Type::tryFrom((string) $data['type']) : null;
+            if ($type?->hasReducedForm()) {
+                // Clear fields the reduced form does not collect, so an update switching
+                // to a reduced type does not keep stale values.
+                foreach (Type::REDUCED_FORM_FIELDS as $field) {
+                    $data[$field] = null;
+                }
+            }
             if ($opportunity) {
                 $this->repository->update($opportunity, $data);
                 $opportunity = $opportunity->fresh();
@@ -186,6 +196,16 @@ readonly class OpportunityService
     public function getPublicOpportunities(): Collection
     {
         return $this->repository->getPublicOpportunities();
+    }
+
+    /**
+     * Get active, still-open opportunities of a given type, closing soonest first.
+     *
+     * @return Collection<int, Opportunity>
+     */
+    public function getActiveOpportunitiesByType(Type $type, int $limit = 50): Collection
+    {
+        return $this->repository->getActiveOpenByType($type, $limit);
     }
 
     /**

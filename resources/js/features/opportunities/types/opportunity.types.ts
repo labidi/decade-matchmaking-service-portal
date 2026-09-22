@@ -18,7 +18,8 @@ export interface Opportunity {
     type: { value: string; label: string };
     status: { value: string; label: string };
     closing_date: string;
-    coverage_activity: { value: string; label: string };
+    /** Null for opportunity types that do not collect it (e.g. ODC travel support). */
+    coverage_activity: { value: string; label: string } | null;
     implementation_location: Array<{ value: string; label: string }>;
     thematic_areas: Array<{ value: string; label: string }>;
     thematic_areas_other: string;

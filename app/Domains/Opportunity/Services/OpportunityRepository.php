@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domains\Opportunity\Services;
 
 use App\Domains\Opportunity\Enums\Status;
+use App\Domains\Opportunity\Enums\Type;
 use App\Domains\Opportunity\Models\Opportunity;
 use App\Domains\User\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -146,6 +147,20 @@ class OpportunityRepository
      *
      * @return LazyCollection<int, Opportunity>
      */
+    /**
+     * Active, still-open opportunities of a given type, closing soonest first.
+     *
+     * @return Collection<int, Opportunity>
+     */
+    public function getActiveOpenByType(Type $type, int $limit = 50): Collection
+    {
+        return $this->queryBuilder->buildActiveOpenByClosingDateQuery()
+            ->with('user')
+            ->where('type', $type->value)
+            ->limit($limit)
+            ->get();
+    }
+
     public function getOpportunitiesForExport(): LazyCollection
     {
         return Opportunity::query()

@@ -11,7 +11,7 @@
             <ul>
                 <li><strong>Type:</strong> {{ $opportunity->type->label() }}</li>
                 <li><strong>Closing Date:</strong> {{ $opportunity->closing_date->format('F j, Y') }}</li>
-                <li><strong>Coverage:</strong> {{ $opportunity->coverage_activity->label() }}</li>
+                <li><strong>Coverage:</strong> {{ $opportunity->coverage_activity?->label() ?? 'N/A' }}</li>
                 <li><strong>Status:</strong> {{ $opportunity->status->label() }}</li>
             </ul>
         </div>

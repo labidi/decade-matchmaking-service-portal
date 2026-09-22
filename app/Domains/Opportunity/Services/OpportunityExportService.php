@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class OpportunityExportService
 {
+    private const NOT_APPLICABLE = 'N/A';
+
     public function __construct(
         private readonly OpportunityRepository $repository
     ) {}
@@ -109,6 +111,8 @@ class OpportunityExportService
      */
     private function formatOpportunityRow(Opportunity $opportunity): array
     {
+        $notCollected = $opportunity->type?->hasReducedForm() ? self::NOT_APPLICABLE : '';
+
         return [
             ($opportunity->user?->first_name ?? '').' '.($opportunity->user?->last_name ?? ''),
             $opportunity->user?->email ?? '',
@@ -120,13 +124,13 @@ class OpportunityExportService
             $opportunity->title ?? '',
             $opportunity->summary ?? '',
             $opportunity->type?->label() ?? '',
-            $this->formatThematicAreas($opportunity),
+            $this->formatThematicAreas($opportunity) ?: $notCollected,
             $opportunity->thematic_areas_other ?? '',
-            $opportunity->coverage_activity?->label() ?? '',
-            $this->formatImplementationLocation($opportunity),
+            $opportunity->coverage_activity?->label() ?? $notCollected,
+            $this->formatImplementationLocation($opportunity) ?: $notCollected,
             $this->formatTargetAudience($opportunity),
             $opportunity->target_audience_other ?? '',
-            $this->formatTargetLanguages($opportunity),
+            $this->formatTargetLanguages($opportunity) ?: $notCollected,
             $opportunity->target_languages_other ?? '',
             $opportunity->url ?? '',
             $this->formatKeywords($opportunity),

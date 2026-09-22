@@ -11,6 +11,7 @@ enum Type: string
     case MENTORSHIPS = 'mentorships';
     case VISITING_LECTURERS = 'visiting-lecturers';
     case TRAVEL_GRANTS = 'travel-grants';
+    case ODC_TRAVEL_SUPPORT = 'odc-travel-support';
     case AWARDS = 'awards';
     case RESEARCH_FUNDING = 'research-funding';
     case ACCESS_INFRASTRUCTURE = 'access-infrastructure';
@@ -23,6 +24,20 @@ enum Type: string
     case ONLINE_COURSES = 'online-courses';
     case TECHNICAL_ASSISTANCE = 'technical-assistance-advisory-support';
 
+    /**
+     * Fields that are not collected for types with a reduced submission form.
+     *
+     * @var list<string>
+     */
+    public const REDUCED_FORM_FIELDS = [
+        'coverage_activity',
+        'implementation_location',
+        'thematic_areas',
+        'thematic_areas_other',
+        'target_languages',
+        'target_languages_other',
+    ];
+
     public function label(): string
     {
         return match ($this) {
@@ -33,6 +48,7 @@ enum Type: string
             self::MENTORSHIPS => 'Mentorships',
             self::VISITING_LECTURERS => 'Visiting Lecturers and Scholars Programmes',
             self::TRAVEL_GRANTS => 'Travel Grants',
+            self::ODC_TRAVEL_SUPPORT => 'ODC Travel Support',
             self::AWARDS => 'Awards',
             self::RESEARCH_FUNDING => 'Funding, Grants and Scholarships',
             self::ACCESS_INFRASTRUCTURE => 'Access to Infrastructure',
@@ -45,6 +61,14 @@ enum Type: string
             self::ONLINE_COURSES => 'Online Courses',
             self::TECHNICAL_ASSISTANCE => 'Technical Assistance/Advisory Support',
         };
+    }
+
+    /**
+     * Whether this type uses the reduced submission form (see REDUCED_FORM_FIELDS).
+     */
+    public function hasReducedForm(): bool
+    {
+        return $this === self::ODC_TRAVEL_SUPPORT;
     }
 
     public static function getOptions(): array

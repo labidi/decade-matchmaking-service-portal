@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import {Head} from '@inertiajs/react';
 import { FrontendLayout } from '@layouts/index';
-import {Opportunity, PageProps} from '@/types';
+import {PageProps} from '@/types';
+import { Opportunity } from '@features/opportunities/types';
 import {Badge} from '@ui/primitives/badge';
 import { Button } from '@ui/primitives/button';
 import { ExtendOpportunityDialog } from '@features/opportunities';
@@ -21,6 +22,31 @@ function formatDate(dateString: string): string {
         month: 'long',
         day: 'numeric'
     });
+}
+
+type LabelledOption = { value: string; label: string };
+
+/**
+ * Render a badge list, or "N/A" when neither the list nor its free-text companion has a value
+ * (fields not collected for some opportunity types, e.g. ODC travel support).
+ */
+function renderBadgeList(items: LabelledOption[] | undefined, other?: string | null): React.ReactNode {
+    if ((items?.length ?? 0) === 0 && !other) {
+        return 'N/A';
+    }
+
+    return (
+        <>
+            {items?.map(item => (
+                <Badge key={item.value} color="blue" className="mr-1 mb-1">
+                    {item.label}
+                </Badge>
+            ))}
+            {other && (
+                <Badge color="blue" className="mr-1 mb-1">{other}</Badge>
+            )}
+        </>
+    );
 }
 
 export default function Show({opportunity}: Readonly<ShowPageProps>) {
@@ -77,15 +103,11 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                         </div>
                         <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900 dark:text-gray-100">Coverage of CD Activity</dt>
-                            <dd className="mt-1 text-sm/6 text-gray-700 dark:text-gray-300 sm:mt-2">{opportunity.coverage_activity.label}</dd>
+                            <dd className="mt-1 text-sm/6 text-gray-700 dark:text-gray-300 sm:mt-2">{opportunity.coverage_activity?.label ?? 'N/A'}</dd>
                         </div>
                         <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900 dark:text-gray-100">Implementation Location</dt>
-                            <dd className="mt-1 text-sm/6 text-gray-700 dark:text-gray-300 sm:mt-2">{opportunity.implementation_location?.map((item: { value: string; label: string }) => (
-                                <Badge key={item.value} color="blue" className="mr-1 mb-1">
-                                    {item.label}
-                                </Badge>
-                            ))}</dd>
+                            <dd className="mt-1 text-sm/6 text-gray-700 dark:text-gray-300 sm:mt-2">{renderBadgeList(opportunity.implementation_location)}</dd>
                         </div>
                         <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900 dark:text-gray-100">Target Audience</dt>
@@ -102,29 +124,11 @@ export default function Show({opportunity}: Readonly<ShowPageProps>) {
                         </div>
                         <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900 dark:text-gray-100">Thematic areas</dt>
-                            <dd className="mt-1 text-sm/6 text-gray-700 dark:text-gray-300 sm:mt-2">{opportunity.thematic_areas?.map((item: { value: string; label: string }) => (
-                                <Badge key={item.value} color="blue" className="mr-1 mb-1">
-                                    {item.label}
-                                </Badge>
-                            ))}
-                                {opportunity.thematic_areas_other && (
-                                    <Badge color="blue"
-                                           className="mr-1 mb-1">{opportunity.thematic_areas_other}</Badge>
-                                )}
-                            </dd>
+                            <dd className="mt-1 text-sm/6 text-gray-700 dark:text-gray-300 sm:mt-2">{renderBadgeList(opportunity.thematic_areas, opportunity.thematic_areas_other)}</dd>
                         </div>
                         <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-6 sm:col-span-1 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900 dark:text-gray-100">Language of participation</dt>
-                            <dd className="mt-1 text-sm/6 text-gray-700 dark:text-gray-300 sm:mt-2">{opportunity.target_languages?.map((item: { value: string; label: string }) => (
-                                <Badge key={item.value} color="blue" className="mr-1 mb-1">
-                                    {item.label}
-                                </Badge>
-                            ))}
-                                {opportunity.target_languages_other && (
-                                    <Badge color="blue"
-                                           className="mr-1 mb-1">{opportunity.target_languages_other}</Badge>
-                                )}
-                            </dd>
+                            <dd className="mt-1 text-sm/6 text-gray-700 dark:text-gray-300 sm:mt-2">{renderBadgeList(opportunity.target_languages, opportunity.target_languages_other)}</dd>
                         </div>
                         <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-6 sm:col-span-2 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900 dark:text-gray-100">Full summary</dt>

@@ -36,10 +36,10 @@ class OpportunityResource extends JsonResource
                 'label' => $opportunity->status->label(),
             ],
             'closing_date' => Carbon::parse($opportunity->closing_date)->toDateString(),
-            'coverage_activity' => [
+            'coverage_activity' => $opportunity->coverage_activity ? [
                 'value' => $opportunity->coverage_activity->value,
                 'label' => $opportunity->coverage_activity->label(),
-            ],
+            ] : null,
             'implementation_location' => $this->transformEnumArray($opportunity->implementation_location),
             'thematic_areas' => $this->transformEnumArray($opportunity->thematic_areas),
             'thematic_areas_other' => $opportunity->thematic_areas_other,

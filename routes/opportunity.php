@@ -5,6 +5,7 @@ use App\Domains\Opportunity\Controllers\ExportController as OpportunityExportCon
 use App\Domains\Opportunity\Controllers\ExtendController;
 use App\Domains\Opportunity\Controllers\FormController;
 use App\Domains\Opportunity\Controllers\ListController;
+use App\Domains\Opportunity\Controllers\OdcTravelSupportController;
 use App\Domains\Opportunity\Controllers\RedirectController;
 use App\Domains\Opportunity\Controllers\ShowController;
 use App\Domains\Opportunity\Controllers\UpdateStatusController as OpportunityUpdateStatusController;
@@ -15,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->group(function () {
     Route::get('opportunity/list', ListController::class)->name('opportunity.list');
     Route::get('opportunity/show/{opportunity}', ShowController::class)->name('opportunity.show');
+    // Any signed-in user may submit an ODC travel support opportunity (issue #218).
+    Route::post('opportunity/odc-travel-support/submit', OdcTravelSupportController::class)
+        ->name('opportunity.odc-travel-support.submit');
 });
 
 Route::middleware(['auth', 'role:partner'])->prefix('me')->group(function () {

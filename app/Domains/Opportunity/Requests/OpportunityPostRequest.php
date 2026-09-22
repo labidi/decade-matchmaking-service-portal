@@ -26,14 +26,17 @@ class OpportunityPostRequest extends FormRequest
      */
     public function rules(): array
     {
+        $excludeIfReduced = Rule::excludeIf(fn () => $this->isReducedForm());
+        $requiredUnlessReduced = Rule::requiredIf(fn () => ! $this->isReducedForm());
+
         return [
             'co_organizers' => ['required', 'array'],
             'title' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::enum(Type::class)],
             'closing_date' => ['required', 'date', Rule::date()->after('today')],
-            'coverage_activity' => ['required'],
-            'implementation_location' => ['required'],
-            'thematic_areas' => ['required', 'array'],
+            'coverage_activity' => [$excludeIfReduced, $requiredUnlessReduced],
+            'implementation_location' => [$excludeIfReduced, $requiredUnlessReduced],
+            'thematic_areas' => [$excludeIfReduced, $requiredUnlessReduced, 'array'],
             'thematic_areas.*' => [Rule::enum(ThematicAreas::class)],
             'thematic_areas_other' => [
                 Rule::excludeIf(fn () => ! in_array(ThematicAreas::OTHER->value, $this->input('thematic_areas', []))),
@@ -45,7 +48,7 @@ class OpportunityPostRequest extends FormRequest
                 Rule::excludeIf(fn () => ! in_array(TargetAudience::OTHER->value, $this->input('target_audience', []))),
                 'string',
             ],
-            'target_languages' => ['required'],
+            'target_languages' => [$excludeIfReduced, $requiredUnlessReduced],
             'target_languages.*' => [Rule::enum(Language::class)],
             'target_languages_other' => [
                 Rule::excludeIf(fn () => ! in_array(Language::OTHER->value, $this->input('target_languages', []))),
@@ -55,6 +58,20 @@ class OpportunityPostRequest extends FormRequest
             'url' => ['required', 'string', 'max:2048', 'url:http,https'],
             'key_words' => ['required', 'array'],
         ];
+    }
+
+    /**
+     * Whether the submitted type uses the reduced form (fields in Type::REDUCED_FORM_FIELDS are not collected).
+     */
+    protected function isReducedForm(): bool
+    {
+        $type = $this->input('type');
+
+        if (! is_string($type)) {
+            return false;
+        }
+
+        return Type::tryFrom($type)?->hasReducedForm() ?? false;
     }
 
     protected function prepareForValidation(): void

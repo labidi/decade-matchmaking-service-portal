@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Opportunity\Enums\Type;
 use App\Domains\Opportunity\Resources\OpportunityResource;
 use App\Domains\Opportunity\Services\OpportunityService;
 use App\Domains\Settings\Models\Setting;
 use App\Domains\Settings\Services\SettingsService;
+use App\Shared\Enums\TargetAudience;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class IndexController extends Controller
@@ -18,9 +21,17 @@ class IndexController extends Controller
     /**
      * @throws \Throwable
      */
-    public function __invoke()
+    public function __invoke(Request $request)
     {
         $recentOpportunities = $this->opportunityService->getRecentActiveOpportunities(200);
+
+        // ODC travel support rows are only for signed-in users: the list/show routes are
+        // auth-only and the home section merely blurs placeholders for guests.
+        $odcTravelSupport = $request->user()
+            ? $this->opportunityService
+                ->getActiveOpportunitiesByType(Type::ODC_TRAVEL_SUPPORT)
+                ->toResourceCollection(OpportunityResource::class)
+            : [];
 
         return Inertia::render('Index', [
             'title' => 'Welcome',
@@ -46,6 +57,10 @@ class IndexController extends Controller
                 'committed_funding_amount' => $this->settingsService->getSetting(Setting::COMMITTED_FUNDING_METRIC) ?? 0,
             ],
             'recentOpportunities' => $recentOpportunities->toResourceCollection(OpportunityResource::class),
+            'odcTravelSupport' => $odcTravelSupport,
+            'formOptions' => [
+                'target_audience' => TargetAudience::getOptions(),
+            ],
         ]);
     }
 }

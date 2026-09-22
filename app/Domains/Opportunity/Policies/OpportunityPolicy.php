@@ -21,7 +21,9 @@ class OpportunityPolicy
      */
     public function view(User $user, Opportunity $opportunity): bool
     {
-        return $user->hasRole('partner') && $opportunity->user->id === $user->id || $user->hasRole('administrator') || $opportunity->status === Status::ACTIVE;
+        return $opportunity->user_id === $user->id
+            || $user->hasRole('administrator')
+            || $opportunity->status === Status::ACTIVE;
     }
 
     /**
@@ -30,6 +32,16 @@ class OpportunityPolicy
     public function create(User $user): bool
     {
         return $user->hasRole('partner');
+    }
+
+    /**
+     * Determine whether the user can submit an ODC travel support opportunity.
+     *
+     * Per issue #218, any signed-in user may do so, without a partner role.
+     */
+    public function createOdcTravelSupport(User $user): bool
+    {
+        return true;
     }
 
     /**

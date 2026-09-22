@@ -70,4 +70,14 @@ class OpportunityFactory extends Factory
             'type' => $typeEnum ?? Type::TRAINING,
         ]);
     }
+
+    /**
+     * An ODC travel support opportunity: reduced form, non-collected fields are null.
+     */
+    public function odcTravelSupport(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => Type::ODC_TRAVEL_SUPPORT,
+        ] + array_fill_keys(Type::REDUCED_FORM_FIELDS, null));
+    }
 }
