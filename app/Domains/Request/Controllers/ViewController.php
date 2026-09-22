@@ -13,6 +13,7 @@ use App\Domains\Request\Services\RequestContextService;
 use App\Domains\Request\Services\RequestService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
@@ -51,6 +52,10 @@ class ViewController extends BaseRequestController
             'detail',
             'user',
         ])->findOrFail($id);
+
+        // Authorize access before exposing any request data (owner, matched partner,
+        // any partner, or administrator — see RequestPolicy::view).
+        Gate::authorize('view', $userRequest);
 
         // Extract request title for display
         $requestTitle = $userRequest->detail?->capacity_development_title

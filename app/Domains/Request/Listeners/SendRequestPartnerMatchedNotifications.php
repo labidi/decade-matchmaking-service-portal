@@ -47,12 +47,18 @@ class SendRequestPartnerMatchedNotifications implements ShouldQueue
 
             // Send emails to all recipients
             foreach ($recipients as $recipient) {
+                // Deep-link each recipient to the request view they can access:
+                // the requester lands on their own request, the partner on the matched view.
+                $requestLink = $recipient['type'] === 'requester'
+                    ? route('request.me.show', $request->id)
+                    : route('request.matched.show', $request->id);
+
                 dispatch(new SendTransactionalEmail(
                     'request.partner.matched',
                     $recipient['user'],
                     [
-                        'Request_Title' => $request->capacity_development_title ?? 'N/A',
-                        'Request_Link' => route('request.show', $request->id),
+                        'Request_Title' => $request->detail?->capacity_development_title ?? 'N/A',
+                        'Request_Link' => $requestLink,
                         'user_name' => $recipient['user']->name,
                         'Partner_Name' => $partner->name,
                         'Partner_Email' => $partner->email,

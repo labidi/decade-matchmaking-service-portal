@@ -57,15 +57,14 @@ readonly class RequestService
                     default => $this->getStatusId('under_review'),
                 };
 
-                $requestData = [
-                    'user_id' => $user->id,
-                    'status_id' => $statusId,
-                ];
-
                 if ($isUpdate) {
-                    $this->repository->update($request, $requestData);
+                    // Never reassign ownership on update; only the status may change here.
+                    $this->repository->update($request, ['status_id' => $statusId]);
                 } else {
-                    $request = $this->repository->create($requestData);
+                    $request = $this->repository->create([
+                        'user_id' => $user->id,
+                        'status_id' => $statusId,
+                    ]);
                     if (! $request) {
                         throw RequestStorageException::failedToCreate();
                     }

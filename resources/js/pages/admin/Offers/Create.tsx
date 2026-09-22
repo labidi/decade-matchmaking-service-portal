@@ -20,7 +20,7 @@ function getOptionsKey(fieldKey: string): string | null {
 
 export interface OfferFormOptions {
     availableRequests: Array<{ value: string; label: string }>;
-    partners: Array<{ value: string; label: string }>;
+    partners: Array<{ value: number; label: string }>;
 }
 
 interface CreateOfferPageProps {
@@ -93,7 +93,7 @@ export default function CreateOffer({
                                     const optionsKey = getOptionsKey(fieldName);
                                     if (optionsKey && Array.isArray(formOptions?.[optionsKey as keyof OfferFormOptions])) {
                                         fieldWithOptions.options = formOptions[optionsKey as keyof OfferFormOptions] as Array<{
-                                            value: string;
+                                            value: string | number;
                                             label: string
                                         }>;
                                     }

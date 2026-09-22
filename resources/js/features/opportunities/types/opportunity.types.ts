@@ -48,6 +48,7 @@ export interface OpportunityFormOptions {
     opportunity_types?: Array<{ value: string; label: string }>;
     coverage_activity?: Array<{ value: string; label: string }>;
     thematic_areas?: Array<{ value: string; label: string }>;
+    target_languages?: Array<{ value: string; label: string }>;
     yes_no?: Array<{ value: string; label: string }>;
 }
 

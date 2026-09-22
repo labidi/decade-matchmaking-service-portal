@@ -92,8 +92,8 @@ class SendRequestValidatedNotifications implements ShouldQueue
                     'request.notification.instant',
                     $user,
                     [
-                        'Request_Title' => $request->capacity_development_title ?? 'N/A',
-                        'Request_Link' => route('request.show', $request->id),
+                        'Request_Title' => $request->detail?->capacity_development_title ?? 'N/A',
+                        'Request_Link' => route('request.public.show', $request->id),
                         'user_name' => $user->name,
                         'Request_Challenges' => implode(', ', $requestChallenges),
                         'UNSUB' => route('unsubscribe.show', $user->id),

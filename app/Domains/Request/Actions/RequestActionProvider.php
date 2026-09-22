@@ -192,7 +192,7 @@ readonly class RequestActionProvider implements ActionProviderInterface
             RequestContextService::CONTEXT_PUBLIC => 'request.public.show',
             RequestContextService::CONTEXT_MATCHED => 'request.matched.show',
             RequestContextService::CONTEXT_SUBSCRIBED => 'request.subscribed.show',
-            default => 'request.show', // Fallback for backward compatibility
+            default => 'request.me.show', // Safe fallback: an existing route (matches the CONTEXT_USER_OWN default used by callers)
         };
     }
 }

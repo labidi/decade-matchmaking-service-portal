@@ -5,6 +5,7 @@ namespace App\Domains\Request\Controllers;
 use App\Domains\Request\Services\RequestContextService;
 use App\Domains\Request\Services\RequestService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Gate;
 
 class ExportRequestPdfController extends BaseRequestController
 {
@@ -21,6 +22,14 @@ class ExportRequestPdfController extends BaseRequestController
     public function __invoke(int $requestId)
     {
         $ocdRequest = $this->requestService->findRequest($requestId);
+
+        if (! $ocdRequest) {
+            abort(404);
+        }
+
+        // Only users authorized to view the request may export it (owner, matched
+        // partner, any partner, or administrator — see RequestPolicy::exportPdf).
+        Gate::authorize('exportPdf', $ocdRequest);
 
         // Eager load all relationships to avoid N+1 queries and ensure data availability
         $ocdRequest->load([

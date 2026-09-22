@@ -4,7 +4,7 @@ import { offerFormFields } from '../config';
 import {RequestOffer} from '../types/offer.types';
 
 interface UseOfferFormProps {
-    partners: Array<{ value: string; label: string }>;
+    partners: Array<{ value: number; label: string }>;
     availableRequests: Array<{ value: string; label: string }>;
     offer: RequestOffer;
     isEditing?: boolean;

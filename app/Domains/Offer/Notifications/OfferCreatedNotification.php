@@ -23,8 +23,8 @@ class OfferCreatedNotification extends AbstractMandrillNotification
             'template' => 'offer.created',
             'variables' => [
                 'Offer_ID' => $this->offer->id,
-                'Request_Title' => $this->offer->request->capacity_development_title ?? 'N/A',
-                'Request_Link' => route('request.show', $this->offer->request_id),
+                'Request_Title' => $this->offer->request?->detail?->capacity_development_title ?? 'N/A',
+                'Request_Link' => route('request.me.show', $this->offer->request_id),
                 'Partner_Name' => $this->offer->matchedPartner?->name ?? 'Unknown Partner',
                 'user_name' => $notifiable->name,
             ] + $this->baseVariables($notifiable),

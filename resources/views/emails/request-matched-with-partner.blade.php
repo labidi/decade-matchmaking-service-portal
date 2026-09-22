@@ -59,7 +59,7 @@
         <ul>
             @foreach(['primary' => 'Primary', 'secondary' => 'Secondary', 'tertiary' => 'Tertiary'] as $rank => $rankLabel)
                 @if(!empty($request->decade_challenges[$rank]))
-                    <li><strong>{{ $rankLabel }}:</strong> {{ \App\Enums\Request\DecadeChallenge::getLabelByValue($request->decade_challenges[$rank]) ?? $request->decade_challenges[$rank] }}</li>
+                    <li><strong>{{ $rankLabel }}:</strong> {{ \App\Domains\Request\Enums\DecadeChallenge::getLabelByValue($request->decade_challenges[$rank]) ?? $request->decade_challenges[$rank] }}</li>
                 @endif
             @endforeach
         </ul>

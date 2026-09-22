@@ -84,9 +84,9 @@ Route::prefix('guide')->group(function () {
     Route::get('platform-guide.pdf', [UserGuideController::class, 'download'])->name('user.guide');
 });
 
-require_once __DIR__.'/user.php';
-require_once __DIR__.'/auth.php';
-require_once __DIR__.'/request.php';
-require_once __DIR__.'/opportunity.php';
-require_once __DIR__.'/offer.php';
-require_once __DIR__.'/notification-preferences.php';
+require __DIR__.'/user.php';
+require __DIR__.'/auth.php';
+require __DIR__.'/request.php';
+require __DIR__.'/opportunity.php';
+require __DIR__.'/offer.php';
+require __DIR__.'/notification-preferences.php';

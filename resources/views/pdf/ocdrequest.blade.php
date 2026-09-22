@@ -168,7 +168,7 @@
                 $decadeChallenges = is_array($ocdRequest->detail->decade_challenges) ? $ocdRequest->detail->decade_challenges : [];
                 $rankedChallenges = collect(['primary' => 'Primary', 'secondary' => 'Secondary', 'tertiary' => 'Tertiary'])
                     ->map(fn ($rankLabel, $rank) => isset($decadeChallenges[$rank]) && is_string($decadeChallenges[$rank])
-                        ? ['rank' => $rankLabel, 'label' => \App\Enums\Request\DecadeChallenge::getLabelByValue($decadeChallenges[$rank]) ?? $decadeChallenges[$rank]]
+                        ? ['rank' => $rankLabel, 'label' => \App\Domains\Request\Enums\DecadeChallenge::getLabelByValue($decadeChallenges[$rank]) ?? $decadeChallenges[$rank]]
                         : null)
                     ->filter();
             @endphp

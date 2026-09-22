@@ -32,8 +32,17 @@ class OfferAcceptedNotification extends AbstractMandrillNotification
             'template' => 'offer.accepted',
             'variables' => [
                 'Offer_ID' => $this->offer->id,
-                'Request_Title' => $this->offer->request->capacity_development_title ?? 'N/A',
-                'Request_Link' => route('request.public.show', $this->offer->request_id),
+                'Request_Title' => $this->offer->request?->detail?->capacity_development_title ?? 'N/A',
+                // Deep-link each audience to a request view they can reach that also
+                // surfaces the active offer: the requester to their own request, the
+                // partner to the matched view (role:user group), and the admin to the
+                // admin view (role:administrator group). request.public.show is avoided
+                // because the PUBLIC context hides the active offer.
+                'Request_Link' => match ($this->recipientType) {
+                    'requester' => route('request.me.show', $this->offer->request_id),
+                    'admin' => route('admin.request.show', $this->offer->request_id),
+                    default => route('request.matched.show', $this->offer->request_id),
+                },
                 'Partner_Name' => $this->offer->matchedPartner?->name ?? 'N/A',
                 'Accepted_By' => $this->acceptedBy->name ?? 'N/A',
                 'user_name' => $notifiable->name,

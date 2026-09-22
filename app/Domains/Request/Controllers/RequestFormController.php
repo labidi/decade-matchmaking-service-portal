@@ -19,6 +19,7 @@ use App\Shared\Enums\YesNo;
 use App\Shared\Http\HasPageActions;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -50,6 +51,8 @@ class RequestFormController extends BaseRequestController
             if (! $request) {
                 return to_route('request.me.list')->with('error', 'Request not found.');
             }
+            // Only the owner may open the edit form, and only while editable.
+            Gate::authorize('update', $request);
         }
         $data = [
             'formOptions' => [
@@ -95,12 +98,23 @@ class RequestFormController extends BaseRequestController
      */
     public function submit(StoreRequest $request, ?int $id = null): RedirectResponse
     {
+        // Resolve and authorize the target BEFORE the try, so an authorization
+        // failure surfaces as a 403 rather than being swallowed into an error flash.
+        $existing = null;
+        if ($id !== null) {
+            $existing = $this->service->findRequest($id);
+            if (! $existing) {
+                abort(404);
+            }
+            Gate::authorize('update', $existing);
+        }
+
         $mode = $request->input('mode', 'submit');
         try {
             $request = $this->service->storeRequest(
                 $request->user(),
                 $request->validated(),
-                $id ? $this->service->findRequest($id) : null,
+                $existing,
                 $mode
             );
             if ($mode == 'submit') {

@@ -4,6 +4,7 @@ namespace App\Domains\Request\Policies;
 
 use App\Domains\Offer\Enums\RequestOfferStatus;
 use App\Domains\Offer\Policies\OfferPolicy;
+use App\Domains\Request\Enums\PublicRequestStatus;
 use App\Domains\Request\Models\Request;
 use App\Domains\Request\Models\Status;
 use App\Domains\User\Models\User;
@@ -30,14 +31,30 @@ class RequestPolicy
         if (! $user) {
             return false;
         }
-        if ($user->hasRole('partner')) {
+
+        // Owner or admin: full access in any status.
+        if ($user->id === $request->user_id || $user->hasRole('administrator')) {
             return true;
         }
 
-        // Request owner, matched partner, or admin can view
-        return $user->id === $request->user->id
-            || $user->id === $request->matchedPartner?->id
-            || $user->hasRole('administrator');
+        // Other partners may only view a request once its status is publicly
+        // visible (validated / offer_made / in_implementation / closed). This
+        // keeps drafts, under-review and rejected requests private.
+        if ($user->hasRole('partner')
+            && PublicRequestStatus::isPubliclyVisible($request->status?->status_code ?? '')) {
+            return true;
+        }
+
+        // The partner on the active offer keeps access regardless of status
+        // (matched partner). activeOffer is eager-loaded by RequestRepository::findById.
+        if ($user->id === $request->activeOffer?->matched_partner_id) {
+            return true;
+        }
+
+        // Subscribers are an intended audience (request.subscribed.show route,
+        // viewActiveOffer(), and DetailResource all grant them access). This is
+        // the only branch that costs a query, so it runs last.
+        return $request->subscribers()->where('users.id', $user->id)->exists();
     }
 
     /**
