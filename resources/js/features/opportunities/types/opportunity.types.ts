@@ -11,6 +11,14 @@ export interface OpportunityPermissions {
     can_close?: boolean;
 }
 
+/** Opportunity status values as the API sends them (see App\Domains\Opportunity\Enums\Status). */
+export const OpportunityStatus = {
+    ACTIVE: '1',
+    CLOSED: '2',
+    REJECTED: '3',
+    PENDING_REVIEW: '4',
+} as const;
+
 export interface Opportunity {
     id: string;
     co_organizers: string[];

@@ -11,6 +11,7 @@ export { useOpportunityForm, useOpportunityActions } from './hooks';
 export { OpportunityActionService } from './services';
 
 // Types
+export { OpportunityStatus } from './types';
 export type {
     Opportunity,
     OpportunityList,

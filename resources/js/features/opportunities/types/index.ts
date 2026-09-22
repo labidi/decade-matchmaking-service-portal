@@ -1,3 +1,4 @@
+export { OpportunityStatus } from './opportunity.types';
 export type {
     Opportunity,
     OpportunitiesList as OpportunityList,

@@ -51,3 +51,21 @@ export const formatTime = (
         minute: '2-digit'
     });
 };
+
+/**
+ * Formats a date-only string (YYYY-MM-DD) without timezone shifting.
+ * `new Date('2026-09-12')` is parsed as UTC midnight, which renders as the previous day
+ * west of UTC; interpreting the string as local midnight keeps the calendar date intact.
+ * A full ISO timestamp is accepted too: only its date part is used.
+ */
+export const formatDateOnly = (
+    dateString: string,
+    locale: string = 'en-US',
+    options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    }
+): string => {
+    return new Date(`${dateString.slice(0, 10)}T00:00:00`).toLocaleDateString(locale, options);
+};
