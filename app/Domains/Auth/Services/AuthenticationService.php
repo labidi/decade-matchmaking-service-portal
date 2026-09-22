@@ -88,7 +88,7 @@ class AuthenticationService implements AuthenticationServiceInterface
             // Increment rate limit on failure
             RateLimiter::hit($throttleKey);
 
-            $this->logAuthenticationFailure($email, 'credentials', $e->getMessage());
+            $this->logAuthenticationFailure($email, 'credentials', $e->reason());
 
             throw $e;
         }

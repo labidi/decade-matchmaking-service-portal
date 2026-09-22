@@ -13,6 +13,7 @@ use App\Domains\User\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Throwable;
 
 class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
@@ -31,7 +32,6 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
      */
     public function authenticate(array $credentials): AuthenticationResult
     {
-        // Validate required credentials
         if (! isset($credentials['email'], $credentials['password'])) {
             throw OceanExpertAuthenticationException::invalidCredentials();
         }
@@ -40,16 +40,10 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
         $password = $credentials['password'];
 
         try {
-            // Authenticate with Ocean Expert API
-            ['token' => $token, 'user' => $userPayload] = $this->authService->authenticate(
-                $email,
-                $password
-            );
+            ['token' => $token] = $this->authService->authenticate($email, $password);
 
-            // Fetch user profile from Ocean Expert Search API
-            $profile = $this->searchService->searchUserByEmail($email);
+            $profile = $this->fetchProfile($email);
 
-            // Create or update local user in database transaction
             $user = $this->syncLocalUser($email, $password, $profile);
 
             return new AuthenticationResult(
@@ -58,25 +52,19 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
                 externalToken: $token,
             );
         } catch (OceanExpertAuthenticationException $e) {
-            // Re-throw our custom exceptions
+            $this->logOperationalFailure($e, $email);
+
             throw $e;
         } catch (Throwable $e) {
+            $wrapped = OceanExpertAuthenticationException::apiError($e->getMessage());
+
             Log::channel('auth')->error('Ocean Expert authentication failed', [
                 'email' => $email,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'reason' => $wrapped->reason(),
+                'exception' => $e,
             ]);
 
-            // Determine appropriate exception based on error message
-            if (str_contains($e->getMessage(), 'unavailable')) {
-                throw OceanExpertAuthenticationException::serviceUnavailable();
-            }
-
-            if (str_contains($e->getMessage(), 'Invalid credentials')) {
-                throw OceanExpertAuthenticationException::invalidCredentials();
-            }
-
-            throw OceanExpertAuthenticationException::apiError($e->getMessage());
+            throw $wrapped;
         }
     }
 
@@ -87,6 +75,42 @@ class OceanExpertAuthStrategy implements AuthenticationStrategyInterface
     {
         return isset($credentials['email'], $credentials['password'])
             && ! isset($credentials['socialite_user']);
+    }
+
+    /**
+     * Fetch the Ocean Expert profile, translating "not found" into a domain exception
+     *
+     * @return array<string, mixed>
+     *
+     * @throws OceanExpertAuthenticationException
+     */
+    private function fetchProfile(string $email): array
+    {
+        try {
+            return $this->searchService->searchUserByEmail($email);
+        } catch (RuntimeException) {
+            throw OceanExpertAuthenticationException::userNotFound($email);
+        }
+    }
+
+    /**
+     * Log failures caused by Ocean Expert or by us, not by the user.
+     *
+     * User errors (wrong password, unknown account) are already logged as a
+     * warning by AuthenticationService::logAuthenticationFailure(); repeating
+     * them here would duplicate the audit trail.
+     */
+    private function logOperationalFailure(OceanExpertAuthenticationException $e, string $email): void
+    {
+        if (! $e->isOperationalError()) {
+            return;
+        }
+
+        Log::channel('auth')->log($e->logLevel(), 'Ocean Expert authentication failed', [
+            'email' => $email,
+            'reason' => $e->reason(),
+            ...$e->context(),
+        ]);
     }
 
     /**

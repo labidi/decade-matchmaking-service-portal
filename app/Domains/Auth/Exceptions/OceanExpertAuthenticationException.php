@@ -7,27 +7,53 @@ namespace App\Domains\Auth\Exceptions;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class OceanExpertAuthenticationException extends Exception
 {
+    public const LEVEL_WARNING = 'warning';
+
+    public const LEVEL_ERROR = 'error';
+
+    /**
+     * @param  string  $reason  Machine-readable failure reason (credentials_invalid, service_unavailable, ...)
+     * @param  array<string, mixed>  $context  Diagnostic context safe to write to the auth log
+     * @param  string  $logLevel  PSR-3 level the caller should log this failure at
+     */
     public function __construct(
         string $message,
-        private readonly ?string $context = null
+        private readonly string $reason,
+        private readonly array $context = [],
+        private readonly string $logLevel = self::LEVEL_WARNING,
     ) {
         parent::__construct($message);
     }
 
-    /**
-     * Report the exception with context
-     */
-    public function report(): void
+    public function reason(): string
     {
-        Log::channel('auth')->warning('Ocean Expert authentication failed', [
-            'message' => $this->getMessage(),
-            'context' => $this->context,
-            'ip' => request()->ip(),
-        ]);
+        return $this->reason;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function context(): array
+    {
+        return $this->context;
+    }
+
+    public function logLevel(): string
+    {
+        return $this->logLevel;
+    }
+
+    /**
+     * Whether this failure indicates a problem on our side or Ocean Expert's side,
+     * as opposed to a user error such as a wrong password.
+     */
+    public function isOperationalError(): bool
+    {
+        return $this->logLevel === self::LEVEL_ERROR;
     }
 
     /**
@@ -42,7 +68,7 @@ class OceanExpertAuthenticationException extends Exception
     }
 
     /**
-     * Invalid credentials provided
+     * Invalid credentials provided (4xx from Ocean Expert or an error payload)
      */
     public static function invalidCredentials(): self
     {
@@ -53,24 +79,46 @@ class OceanExpertAuthenticationException extends Exception
     }
 
     /**
-     * Ocean Expert service is unavailable
+     * Ocean Expert service returned a 5xx response
      */
-    public static function serviceUnavailable(): self
+    public static function serviceUnavailable(?int $status = null, ?string $body = null): self
     {
+        $context = array_filter([
+            'status' => $status,
+            'body' => $body === null ? null : Str::limit($body, 500),
+        ], static fn ($value) => $value !== null);
+
         return new self(
             'Ocean Expert authentication service is currently unavailable',
-            'service_unavailable'
+            'service_unavailable',
+            $context,
+            self::LEVEL_ERROR
         );
     }
 
     /**
-     * Ocean Expert API error
+     * Ocean Expert responded successfully but with an unusable payload
+     */
+    public static function invalidResponse(string $detail): self
+    {
+        return new self(
+            'Ocean Expert returned an unexpected response',
+            'invalid_response',
+            ['detail' => $detail],
+            self::LEVEL_ERROR
+        );
+    }
+
+    /**
+     * Ocean Expert API error (unexpected failure while talking to Ocean Expert)
      */
     public static function apiError(string $message): self
     {
         return new self(
             "Ocean Expert API error: {$message}",
-            'api_error'
+            'api_error',
+            [],
+            self::LEVEL_ERROR
         );
     }
 

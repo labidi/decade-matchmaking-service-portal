@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Domains\Auth\Services;
 
-use Exception;
+use App\Domains\Auth\Exceptions\OceanExpertAuthenticationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class OceanExpertAuthService
@@ -17,9 +15,14 @@ class OceanExpertAuthService
     /**
      * Attempt to authenticate against the OceanExpert API.
      *
-     * @return array Returns ['token' => string, 'user' => array]
+     * This class is a thin HTTP wrapper: it does not log. Failures are reported
+     * through typed exceptions carrying whatever diagnostic context the caller
+     * needs to log (HTTP status, truncated body, ...).
      *
-     * @throws Exception on network or auth failure
+     * @return array{token: string, user: array{email: string, password: string}}
+     *
+     * @throws RuntimeException when the auth URL is not configured
+     * @throws OceanExpertAuthenticationException on any auth or transport failure
      */
     public function authenticate(string $email, string $password): array
     {
@@ -32,36 +35,28 @@ class OceanExpertAuthService
             'username' => $email,
             'password' => $password,
         ]);
-        $this->getLogger()->info('OceanExpert auth response', ['status' => $response->status(), 'body' => $response->body()]);
 
         if ($response->serverError()) {
-            $this->getLogger()->error('OceanExpert auth server error', ['status' => $response->status(), 'body' => $response->body()]);
-            throw new Exception('Authentication service is currently unavailable. Please try again later.');
-        }
-
-        if ($response->failed()) {
-            $message = Arr::get($response->json(), 'error.message', 'Invalid credentials provided.');
-            throw new Exception($message);
+            throw OceanExpertAuthenticationException::serviceUnavailable($response->status(), $response->body());
         }
 
         $data = $response->json();
-        if (isset($data['error'])) {
-            throw new Exception(Arr::get($data, 'error.message', 'Invalid credentials provided.'));
+
+        if ($response->failed() || (is_array($data) && isset($data['error']))) {
+            throw OceanExpertAuthenticationException::invalidCredentials();
         }
+
         $token = Arr::get($data, 'token');
-        if (! $token || ! is_string($token)) {
-            throw new Exception('Authentication service did not return a valid token.');
+        if (! is_string($token) || $token === '') {
+            throw OceanExpertAuthenticationException::invalidResponse('token missing from response');
         }
-        $user = [
-            'password' => $password,
-            'email' => $email,
+
+        return [
+            'token' => $token,
+            'user' => [
+                'email' => $email,
+                'password' => $password,
+            ],
         ];
-
-        return ['token' => $token, 'user' => $user];
-    }
-
-    private function getLogger(): LoggerInterface
-    {
-        return Log::channel('auth');
     }
 }
