@@ -243,16 +243,6 @@ export default function Show({ opportunity }: Readonly<ShowPageProps>) {
                                     <DetailRow label="Location">{locations.join(', ')}</DetailRow>
                                 )}
                                 <DetailRow label="Status">{opportunity.status.label}</DetailRow>
-                                {opportunity.url && (
-                                    <DetailRow label="Website">
-                                        <ExternalLink
-                                            href={opportunity.url}
-                                            className="inline-flex max-w-full items-center gap-1 break-all text-firefly-700 hover:underline dark:text-firefly-400"
-                                        >
-                                            {opportunity.url}
-                                        </ExternalLink>
-                                    </DetailRow>
-                                )}
                             </dl>
                         </div>
 
