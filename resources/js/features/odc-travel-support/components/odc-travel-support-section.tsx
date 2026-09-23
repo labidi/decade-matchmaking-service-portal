@@ -60,7 +60,7 @@ export default function ODCTravelSupportSection({ opportunities = [], formOption
                         ODC Travel Support
                     </h2>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                        Browse the ODC travel support opportunities currently open, or post one your organisation offers. Any signed-in user can upload an ODC travel support opportunity; you do not need to be a registered partner.
+                        Browse the ODC travel support opportunities currently open, or post one your organisation offers.
                     </p>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
