@@ -31,7 +31,7 @@ const FrontendLayout: React.FC<FrontendLayoutProps> = ({ children }) => {
                 <div>
                     <FlashMessages />
                 </div>
-                <div>
+                <div className="pt-4">
                     {actions && <ActionsBar actions={actions} />}
                 </div>
                 <div className="shadow rounded bg-white dark:bg-gray-800 p-4">
