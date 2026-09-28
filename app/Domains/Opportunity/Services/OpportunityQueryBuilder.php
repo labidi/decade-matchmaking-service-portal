@@ -19,8 +19,8 @@ class OpportunityQueryBuilder
         if (! empty($searchFilters['title'])) {
             $term = $searchFilters['title'];
             $query->where(function ($q) use ($term) {
-                $q->where('title', 'like', '%'.$term.'%')
-                    ->orWhere('key_words', 'like', '%'.$term.'%');
+                $q->where('title', 'like', '%'.$term.'%');
+                $this->orWhereKeyWordsLike($q, $term);
             });
         }
 
@@ -109,9 +109,19 @@ class OpportunityQueryBuilder
     {
         $query->where(function ($q) use ($searchTerm) {
             $q->where('title', 'like', '%'.$searchTerm.'%')
-                ->orWhere('summary', 'like', '%'.$searchTerm.'%')
-                ->orWhere('key_words', 'like', '%'.$searchTerm.'%');
+                ->orWhere('summary', 'like', '%'.$searchTerm.'%');
+            $this->orWhereKeyWordsLike($q, $searchTerm);
         });
+    }
+
+    /**
+     * `key_words` is a JSON column; MySQL compares JSON values as binary, so a
+     * plain LIKE is case-sensitive. Lower-case both sides to make it
+     * case-insensitive.
+     */
+    private function orWhereKeyWordsLike(Builder $query, string $term): Builder
+    {
+        return $query->orWhereRaw('LOWER(key_words) LIKE ?', ['%'.mb_strtolower($term).'%']);
     }
 
     /**
