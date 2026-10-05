@@ -1,1 +1,1 @@
-export type { RequestOffer, RequestOfferList, RequestOfferPermissions } from './offer.types';
+export type { RequestOffer, RequestOfferList } from './offer.types';

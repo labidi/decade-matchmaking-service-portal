@@ -11,6 +11,14 @@ export interface OpportunityPermissions {
     can_close?: boolean;
 }
 
+/** Opportunity status values as the API sends them (see App\Domains\Opportunity\Enums\Status). */
+export const OpportunityStatus = {
+    ACTIVE: '1',
+    CLOSED: '2',
+    REJECTED: '3',
+    PENDING_REVIEW: '4',
+} as const;
+
 export interface Opportunity {
     id: string;
     co_organizers: string[];
@@ -18,7 +26,8 @@ export interface Opportunity {
     type: { value: string; label: string };
     status: { value: string; label: string };
     closing_date: string;
-    coverage_activity: { value: string; label: string };
+    /** Null for opportunity types that do not collect it (e.g. ODC travel support). */
+    coverage_activity: { value: string; label: string } | null;
     implementation_location: Array<{ value: string; label: string }>;
     thematic_areas: Array<{ value: string; label: string }>;
     thematic_areas_other: string;
@@ -48,6 +57,7 @@ export interface OpportunityFormOptions {
     opportunity_types?: Array<{ value: string; label: string }>;
     coverage_activity?: Array<{ value: string; label: string }>;
     thematic_areas?: Array<{ value: string; label: string }>;
+    target_languages?: Array<{ value: string; label: string }>;
     yes_no?: Array<{ value: string; label: string }>;
 }
 

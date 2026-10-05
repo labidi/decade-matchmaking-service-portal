@@ -44,8 +44,11 @@ export interface OCDRequest {
         project_stage: string;
         project_url: string;
         related_activity: 'Training' | 'Workshop' | 'Both';
-        subthemes: Array<{ value: string; label: string }>;
-        subthemes_other: string;
+        decade_challenges: {
+            primary: { value: string; label: string } | null;
+            secondary: { value: string; label: string } | null;
+            tertiary: { value: string; label: string } | null;
+        };
         support_types: Array<{ value: string; label: string }>;
         support_types_other: string;
         gap_description: string;

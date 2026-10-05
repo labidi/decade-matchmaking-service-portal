@@ -8,6 +8,7 @@ export { FormProvider } from './form-provider';
 export { default as KeywordChip } from './KeywordChip';
 export { default as KeywordsField } from './KeywordsField';
 export { default as MultiSelectField } from './MultiSelectField';
+export { default as RankedChallengeField } from './RankedChallengeField';
 export { default as SelectField } from './SelectField';
 export { default as SignInForm } from './SignInForm';
 export { default as TagsInputField } from './tags-input-field';

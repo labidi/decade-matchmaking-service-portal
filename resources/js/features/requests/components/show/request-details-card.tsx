@@ -10,8 +10,40 @@ interface RequestDetailsCardProps {
     request: OCDRequest;
 }
 
+const RANKED_POS = ['Primary', 'Secondary', 'Tertiary'] as const;
+
+// Render the ranked decade_challenges object ({primary, secondary, tertiary} of {value,label}|null)
+const renderRankedChallenges = (value: any) => {
+    const ranks = ['primary', 'secondary', 'tertiary'] as const;
+    const entries = ranks
+        .map((rank, index) => ({rank: RANKED_POS[index], entry: value?.[rank]}))
+        .filter((r) => r.entry && (r.entry.label || r.entry.value));
+
+    if (entries.length === 0) {
+        return <span className="text-gray-400 dark:text-gray-500">None specified</span>;
+    }
+
+    return (
+        <div className="flex flex-wrap gap-2">
+            {entries.map(({rank, entry}) => (
+                <Badge key={rank} color="blue">
+                    {rank}: {entry.label || entry.value}
+                </Badge>
+            ))}
+        </div>
+    );
+};
+
+const isRankedChallenges = (value: any): boolean =>
+    !!value && typeof value === 'object' && !Array.isArray(value) &&
+    ('primary' in value || 'secondary' in value || 'tertiary' in value);
+
 // Helper function to render field values
 const renderFieldValue = (value: any, fieldKey: string) => {
+    if (isRankedChallenges(value)) {
+        return renderRankedChallenges(value);
+    }
+
     if (Array.isArray(value)) {
         if (value.length === 0) {
             return <span className="text-gray-400 dark:text-gray-500">None specified</span>;

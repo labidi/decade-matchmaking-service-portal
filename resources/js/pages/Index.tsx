@@ -1,56 +1,41 @@
-import {Head, Link} from '@inertiajs/react';
+import {Head} from '@inertiajs/react';
 import { FrontendLayout } from '@layouts/index';
 import PortalGuideSection from "@features/home/components/portal-guide-section";
+import DirectorySection from "@features/home/components/directory-section";
+import { ODCTravelSupportSection } from "@features/odc-travel-support";
 import {PortalGuide} from '@/types';
+import { Opportunity, OpportunityFormOptions } from '@features/opportunities/types';
 import { OrganizationsDialog, IOCPlatformsDialog } from '@features/settings';
 import React, {useState} from "react";
 
 
 interface IndexPageProps {
     portalGuide?: PortalGuide | null;
+    /** Active ODC travel support opportunities, sorted by closing date. Provided by the backend to signed-in users only (issue #218). */
+    odcTravelSupport?: Opportunity[];
+    /** Select options for the ODC travel support upload form. Provided by the backend (issue #218). */
+    formOptions?: OpportunityFormOptions;
 }
 
-export default function Index({portalGuide}: Readonly<IndexPageProps>) {
+export default function Index({portalGuide, odcTravelSupport, formOptions}: Readonly<IndexPageProps>) {
     const [showOrganizationsDialog, setShowOrganizationsDialog] = useState(false);
     const [showIOCPlatformsDialog, setShowIOCPlatformsDialog] = useState(false);
 
     return (
         <FrontendLayout>
             <Head title="Welcome"/>
-            {portalGuide && (
-                <PortalGuideSection portalGuide={portalGuide}/>
-            )}
-            <section id="features" className="py-20 px-4">
-                <div className="max-w-6xl mx-auto text-center">
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <Link
-                            href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                setShowOrganizationsDialog(true);
-                            }}
-                            className="p-12 bg-firefly-600 dark:bg-firefly-700 shadow hover:bg-firefly-700 dark:hover:bg-firefly-800 transition-colors cursor-pointer"
-                        >
-                            <h4 className="text-xl font-semibold mb-2 text-white">
-                                Click to view CDF Partners supporting capacity development through Ocean connector.<br/>
-                            </h4>
-                        </Link>
-                        <Link
-                            id="iocplatform"
-                            href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                setShowIOCPlatformsDialog(true);
-                            }}
-                            className="p-12 bg-firefly-600 dark:bg-firefly-700 shadow hover:bg-firefly-700 dark:hover:bg-firefly-800 transition-colors cursor-pointer"
-                        >
-                            <h4 className="text-xl font-semibold text-white mb-2">
-                                Click to view directory of IOC platforms supporting capacity development in ocean
-                                science </h4>
-                        </Link>
-                    </div>
-                </div>
-            </section>
+            <div className="space-y-9">
+                <ODCTravelSupportSection opportunities={odcTravelSupport} formOptions={formOptions} />
+
+                {portalGuide && (
+                    <PortalGuideSection portalGuide={portalGuide}/>
+                )}
+
+                <DirectorySection
+                    onShowOrganizations={() => setShowOrganizationsDialog(true)}
+                    onShowIOCPlatforms={() => setShowIOCPlatformsDialog(true)}
+                />
+            </div>
 
             <OrganizationsDialog
                 open={showOrganizationsDialog}

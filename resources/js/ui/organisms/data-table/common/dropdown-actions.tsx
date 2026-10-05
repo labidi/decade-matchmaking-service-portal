@@ -24,7 +24,7 @@ interface DropdownActionsProps {
  * Type guard to check if an action is an EntityAction
  */
 function isEntityAction(action: Action | EntityAction): action is EntityAction {
-    return 'route' in action && 'method' in action && 'style' in action;
+    return 'route' in action && 'method' in action;
 }
 
 /**
@@ -75,7 +75,7 @@ export function DropdownActions({ actions, onDialogOpen }: DropdownActionsProps)
             router.visit(action.route);
         } else {
             // For POST/PUT/PATCH/DELETE
-            router[method](action.route, {} as any, {
+            router[method](action.route, (action.data ?? {}) as any, {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {
@@ -92,8 +92,8 @@ export function DropdownActions({ actions, onDialogOpen }: DropdownActionsProps)
      * Render a dropdown item for an EntityAction
      */
     const renderEntityActionItem = (action: EntityAction) => {
-        const Icon = getIconComponent(action.style.icon);
-        const isDanger = action.style.color === 'red';
+        const Icon = action.style?.icon ? getIconComponent(action.style.icon) : null;
+        const isDanger = action.style?.color === 'red';
 
         return (
             <DropdownItem
@@ -101,7 +101,7 @@ export function DropdownActions({ actions, onDialogOpen }: DropdownActionsProps)
                 disabled={!action.enabled}
                 className={isDanger ? 'text-red-600 hover:bg-red-50' : undefined}
             >
-                <Icon data-slot="icon" />
+                {Icon && <Icon data-slot="icon" />}
                 {action.label}
             </DropdownItem>
         );

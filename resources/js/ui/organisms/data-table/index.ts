@@ -6,8 +6,6 @@ export * from './common';
 
 // Entity-specific data tables
 export { IOCPlatformsDataTable } from './ioc-platforms/ioc-platforms-data-table';
-export { NotificationPreferencesDataTable } from './notification-preferences/notification-preferences-data-table';
-export { PreferenceActionsDropdown } from './notification-preferences/preference-actions-dropdown';
 export { NotificationsDataTable } from './notifications/notifications-data-table';
 export { NotificationDialogView } from './notifications/notification-dialog-view';
 export { OffersDataTable } from './offers/offers-data-table';

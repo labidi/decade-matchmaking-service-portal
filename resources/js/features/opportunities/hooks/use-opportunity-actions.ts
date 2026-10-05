@@ -3,7 +3,7 @@ import {router, usePage} from '@inertiajs/react';
 import {Auth , Context} from '@/types';
 import {Action} from '@ui/organisms/data-table/common';
 import {OpportunityActionService} from '../services/opportunity.service';
-import { Opportunity } from '../types';
+import { Opportunity, OpportunityStatus } from '../types';
 import {useConfirmation, useDeleteConfirmation} from '@ui/organisms/confirmation';
 
 export function useOpportunityActions(context: Context , showRouteName : string) {
@@ -79,7 +79,7 @@ export function useOpportunityActions(context: Context , showRouteName : string)
             actions.push({
                 key: 'reject',
                 label: 'Reject Opportunity',
-                onClick: () => handleUpdateStatus(opportunity,'3'),
+                onClick: () => handleUpdateStatus(opportunity, OpportunityStatus.REJECTED),
                 divider: actions.length > 0,
             });
         }
@@ -87,7 +87,7 @@ export function useOpportunityActions(context: Context , showRouteName : string)
             actions.push({
                 key: 'approve',
                 label: 'Approve Opportunity',
-                onClick: () => handleUpdateStatus(opportunity,'1'),
+                onClick: () => handleUpdateStatus(opportunity, OpportunityStatus.ACTIVE),
                 divider: actions.length > 0,
             });
         }
@@ -95,7 +95,7 @@ export function useOpportunityActions(context: Context , showRouteName : string)
             actions.push({
                 key: 'close',
                 label: 'Close Opportunity',
-                onClick: () => handleUpdateStatus(opportunity , '2'),
+                onClick: () => handleUpdateStatus(opportunity, OpportunityStatus.CLOSED),
                 divider: actions.length > 0,
             });
         }

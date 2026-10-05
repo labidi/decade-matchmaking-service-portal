@@ -1,5 +1,11 @@
 import {UIStep} from '@/types';
 
+/** Opportunity type value for Ocean Decade Conference (ODC) travel support. Defined here to avoid a circular import with the ODC feature config. */
+export const ODC_TRAVEL_SUPPORT_TYPE = 'odc-travel-support';
+
+/** Fields that are not asked for ODC travel support opportunities. */
+const isNotODCTravelSupport = (data: { type?: string }) => data.type !== ODC_TRAVEL_SUPPORT_TYPE;
+
 export const opportunityFormFields: UIStep[] = [
     {
         label: 'Basic Info',
@@ -31,6 +37,7 @@ export const opportunityFormFields: UIStep[] = [
                 type: 'multiselect',
                 required: true,
                 label: 'Thematic Areas',
+                show: isNotODCTravelSupport,
                 description: 'If your area is not listed, select “Other” and use the Three Keywords question to describe it, or to further specify the selected areas.\n' +
                     'Multiple choice (select all that apply):',
                 // options should be provided by the parent component from backend
@@ -40,7 +47,7 @@ export const opportunityFormFields: UIStep[] = [
                 type: 'text',
                 required: false,
                 label: 'Please specify the areas',
-                show: data => data.thematic_areas?.includes('other')
+                show: data => isNotODCTravelSupport(data) && data.thematic_areas?.includes('other')
                 // options should be provided by the parent component from backend
             },
             closing_date: {
@@ -54,12 +61,14 @@ export const opportunityFormFields: UIStep[] = [
                 type: 'select',
                 required: true,
                 label: 'Coverage of CD Activity',
+                show: isNotODCTravelSupport,
             },
             implementation_location: {
                 id: 'implementation_location',
                 type: 'multiselect',
                 required: true,
                 label: 'Implementation Location',
+                show: isNotODCTravelSupport,
                 // options will be set dynamically based on coverage_activity
             },
             target_audience: {
@@ -81,6 +90,7 @@ export const opportunityFormFields: UIStep[] = [
                 type: 'multiselect',
                 required: true,
                 label: 'Language of participation',
+                show: isNotODCTravelSupport,
                 // options will be provided by the parent component from FormOptions
             },
             target_languages_other: {
@@ -88,7 +98,7 @@ export const opportunityFormFields: UIStep[] = [
                 type: 'text',
                 required: false,
                 label: 'Please specify the Language of participation',
-                show: data => data.target_languages?.includes('other')
+                show: data => isNotODCTravelSupport(data) && data.target_languages?.includes('other')
             },
             summary: {
                 id: 'summary',

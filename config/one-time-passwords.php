@@ -63,7 +63,7 @@ return [
      * The notification used to send a one-time password to a user.
      * Using our custom notification that integrates with Mandrill.
      */
-    'notification' => App\Notifications\Auth\OneTimePasswordNotification::class,
+    'notification' => App\Domains\Auth\Notifications\OneTimePasswordNotification::class,
 
     /*
      * These class are responsible for performing core tasks regarding one-time passwords.

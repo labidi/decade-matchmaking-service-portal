@@ -3,6 +3,7 @@ export { default as CardGuide } from './card-guide';
 export { default as CardLink } from './card-link';
 export { default as SectionTitle } from './section-title';
 export { default as PortalGuideSection } from './portal-guide-section';
+export { default as DirectorySection } from './directory-section';
 
 // Action components
 export { default as ActionCard } from './action-card';

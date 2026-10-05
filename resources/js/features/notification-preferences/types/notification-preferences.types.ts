@@ -1,58 +1,42 @@
-export type NotificationEntityType = 'request' | 'opportunity';
+import { PageProps } from '@/types/index';
 
-import { PageProps } from "@/types/index";
+/**
+ * Notification entity types supported by the toggle-based preference system.
+ */
+export type NotificationEntityType = 'opportunity' | 'request';
 
-// Simplified notification preference interface
-export interface UserNotificationPreference {
-    id: number;
-    user_id: number;
-    entity_type: NotificationEntityType;
-    attribute_type: 'subtheme' | 'type';  // Fixed based on entity_type
-    attribute_value: string;
-    attribute_label?: string;  // Human-readable label
-    email_notification_enabled: boolean;
-    created_at: string;
-    updated_at: string;
+/**
+ * A single togglable notification option (one taxonomy value).
+ */
+export interface NotificationOption {
+    value: string;
+    label: string;
+    enabled: boolean;
 }
 
-// Simplified form data for creating preferences
-export interface NotificationPreferenceFormData {
-    entity_type: NotificationEntityType;
-    attribute_value: string;  // subtheme or type value
-    email_notification_enabled: boolean;
+/**
+ * Opt-out notification settings returned by the backend.
+ *
+ * - `opportunity` is always present (all users).
+ * - `request` is present only for partners; `null` otherwise.
+ */
+export interface NotificationSettings {
+    master_enabled: boolean;
+    opportunity: NotificationOption[];
+    request: NotificationOption[] | null;
 }
 
-// Simplified pagination interface
-export interface NotificationPreferencesPagination {
-    current_page: number;
-    last_page: number;
-    links: Array<{
-        active: boolean;
-        label: string;
-        url: string;
-    }>;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-    from: number;
-    to: number;
-    total: number;
-    per_page: number;
-    data: UserNotificationPreference[];
-}
-
-// Simplified page props
-export interface NotificationPreferencesPagePropsWithPagination extends PageProps {
-    preferences: NotificationPreferencesPagination;
-    availableOptions: {
-        request?: {
-            subtheme?: Array<{value: string, label: string}>;
-        };
-        opportunity?: {
-            type?: Array<{value: string, label: string}>;
-        };
+/**
+ * Page props for the notification preferences List page.
+ */
+export interface NotificationPreferencesPageProps extends PageProps {
+    settings: NotificationSettings;
+    title?: string;
+    banner?: {
+        title: string;
+        description: string;
+        image?: string;
     };
-    attributeTypes: Record<string, string>;
-    entityTypes: Record<NotificationEntityType, string>;
 }
 
 // Entity type constants

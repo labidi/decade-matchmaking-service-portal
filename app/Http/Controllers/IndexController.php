@@ -2,52 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\SettingsService;
-use App\Services\OpportunityService;
-use App\Http\Resources\OpportunityResource;
+use App\Domains\Opportunity\Enums\Type;
+use App\Domains\Opportunity\Resources\OpportunityResource;
+use App\Domains\Opportunity\Services\OpportunityService;
+use App\Domains\Settings\Models\Setting;
+use App\Domains\Settings\Services\SettingsService;
+use App\Shared\Enums\TargetAudience;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Setting;
 
 class IndexController extends Controller
 {
-
     public function __construct(
         private readonly SettingsService $settingsService,
         private readonly OpportunityService $opportunityService
-    ) {
-    }
+    ) {}
 
     /**
      * @throws \Throwable
      */
-    public function __invoke()
+    public function __invoke(Request $request)
     {
         $recentOpportunities = $this->opportunityService->getRecentActiveOpportunities(200);
 
+        // ODC travel support rows are only for signed-in users: the list/show routes are
+        // auth-only and the home section merely blurs placeholders for guests.
+        $odcTravelSupport = $request->user()
+            ? $this->opportunityService
+                ->getActiveOpportunitiesByType(Type::ODC_TRAVEL_SUPPORT)
+                ->toResourceCollection(OpportunityResource::class)
+            : [];
+
         return Inertia::render('Index', [
             'title' => 'Welcome',
-            'description' => "",
+            'description' => '',
             'banner' => [
                 'title' => 'Connect for a Sustainable Ocean',
-                'description' => "The Ocean Decade Capacity Development Platform",
-                'image' => '/assets/img/sidebar.png'
+                'description' => 'The Ocean Decade Capacity Development Platform',
+                'image' => '/assets/img/sidebar.png',
             ],
             'YoutubeEmbed' => [
-                'src' => $this->settingsService->getSetting(setting::HOMEPAGE_YOUTUBE_VIDEO),
-                'title' => 'Connect for a Sustainable Ocean'
+                'src' => $this->settingsService->getSetting(Setting::HOMEPAGE_YOUTUBE_VIDEO),
+                'title' => 'Connect for a Sustainable Ocean',
             ],
             'portalGuide' => [
                 'description' => 'A user guide to help you navigate the platform.',
-                'url' => $this->settingsService->getSetting(setting::PORTAL_GUIDE),
+                'url' => $this->settingsService->getSetting(Setting::PORTAL_GUIDE),
             ],
             'metrics' => [
-                'number_of_open_partner_opportunities' => $this->settingsService->getSetting(setting::OPEN_PARTNER_OPPORTUNITIES_METRIC) ?? 0,
-                'number_successful_matches' =>  $this->settingsService->getSetting(setting::SUCCESSFUL_MATCHES_METRIC) ?? 0,
-                'number_fully_closed_matches' => $this->settingsService->getSetting(setting::FULLY_CLOSED_MATCHES_METRIC) ?? 0,
-                'number_user_requests_in_implementation' => $this->settingsService->getSetting(setting::REQUEST_IN_IMPLEMENTATION_METRIC) ?? 0,
-                'committed_funding_amount' => $this->settingsService->getSetting(setting::COMMITTED_FUNDING_METRIC) ?? 0,
+                'number_of_open_partner_opportunities' => $this->settingsService->getSetting(Setting::OPEN_PARTNER_OPPORTUNITIES_METRIC) ?? 0,
+                'number_successful_matches' => $this->settingsService->getSetting(Setting::SUCCESSFUL_MATCHES_METRIC) ?? 0,
+                'number_fully_closed_matches' => $this->settingsService->getSetting(Setting::FULLY_CLOSED_MATCHES_METRIC) ?? 0,
+                'number_user_requests_in_implementation' => $this->settingsService->getSetting(Setting::REQUEST_IN_IMPLEMENTATION_METRIC) ?? 0,
+                'committed_funding_amount' => $this->settingsService->getSetting(Setting::COMMITTED_FUNDING_METRIC) ?? 0,
             ],
             'recentOpportunities' => $recentOpportunities->toResourceCollection(OpportunityResource::class),
+            'odcTravelSupport' => $odcTravelSupport,
+            'formOptions' => [
+                'target_audience' => TargetAudience::getOptions(),
+            ],
         ]);
     }
 }

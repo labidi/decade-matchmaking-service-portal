@@ -1,17 +1,24 @@
 <?php
 
-use App\Http\Controllers\Opportunities\DestroyController as OpportunityDestroyController;
-use App\Http\Controllers\Opportunities\ExportController as OpportunityExportController;
-use App\Http\Controllers\Opportunities\ExtendController;
-use App\Http\Controllers\Opportunities\FormController;
-use App\Http\Controllers\Opportunities\ListController;
-use App\Http\Controllers\Opportunities\ShowController;
-use App\Http\Controllers\Opportunities\UpdateStatusController as OpportunityUpdateStatusController;
+use App\Domains\Opportunity\Controllers\DestroyController as OpportunityDestroyController;
+use App\Domains\Opportunity\Controllers\ExportController as OpportunityExportController;
+use App\Domains\Opportunity\Controllers\ExtendController;
+use App\Domains\Opportunity\Controllers\FormController;
+use App\Domains\Opportunity\Controllers\ListController;
+use App\Domains\Opportunity\Controllers\OdcTravelSupportController;
+use App\Domains\Opportunity\Controllers\RedirectController;
+use App\Domains\Opportunity\Controllers\ShowController;
+use App\Domains\Opportunity\Controllers\UpdateStatusController as OpportunityUpdateStatusController;
+use App\Domains\Opportunity\Models\Opportunity;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('opportunity/list', ListController::class)->name('opportunity.list');
     Route::get('opportunity/show/{opportunity}', ShowController::class)->name('opportunity.show');
+    // Any signed-in user may submit an ODC travel support opportunity (issue #218).
+    Route::post('opportunity/odc-travel-support/submit', OdcTravelSupportController::class)
+        ->name('opportunity.odc-travel-support.submit');
 });
 
 Route::middleware(['auth', 'role:partner'])->prefix('me')->group(function () {
@@ -39,14 +46,14 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('opportunity/export/csv', OpportunityExportController::class)->name('admin.opportunity.export.csv');
 });
 
-Route::get('go/opportunity/{identifier}', function (\Illuminate\Http\Request $request, string $identifier) {
+Route::get('go/opportunity/{identifier}', function (Request $request, string $identifier) {
     $opportunity = ctype_digit($identifier)
-        ? \App\Models\Opportunity::find($identifier)
-        : \App\Models\Opportunity::where('public_id', $identifier)->first();
+        ? Opportunity::find($identifier)
+        : Opportunity::where('public_id', $identifier)->first();
 
     abort_unless($opportunity !== null, 404);
 
-    return app(\App\Http\Controllers\Opportunities\RedirectController::class)($request, $opportunity);
+    return app(RedirectController::class)($request, $opportunity);
 })
     ->middleware('throttle:60,1')
     ->name('opportunity.go');

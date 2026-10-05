@@ -11,7 +11,7 @@ interface RequestFormOptions {
     delivery_countries?: Array<{ value: string; label: string }>;
     regions?: Array<{ value: string; label: string }>;
     oceans?: Array<{ value: string; label: string }>;
-    subthemes?: Array<{ value: string; label: string }>;
+    decade_challenges?: Array<{ value: string; label: string }>;
     support_types?: Array<{ value: string; label: string }>;
     target_audience?: Array<{ value: string; label: string }>;
     target_languages?: Array<{ value: string; label: string }>;
@@ -28,7 +28,7 @@ type Id = '';
 function getOptionsKey(fieldKey: string): string | null {
     const keyMap: Record<string, string> = {
         'delivery_countries': 'delivery_countries',
-        'subthemes': 'subthemes',
+        'decade_challenges': 'decade_challenges',
         'support_types': 'support_types',
         'target_audience': 'target_audience',
         'target_languages': 'target_languages',

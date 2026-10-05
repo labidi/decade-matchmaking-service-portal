@@ -1,24 +1,29 @@
 <?php
 
-use App\Http\Controllers\Admin\SubscriptionController;
-use App\Http\Controllers\Admin\SystemNotificationsController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DocumentsController;
+use App\Domains\Document\Controllers\DocumentsController;
+use App\Domains\Notification\Controllers\Admin\SubscriptionController;
+use App\Domains\Notification\Controllers\Admin\SystemNotificationsController;
+use App\Domains\Notification\Controllers\SubscriptionController as UserSubscriptionController;
+use App\Domains\Notification\Controllers\UnsubscribeController;
+use App\Domains\ReferenceData\Controllers\IOCPlatformsController;
+use App\Domains\ReferenceData\Controllers\OrganizationsController;
+use App\Domains\Settings\Controllers\SettingsController;
+use App\Domains\User\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\IndexController;
 use App\Http\Controllers\UserGuideController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', \App\Http\Controllers\IndexController::class)->name('index');
-Route::get('organizations', [\App\Http\Controllers\OrganizationsController::class, 'index'])->name('organizations.index');
-Route::get('ioc-platforms', [\App\Http\Controllers\IOCPlatformsController::class, 'index'])->name('ioc-platforms.index');
+Route::get('/', IndexController::class)->name('index');
+Route::get('organizations', [OrganizationsController::class, 'index'])->name('organizations.index');
+Route::get('ioc-platforms', [IOCPlatformsController::class, 'index'])->name('ioc-platforms.index');
 
 // Email Unsubscribe routes (public - no auth required for email links)
 
 Route::prefix('unsubscribe')->group(function () {
-    Route::get('{user}', [\App\Http\Controllers\UnsubscribeController::class, 'show'])->name('unsubscribe.show');
-    Route::post('{user}', [\App\Http\Controllers\UnsubscribeController::class, 'unsubscribe'])->name('unsubscribe.process');
-    Route::get('{user}/success', [\App\Http\Controllers\UnsubscribeController::class, 'success'])->name('unsubscribe.success');
+    Route::get('{user}', [UnsubscribeController::class, 'show'])->name('unsubscribe.show');
+    Route::post('{user}', [UnsubscribeController::class, 'unsubscribe'])->name('unsubscribe.process');
+    Route::get('{user}/success', [UnsubscribeController::class, 'success'])->name('unsubscribe.success');
 });
 
 // Access denied route for direct navigation
@@ -37,10 +42,10 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:user'])->group(function () {
 
     // User subscription routes
-    Route::get('subscriptions', [\App\Http\Controllers\SubscriptionController::class, 'index'])->name('user.subscriptions.index');
-    Route::post('subscriptions/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('user.subscriptions.subscribe');
-    Route::post('subscriptions/unsubscribe', [\App\Http\Controllers\SubscriptionController::class, 'unsubscribe'])->name('user.subscriptions.unsubscribe');
-    Route::get('subscriptions/status', [\App\Http\Controllers\SubscriptionController::class, 'status'])->name('user.subscriptions.status');
+    Route::get('subscriptions', [UserSubscriptionController::class, 'index'])->name('user.subscriptions.index');
+    Route::post('subscriptions/subscribe', [UserSubscriptionController::class, 'subscribe'])->name('user.subscriptions.subscribe');
+    Route::post('subscriptions/unsubscribe', [UserSubscriptionController::class, 'unsubscribe'])->name('user.subscriptions.unsubscribe');
+    Route::get('subscriptions/status', [UserSubscriptionController::class, 'status'])->name('user.subscriptions.status');
     Route::post('offer/{id}/document', [DocumentsController::class, 'storeOfferDocument'])->name(
         'user.offer.document.store'
     );
@@ -79,9 +84,9 @@ Route::prefix('guide')->group(function () {
     Route::get('platform-guide.pdf', [UserGuideController::class, 'download'])->name('user.guide');
 });
 
-require_once __DIR__.'/user.php';
-require_once __DIR__.'/auth.php';
-require_once __DIR__.'/request.php';
-require_once __DIR__.'/opportunity.php';
-require_once __DIR__.'/offer.php';
-require_once __DIR__.'/notification-preferences.php';
+require __DIR__.'/user.php';
+require __DIR__.'/auth.php';
+require __DIR__.'/request.php';
+require __DIR__.'/opportunity.php';
+require __DIR__.'/offer.php';
+require __DIR__.'/notification-preferences.php';

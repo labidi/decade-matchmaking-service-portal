@@ -5,7 +5,6 @@ import {RequestOfferList, PaginationLinkProps} from '@/types';
 import {OffersDataTable} from '@ui/organisms/data-table/offers';
 import {PlusIcon} from '@heroicons/react/16/solid';
 import {PageHeader} from "@ui/molecules/page-header";
-import {useOfferActions} from '@features/offers/hooks';
 
 interface OffersPagination {
     current_page: number;
@@ -43,11 +42,6 @@ export default function OffersList({
                                        currentSearch = {},
                                        searchFieldsOptions = {}
                                    }: Readonly<OffersListPageProps>) {
-    // Use the new offer actions hook
-    const {
-        getActionsForOffer,
-    } = useOfferActions('admin');
-
     return (
         <SidebarLayout>
             <Head title="Manage Offers"/>
@@ -71,7 +65,6 @@ export default function OffersList({
                         currentSort={currentSort}
                         currentSearch={currentSearch}
                         routeName={routeName}
-                        getActionsForOffer={getActionsForOffer}
                         pagination={{
                             current_page: offers.current_page,
                             last_page: offers.last_page,

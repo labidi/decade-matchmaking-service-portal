@@ -3,7 +3,7 @@
 // Pure functions and utilities used throughout the application
 
 export { cn } from './cn';
-export { formatDate } from './date-formatter';
+export { formatDate, formatDateShort, formatDateOnly } from './date-formatter';
 export {
     opportunityStatusBadgeRenderer,
     requestStatusBadgeRenderer,

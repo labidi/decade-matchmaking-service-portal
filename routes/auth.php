@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Auth\OtpController;
-use App\Http\Controllers\Auth\SessionController;
-use App\Http\Controllers\Auth\SocialController;
-use App\Http\Controllers\InvitationAcceptController;
+use App\Domains\Auth\Controllers\OtpController;
+use App\Domains\Auth\Controllers\SessionController;
+use App\Domains\Auth\Controllers\SocialController;
+use App\Domains\User\Controllers\InvitationAcceptController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {

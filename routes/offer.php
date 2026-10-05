@@ -1,16 +1,17 @@
 <?php
-use App\Http\Controllers\Offer\AcceptOfferController;
-use App\Http\Controllers\Offer\ClarificationRequestController;
-use App\Http\Controllers\Offer\DeleteDocumentController;
-use App\Http\Controllers\Offer\DestroyController;
-use App\Http\Controllers\Offer\DownloadDocumentController;
-use App\Http\Controllers\Offer\FormController;
-use App\Http\Controllers\Offer\ListController;
-use App\Http\Controllers\Offer\ShowController;
-use App\Http\Controllers\Offer\StoreController;
-use App\Http\Controllers\Offer\UpdateController;
-use App\Http\Controllers\Offer\UpdateStatusController;
-use App\Http\Controllers\Offer\UploadDocumentController;
+
+use App\Domains\Offer\Controllers\AcceptOfferController;
+use App\Domains\Offer\Controllers\ClarificationRequestController;
+use App\Domains\Offer\Controllers\DeleteDocumentController;
+use App\Domains\Offer\Controllers\DestroyController;
+use App\Domains\Offer\Controllers\DownloadDocumentController;
+use App\Domains\Offer\Controllers\FormController;
+use App\Domains\Offer\Controllers\ListController;
+use App\Domains\Offer\Controllers\ShowController;
+use App\Domains\Offer\Controllers\StoreController;
+use App\Domains\Offer\Controllers\UpdateController;
+use App\Domains\Offer\Controllers\UpdateStatusController;
+use App\Domains\Offer\Controllers\UploadDocumentController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(function () {

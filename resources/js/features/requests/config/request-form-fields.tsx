@@ -145,21 +145,14 @@ export const requestFormFields: UIStep[] = [
                   label: 'Please specify the other target language(s)',
                   show: data => data.target_languages?.includes('other'),
               },
-              subthemes: {
-                  id: 'subthemes',
-                  type: 'checkbox-group',
+              decade_challenges: {
+                  id: 'decade_challenges',
+                  type: 'ranked-challenge',
                   required: true,
-                  label: 'Which sub-theme(s) of the Capacity Development Facility priorities does your request fall under?',
-                  image : '/assets/img/cdf_subthemes.svg',
-                  description: 'Please review the umbrella theme carefully before selecting the corresponding sub-themes.',
-                  // Options should be provided via formOptions.subthemes from page props
+                  label: 'Please rank up to three Decade Challenges that this particular request addresses, in order of relevance (primary, secondary, tertiary).',
+                  description: 'While your overall programme may be broader, select only the Challenges relevant to this specific request.',
+                  // Options should be provided via formOptions.decade_challenges from page props
               },
-            subthemes_other: {
-                id: 'subthemes_other',
-                type: 'textarea',
-                required: true,
-                show: data => data.subthemes?.includes('other'),
-            },
             support_types: {
                 id: 'support_types',
                 type: 'checkbox-group',
