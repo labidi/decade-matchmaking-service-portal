@@ -11,6 +11,12 @@ try {
     Breadcrumbs::for('user.home', function (BreadcrumbTrail $trail) {
         $trail->push('Home', route('user.home'));
     });
+    if (\Illuminate\Support\Facades\Route::has('admin.sample-data.index')) {
+        Breadcrumbs::for('admin.sample-data.index', function (BreadcrumbTrail $trail) {
+            $trail->parent('admin.dashboard.index');
+            $trail->push('Sample data', route('admin.sample-data.index'));
+        });
+    }
 
     // Offer Breadcrumbs section
     Breadcrumbs::for('admin.offer.list', function (BreadcrumbTrail $trail) {

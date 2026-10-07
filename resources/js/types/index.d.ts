@@ -121,6 +121,10 @@ export interface SharedData {
 
     unread_notifications?: number;
     navigation?: NavigationConfig;
+    devTools?: {
+        /** True only for administrators on local/staging, where the sample-data route exists. */
+        sampleData: boolean;
+    };
 
     [key: string]: unknown;
 }

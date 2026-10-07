@@ -9,9 +9,11 @@ use App\Domains\ReferenceData\Controllers\IOCPlatformsController;
 use App\Domains\ReferenceData\Controllers\OrganizationsController;
 use App\Domains\Settings\Controllers\SettingsController;
 use App\Domains\User\Controllers\DashboardController;
+use App\Http\Controllers\Admin\SampleDataController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\UserGuideController;
+use Database\Seeders\SampleDataSeeder;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', IndexController::class)->name('index');
@@ -78,6 +80,12 @@ Route::middleware(['auth', 'role:administrator'])->prefix('admin')->group(functi
     Route::get('notifications/{notification}/read', [SystemNotificationsController::class, 'markAsRead'])->name(
         'admin.notifications.read'
     );
+
+    // Developer tool: reset the database to a fake dataset (local / staging only).
+    if (SampleDataSeeder::isAllowedEnvironment()) {
+        Route::get('sample-data', [SampleDataController::class, 'index'])->name('admin.sample-data.index');
+        Route::post('sample-data', [SampleDataController::class, 'run'])->name('admin.sample-data.run');
+    }
 });
 
 Route::prefix('guide')->group(function () {

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Domains\User\Resources\UserResource;
 use App\Shared\Support\NavigationService;
+use Database\Seeders\SampleDataSeeder;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,9 @@ class HandleInertiaRequests extends Middleware
                 'info' => $request->session()->get('info'),
             ],
             'breadcrumbs' => Breadcrumbs::generate(Route::currentRouteName()),
+            'devTools' => [
+                'sampleData' => SampleDataSeeder::isAllowedEnvironment() && (bool) $user?->hasRole('administrator'),
+            ],
         ];
     }
 }

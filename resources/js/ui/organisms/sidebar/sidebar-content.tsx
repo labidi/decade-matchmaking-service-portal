@@ -18,11 +18,17 @@ import {
     PresentationChartBarIcon,
     UserIcon,
     TagIcon,
-    EnvelopeIcon
+    EnvelopeIcon,
+    BeakerIcon
 } from '@heroicons/react/16/solid'
+import { usePage } from '@inertiajs/react'
+import type { SharedData } from '@/types'
 
 
 export function SidebarContent() {
+    const { devTools } = usePage<SharedData>().props
+    const showSampleData = devTools?.sampleData === true
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -69,6 +75,12 @@ export function SidebarContent() {
                         <Cog6ToothIcon/>
                         <SidebarLabel>Request subscriptions</SidebarLabel>
                     </SidebarItem>
+                    {showSampleData && (
+                        <SidebarItem href={route('admin.sample-data.index')}>
+                            <BeakerIcon/>
+                            <SidebarLabel>Sample data</SidebarLabel>
+                        </SidebarItem>
+                    )}
                 </SidebarSection>
             </SidebarBody>
             <SidebarFooter>
