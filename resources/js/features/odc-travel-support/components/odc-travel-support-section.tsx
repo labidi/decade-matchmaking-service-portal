@@ -54,14 +54,26 @@ export default function ODCTravelSupportSection({ opportunities = [], formOption
     return (
         <section id="odc-travel-support" aria-labelledby="odc-travel-support-heading" className="space-y-5">
             <div className="flex flex-col gap-5 rounded-xl border border-firefly-200 bg-firefly-50 px-6 py-5 lg:flex-row lg:items-center lg:justify-between dark:border-firefly-800 dark:bg-firefly-950/40">
-                <div className="max-w-2xl space-y-1">
-                    <p className="text-xs font-medium text-firefly-700 dark:text-firefly-300">Ocean Decade Conference (ODC)</p>
-                    <h2 id="odc-travel-support-heading" className="text-xl font-semibold text-firefly-800 dark:text-gray-100">
-                        ODC Travel Support
-                    </h2>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                        Browse the ODC travel support opportunities currently open, or post one your organisation offers.
-                    </p>
+                <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+                    <span className="shrink-0 dark:inline-flex dark:rounded-lg dark:bg-white dark:px-3 dark:py-2">
+                        <img
+                            src="/assets/img/logo-odc-conference.svg"
+                            alt="Ocean Decade Conference logo"
+                            width={137}
+                            height={80}
+                            className="h-20 w-auto"
+                        />
+                    </span>
+                    <div className="hidden w-px self-stretch bg-firefly-200 sm:block dark:bg-firefly-800" aria-hidden="true" />
+                    <div className="max-w-md space-y-1">
+                        <p className="text-xs font-medium text-firefly-700 dark:text-firefly-300">Ocean Decade Conference (ODC)</p>
+                        <h2 id="odc-travel-support-heading" className="text-xl font-semibold text-firefly-800 dark:text-gray-100">
+                            ODC Travel Support
+                        </h2>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                            Browse the ODC travel support opportunities currently open, or post one your organisation offers.
+                        </p>
+                    </div>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
                     {isSignedIn ? (
