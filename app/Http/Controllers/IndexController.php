@@ -25,13 +25,9 @@ class IndexController extends Controller
     {
         $recentOpportunities = $this->opportunityService->getRecentActiveOpportunities(200);
 
-        // ODC travel support rows are only for signed-in users: the list/show routes are
-        // auth-only and the home section merely blurs placeholders for guests.
-        $odcTravelSupport = $request->user()
-            ? $this->opportunityService
-                ->getActiveOpportunitiesByType(Type::ODC_TRAVEL_SUPPORT)
-                ->toResourceCollection(OpportunityResource::class)
-            : [];
+        $odcTravelSupport = $this->opportunityService
+            ->getActiveOpportunitiesByType(Type::ODC_TRAVEL_SUPPORT)
+            ->toResourceCollection(OpportunityResource::class);
 
         return Inertia::render('Index', [
             'title' => 'Welcome',

@@ -1,38 +1,12 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { Button } from '@ui/primitives/button';
-import { ArrowUpTrayIcon, ChevronRightIcon, ListBulletIcon, LockClosedIcon } from '@heroicons/react/16/solid';
+import { ArrowUpTrayIcon, ChevronRightIcon, ListBulletIcon } from '@heroicons/react/16/solid';
 import { Auth } from '@/types';
 import { Opportunity, OpportunityFormOptions } from '@features/opportunities/types';
 import { ODC_TRAVEL_SUPPORT_TYPE } from '../config/odc-travel-support-form-fields';
 import ODCTravelSupportList from './odc-travel-support-list';
 import ODCTravelSupportUploadDialog from './odc-travel-support-upload-dialog';
-
-/** Placeholder rows shown, blurred, to signed-out visitors. The backend never sends real rows to guests. */
-const PLACEHOLDER_OPPORTUNITIES: Opportunity[] = Array.from({ length: 4 }, (_, index) => ({
-    id: `placeholder-${index}`,
-    title: 'ODC travel support opportunity',
-    co_organizers: ['Organiser'],
-    type: { value: ODC_TRAVEL_SUPPORT_TYPE, label: 'ODC Travel Support' },
-    status: { value: 'active', label: 'Active' },
-    closing_date: new Date(Date.now() + (index + 1) * 12 * 24 * 60 * 60 * 1000).toISOString(),
-    coverage_activity: null,
-    implementation_location: [],
-    thematic_areas: [],
-    thematic_areas_other: '',
-    target_audience: [],
-    target_audience_other: '',
-    target_languages: [],
-    target_languages_other: '',
-    summary: '',
-    url: '',
-    apply_url: '',
-    created_at: '',
-    updated_at: '',
-    user_id: '',
-    can_edit: false,
-    key_words: [],
-}));
 
 interface ODCTravelSupportSectionProps {
     opportunities?: Opportunity[];
@@ -76,17 +50,10 @@ export default function ODCTravelSupportSection({ opportunities = [], formOption
                     </div>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-                    {isSignedIn ? (
-                        <Button href={listHref} color="firefly">
-                            <ListBulletIcon data-slot="icon" aria-hidden="true" />
-                            See active ODC travel support
-                        </Button>
-                    ) : (
-                        <Button color="firefly" disabled title="Sign in to see active ODC travel support">
-                            <LockClosedIcon data-slot="icon" aria-hidden="true" />
-                            See active ODC travel support
-                        </Button>
-                    )}
+                    <Button href={listHref} color="firefly">
+                        <ListBulletIcon data-slot="icon" aria-hidden="true" />
+                        See active ODC travel support
+                    </Button>
                     <Button outline onClick={() => setShowUploadDialog(true)}>
                         <ArrowUpTrayIcon data-slot="icon" aria-hidden="true" />
                         Upload an ODC travel support opportunity
@@ -99,25 +66,18 @@ export default function ODCTravelSupportSection({ opportunities = [], formOption
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Open ODC travel support opportunities, closing soonest first</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Only ODC travel support opportunities. Sorted by closing date.</p>
                 </div>
-                {isSignedIn ? (
-                    <Link
-                        href={listHref}
-                        className="inline-flex items-center gap-1 text-sm font-medium text-firefly-700 hover:underline dark:text-firefly-300"
-                    >
-                        View all ODC travel support
-                        <ChevronRightIcon className="size-4" aria-hidden="true" />
-                    </Link>
-                ) : (
-                    <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400">
-                        <LockClosedIcon className="size-4" aria-hidden="true" />
-                        Sign in to view
-                    </span>
-                )}
+                <Link
+                    href={listHref}
+                    className="inline-flex items-center gap-1 text-sm font-medium text-firefly-700 hover:underline dark:text-firefly-300"
+                >
+                    View all ODC travel support
+                    <ChevronRightIcon className="size-4" aria-hidden="true" />
+                </Link>
             </div>
 
             <ODCTravelSupportList
-                opportunities={isSignedIn ? openOpportunities : PLACEHOLDER_OPPORTUNITIES}
-                unlocked={isSignedIn}
+                opportunities={openOpportunities}
+                interactive={isSignedIn}
             />
 
             <ODCTravelSupportUploadDialog

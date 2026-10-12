@@ -53,10 +53,9 @@ class OpportunityResource extends JsonResource
             'created_at' => $opportunity->created_at,
             'updated_at' => $opportunity->updated_at,
             'key_words' => $opportunity->key_words,
-            // Relationships
-            'user' => $this->whenLoaded('user'),
         ];
         if ($request->user()) {
+            $baseData['user'] = $this->whenLoaded('user');
             $baseData['permissions'] = [
                 'can_view' => $request->user()?->can('view', [Opportunity::class, $opportunity]) ?? false,
                 'can_edit' => $request->user()?->can('update', [Opportunity::class, $opportunity]) ?? false,

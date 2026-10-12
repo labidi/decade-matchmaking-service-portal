@@ -11,7 +11,7 @@ import React, {useState} from "react";
 
 interface IndexPageProps {
     portalGuide?: PortalGuide | null;
-    /** Active ODC travel support opportunities, sorted by closing date. Provided by the backend to signed-in users only (issue #218). */
+    /** Active ODC travel support opportunities, sorted by closing date. Provided by the backend to everyone, including guests (issue #218). */
     odcTravelSupport?: Opportunity[];
     /** Select options for the ODC travel support upload form. Provided by the backend (issue #218). */
     formOptions?: OpportunityFormOptions;
