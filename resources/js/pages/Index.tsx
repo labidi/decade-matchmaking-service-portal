@@ -6,6 +6,7 @@ import { ODCTravelSupportSection } from "@features/odc-travel-support";
 import {PortalGuide} from '@/types';
 import { Opportunity, OpportunityFormOptions } from '@features/opportunities/types';
 import { OrganizationsDialog, IOCPlatformsDialog } from '@features/settings';
+import { Reveal } from '@shared/motion';
 import React, {useState} from "react";
 
 
@@ -25,16 +26,22 @@ export default function Index({portalGuide, odcTravelSupport, formOptions}: Read
         <FrontendLayout>
             <Head title="Welcome"/>
             <div className="space-y-9">
-                <ODCTravelSupportSection opportunities={odcTravelSupport} formOptions={formOptions} />
+                <Reveal>
+                    <ODCTravelSupportSection opportunities={odcTravelSupport} formOptions={formOptions} />
+                </Reveal>
 
                 {portalGuide && (
-                    <PortalGuideSection portalGuide={portalGuide}/>
+                    <Reveal>
+                        <PortalGuideSection portalGuide={portalGuide}/>
+                    </Reveal>
                 )}
 
-                <DirectorySection
-                    onShowOrganizations={() => setShowOrganizationsDialog(true)}
-                    onShowIOCPlatforms={() => setShowIOCPlatformsDialog(true)}
-                />
+                <Reveal>
+                    <DirectorySection
+                        onShowOrganizations={() => setShowOrganizationsDialog(true)}
+                        onShowIOCPlatforms={() => setShowIOCPlatformsDialog(true)}
+                    />
+                </Reveal>
             </div>
 
             <OrganizationsDialog

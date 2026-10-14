@@ -1,8 +1,12 @@
 import { Link } from '@inertiajs/react';
 import { Badge } from '@ui/primitives/badge';
 import { LockClosedIcon } from '@heroicons/react/20/solid';
+import { motion, useReducedMotion } from 'motion/react';
+import { springGentle } from '@shared/motion';
 import React from 'react';
 import clsx from 'clsx';
+
+const MotionLink = motion.create(Link);
 
 type ActionCardVariant = 'request' | 'opportunity' | 'neutral';
 
@@ -80,6 +84,12 @@ export default function ActionCard(props: ActionCardProps) {
     // Determine if this is a button or link variant
     const isButton = 'onClick' in props && props.onClick !== undefined;
     const styles = variantStyles[variant];
+    const reduceMotion = useReducedMotion();
+
+    // Spring-based hover/tap feedback, disabled when the user prefers reduced motion.
+    const hoverProps = reduceMotion
+        ? {}
+        : { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 }, transition: springGentle };
 
     const cardContent = (
         <div className="relative h-full p-6">
@@ -119,24 +129,23 @@ export default function ActionCard(props: ActionCardProps) {
     );
 
     const interactiveClasses = clsx(
-        'group relative overflow-hidden rounded-xl',
+        'group relative h-full overflow-hidden rounded-xl',
         'bg-gradient-to-br',
         styles.gradient,
         'shadow-sm hover:shadow-lg',
-        'transition-all duration-200',
+        // Ease colours + shadow via CSS; transform is owned by motion (whileHover/whileTap).
+        'transition-[color,background-color,box-shadow] duration-200',
         styles.hoverGradient,
-        'hover:scale-[1.02]',
         'focus:outline-none focus-visible:ring-2',
         styles.focusRing,
-        'focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900',
-        'active:scale-[0.98]'
+        'focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900'
     );
 
     if (disabled) {
         return (
             <div
                 className={clsx(
-                    'relative overflow-hidden rounded-xl',
+                    'relative h-full overflow-hidden rounded-xl',
                     'bg-gradient-to-br',
                     styles.gradient,
                     'shadow-sm',
@@ -152,24 +161,26 @@ export default function ActionCard(props: ActionCardProps) {
     // Button variant - for onClick handlers (e.g., opening dialogs)
     if (isButton) {
         return (
-            <button
+            <motion.button
                 type="button"
                 onClick={props.onClick}
                 className={clsx(interactiveClasses, 'w-full text-left')}
+                {...hoverProps}
             >
                 {cardContent}
-            </button>
+            </motion.button>
         );
     }
 
     // Link variant - for navigation
     return (
-        <Link
+        <MotionLink
             href={props.href}
             className={clsx(interactiveClasses, 'block')}
+            {...hoverProps}
         >
             {cardContent}
-        </Link>
+        </MotionLink>
     );
 }
 

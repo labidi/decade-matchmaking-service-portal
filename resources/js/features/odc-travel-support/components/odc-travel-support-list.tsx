@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
+import { motion, useReducedMotion } from 'motion/react';
 import { Opportunity } from '@features/opportunities/types';
+import { staggerContainer, staggerItem } from '@shared/motion';
 import { formatDateShort } from '@shared/utils/date-formatter';
 import clsx from 'clsx';
 
@@ -31,7 +33,8 @@ const titleClasses =
 function ODCTravelSupportRow({
     opportunity,
     interactive,
-}: Readonly<{ opportunity: Opportunity; interactive: boolean }>) {
+    animate,
+}: Readonly<{ opportunity: Opportunity; interactive: boolean; animate: boolean }>) {
     const days = getDaysRemaining(opportunity.closing_date);
     const closingSoon = days >= 0 && days <= CLOSING_SOON_DAYS;
     const showHref = route('opportunity.show', opportunity.id);
@@ -47,8 +50,9 @@ function ODCTravelSupportRow({
     const chevronClasses =
         'inline-flex size-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-firefly-300 hover:text-firefly-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-firefly-500 dark:border-gray-700 dark:text-gray-400';
 
-    return (
-        <li className={clsx(gridClasses, 'border-b border-gray-100 py-3.5 last:border-b-0 dark:border-gray-700/60')}>
+    const rowClassName = clsx(gridClasses, 'border-b border-gray-100 py-3.5 last:border-b-0 dark:border-gray-700/60');
+    const rowContent = (
+        <>
             <div className="col-span-6 flex min-w-0 flex-col gap-0.5">{title}</div>
             <div className="col-span-3 truncate text-sm text-gray-700 dark:text-gray-300">{organiserLabel(opportunity)}</div>
             <div className="col-span-2 flex flex-col">
@@ -66,7 +70,17 @@ function ODCTravelSupportRow({
                     <span className="inline-flex size-8 rounded-lg border border-gray-200 dark:border-gray-700" />
                 )}
             </div>
-        </li>
+        </>
+    );
+
+    if (!animate) {
+        return <li className={rowClassName}>{rowContent}</li>;
+    }
+
+    return (
+        <motion.li className={rowClassName} variants={staggerItem}>
+            {rowContent}
+        </motion.li>
     );
 }
 
@@ -77,6 +91,9 @@ interface ODCTravelSupportListProps {
 }
 
 export default function ODCTravelSupportList({ opportunities, interactive }: Readonly<ODCTravelSupportListProps>) {
+    const reduceMotion = useReducedMotion();
+    const animate = !reduceMotion;
+
     if (opportunities.length === 0) {
         return (
             <div className="rounded-lg border border-dashed border-gray-300 px-6 py-10 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
@@ -93,15 +110,34 @@ export default function ODCTravelSupportList({ opportunities, interactive }: Rea
                 <div className="col-span-2">Closing date</div>
                 <div className="col-span-1" />
             </div>
-            <ul>
-                {opportunities.map(opportunity => (
-                    <ODCTravelSupportRow
-                        key={opportunity.id}
-                        opportunity={opportunity}
-                        interactive={interactive}
-                    />
-                ))}
-            </ul>
+            {animate ? (
+                <motion.ul
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-10%' }}
+                    variants={staggerContainer}
+                >
+                    {opportunities.map(opportunity => (
+                        <ODCTravelSupportRow
+                            key={opportunity.id}
+                            opportunity={opportunity}
+                            interactive={interactive}
+                            animate
+                        />
+                    ))}
+                </motion.ul>
+            ) : (
+                <ul>
+                    {opportunities.map(opportunity => (
+                        <ODCTravelSupportRow
+                            key={opportunity.id}
+                            opportunity={opportunity}
+                            interactive={interactive}
+                            animate={false}
+                        />
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }

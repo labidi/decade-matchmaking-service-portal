@@ -2,6 +2,7 @@ import { Heading } from '@ui/primitives/heading';
 import { Text } from '@ui/primitives/text';
 import React from 'react';
 import clsx from 'clsx';
+import { Stagger, StaggerItem } from '@shared/motion';
 import ActionCard, { ActionCardVariant } from './action-card';
 
 // Base data shared by all variants
@@ -70,11 +71,13 @@ export default function ActionSection({
             </div>
 
             {visibleCards.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
-                    {visibleCards.map((card, index) => (
-                        <ActionCard key={index} {...card} />
+                <Stagger className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
+                    {visibleCards.map((card) => (
+                        <StaggerItem key={card.title} className="h-full">
+                            <ActionCard {...card} />
+                        </StaggerItem>
                     ))}
-                </div>
+                </Stagger>
             ) : (
                 <div className="text-center py-12 px-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
                     <Text className="text-gray-600 dark:text-gray-400">

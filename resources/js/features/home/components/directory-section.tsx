@@ -1,5 +1,6 @@
 import { BuildingOffice2Icon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import { ChevronRightIcon } from '@heroicons/react/16/solid';
+import { Stagger, StaggerItem } from '@shared/motion';
 import React from 'react';
 
 interface DirectoryCardProps {
@@ -16,7 +17,7 @@ function DirectoryCard({ title, description, icon: Icon, onClick, id }: Readonly
             type="button"
             id={id}
             onClick={onClick}
-            className="group flex w-full flex-col gap-3 rounded-xl border border-gray-200 bg-white p-6 text-left transition-colors hover:border-firefly-300 hover:bg-firefly-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-firefly-500 focus-visible:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-firefly-700 dark:hover:bg-gray-700/60 dark:focus-visible:ring-offset-gray-900"
+            className="group flex h-full w-full flex-col gap-3 rounded-xl border border-gray-200 bg-white p-6 text-left transition-colors hover:border-firefly-300 hover:bg-firefly-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-firefly-500 focus-visible:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-firefly-700 dark:hover:bg-gray-700/60 dark:focus-visible:ring-offset-gray-900"
         >
             <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-firefly-900 text-white dark:bg-firefly-700">
                 <Icon className="h-5 w-5" aria-hidden="true" data-slot="icon" />
@@ -51,21 +52,25 @@ export default function DirectorySection({
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Two directories, open to everyone.</p>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <DirectoryCard
-                    title="CDF partners"
-                    description="Organisations supporting capacity development through the Ocean Connector."
-                    icon={BuildingOffice2Icon}
-                    onClick={onShowOrganizations}
-                />
-                <DirectoryCard
-                    id="iocplatform"
-                    title="IOC platforms"
-                    description="Directory of IOC platforms supporting capacity development in ocean science."
-                    icon={GlobeAltIcon}
-                    onClick={onShowIOCPlatforms}
-                />
-            </div>
+            <Stagger className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <StaggerItem className="h-full">
+                    <DirectoryCard
+                        title="CDF partners"
+                        description="Organisations supporting capacity development through the Ocean Connector."
+                        icon={BuildingOffice2Icon}
+                        onClick={onShowOrganizations}
+                    />
+                </StaggerItem>
+                <StaggerItem className="h-full">
+                    <DirectoryCard
+                        id="iocplatform"
+                        title="IOC platforms"
+                        description="Directory of IOC platforms supporting capacity development in ocean science."
+                        icon={GlobeAltIcon}
+                        onClick={onShowIOCPlatforms}
+                    />
+                </StaggerItem>
+            </Stagger>
         </section>
     );
 }

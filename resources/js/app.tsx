@@ -4,6 +4,7 @@ import './bootstrap';
 import {createInertiaApp} from '@inertiajs/react';
 import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
 import {createRoot} from 'react-dom/client';
+import {MotionConfig} from 'motion/react';
 import {ConfirmationProvider} from '@ui/organisms/confirmation';
 import {initDarkMode} from '@shared/utils/darkMode';
 
@@ -22,9 +23,11 @@ createInertiaApp({
     setup({el, App, props}) {
         const root = createRoot(el);
         root.render(
-            <ConfirmationProvider>
-                <App {...props} />
-            </ConfirmationProvider>
+            <MotionConfig reducedMotion="user">
+                <ConfirmationProvider>
+                    <App {...props} />
+                </ConfirmationProvider>
+            </MotionConfig>
         );
     },
     progress: {

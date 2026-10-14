@@ -2,6 +2,7 @@ import React from 'react';
 import { Header, Footer } from '@layouts/components';
 import BannerSection from '@layouts/frontend-layout/banner-section';
 import { usePage } from '@inertiajs/react';
+import { PageTransition } from '@shared/motion';
 import { FlashMessages, ActionsBar } from '@ui/organisms';
 import { ActionButton } from '@/types';
 import type { Banner } from '@layouts/frontend-layout/banner-section';
@@ -11,8 +12,9 @@ interface FrontendLayoutProps {
 }
 
 const FrontendLayout: React.FC<FrontendLayoutProps> = ({ children }) => {
-    const actions = usePage().props?.actions as ActionButton[] | undefined;
-    const banner = usePage().props.banner as Banner | undefined;
+    const page = usePage();
+    const actions = page.props?.actions as ActionButton[] | undefined;
+    const banner = page.props.banner as Banner | undefined;
 
     // Determine if banner will be shown (has image)
     const hasBanner = Boolean(banner?.image);
@@ -34,9 +36,12 @@ const FrontendLayout: React.FC<FrontendLayoutProps> = ({ children }) => {
                 <div className="pt-4">
                     {actions && <ActionsBar actions={actions} />}
                 </div>
-                <div className="shadow rounded bg-white dark:bg-gray-800 p-4">
+                <PageTransition
+                    key={page.component}
+                    className="shadow rounded bg-white dark:bg-gray-800 p-4"
+                >
                     {children}
-                </div>
+                </PageTransition>
             </main>
             <Footer />
         </div>
