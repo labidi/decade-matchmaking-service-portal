@@ -174,7 +174,7 @@ export default function Show({ opportunity }: Readonly<ShowPageProps>) {
                             )}
                         </Section>
 
-                        <Section title="Organizers">
+                        <Section title={opportunity.type.value == 'odc-travel-support' ? "Sponsoring Organization" : "Organizers"}>
                             {organizers.length > 0 && <ChipList items={organizers} />}
                         </Section>
 
