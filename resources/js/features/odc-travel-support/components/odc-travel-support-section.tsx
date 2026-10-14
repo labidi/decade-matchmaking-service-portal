@@ -42,35 +42,35 @@ export default function ODCTravelSupportSection({ opportunities = [], formOption
                     <div className="max-w-md space-y-1">
                         <p className="text-xs font-medium text-firefly-700 dark:text-firefly-300">Ocean Decade Conference (ODC)</p>
                         <h2 id="odc-travel-support-heading" className="text-xl font-semibold text-firefly-800 dark:text-gray-100">
-                            ODC Travel Support
+                            2027 ODC Travel Support
                         </h2>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                            Browse the ODC travel support opportunities currently open, or post one your organisation offers.
+                            Browse the 2027 ODC travel support opportunities currently open, or post one your organisation offers.
                         </p>
                     </div>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
                     <Button href={listHref} color="firefly">
                         <ListBulletIcon data-slot="icon" aria-hidden="true" />
-                        See active ODC travel support
+                        See active 2027 ODC travel support
                     </Button>
                     <Button outline onClick={() => setShowUploadDialog(true)}>
                         <ArrowUpTrayIcon data-slot="icon" aria-hidden="true" />
-                        Upload an ODC travel support opportunity
+                        Upload a 2027 ODC travel support opportunity
                     </Button>
                 </div>
             </div>
 
             <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                 <div>
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Open ODC travel support opportunities, closing soonest first</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Only ODC travel support opportunities. Sorted by closing date.</p>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Open 2027 ODC travel support opportunities, closing soonest first</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Only 2027 ODC travel support opportunities. Sorted by closing date.</p>
                 </div>
                 <Link
                     href={listHref}
                     className="inline-flex items-center gap-1 text-sm font-medium text-firefly-700 hover:underline dark:text-firefly-300"
                 >
-                    View all ODC travel support
+                    View all 2027 ODC travel support
                     <ChevronRightIcon className="size-4" aria-hidden="true" />
                 </Link>
             </div>

@@ -607,7 +607,7 @@ final class SampleDataSeeder extends Seeder
             OpportunityType::WEBINAR => "Webinar Series: {$topic}",
             OpportunityType::ACCESS_EQUIPMENT => "Equipment Loan Scheme: {$topic}",
             OpportunityType::CONFERENCE_FORUMS => "{$region} Forum on {$topic}",
-            OpportunityType::ODC_TRAVEL_SUPPORT => "ODC Travel Support: {$topic} ({$region})",
+            OpportunityType::ODC_TRAVEL_SUPPORT => "2027 ODC Travel Support: {$topic} ({$region})",
             OpportunityType::ONLINE_COURSES => "Online Course: {$topic}",
             OpportunityType::TECHNICAL_ASSISTANCE => "Technical Assistance on {$topic} ({$region})",
             default => sprintf('%s: %s (%s)', $type->label(), $topic, $region),

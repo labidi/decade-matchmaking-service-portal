@@ -20,9 +20,9 @@ export default function ODCTravelSupportUploadDialog({ open, onClose, formOption
             <div className="flex items-start justify-between gap-4">
                 <div>
                     <p className="text-xs font-medium text-firefly-700 dark:text-firefly-300">Ocean Decade Conference (ODC)</p>
-                    <DialogTitle>Upload an ODC travel support opportunity</DialogTitle>
+                    <DialogTitle>Upload a 2027 ODC travel support opportunity</DialogTitle>
                     <DialogDescription>
-                        The opportunity type is set to ODC Travel Support. Only the fields relevant to ODC travel support are shown.
+                        The opportunity type is set to 2027 ODC Travel Support. Only the fields relevant to 2027 ODC travel support are shown.
                     </DialogDescription>
                 </div>
                 <Button
@@ -41,7 +41,7 @@ export default function ODCTravelSupportUploadDialog({ open, onClose, formOption
                         <div className="flex items-center gap-3">
                             <LockClosedIcon className="size-4 shrink-0 text-gray-400" aria-hidden="true" />
                             <span className="text-gray-500 dark:text-gray-400">Type of opportunity</span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">ODC Travel Support</span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100">2027 ODC Travel Support</span>
                         </div>
                         {form.errors.type && (
                             <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{form.errors.type}</p>
@@ -61,7 +61,7 @@ export default function ODCTravelSupportUploadDialog({ open, onClose, formOption
                     ))}
 
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Thematic areas, coverage of activity, implementation location and language of participation are not asked for ODC travel support and are shown as N/A in the back office.
+                        Thematic areas, coverage of activity, implementation location and language of participation are not asked for 2027 ODC travel support and are shown as N/A in the back office.
                     </p>
                 </DialogBody>
 

@@ -48,7 +48,7 @@ enum Type: string
             self::MENTORSHIPS => 'Mentorships',
             self::VISITING_LECTURERS => 'Visiting Lecturers and Scholars Programmes',
             self::TRAVEL_GRANTS => 'Travel Grants',
-            self::ODC_TRAVEL_SUPPORT => 'ODC Travel Support',
+            self::ODC_TRAVEL_SUPPORT => '2027 ODC Travel Support',
             self::AWARDS => 'Awards',
             self::RESEARCH_FUNDING => 'Funding, Grants and Scholarships',
             self::ACCESS_INFRASTRUCTURE => 'Access to Infrastructure',

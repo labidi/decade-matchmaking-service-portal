@@ -80,7 +80,7 @@ export default function ODCTravelSupportList({ opportunities, interactive }: Rea
     if (opportunities.length === 0) {
         return (
             <div className="rounded-lg border border-dashed border-gray-300 px-6 py-10 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
-                No ODC travel support opportunities are open right now. Check back soon or upload one your organisation offers.
+                No 2027 ODC travel support opportunities are open right now. Check back soon or upload one your organisation offers.
             </div>
         );
     }

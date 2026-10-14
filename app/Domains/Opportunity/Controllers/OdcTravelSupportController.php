@@ -27,7 +27,7 @@ final class OdcTravelSupportController extends Controller
 
             return to_route('index')->with(
                 'success',
-                'ODC travel support opportunity submitted successfully. It will be reviewed before publication.'
+                '2027 ODC travel support opportunity submitted successfully. It will be reviewed before publication.'
             );
         } catch (Throwable $e) {
             return back()->with('error', 'An error occurred. Error message :'.$e->getMessage());

@@ -24,7 +24,7 @@ const FIELD_LABEL_OVERRIDES: Record<string, Partial<UIField>> = {
     title: { label: 'Opportunity title' },
     closing_date: { label: 'Application closing date' },
     summary: {
-        label: 'Summary of the ODC travel support',
+        label: 'Summary of the 2027 ODC travel support',
         placeholder: 'What the support covers, who is eligible and how to apply.',
     },
 };
