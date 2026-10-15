@@ -19,11 +19,8 @@ export default function ODCTravelSupportUploadDialog({ open, onClose, formOption
         <Dialog size="3xl" open={open} onClose={onClose} closeOnBackdropClick={false}>
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <p className="text-xs font-medium text-firefly-700 dark:text-firefly-300">Ocean Decade Conference (ODC)</p>
+                    <p className="text-xs font-medium text-firefly-700 dark:text-firefly-300">2027 Ocean Decade Conference (ODC)</p>
                     <DialogTitle>Upload a 2027 ODC travel support opportunity</DialogTitle>
-                    <DialogDescription>
-                        The opportunity type is set to 2027 ODC Travel Support. Only the fields relevant to 2027 ODC travel support are shown.
-                    </DialogDescription>
                 </div>
                 <Button
                     plain
@@ -59,10 +56,6 @@ export default function ODCTravelSupportUploadDialog({ open, onClose, formOption
                             formData={form.data}
                         />
                     ))}
-
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Thematic areas, coverage of activity, implementation location and language of participation are not asked for 2027 ODC travel support and are shown as N/A in the back office.
-                    </p>
                 </DialogBody>
 
                 <DialogActions className="items-center justify-between">

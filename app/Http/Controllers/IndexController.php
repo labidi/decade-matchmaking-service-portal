@@ -55,7 +55,7 @@ class IndexController extends Controller
             'recentOpportunities' => $recentOpportunities->toResourceCollection(OpportunityResource::class),
             'odcTravelSupport' => $odcTravelSupport,
             'formOptions' => [
-                'target_audience' => TargetAudience::getOptions(),
+                'target_audience' => TargetAudience::getOdcTravelSupportOptions(),
             ],
         ]);
     }

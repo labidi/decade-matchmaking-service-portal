@@ -20,13 +20,14 @@ export const ODC_TRAVEL_SUPPORT_EXCLUDED_FIELDS: readonly string[] = [
     'target_languages_other',
 ];
 
-const FIELD_LABEL_OVERRIDES: Record<string, Partial<UIField>> = {
+const FIELD_OVERRIDES: Record<string, Partial<UIField>> = {
     title: { label: 'Opportunity title' },
     closing_date: { label: 'Application closing date' },
     summary: {
         label: 'Summary of the 2027 ODC travel support',
         placeholder: 'What the support covers, who is eligible and how to apply.',
     },
+    target_audience: { type: 'checkbox-group' },
 };
 
 /**
@@ -35,4 +36,4 @@ const FIELD_LABEL_OVERRIDES: Record<string, Partial<UIField>> = {
  */
 export const odcTravelSupportFormFields: UIField[] = Object.entries(opportunityFormFields[0].fields)
     .filter(([key]) => !ODC_TRAVEL_SUPPORT_EXCLUDED_FIELDS.includes(key))
-    .map(([key, field]) => ({ ...field, ...FIELD_LABEL_OVERRIDES[key] }));
+    .map(([key, field]) => ({ ...field, ...FIELD_OVERRIDES[key] }));

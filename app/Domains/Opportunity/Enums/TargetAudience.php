@@ -45,11 +45,32 @@ enum TargetAudience: string
         };
     }
 
+    /**
+     * Audiences offered on the 2027 ODC Travel Support upload form.
+     *
+     * @var list<self>
+     */
+    public const ODC_TRAVEL_SUPPORT = [
+        self::SMALL_ISLAND_DEVELOPING_STATES,
+        self::LEAST_DEVELOPING_COUNTRIES,
+        self::EARLY_CAREER_OCEAN_PROFESSIONALS,
+        self::YOUTH,
+        self::OTHER
+    ];
+
     public static function getOptions(): array
     {
         return array_map(
             fn ($case) => ['value' => $case->value, 'label' => $case->label()],
             self::cases()
+        );
+    }
+
+    public static function getOdcTravelSupportOptions(): array
+    {
+        return array_map(
+            fn (self $case) => ['value' => $case->value, 'label' => $case->label()],
+            self::ODC_TRAVEL_SUPPORT
         );
     }
 

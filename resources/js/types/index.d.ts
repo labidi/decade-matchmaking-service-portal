@@ -30,13 +30,18 @@ export interface UIStep {
     fields: Record<string, UIField>;
 }
 
+export interface OptionDetail {
+    description: string;
+    htmlContent?: string;
+}
+
 export interface UIField {
     id: string;
     type: string;
     label?: string;
     description?: string;
     placeholder?: string;
-    options?: { value: string | number; label: string }[];
+    options?: { value: string | number; label: string; detail?: OptionDetail }[];
     required?: boolean;
     show?: (data: any) => boolean;  // Remove RequestForm dependency
     multiple?: boolean;

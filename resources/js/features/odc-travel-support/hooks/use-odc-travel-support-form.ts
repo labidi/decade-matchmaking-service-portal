@@ -1,7 +1,9 @@
 import { useForm } from '@inertiajs/react';
 import { useMemo } from 'react';
+import { OptionDetail } from '@/types';
 import { OpportunityFormOptions } from '@features/opportunities/types';
 import { ODC_TRAVEL_SUPPORT_TYPE, odcTravelSupportFormFields } from '../config/odc-travel-support-form-fields';
+import { TARGET_AUDIENCE_DETAILS } from '../config/target-audience-details';
 
 export type ODCTravelSupportFormData = {
     co_organizers: string[];
@@ -33,8 +35,11 @@ export function useODCTravelSupportForm({ formOptions, onSuccess }: UseODCTravel
         key_words: [],
     });
 
-    const optionsByField = useMemo<Record<string, { value: string; label: string }[]>>(() => ({
-        target_audience: formOptions?.target_audience ?? [],
+    const optionsByField = useMemo<Record<string, { value: string | number; label: string; detail?: OptionDetail }[]>>(() => ({
+        target_audience: (formOptions?.target_audience ?? []).map(option => ({
+            ...option,
+            detail: TARGET_AUDIENCE_DETAILS[String(option.value)],
+        })),
     }), [formOptions]);
 
     const fields = useMemo(

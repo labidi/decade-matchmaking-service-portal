@@ -1,16 +1,15 @@
 import React, {useMemo, useCallback} from 'react';
 import {UIField} from '@/types';
-import {Field, Label, Description, ErrorMessage, Fieldset, Legend} from '@ui/primitives/fieldset';
+import {Field, Label, Description, ErrorMessage} from '@ui/primitives/fieldset';
 import {Input} from '@ui/primitives/input';
 import {Textarea} from '@ui/primitives/textarea';
 import {RadioGroup, RadioField, Radio} from '@ui/primitives/radio';
-import {CheckboxGroup, CheckboxField, Checkbox} from '@ui/primitives/checkbox';
-import {Text} from '@ui/primitives/text'
 import CSVUpload from './csv-upload';
 import SelectField from './SelectField';
 import MultiSelectField from './MultiSelectField';
 import KeywordsField from './KeywordsField';
 import RankedChallengeField from './RankedChallengeField';
+import CheckboxGroupField from './CheckboxGroupField';
 
 interface FieldRendererProps {
     name: string;
@@ -122,16 +121,6 @@ export default function FieldRenderer({
             </Field>
         );
     }
-
-
-    const handleCheckboxChange = (optionValue: string) => {
-        const arr = Array.isArray(value) ? [...value] : [];
-        if (arr.includes(optionValue)) {
-            onChange(name, arr.filter((i: string) => i !== optionValue));
-        } else {
-            onChange(name, [...arr, optionValue]);
-        }
-    };
 
 
     if (field.show && !field.show(formData)) {
@@ -352,31 +341,14 @@ export default function FieldRenderer({
             );
         case 'checkbox-group':
             return (
-                <Fieldset key={name} className="mt-8">
-                    {field.label && <Legend className="capitalize">{field.label}</Legend>}
-                    {field.image && (
-                        <div className="w-full">
-                            <img src={field.image} alt="Logo" className="object-cover"/>
-                        </div>
-                    )}
-                    {field.description && <Text>{field.description}</Text>}
-                    <CheckboxGroup className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                        {field.options?.map(opt => (
-                            <CheckboxField key={opt.value}>
-                                <Checkbox
-                                    checked={Array.isArray(value) ? value.includes(opt.value) : false}
-                                    onChange={() => handleCheckboxChange(String(opt.value))}
-                                />
-                                <Label>{opt.label}</Label>
-                            </CheckboxField>
-                        ))}
-                    </CheckboxGroup>
-                    {error && (
-                        <Field>
-                            <ErrorMessage>{error}</ErrorMessage>
-                        </Field>
-                    )}
-                </Fieldset>
+                <CheckboxGroupField
+                    key={name}
+                    name={name}
+                    field={field}
+                    value={value}
+                    error={error}
+                    onChange={onChange}
+                />
             );
         case 'csv-upload':
             return (
