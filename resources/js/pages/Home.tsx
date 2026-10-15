@@ -15,13 +15,19 @@ import {
 import { CardGuide } from '@features/home';
 import WelcomeSection from '@features/home/components/welcome-section';
 import ActionSection, { ActionCardData } from '@features/home/components/action-section';
+import {Reveal} from "@shared/motion";
+import {ODCTravelSupportSection} from "@features/odc-travel-support";
+import React from "react";
+import {Opportunity, OpportunityFormOptions} from "@features/opportunities";
 
 type HomePageProps = {
     userGuide?: string;
     partnerGuide?: string;
+    odcTravelSupport?: Opportunity[];
+    formOptions?: OpportunityFormOptions;
 }
 
-export default function Home({ userGuide, partnerGuide }: Readonly<HomePageProps>) {
+export default function Home({ userGuide, partnerGuide, odcTravelSupport, formOptions}: Readonly<HomePageProps>) {
     const { auth } = usePage<{ auth: Auth }>().props;
 
     // Helper function to check if user has access (either is_user or is_partner)
@@ -114,7 +120,9 @@ export default function Home({ userGuide, partnerGuide }: Readonly<HomePageProps
 
             <div className="space-y-10">
                 <WelcomeSection user={auth.user} />
-
+                <Reveal>
+                    <ODCTravelSupportSection opportunities={odcTravelSupport} formOptions={formOptions} />
+                </Reveal>
                 {/* Getting Started Guides */}
                 {hasGuides && (
                     <section className="space-y-6">
