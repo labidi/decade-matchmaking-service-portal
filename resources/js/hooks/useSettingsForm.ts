@@ -14,6 +14,7 @@ export function useSettingsForm({settings, isEditing = false}: UseSettingsFormPr
         site_name: '',
         site_description: '',
         homepage_youtube_video: '',
+        show_odc_travel_support_section: '1',
         organizations_csv: null,
         portal_guide: '',
         user_guide: '',

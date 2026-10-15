@@ -16,9 +16,11 @@ interface IndexPageProps {
     odcTravelSupport?: Opportunity[];
     /** Select options for the ODC travel support upload form. Provided by the backend (issue #218). */
     formOptions?: OpportunityFormOptions;
+    /** Whether the ODC travel support section is enabled in portal settings. Defaults to shown. */
+    showOdcTravelSupport?: boolean;
 }
 
-export default function Index({portalGuide, odcTravelSupport, formOptions}: Readonly<IndexPageProps>) {
+export default function Index({portalGuide, odcTravelSupport, formOptions, showOdcTravelSupport = true}: Readonly<IndexPageProps>) {
     const [showOrganizationsDialog, setShowOrganizationsDialog] = useState(false);
     const [showIOCPlatformsDialog, setShowIOCPlatformsDialog] = useState(false);
 
@@ -26,9 +28,11 @@ export default function Index({portalGuide, odcTravelSupport, formOptions}: Read
         <FrontendLayout>
             <Head title="Welcome"/>
             <div className="space-y-9">
-                <Reveal>
-                    <ODCTravelSupportSection opportunities={odcTravelSupport} formOptions={formOptions} />
-                </Reveal>
+                {showOdcTravelSupport && (
+                    <Reveal>
+                        <ODCTravelSupportSection opportunities={odcTravelSupport} formOptions={formOptions} />
+                    </Reveal>
+                )}
 
                 {portalGuide && (
                     <Reveal>

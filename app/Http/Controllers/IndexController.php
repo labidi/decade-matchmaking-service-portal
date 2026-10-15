@@ -25,9 +25,17 @@ class IndexController extends Controller
     {
         $recentOpportunities = $this->opportunityService->getRecentActiveOpportunities(200);
 
-        $odcTravelSupport = $this->opportunityService
-            ->getActiveOpportunitiesByType(Type::ODC_TRAVEL_SUPPORT)
-            ->toResourceCollection(OpportunityResource::class);
+        $showOdcTravelSupport = filter_var(
+            $this->settingsService->getSetting(Setting::SHOW_ODC_TRAVEL_SUPPORT_SECTION, true),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        // Only fetch and serialize the ODC travel support data when the section is shown.
+        $odcTravelSupport = $showOdcTravelSupport
+            ? $this->opportunityService
+                ->getActiveOpportunitiesByType(Type::ODC_TRAVEL_SUPPORT)
+                ->toResourceCollection(OpportunityResource::class)
+            : [];
 
         return Inertia::render('Index', [
             'title' => 'Welcome',
@@ -54,6 +62,7 @@ class IndexController extends Controller
             ],
             'recentOpportunities' => $recentOpportunities->toResourceCollection(OpportunityResource::class),
             'odcTravelSupport' => $odcTravelSupport,
+            'showOdcTravelSupport' => $showOdcTravelSupport,
             'formOptions' => [
                 'target_audience' => TargetAudience::getOdcTravelSupportOptions(),
             ],

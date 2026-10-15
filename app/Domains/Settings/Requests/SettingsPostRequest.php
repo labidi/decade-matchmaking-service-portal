@@ -49,6 +49,7 @@ class SettingsPostRequest extends FormRequest
             Setting::SITE_NAME => ['nullable', 'string', 'max:255'],
             Setting::SITE_DESCRIPTION => ['nullable', 'string', 'max:1000'],
             Setting::HOMEPAGE_YOUTUBE_VIDEO => ['nullable', 'string', 'max:500'],
+            Setting::SHOW_ODC_TRAVEL_SUPPORT_SECTION => ['nullable', 'in:0,1'],
 
             // Metric settings (integers)
             Setting::SUCCESSFUL_MATCHES_METRIC => ['nullable', 'integer', 'min:0'],
@@ -91,6 +92,7 @@ class SettingsPostRequest extends FormRequest
             'site_name' => 'site name',
             'site_description' => 'site description',
             'homepage_youtube_video' => 'YouTube video URL',
+            'show_odc_travel_support_section' => 'ODC travel support section visibility',
             'successful_matches_metric' => 'successful matches',
             'committed_funding_metric' => 'committed funding',
             'fully_closed_matches_metric' => 'fully closed matches',

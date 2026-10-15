@@ -16,10 +16,16 @@ class HomeController extends Controller
     ): \Inertia\Response {
         $user = $request->user();
 
+        $showOdcTravelSupport = filter_var(
+            $this->settingsService->getSetting(Setting::SHOW_ODC_TRAVEL_SUPPORT_SECTION, true),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
         return Inertia::render('Home', [
             'title' => 'Welcome '.$user->name,
             'userGuide' => $this->settingsService->getSetting(Setting::USER_GUIDE),
             'partnerGuide' => $this->settingsService->getSetting(Setting::PARTNER_GUIDE),
+            'showOdcTravelSupport' => $showOdcTravelSupport,
             'banner' => [
                 'title' => 'Welcome back '.$user->name,
                 'description' => 'The Ocean Decade Capacity Development Platform',

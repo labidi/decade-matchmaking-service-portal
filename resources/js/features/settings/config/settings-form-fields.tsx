@@ -25,6 +25,17 @@ export const settingsFormFields: UIStep[] = [
                 required: false,
                 label: 'Homepage YouTube Video',
                 placeholder: 'Enter the YouTube video URL for the homepage',
+            },
+            show_odc_travel_support_section: {
+                id: 'show_odc_travel_support_section',
+                type: 'radio',
+                required: false,
+                label: '2027 ODC Travel Support Section',
+                description: 'Show or hide the 2027 ODC Travel Support section on the landing and home pages.',
+                options: [
+                    { value: '1', label: 'Show' },
+                    { value: '0', label: 'Hide' },
+                ],
             }
         }
     },

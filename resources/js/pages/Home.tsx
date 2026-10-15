@@ -25,9 +25,11 @@ type HomePageProps = {
     partnerGuide?: string;
     odcTravelSupport?: Opportunity[];
     formOptions?: OpportunityFormOptions;
+    /** Whether the ODC travel support section is enabled in portal settings. Defaults to shown. */
+    showOdcTravelSupport?: boolean;
 }
 
-export default function Home({ userGuide, partnerGuide, odcTravelSupport, formOptions}: Readonly<HomePageProps>) {
+export default function Home({ userGuide, partnerGuide, odcTravelSupport, formOptions, showOdcTravelSupport = true}: Readonly<HomePageProps>) {
     const { auth } = usePage<{ auth: Auth }>().props;
 
     // Helper function to check if user has access (either is_user or is_partner)
@@ -120,9 +122,11 @@ export default function Home({ userGuide, partnerGuide, odcTravelSupport, formOp
 
             <div className="space-y-10">
                 <WelcomeSection user={auth.user} />
-                <Reveal>
-                    <ODCTravelSupportSection opportunities={odcTravelSupport} formOptions={formOptions} />
-                </Reveal>
+                {showOdcTravelSupport && (
+                    <Reveal>
+                        <ODCTravelSupportSection opportunities={odcTravelSupport} formOptions={formOptions} />
+                    </Reveal>
+                )}
                 {/* Getting Started Guides */}
                 {hasGuides && (
                     <section className="space-y-6">

@@ -17,6 +17,8 @@ class Setting extends Model
 
     public const HOMEPAGE_YOUTUBE_VIDEO = 'homepage_youtube_video';
 
+    public const SHOW_ODC_TRAVEL_SUPPORT_SECTION = 'show_odc_travel_support_section';
+
     public const PORTAL_GUIDE = 'portal_guide';
 
     public const USER_GUIDE = 'user_guide';
@@ -57,6 +59,7 @@ class Setting extends Model
         self::SITE_NAME,
         self::SITE_DESCRIPTION,
         self::HOMEPAGE_YOUTUBE_VIDEO,
+        self::SHOW_ODC_TRAVEL_SUPPORT_SECTION,
         self::PORTAL_GUIDE,
         self::USER_GUIDE,
         self::PARTNER_GUIDE,

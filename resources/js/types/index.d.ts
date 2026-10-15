@@ -215,6 +215,7 @@ export interface Settings {
     site_favicon: string;
     contact_email: string;
     homepage_youtube_video: string;
+    show_odc_travel_support_section: string;
     portal_guide: string;
     user_guide: string;
     partner_guide: string;
