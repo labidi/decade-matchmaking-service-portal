@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Shared\Enums;
+namespace App\Domains\Request\Enums;
 
 enum TargetAudience: string
 {

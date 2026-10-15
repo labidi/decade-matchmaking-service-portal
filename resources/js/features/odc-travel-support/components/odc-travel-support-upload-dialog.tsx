@@ -4,7 +4,7 @@ import { Button } from '@ui/primitives/button';
 import { FieldRenderer } from '@ui/organisms/forms';
 import { XMarkIcon, LockClosedIcon } from '@heroicons/react/20/solid';
 import { OpportunityFormOptions } from '@features/opportunities/types';
-import { useODCTravelSupportForm } from '../hooks/use-odc-travel-support-form';
+import { useODCTravelSupportForm } from '@features/odc-travel-support';
 
 interface ODCTravelSupportUploadDialogProps {
     open: boolean;

@@ -3,6 +3,7 @@
 namespace App\Domains\Opportunity\Controllers;
 
 use App\Domains\Opportunity\Enums\CoverageActivity;
+use App\Domains\Opportunity\Enums\TargetAudience;
 use App\Domains\Opportunity\Enums\ThematicAreas;
 use App\Domains\Opportunity\Enums\Type;
 use App\Domains\Opportunity\Models\Opportunity;
@@ -13,7 +14,6 @@ use App\Shared\Enums\Country;
 use App\Shared\Enums\Language;
 use App\Shared\Enums\Ocean;
 use App\Shared\Enums\Region;
-use App\Shared\Enums\TargetAudience;
 use App\Shared\Enums\YesNo;
 use Inertia\Inertia;
 use Inertia\Response;

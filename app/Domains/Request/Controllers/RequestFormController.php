@@ -14,7 +14,7 @@ use App\Domains\Request\Services\RequestContextService;
 use App\Domains\Request\Services\RequestService;
 use App\Shared\Enums\Country;
 use App\Shared\Enums\Language;
-use App\Shared\Enums\TargetAudience;
+use App\Domains\Request\Enums\TargetAudience;
 use App\Shared\Enums\YesNo;
 use App\Shared\Http\HasPageActions;
 use Exception;

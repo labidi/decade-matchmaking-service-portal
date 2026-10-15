@@ -10,6 +10,7 @@ use App\Domains\Offer\Enums\RequestOfferStatus;
 use App\Domains\Offer\Models\Offer;
 use App\Domains\Opportunity\Enums\CoverageActivity;
 use App\Domains\Opportunity\Enums\Status as OpportunityStatus;
+use App\Domains\Opportunity\Enums\TargetAudience as OpportunityTargetAudience;
 use App\Domains\Opportunity\Enums\ThematicAreas;
 use App\Domains\Opportunity\Enums\Type as OpportunityType;
 use App\Domains\Opportunity\Models\Opportunity;
@@ -18,6 +19,7 @@ use App\Domains\Request\Enums\DeliveryFormat;
 use App\Domains\Request\Enums\ProjectStage;
 use App\Domains\Request\Enums\RelatedActivity;
 use App\Domains\Request\Enums\SupportType;
+use App\Domains\Request\Enums\TargetAudience as RequestTargetAudience;
 use App\Domains\Request\Models\Detail;
 use App\Domains\Request\Models\Request as OCDRequest;
 use App\Domains\Request\Models\Status as RequestStatus;
@@ -26,7 +28,6 @@ use App\Shared\Enums\Country;
 use App\Shared\Enums\Language;
 use App\Shared\Enums\Ocean;
 use App\Shared\Enums\Region;
-use App\Shared\Enums\TargetAudience;
 use App\Shared\Enums\YesNo;
 use Carbon\CarbonImmutable;
 use Faker\Generator as Faker;
@@ -537,7 +538,7 @@ final class SampleDataSeeder extends Seeder
                     : $this->faker->dateTimeBetween('+1 week', '+6 months');
 
                 $thematicAreas = $this->pickValues(ThematicAreas::cases(), 1, 3);
-                $audiences = $this->pickValues(TargetAudience::cases(), 1, 3);
+                $audiences = $this->pickValues(OpportunityTargetAudience::cases(), 1, 3);
                 $languages = $this->pickValues(Language::cases(), 1, 2);
 
                 $opportunity = new Opportunity([
@@ -551,7 +552,7 @@ final class SampleDataSeeder extends Seeder
                     'thematic_areas' => $thematicAreas,
                     'thematic_areas_other' => in_array(ThematicAreas::OTHER->value, $thematicAreas, true) ? $this->faker->words(3, true) : null,
                     'target_audience' => $audiences,
-                    'target_audience_other' => in_array(TargetAudience::OTHER->value, $audiences, true) ? $this->faker->jobTitle() : null,
+                    'target_audience_other' => in_array(OpportunityTargetAudience::OTHER->value, $audiences, true) ? $this->faker->jobTitle() : null,
                     'target_languages' => $languages,
                     'target_languages_other' => in_array(Language::OTHER->value, $languages, true) ? $this->faker->word() : null,
                     'summary' => $this->faker->paragraphs(2, true),
@@ -766,7 +767,7 @@ final class SampleDataSeeder extends Seeder
         $needsFunding = $this->faker->boolean(70);
 
         $supportTypes = $this->pickValues(SupportType::cases(), 1, 2);
-        $audiences = $this->pickValues(TargetAudience::cases(), 1, 3);
+        $audiences = $this->pickValues(RequestTargetAudience::cases(), 1, 3);
         $languages = $this->pickValues(Language::cases(), 1, 2);
 
         return [
@@ -786,7 +787,7 @@ final class SampleDataSeeder extends Seeder
             'support_types' => $supportTypes,
             'support_types_other' => in_array(SupportType::OTHER->value, $supportTypes, true) ? $this->faker->sentence(4) : null,
             'target_audience' => $audiences,
-            'target_audience_other' => in_array(TargetAudience::OTHER->value, $audiences, true) ? $this->faker->jobTitle() : null,
+            'target_audience_other' => in_array(RequestTargetAudience::OTHER->value, $audiences, true) ? $this->faker->jobTitle() : null,
             'target_languages' => $languages,
             'target_languages_other' => in_array(Language::OTHER->value, $languages, true) ? $this->faker->word() : null,
             'gap_description' => $this->faker->paragraph(4),

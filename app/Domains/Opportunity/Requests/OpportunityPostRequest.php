@@ -2,10 +2,10 @@
 
 namespace App\Domains\Opportunity\Requests;
 
+use App\Domains\Opportunity\Enums\TargetAudience;
 use App\Domains\Opportunity\Enums\ThematicAreas;
 use App\Domains\Opportunity\Enums\Type;
 use App\Shared\Enums\Language;
-use App\Shared\Enums\TargetAudience;
 use App\Shared\Support\UrlNormalizer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

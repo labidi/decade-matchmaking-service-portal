@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Opportunity\Enums\TargetAudience;
 use App\Domains\Opportunity\Enums\Type;
 use App\Domains\Opportunity\Resources\OpportunityResource;
 use App\Domains\Opportunity\Services\OpportunityService;
 use App\Domains\Settings\Models\Setting;
 use App\Domains\Settings\Services\SettingsService;
-use App\Shared\Enums\TargetAudience;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

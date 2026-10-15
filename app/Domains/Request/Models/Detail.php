@@ -4,9 +4,9 @@ namespace App\Domains\Request\Models;
 
 use App\Domains\Request\Enums\SubTheme;
 use App\Domains\Request\Enums\SupportType;
+use App\Domains\Request\Enums\TargetAudience;
 use App\Shared\Enums\Country;
 use App\Shared\Enums\Language;
-use App\Shared\Enums\TargetAudience;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
